@@ -1,0 +1,18 @@
+Package: autoparallel
+Version: 0.0.1
+Date: 2017-06-12
+Title: Automatically Parallelize R Apply Functions
+Authors@R: person("Clark", "Fitzgerald", role = c("aut", "cre"),
+                     email = "clarkfitzg@gmail.com")
+Author: Clark Fitzgerald [aut, cre]
+Maintainer: Clark Fitzgerald <clarkfitzg@gmail.com>
+Depends: R (>= 3.1.0)
+Imports: parallel, CodeDepends
+Suggests: roxygen2,
+    testthat
+Description: Examines R code and attempts to automatically generate a
+    parallel version.
+License: MIT
+URL: https://github.com/clarkfitzg/autoparallel
+BugReports: https://github.com/clarkfitzg/autoparallel
+RoxygenNote: 6.0.1
