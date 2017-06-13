@@ -1,9 +1,12 @@
+#' @importFrom microbenchmark microbenchmark
+NULL
+
 
 #' Adapted from Hadley Wickham's pryr / Advanced R
-sub_one = function(expr, env)
+sub_one = function(statement, env)
 {
-    stopifnot(is.language(expr))
-    call <- substitute(substitute(expr, env), list(expr = expr))
+    stopifnot(is.language(statement))
+    call <- substitute(substitute(statement, env), list(statement = statement))
     eval(call)
 }
 

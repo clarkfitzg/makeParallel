@@ -4,10 +4,10 @@
 \alias{apply_parallel}
 \title{Convert \code{apply} To Parallel}
 \usage{
-apply_parallel(expr)
+apply_parallel(statement)
 }
 \arguments{
-\item{expression}{\code{apply()} function call}
+\item{statement}{\code{apply()} function call}
 }
 \value{
 modified parallel code

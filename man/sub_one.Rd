@@ -4,7 +4,7 @@
 \alias{sub_one}
 \title{Adapted from Hadley Wickham's pryr / Advanced R}
 \usage{
-sub_one(expr, env)
+sub_one(statement, env)
 }
 \description{
 Adapted from Hadley Wickham's pryr / Advanced R

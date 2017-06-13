@@ -24,13 +24,13 @@ apply_column_chunk = function(expr)
 #' Transform a single
 #' \code{apply()} function call into a parallel version using mclapply
 #'
-#' @param expression \code{apply()} function call
+#' @param statement \code{apply()} function call
 #' @return modified parallel code
 #' @export
-apply_parallel = function(expr)
+apply_parallel = function(statement)
 {
 
-    if(expr[[3]] != 2)
+    if(statement[[3]] != 2)
        stop("Only considering explicit MARGIN = 2 at the moment")
 
     template = parse(text = "
@@ -45,11 +45,56 @@ apply_parallel = function(expr)
         unlist(parts)
     ")
 
-    sub_expr(template, list(X = expr[[2]]
-                            , APPLY_COLUMN_CHUNK = apply_column_chunk(expr)
+    sub_expr(template, list(X = statement[[2]]
+                            , APPLY_COLUMN_CHUNK = apply_column_chunk(statement)
                             , NWORKERS = nworkers()
                             ))
 }
+
+
+#' Run Benchmark To Find Efficient Parallel Code
+#'
+#' One doesn't know ahead of time if it will be more efficient to run code
+#' in serial or in parallel. This function runs the code in both serial and
+#' parallel, then returns the faster version based on the median timing.
+#'
+#' It may be nice to return more, or log the profiling
+#'
+#' @param statement a single R statment
+#' @param times the number of times to run the benchmark
+#' @return statement potentially in parallel
+#' @export
+benchmark_parallel = function(statement, times = 100L)
+{
+
+    apply_loc = apply_location(statement)
+
+    # Early exit if unable to find a place to parallelize
+    if(apply_loc == 0L)
+        return(statement)
+
+    if(apply_loc == 3L)
+        serial = statement[[3L]]
+    if(apply_loc == 1L)
+        serial = statement
+
+    parallel = apply_parallel(serial)
+
+    ser_median = median(microbenchmark(eval(serial), times = times)[, "time"])
+    par_median = median(microbenchmark(eval(parallel), times = times)[, "time"])
+
+    fastest = ifelse(ser_median < par_median, serial, parallel)
+
+    if(apply_loc == 3L){
+        # Need to put the fast code back into the original code
+        tmp = statement
+        tmp[[3]] = fastest
+        fastest = tmp
+    }
+
+    fastest
+}
+
 
 
 #' Find Location Of Apply In Parse Tree
@@ -81,6 +126,7 @@ apply_location = function(expr, apply_func = "apply")
 
 #' Find Expressions Using \code{apply}
 #'
+#' Not sure I need this.
 #' Only looks at the top level expression.
 #'
 #' @param expr expression
@@ -88,5 +134,18 @@ apply_location = function(expr, apply_func = "apply")
 #' @export
 find_apply = function(expr)
 {
-    sapply(expr, apply_location) != 0L
+    sapply(expr, apply_location)
+}
+
+
+#' Convert A Script To Parallel Through Benchmarking
+#'
+#' Benchmarking is used to determine if it's worth it go parallel.
+#'
+#' @param expression serial code
+#' @return modified parallel code
+#' @export
+parallel_empirical = function(expr)
+{
+    opportunities = sapply(expr, apply_location)
 }
