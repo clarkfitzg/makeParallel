@@ -1,13 +1,50 @@
-# I'll generalize this later
-nworkers = 2
 
-
-# From Hadley Wickham's pryr / Advanced R
-sub_expr <- function(expr, env) {
+#' Adapted from Hadley Wickham's pryr / Advanced R
+sub_one = function(expr, env)
+{
     stopifnot(is.language(expr))
     call <- substitute(substitute(expr, env), list(expr = expr))
     eval(call)
 }
+
+
+#' Handles expression objects as well as single calls
+sub_expr = function(expr, env) {
+    if(is.expression(expr)){
+        as.expression(lapply(expr, sub_one, env))
+    } else {
+        sub_one(expr, env)
+    }
+}
+
+
+#' Chunk Based On Columns
+#'
+#' \code{apply(X, 2, FUN)} becomes \code{apply(X[, columns], 2, FUN)}
+#'
+#' @param incode
+#' @return outcode
+apply_column_chunk = function(incode)
+{
+    # The first argument to apply
+    Xcode = incode[[2]]
+    Xstring = deparse(Xcode)
+
+    chunk_name_map = list(
+        sub_expr(quote(X[, columns, drop = FALSE]), list(X = Xcode))
+    )
+    # Not sure if setting name to arbitrary code will always work
+    names(chunk_name_map) = Xstring
+    sub_expr(incode, chunk_name_map)
+}
+
+
+# Not necessary yet
+##' Return code to detect the number of parallel workers
+#nworkers = function()
+#{
+#    quote(floor(parallel::detectCores() / 2))
+#}
 
 
 #' Convert \code{apply} To Parallel
@@ -26,35 +63,27 @@ apply_parallel = function(incode)
 
     template = parse(text = "
         n = ncol(X)
-        idx = parallel::splitIndices(n, nworkers)
+        idx = parallel::splitIndices(n, NWORKERS)
         parts = parallel::mclapply(idx, function(columns){
-            APPLY_X_CHUNK
+            APPLY_COLUMN_CHUNK
         })
 
         # TODO: handle general case. This assumes a scalar result
         unlist(parts)
     ")
 
-    # The first argument to apply
-    Xcode = incode[[2]]
-    Xstring = deparse(Xcode)
-
-    # Transform incode to a form chunked on columns
-    # Essentially X becomes X[, columns]
-    chunk_name_map = list(
-        sub_expr(quote(X[, columns]), list(X = Xcode))
-    )
-    # Not sure if setting name to arbitrary code will always work
-    names(chunk_name_map) = Xstring
-    APPLY_X_CHUNK = sub_expr(incode, chunk_name_map)
-
-
-    sub_expr(template, list(X = Xcode
-                            , APPLY_X_CHUNK = APPLY_X_CHUNK
+    sub_expr(template, list(X = incode[[2]]
+                            , APPLY_COLUMN_CHUNK = apply_column_chunk(incode)
+                            , NWORKERS = quote(floor(parallel::detectCores() / 2))
                             ))
-
 }
+
+
+# Testing code:
 
 x = matrix(1:10, ncol = 2)
 incode = quote(apply(x, 2, max))
+parcode = apply_parallel(incode)
 
+eval(incode)
+eval(parcode)
