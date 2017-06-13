@@ -8,7 +8,7 @@ sub_one = function(expr, env)
 }
 
 
-#' Handles expression objects as well as single calls
+#' Handles expression objects as well as single objects
 sub_expr = function(expr, env) {
     if(is.expression(expr)){
         as.expression(lapply(expr, sub_one, env))
@@ -79,11 +79,4 @@ apply_parallel = function(incode)
 }
 
 
-# Testing code:
 
-x = matrix(1:10, ncol = 2)
-incode = quote(apply(x, 2, max))
-parcode = apply_parallel(incode)
-
-eval(incode)
-eval(parcode)
