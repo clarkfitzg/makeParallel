@@ -4,10 +4,10 @@
 \alias{find_apply}
 \title{Find Expressions Using \code{apply}}
 \usage{
-find_apply(code)
+find_apply(expr)
 }
 \arguments{
-\item{code}{expression}
+\item{expr}{expression}
 }
 \value{
 logical locations of apply

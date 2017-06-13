@@ -4,10 +4,13 @@
 \alias{apply_column_chunk}
 \title{Chunk Based On Columns}
 \usage{
-apply_column_chunk(code)
+apply_column_chunk(expr)
+}
+\arguments{
+\item{expr}{where \code{apply} is \code{expr[[1]]}}
 }
 \value{
-outcode
+outexpr for use in chunked columns
 }
 \description{
 \code{apply(X, 2, FUN)} becomes \code{apply(X[, columns], 2, FUN)}

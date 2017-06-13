@@ -4,7 +4,7 @@
 \alias{apply_parallel}
 \title{Convert \code{apply} To Parallel}
 \usage{
-apply_parallel(code)
+apply_parallel(expr)
 }
 \arguments{
 \item{expression}{\code{apply()} function call}
