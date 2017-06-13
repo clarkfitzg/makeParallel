@@ -4,14 +4,11 @@
 RFILES!= ls R/*.R
 TESTFILES!= ls tests/testthat/test*.R
 
-
-test:
+all: $(RFILES) $(TESTFILES)
+	R -e "roxygen2::roxygenize()"
 	R CMD INSTALL .
 	cd tests && Rscript testthat.R && cd ..
 
-# Updates documentation and does a local install
-docs:
-	R -e "roxygen2::roxygenize()"
 
 # Could make this more robust to do a better CRAN check, but no need yet.
 #build: $(RFILES)

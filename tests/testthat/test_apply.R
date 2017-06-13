@@ -2,15 +2,20 @@ library(autoparallel)
 
 context("apply")
 
-test_that("convert apply to parallel", {
+test_that("convert single apply to parallel", {
 
     x = matrix(1:10, ncol = 2)
 
-    incode = quote(apply(x, 2, max))
+    code = quote(apply(x, 2, max))
+    parcode = apply_parallel(code)
 
+    expect_identical(eval(code), eval(parcode))
 
 })
 
+
+if(FALSE)
+{
 
 # Testing code:
 n = 100000L
@@ -38,4 +43,4 @@ tapply(bm$time, bm$expr, function(x){
            qqline(x)
         })
 tapply(bm$time, bm$expr, hist)
-
+}
