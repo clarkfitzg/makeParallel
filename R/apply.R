@@ -83,7 +83,10 @@ benchmark_parallel = function(statement, times = 100L)
     ser_median = median(microbenchmark(eval(serial), times = times)[, "time"])
     par_median = median(microbenchmark(eval(parallel), times = times)[, "time"])
 
-    fastest = ifelse(ser_median < par_median, serial, parallel)
+    if(ser_median < par_median)
+        fastest = serial
+    else
+        fastest = parallel
 
     if(apply_loc == 3L){
         # Need to put the fast code back into the original code

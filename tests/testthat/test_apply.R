@@ -18,15 +18,21 @@ if(FALSE)
 {
 
 # Testing code:
-n = 100000L
+n = 1000000L
 p = 20L
 
-x = matrix(1:10, ncol = 2)
+x = matrix(1:(n*p), ncol = p)
+
 incode = quote(apply(x, 2, max))
 parcode = apply_parallel(incode)
 
-eval(incode)
-eval(parcode)
+system.time(eval(incode))
+system.time(eval(parcode))
+
+fast = benchmark_parallel(incode, times = 10L)
+
+
+
 
 library(microbenchmark)
 
