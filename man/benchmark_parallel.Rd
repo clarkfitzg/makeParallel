@@ -4,7 +4,7 @@
 \alias{benchmark_parallel}
 \title{Run Benchmark To Find Efficient Parallel Code}
 \usage{
-benchmark_parallel(statement, times = 100L)
+benchmark_parallel(statement, times = 10L)
 }
 \arguments{
 \item{statement}{a single R statment}
@@ -20,5 +20,7 @@ in serial or in parallel. This function runs the code in both serial and
 parallel, then returns the faster version based on the median timing.
 }
 \details{
-It may be nice to return more, or log the profiling
+It may be nice to return more, or log the profiling.
+The statment is evaluated in the global environment to simulate running
+the script.
 }

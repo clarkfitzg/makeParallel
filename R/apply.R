@@ -58,20 +58,27 @@ apply_parallel = function(statement)
 #' in serial or in parallel. This function runs the code in both serial and
 #' parallel, then returns the faster version based on the median timing.
 #'
-#' It may be nice to return more, or log the profiling
+#' It may be nice to return more, or log the profiling.
+#' The statment is evaluated in the global environment to simulate running
+#' the script.
 #'
 #' @param statement a single R statment
 #' @param times the number of times to run the benchmark
 #' @return statement potentially in parallel
 #' @export
-benchmark_parallel = function(statement, times = 100L)
+benchmark_parallel = function(statement, times = 10L)
 {
+
+    # Need to evaluate in case subsequent code depends on it
+    eval(statement, envir = globalenv())
 
     apply_loc = apply_location(statement)
 
     # Early exit if unable to find a place to parallelize
     if(apply_loc == 0L)
         return(statement)
+    else
+        message("Running benchmarks to parallelize\n    ", statement)
 
     if(apply_loc == 3L)
         serial = statement[[3L]]
@@ -89,7 +96,7 @@ benchmark_parallel = function(statement, times = 100L)
         fastest = parallel
 
     if(apply_loc == 3L){
-        # Need to put the fast code back into the original code
+        # put the fast code back into the original code
         tmp = statement
         tmp[[3]] = fastest
         fastest = tmp
@@ -148,7 +155,7 @@ find_apply = function(expr)
 #' @param expression serial code
 #' @return modified parallel code
 #' @export
-parallel_empirical = function(expr)
+parallelize_script = function(expr)
 {
-    opportunities = sapply(expr, apply_location)
+    as.expression(lapply(expr, benchmark_parallel))
 }

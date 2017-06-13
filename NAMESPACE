@@ -3,5 +3,5 @@
 export(apply_parallel)
 export(benchmark_parallel)
 export(find_apply)
-export(parallel_empirical)
+export(parallelize_script)
 importFrom(microbenchmark,microbenchmark)
