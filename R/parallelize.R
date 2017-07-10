@@ -26,11 +26,25 @@ parallelize = function(varname, cluster = NULL, ...)
 
     indices = splitIndices(length(get(varname)), length(cl))
 
+    # Each worker only sees their own indices
+    clusterApply(cl, indices, assign_local_subset
+                 , globalname = varname, localname = varname)
+
+    function(expr, simplify = TRUE)
+    {
+        evaluated = clusterEvalQ(cl, expr)
+        if(simplify){
+            # Assume we're combining elements of a list
+            evaluated = do.call(c, evaluated)
+        }
+        evaluated
+    }
 }
 
 
-assign_local_chunk = function(index, globalname, localname)
+assign_local_subset = function(index, globalname, localname)
 {
     x = get(globalname)
     assign(localname, x[index], envir = .GlobalEnv)
+    NULL
 }
