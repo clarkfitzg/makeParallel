@@ -1,44 +1,53 @@
 #' Parallelized Data Evaluater
 #'
 #' Distributes data over a cluster and returns a closure capable of
-#' evaluating code in parallel.
+#' evaluating code in parallel. Designed for interactive use.
 #'
+#' @export
 #' @param varname name of an existing list that one expects to use \code{lapply} on
-#' @param cluster an existing SNOW cluster, or NULL
-#' @param ... additional arguments to code{\link[parallel]{makeCluster}}
+#' @param cluster an existing SNOW cluster, or NULL to create one
+#' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
+#' @param ... additional arguments to \code{\link[parallel]{makeCluster}}
 #' @return closure works similarly as \code{eval}
 #' @examples
 #' x = list(letters, 1:10)
-#' do = parallelize(x)
+#' do = parallelize("x")
 #' do(lapply(x, head))
-parallelize = function(varname, cluster = NULL, ...)
+parallelize = function(varname, cluster = NULL, spec = 2L, ...)
 {
 
     if(is.null(cluster)){
-        cl = parallel::makeCluster(...)
+        cl = parallel::makeCluster(spec, ...)
     } else {
         cl = cluster
     }
 
     #TODO- Don't need for fork clusters
     #TODO- Only send parts necessary for each worker
-    clusterExport(cl, varname)
+    parallel::clusterExport(cl, varname)
 
-    indices = splitIndices(length(get(varname)), length(cl))
+    indices = parallel::splitIndices(length(get(varname)), length(cl))
 
     # Each worker only sees their own indices
-    clusterApply(cl, indices, assign_local_subset
+    parallel::clusterApply(cl, indices, assign_local_subset
                  , globalname = varname, localname = varname)
 
-    function(expr, simplify = TRUE)
+    evaluator = function(expr, simplify = TRUE)
     {
-        evaluated = clusterEvalQ(cl, expr)
+
+        # Recover the expression as an object to manipulate
+        code = parse(text = deparse(substitute(expr)))
+
+        evaluated = parallel::clusterCall(cl, eval, code, env = .GlobalEnv)
+
         if(simplify){
-            # Assume we're combining elements of a list
+            # Assume we're 'flattening' a list 
             evaluated = do.call(c, evaluated)
         }
         evaluated
     }
+    attr(evaluator, "cluster") = cl
+    evaluator
 }
 
 
