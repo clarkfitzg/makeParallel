@@ -1,16 +1,36 @@
-#' Parallelize Data On Implicit Cluster
+#' Parallelized Data Evaluater
 #'
-#' Creates an implicit cluster and returns a closure capable of evaluating
-#' code in parallel.
+#' Distributes data over a cluster and returns a closure capable of
+#' evaluating code in parallel.
 #'
-#' @param data list that one expects to use \code{lapply} on
-#' @param nworkers number of parallel workers
+#' @param varname name of an existing list that one expects to use \code{lapply} on
+#' @param cluster an existing SNOW cluster, or NULL
+#' @param ... additional arguments to code{\link[parallel]{makeCluster}}
 #' @return closure works similarly as \code{eval}
-parallelize = function(data, nworkers = 2L)
+#' @examples
+#' x = list(letters, 1:10)
+#' do = parallelize(x)
+#' do(lapply(x, head))
+parallelize = function(varname, cluster = NULL, ...)
 {
 
-    cl = parallel::makeCluster(nworkers)
+    if(is.null(cluster)){
+        cl = parallel::makeCluster(...)
+    } else {
+        cl = cluster
+    }
 
-    clusterExport(cl, data)
-    #TODO
+    #TODO- Don't need for fork clusters
+    #TODO- Only send parts necessary for each worker
+    clusterExport(cl, varname)
+
+    indices = splitIndices(length(get(varname)), length(cl))
+
+}
+
+
+assign_local_chunk = function(index, globalname, localname)
+{
+    x = get(globalname)
+    assign(localname, x[index], envir = .GlobalEnv)
 }
