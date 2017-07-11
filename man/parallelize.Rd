@@ -4,13 +4,13 @@
 \alias{parallelize}
 \title{Parallelized Data Evaluater}
 \usage{
-parallelize(varname, cluster = NULL, spec = 2L, ...)
+parallelize(varname, cl = parallel::makeCluster(spec, ...), spec = 2L, ...)
 }
 \arguments{
 \item{varname}{name of an existing list that one expects to use parallel
 code such as \code{lapply} on}
 
-\item{cluster}{an existing SNOW cluster, or NULL to create one}
+\item{cl}{SNOW cluster}
 
 \item{spec}{number of workers, see \code{\link[parallel]{makeCluster}}}
 

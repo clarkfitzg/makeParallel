@@ -8,9 +8,9 @@
 #' iteratively building functions within the global environment.
 #'
 #' @export
-#' @param varname name of an existing list that one expects to use parallel
+#' @param varname character name of an existing list that one expects to use parallel
 #'      code such as \code{lapply} on
-#' @param cluster an existing SNOW cluster, or NULL to create one
+#' @param cl SNOW cluster
 #' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
 #' @param ... additional arguments to \code{\link[parallel]{makeCluster}}
 #' @return closure works similarly as \code{eval}
@@ -18,14 +18,11 @@
 #' x = list(letters, 1:10)
 #' do = parallelize("x")
 #' do(lapply(x, head))
-parallelize = function(varname, cluster = NULL, spec = 2L, ...)
+parallelize = function(varname
+                       , cl = parallel::makeCluster(spec, ...)
+                       , spec = 2L, ...
+                       )
 {
-
-    if(is.null(cluster)){
-        cl = parallel::makeCluster(spec, ...)
-    } else {
-        cl = cluster
-    }
 
     #TODO- Don't need for fork clusters
     #TODO- Only send parts necessary for each worker
@@ -54,6 +51,8 @@ parallelize = function(varname, cluster = NULL, spec = 2L, ...)
         evaluated
     }
     attr(evaluator, "cluster") = cl
+    attr(evaluator, "indices") = indices
+    attr(evaluator, "varname") = varname
     evaluator
 }
 

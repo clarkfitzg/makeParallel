@@ -3,7 +3,8 @@ context("parallelize")
 
 test_that("basics with default", {
 
-    # Looks like this is required to get around whatever testthat is doing
+    # parallelize works off variables in the global environment
+    # testthat does some other things here.
     assign("x", list(letters, LETTERS, 1:10), envir = .GlobalEnv)
 
     do = parallelize("x")
