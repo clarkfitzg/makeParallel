@@ -70,6 +70,6 @@ assign_local_subset = function(index, globalname, localname)
 global_functions = function()
 {
     varnames = ls(.GlobalEnv, all.names = TRUE)
-    funcs = sapply(varnames, function(x) is.function(get(x)))
+    funcs = sapply(varnames, function(x) is.function(get(x, envir = .GlobalEnv)))
     varnames[funcs]
 }
