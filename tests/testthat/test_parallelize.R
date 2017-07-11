@@ -11,4 +11,10 @@ test_that("basics with default", {
 
     expect_identical(actual, lapply(x, head))
 
+    head2 = function(x) x[1:2]
+    assign("head2", head2, envir = .GlobalEnv)
+
+    actual = do(lapply(x, head2))
+
+    expect_identical(actual, lapply(x, head2))
 })

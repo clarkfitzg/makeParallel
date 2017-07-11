@@ -3,6 +3,10 @@
 #' Distributes data over a cluster and returns a closure capable of
 #' evaluating code in parallel. Designed for interactive use.
 #'
+#' The current version sends all the global functions to the parallel
+#' workers each time the evaluator is called. This is useful when
+#' iteratively building functions within the global environment.
+#'
 #' @export
 #' @param varname name of an existing list that one expects to use \code{lapply} on
 #' @param cluster an existing SNOW cluster, or NULL to create one
@@ -34,6 +38,8 @@ parallelize = function(varname, cluster = NULL, spec = 2L, ...)
 
     evaluator = function(expr, simplify = TRUE)
     {
+        # Send all functions in the global workspace over every time.
+        parallel::clusterExport(cl, global_functions())
 
         # Recover the expression as an object to manipulate
         code = parse(text = deparse(substitute(expr)))
@@ -56,4 +62,13 @@ assign_local_subset = function(index, globalname, localname)
     x = get(globalname)
     assign(localname, x[index], envir = .GlobalEnv)
     NULL
+}
+
+
+#' Return the names of all global functions
+global_functions = function()
+{
+    varnames = ls(.GlobalEnv, all.names = TRUE)
+    funcs = sapply(varnames, function(x) is.function(get(x)))
+    varnames[funcs]
 }

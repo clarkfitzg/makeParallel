@@ -22,6 +22,11 @@ closure works similarly as \code{eval}
 Distributes data over a cluster and returns a closure capable of
 evaluating code in parallel. Designed for interactive use.
 }
+\details{
+The current version sends all the global functions to the parallel
+workers each time the evaluator is called. This is useful when
+iteratively building functions within the global environment.
+}
 \examples{
 x = list(letters, 1:10)
 do = parallelize("x")
