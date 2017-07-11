@@ -8,7 +8,8 @@
 #' iteratively building functions within the global environment.
 #'
 #' @export
-#' @param varname name of an existing list that one expects to use \code{lapply} on
+#' @param varname name of an existing list that one expects to use parallel
+#'      code such as \code{lapply} on
 #' @param cluster an existing SNOW cluster, or NULL to create one
 #' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
 #' @param ... additional arguments to \code{\link[parallel]{makeCluster}}

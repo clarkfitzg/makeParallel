@@ -7,7 +7,8 @@
 parallelize(varname, cluster = NULL, spec = 2L, ...)
 }
 \arguments{
-\item{varname}{name of an existing list that one expects to use \code{lapply} on}
+\item{varname}{name of an existing list that one expects to use parallel
+code such as \code{lapply} on}
 
 \item{cluster}{an existing SNOW cluster, or NULL to create one}
 
