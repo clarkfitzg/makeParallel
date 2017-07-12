@@ -40,7 +40,7 @@ parallelize = function(varname
         parallel::clusterExport(cl, global_functions())
 
         # Recover the expression as an object to manipulate
-        code = parse(text = deparse(substitute(expr)))
+        code = substitute(expr)
 
         evaluated = parallel::clusterCall(cl, eval, code, env = .GlobalEnv)
 

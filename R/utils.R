@@ -3,11 +3,18 @@ NULL
 
 
 #' Adapted from Hadley Wickham's pryr / Advanced R
-sub_one = function(statement, env)
+#sub_one = function(statement, env)
+#{
+#    #stopifnot(is.language(statement))
+#    call <- substitute(substitute(statement, env), list(statement = statement))
+#    eval(call)
+#}
+
+
+sub_one = function(expr, env)
 {
-    stopifnot(is.language(statement))
-    call <- substitute(substitute(statement, env), list(statement = statement))
-    eval(call)
+    e = substitute(expr)
+    do.call(substitute, list(e, env))
 }
 
 

@@ -8,13 +8,12 @@ apply_column_chunk = function(expr)
 {
     # The first argument to apply
     Xexpr = expr[[2]]
-    Xstring = deparse(Xexpr)
-
+    
     chunk_name_map = list(
         sub_expr(quote(X[, columns, drop = FALSE]), list(X = Xexpr))
     )
     # Not sure if setting name to arbitrary code will always work
-    names(chunk_name_map) = Xstring
+    names(chunk_name_map) = deparse(Xexpr)
     sub_expr(expr, chunk_name_map)
 }
 
@@ -81,8 +80,10 @@ benchmark_parallel = function(statement, times = 10L)
         message("Running benchmarks to parallelize\n    ", statement)
 
     if(apply_loc == 3L)
+        # x = apply(...)
         serial = statement[[3L]]
     if(apply_loc == 1L)
+        # apply(...)
         serial = statement
 
     parallel = apply_parallel(serial)
@@ -104,7 +105,6 @@ benchmark_parallel = function(statement, times = 10L)
 
     fastest
 }
-
 
 
 #' Find Location Of Apply In Parse Tree

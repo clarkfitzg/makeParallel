@@ -7,7 +7,7 @@
 parallelize(varname, cl = parallel::makeCluster(spec, ...), spec = 2L, ...)
 }
 \arguments{
-\item{varname}{name of an existing list that one expects to use parallel
+\item{varname}{character name of an existing list that one expects to use parallel
 code such as \code{lapply} on}
 
 \item{cl}{SNOW cluster}
