@@ -1,6 +1,6 @@
 library(autoparallel)
 
-test_that("find apply calls inside script", {
+test_that("replacing functions", {
 
     expr = parse(text = "
         # Testing code:
@@ -14,7 +14,7 @@ test_that("find apply calls inside script", {
         apply(x, 2, min)
     ")
 
-    #expect_equal(find_apply(expr), c(0, 0, 3, 3, 3, 1))
+    sub_one_docall(expr, list(apply = quote(FANCY_APPLY)))
 
 
 })

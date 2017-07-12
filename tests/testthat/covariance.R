@@ -10,7 +10,8 @@ library(microbenchmark)
 
 # Split x into chunks of columns. This approach is amenable to automatic
 # parallelization because the core of the computation happens within 
-# `lapply` calls, ie. computing the covariance blocks.
+# `lapply` calls, ie. computing the covariance blocks, which are relatively
+# small objects to return to the manager (assuming n >> p)
 #
 # However, it explicitly splits the indices to do the chunking aspect.
 # This index splitting should really be considered as a parameter to be
@@ -45,6 +46,13 @@ cov_chunked = function(x, nchunks = 2L)
 }
 
 
+b = body(cov_chunked)
+
+sub_expr(b, list(lapply = parallel::mclapply))
+
+
+
+
 # matrix based calculation
 # Naive because it doesn't use the symmetry of the result
 cov_matrix = function(x)
@@ -65,10 +73,11 @@ cm = cov_matrix(x)
 
 cc = cov_chunked(x)
 
-# 150 ms
-microbenchmark(cov_matrix(x))
+# 130 ms
+microbenchmark(cov_matrix(x), times = 10L)
 
-# 30 ms
-microbenchmark(cov(x))
+# 31 ms
+microbenchmark(cov(x), times = 10L)
 
-# 
+# 78 ms
+microbenchmark(cov_chunked(x), times = 10L)

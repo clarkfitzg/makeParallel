@@ -2,20 +2,32 @@
 NULL
 
 
+#' Test Expressions For Equality
+same_expr = function(e1, e2)
+{
+}
+
+
 #' Adapted from Hadley Wickham's pryr / Advanced R
-#sub_one = function(statement, env)
-#{
-#    #stopifnot(is.language(statement))
-#    call <- substitute(substitute(statement, env), list(statement = statement))
-#    eval(call)
-#}
+#' @export
+sub_one_eval = function(statement, env)
+{
+    #stopifnot(is.language(statement))
+    call <- substitute(substitute(statement, env), list(statement = statement))
+    eval(call)
+}
 
 
-sub_one = function(expr, env)
+#' @export
+sub_one_docall = function(expr, env)
 {
     e = substitute(expr)
     do.call(substitute, list(e, env))
 }
+
+
+# TODO: tests to clarify what and how this should work
+sub_one = sub_one_eval
 
 
 #' Substitute Expressions
