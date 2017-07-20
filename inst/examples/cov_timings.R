@@ -4,6 +4,7 @@
 
 library(microbenchmark)
 
+library(autoparallel)
 source("covariance.R")
 
 
@@ -52,4 +53,9 @@ summaryRprof("cov_chunked.out")
 
 
 library(profvis)
+
+# Handier visualization
+profvis({
+    cc = cov_chunked(x)
+})
 
