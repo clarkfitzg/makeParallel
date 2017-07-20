@@ -1,9 +1,3 @@
-# Tue Jul 11 16:45:01 PDT 2017
-# In my summer proposal I mentioned doing a sample covariance calculation in
-# parallel.
-
-library(microbenchmark)
-
 
 # Compute sample covariance for columns of a matrix
 
@@ -46,11 +40,8 @@ cov_chunked = function(x, nchunks = 2L)
 }
 
 
-b = body(cov_chunked)
-
-sub_expr(b, list(lapply = parallel::mclapply))
-
-
+cov_chunked_parallel = cov_chunked
+body(cov_chunked_parallel) = sub_expr(body(cov_chunked), list(lapply = quote(parallel::mclapply)))
 
 
 # matrix based calculation
@@ -61,23 +52,3 @@ cov_matrix = function(x)
     xc = scale(x, center = TRUE, scale = FALSE)
     (t(xc) %*% xc) / (n - 1)
 }
-
-
-n = 1e6
-p = 5
-x = matrix(rnorm(n * p), nrow = n)
-
-c0 = cov(x)
-
-cm = cov_matrix(x)
-
-cc = cov_chunked(x)
-
-# 130 ms
-microbenchmark(cov_matrix(x), times = 10L)
-
-# 31 ms
-microbenchmark(cov(x), times = 10L)
-
-# 78 ms
-microbenchmark(cov_chunked(x), times = 10L)

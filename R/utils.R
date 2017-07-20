@@ -26,14 +26,24 @@ sub_one_docall = function(expr, env)
 }
 
 
-# TODO: tests to clarify what and how this should work
-sub_one = sub_one_eval
+#' Replace Call With Expression
+#'
+#' @export
+#' @examples
+#' e1 = quote(rnorm(10))
+#' replace_call(e1, "rnorm", 
+replace_call = function(input, function_name, replacement)
+{
+}
 
+
+sub_one = sub_one_eval
 
 #' Substitute Expressions
 #' 
 #' Replace code with new code objects in env.
 #' Handles expression objects as well as single objects.
+#' @export
 sub_expr = function(expr, env) {
     if(is.expression(expr)){
         as.expression(lapply(expr, sub_one, env))

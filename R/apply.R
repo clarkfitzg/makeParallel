@@ -88,6 +88,7 @@ benchmark_parallel = function(statement, times = 10L)
 
     parallel = apply_parallel(serial)
 
+    # TODO: Think hard about how to use eval() here.
     ser_median = median(microbenchmark(eval(serial), times = times)[, "time"])
     par_median = median(microbenchmark(eval(parallel), times = times)[, "time"])
 
