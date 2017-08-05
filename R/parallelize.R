@@ -19,7 +19,7 @@
 #' x = list(letters, 1:10)
 #' do = parallelize("x")
 #' do(lapply(x, head))
-parallelize = function(x
+parallelize = function(x = NULL
                        , cl = parallel::makeCluster(spec, ...)
                        , spec = 2L, ...
                        )
