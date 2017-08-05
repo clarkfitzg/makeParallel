@@ -7,7 +7,7 @@ test_that("basics with default", {
     # testthat does some other things here.
     assign("x", list(letters, LETTERS, 1:10), envir = .GlobalEnv)
 
-    do = parallelize("x")
+    do = parallelize(x)
     actual = do(lapply(x, head))
 
     expect_identical(actual, lapply(x, head))

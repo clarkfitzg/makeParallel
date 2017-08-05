@@ -6,10 +6,11 @@
 #' The current version sends all the global functions to the parallel
 #' workers each time the evaluator is called. This is useful when
 #' iteratively building functions within the global environment.
+#' The smarter thing to do is keep track of which functions change, and
+#' then send those over. But it's not clear that is worth it.
 #'
 #' @export
-#' @param varname character name of an existing list that one expects to use parallel
-#'      code such as \code{lapply} on
+#' @param x An object one wants to perform parallel analysis on
 #' @param cl SNOW cluster
 #' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
 #' @param ... additional arguments to \code{\link[parallel]{makeCluster}}
@@ -18,11 +19,13 @@
 #' x = list(letters, 1:10)
 #' do = parallelize("x")
 #' do(lapply(x, head))
-parallelize = function(varname
+parallelize = function(x
                        , cl = parallel::makeCluster(spec, ...)
                        , spec = 2L, ...
                        )
 {
+
+    varname = deparse(substitute(x))
 
     #TODO- Don't need for fork clusters
     #TODO- Only send parts necessary for each worker
@@ -34,7 +37,7 @@ parallelize = function(varname
     parallel::clusterApply(cl, indices, assign_local_subset
                  , globalname = varname, localname = varname)
 
-    evaluator = function(expr, simplify = TRUE)
+    evaluator = function(expr, simplify = c)
     {
         # Send all functions in the global workspace over every time.
         parallel::clusterExport(cl, global_functions())
@@ -44,16 +47,25 @@ parallelize = function(varname
 
         evaluated = parallel::clusterCall(cl, eval, code, env = .GlobalEnv)
 
-        if(simplify){
-            # Assume we're 'flattening' a list 
-            evaluated = do.call(c, evaluated)
+        if(is.function(simplify)){
+            # Typically expect to flatten a list
+            evaluated = do.call(simplify, evaluated)
         }
         evaluated
     }
     attr(evaluator, "cluster") = cl
     attr(evaluator, "indices") = indices
     attr(evaluator, "varname") = varname
+    class(evaluator) = c("parallel_evaluator", class(evaluator))
     evaluator
+}
+
+
+#' @export
+print.parallel_evaluator = function(x)
+{
+    cat("parallel evaluator", "\n")
+    cat("variable: ", attr(x, "varname"), "\n")
 }
 
 

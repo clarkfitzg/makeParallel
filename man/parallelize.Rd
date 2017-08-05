@@ -4,11 +4,10 @@
 \alias{parallelize}
 \title{Parallelized Data Evaluater}
 \usage{
-parallelize(varname, cl = parallel::makeCluster(spec, ...), spec = 2L, ...)
+parallelize(x, cl = parallel::makeCluster(spec, ...), spec = 2L, ...)
 }
 \arguments{
-\item{varname}{character name of an existing list that one expects to use parallel
-code such as \code{lapply} on}
+\item{x}{An object one wants to perform parallel analysis on}
 
 \item{cl}{SNOW cluster}
 
@@ -27,6 +26,8 @@ evaluating code in parallel. Designed for interactive use.
 The current version sends all the global functions to the parallel
 workers each time the evaluator is called. This is useful when
 iteratively building functions within the global environment.
+The smarter thing to do is keep track of which functions change, and
+then send those over. But it's not clear that is worth it.
 }
 \examples{
 x = list(letters, 1:10)
