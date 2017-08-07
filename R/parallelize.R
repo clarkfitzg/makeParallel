@@ -41,10 +41,11 @@ parallelize = function(x = NULL
     {
         # Recover the expression as an object to manipulate
         code = substitute(expr)
-        codeinfo = CodeDepends::getInputs(code, recurisve = TRUE)
+        codeinfo = CodeDepends::getInputs(code, recursive = TRUE)
 
         # Send variables and functions to the cluster
-        used = unique(codeinfo@inputs, names(codeinfo@functions))
+        used = c(codeinfo@inputs, names(codeinfo@functions))
+
         # But not varname, which is presumed to be large and used
         # frequently
         used = used[used != varname]

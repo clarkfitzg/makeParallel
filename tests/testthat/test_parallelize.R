@@ -23,9 +23,10 @@ test_that("basics with default", {
 
 test_that("finds global variables", {
 
-    assign("n", 10, envir = .GlobalEnv)
-
     do = parallelize(x, spec = 2L)
+    # assigning n must happen after cluster creation, otherwise forking
+    # will send n
+    assign("n", 10, envir = .GlobalEnv)
     actual = do(n)
 
     expect_identical(actual, c(n, n))
