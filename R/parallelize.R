@@ -37,15 +37,27 @@ parallelize = function(x = NULL
     parallel::clusterApply(cl, indices, assign_local_subset
                  , globalname = varname, localname = varname)
 
-    evaluator = function(expr, simplify = c)
+    evaluator = function(expr, simplify = c, verbose = FALSE)
     {
-        # Send all functions in the global workspace over every time.
-        parallel::clusterExport(cl, global_functions())
-
         # Recover the expression as an object to manipulate
         code = substitute(expr)
+        codeinfo = CodeDepends::getInputs(code, recurisve = TRUE)
 
-        evaluated = parallel::clusterCall(cl, eval, code, env = .GlobalEnv)
+        # Send variables and functions to the cluster
+        used = unique(codeinfo@inputs, names(codeinfo@functions))
+        # But not varname, which is presumed to be large and used
+        # frequently
+        used = used[used != varname]
+        exports = intersect(ls(globalenv()), used)
+        if(verbose){
+            message("Sending the following variables to the cluster:\n"
+                    , exports)
+        }
+        parallel::clusterExport(cl, exports, env = globalenv())
+
+        # TODO: Is there any difference between using .GlobalEnv and
+        # globalenv()? Probably should read up on this.
+        evaluated = parallel::clusterCall(cl, eval, code, env = globalenv())
 
         if(is.function(simplify)){
             # Typically expect to flatten a list
@@ -78,9 +90,9 @@ assign_local_subset = function(index, globalname, localname)
 
 
 #' Return the names of all global functions
-global_functions = function()
-{
-    varnames = ls(.GlobalEnv, all.names = TRUE)
-    funcs = sapply(varnames, function(x) is.function(get(x, envir = .GlobalEnv)))
-    varnames[funcs]
-}
+#global_functions = function()
+#{
+#    varnames = ls(.GlobalEnv, all.names = TRUE)
+#    funcs = sapply(varnames, function(x) is.function(get(x, envir = .GlobalEnv)))
+#    varnames[funcs]
+#}
