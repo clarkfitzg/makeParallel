@@ -6,12 +6,18 @@ Authors@R: person("Clark", "Fitzgerald", role = c("aut", "cre"),
                      email = "clarkfitzg@gmail.com")
 Author: Clark Fitzgerald [aut, cre]
 Maintainer: Clark Fitzgerald <clarkfitzg@gmail.com>
-Depends: R (>= 3.1.0)
-Imports: parallel, CodeDepends, microbenchmark, igraph
-Suggests: roxygen2,
+Depends:
+    R (>= 3.1.0)
+Imports:
+    parallel,
+    CodeDepends,
+    microbenchmark,
+    igraph
+Suggests:
+    roxygen2,
     testthat
 Description: Examines R code and automatically generates parallel versions.
 License: MIT
 URL: https://github.com/clarkfitzg/autoparallel
 BugReports: https://github.com/clarkfitzg/autoparallel
-RoxygenNote: 6.0.1
+RoxygenNote: 5.0.1
