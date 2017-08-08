@@ -53,17 +53,28 @@ do(lapply(x, myfun))
 ## Working with many files
 
 A realistic example is working with many files simultaneously. The US
-Veterans Administration Court appeals are one such example. Each file
+Veterans Administration (VA) Court appeals are one such example. Each file
 contains the summary of a court case. 
+One can download a handful from the VA servers as follows:
+
+```{R}
+
+datadir = "~/data/vets/appeals_sample/"
+
+fnames = paste0("1719", 100:266, ".txt")
+urls = paste0("https://www.va.gov/vetapp17/files3/", fnames)
+
+Map(download.file, urls, paste0(datadir, fnames))
+
+```
 
 The file names themselves are small, so we can cheaply distribute them
 among the parallel workers.
 
 ```{R}
 
-# The pattern will filter it down to just 999 such files
-filenames = list.files("/home/clark/data/vets/appeals/"
-                       , pattern = "^17000*", full.names = TRUE)
+filenames = list.files(datadir, full.names = TRUE)
+
 length(filenames)
 
 do = parallelize(filenames)
