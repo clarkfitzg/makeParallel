@@ -85,30 +85,60 @@ assigns the result into `appeals` on the cluster.
 
 ```{R}
 
-# I know ahead of time each file is well under 1 MB
-
-readone = function(fname, maxchar = 1e6)
-{
-    f = file(fname, open = "rb", encoding = "ISO-8859")
-    content = readChar(f, maxchar)
-    close(f)
-    content
-}
-
-f1 = readone(filenames[1])
-
-
 do({
-    appeals <- sapply(filenames, readone)
+    appeals <- lapply(filenames, readLines)
+    appeals <- sapply(appeals, paste, collapse = "\n")
+    appeals <- enc2utf8(appeals)
     NULL
 })
-
-do(length(appeals))
 
 ```
 
 The braces along with the final `NULL` are necessary to avoid transferring
-the large data set from the workers back to the manager. 
+the large data set from the workers back to the manager.
+
+The code above only assigned `appeals` to the global environment of the
+workers. It does not exist in the manager process.
+
+```{R}
+
+# FALSE
+"appeals" %in% ls()
+
+```
+
+The parallel evaluator allows us to compute on it with the same code that
+can be used for serial R.
+
+```{R}
+
+do(length(appeals))
+do(class(appeals))
+
+```
+
+We may want to look more closely at those cases which have been remanded
+for further evidence. If they're a reasonably small subset we may choose to
+bring them back into the manager process for further non parallel analysis.
+This would be useful to see the warnings that may come from our code, for example.
+
+```{R}
+
+# Check how many we're about to bring back
+do(sum(grepl("REMAND", appeals)))
+
+# Bring them back from the workers
+remand <- do(appeals[grepl("REMAND", appeals)])
+
+length(remand)
+
+```
+
+In summary, when working with larger data sets it's efficient to minimize
+the data movement. We avoided it in this case by only distributing the
+relatively small vector of file names and having each worker independently
+load the files that it needed, thus keeping the data in place on that
+worker.
 
 ## Cleaning up
 
