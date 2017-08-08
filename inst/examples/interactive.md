@@ -78,9 +78,6 @@ length(filenames)
 
 do = parallelize(filenames)
 
-# I know ahead of time each file is well under 1 MB
-MAXCHAR = 1e6
-
 ```
 
 The following code actually loads the data contained in the files and
@@ -88,19 +85,21 @@ assigns the result into `appeals` on the cluster.
 
 ```{R}
 
-readone = function(fname, nchars = MAXCHAR)
+# I know ahead of time each file is well under 1 MB
+
+readone = function(fname, maxchar = 1e6)
 {
     f = file(fname, open = "rb", encoding = "ISO-8859")
-    readChar(f, nchars)
+    content = readChar(f, maxchar)
+    close(f)
+    content
 }
 
 f1 = readone(filenames[1])
 
 
-readChar(filenames[1], nchars = MAXCHAR)
-
 do({
-    appeals <- sapply(filenames, readChar, nchars = MAXCHAR)
+    appeals <- sapply(filenames, readone)
     NULL
 })
 
