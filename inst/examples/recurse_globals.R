@@ -4,9 +4,11 @@
 library(CodeDepends)
 
 
-# TODO: Modify this to work without requiring that the code be evaluated
-# Probably means we can't use codetools::findGlobals
-#
+#' Recursively Find Global Variables
+#'
+#' TODO: Modify this to work without requiring that the code be evaluated
+#' Probably means we can't use codetools::findGlobals
+#'
 #' fun closure, see codetools::findGlobals
 #' possible_funs character vector of variable names to recurse into
 findGlobals_recursive <- function(fun, possible_funs)
@@ -42,4 +44,13 @@ eval(code)
 
 info = getInputs(code)
 
-findGlobals_recursive(f, info@outputs)
+findGlobals_recursive(f, possible_funs = info@outputs)
+
+g <- function(x) {
+    if(x > 10)
+        h1(x)
+    else
+        h2(x)
+} 
+
+getInputs(body(g))@functions
