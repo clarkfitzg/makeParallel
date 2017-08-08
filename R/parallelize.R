@@ -3,22 +3,25 @@
 #' Distributes data over a cluster and returns a closure capable of
 #' evaluating code in parallel. Designed for interactive use.
 #'
-#' The current version sends all the global functions to the parallel
-#' workers each time the evaluator is called. This is useful when
-#' iteratively building functions within the global environment.
-#' The smarter thing to do is keep track of which functions change, and
-#' then send those over. But it's not clear that is worth it.
+#' The resulting evaluator analyzes the code as if it was executed
+#' within the global scope. Discovered global variables will be
+#' exported to the workers, which can be expensive if they are large.
+#'
 #'
 #' @export
 #' @param x An object one wants to perform parallel analysis on
 #' @param cl SNOW cluster
 #' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
 #' @param ... additional arguments to \code{\link[parallel]{makeCluster}}
-#' @return closure works similarly as \code{eval}
+#' @return parallel evaluator resembling \code{\link[base]{eval}}
 #' @examples
-#' x = list(letters, 1:10)
+#' x = list(1:10, 20:30)
+#' #TODO: doesn't work because of global environment
 #' do = parallelize("x")
 #' do(lapply(x, head))
+#' y = 20
+#' do(x + y)
+#' parallel::stopCluster(attr(do, "cluster"))
 parallelize = function(x = NULL
                        , cl = parallel::makeCluster(spec, ...)
                        , spec = 2L, ...
@@ -31,7 +34,7 @@ parallelize = function(x = NULL
     #TODO- Only send parts necessary for each worker
     parallel::clusterExport(cl, varname)
 
-    indices = parallel::splitIndices(length(get(varname)), length(cl))
+    indices = parallel::splitIndices(length(x), length(cl))
 
     # Each worker only sees their own indices
     parallel::clusterApply(cl, indices, assign_local_subset
@@ -89,7 +92,12 @@ assign_local_subset = function(index, globalname, localname)
     NULL
 }
 
-
+# Keeping this around just in case:
+#' The current version sends all the global functions to the parallel
+#' workers each time the evaluator is called. This is useful when
+#' iteratively building functions within the global environment.
+#' The smarter thing to do is keep track of which functions change, and
+#' then send those over. But it's not clear that is worth it.
 #' Return the names of all global functions
 #global_functions = function()
 #{
