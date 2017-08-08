@@ -59,7 +59,7 @@ One can download a handful from the VA servers as follows:
 
 ```{R}
 
-datadir = "~/data/vets/appeals_sample/"
+datadir = "~/data/vets/appeals_sample"
 
 fnames = paste0("1719", 100:266, ".txt")
 urls = paste0("https://www.va.gov/vetapp17/files3/", fnames)
@@ -74,7 +74,6 @@ among the parallel workers.
 ```{R}
 
 filenames = list.files(datadir, full.names = TRUE)
-
 length(filenames)
 
 do = parallelize(filenames)
@@ -88,6 +87,17 @@ The following code actually loads the data contained in the files and
 assigns the result into `appeals` on the cluster. 
 
 ```{R}
+
+readone = function(fname, nchars = MAXCHAR)
+{
+    f = file(fname, open = "rb", encoding = "ISO-8859")
+    readChar(f, nchars)
+}
+
+f1 = readone(filenames[1])
+
+
+readChar(filenames[1], nchars = MAXCHAR)
 
 do({
     appeals <- sapply(filenames, readChar, nchars = MAXCHAR)
