@@ -14,11 +14,8 @@ set.seed(38290)
 x = matrix(rnorm(n * p), nrow = n)
 
 c0 = cov(x)
-
 cm = cov_matrix(x)
-
 cc = cov_chunked(x)
-
 ccp = cov_chunked_parallel(x)
 
 # Recording lower quartile times
@@ -36,8 +33,8 @@ microbenchmark(cov(x), times = 10L)
 
 # 78 ms for n = 1e6, p = 5
 # 1.14 s for n = 1e7, p = 5
-# 848 ms for n = 1e6, p = 10
-microbenchmark(cov_chunked(x), times = 10L)
+# 326 ms for n = 1e6, p = 10
+microbenchmark(cov_chunked(x, nchunks = 2L), times = 10L)
 
 # 96 ms for n = 1e6, p = 5
 # 0.967 s for n = 1e7, p = 5
@@ -55,11 +52,14 @@ microbenchmark(cov_chunked_parallel(x, nchunks = 10L), times = 10L)
 
 Rprof("cov_chunked.out")
 cov_chunked(x)
+cov_chunked(x)
+cov_chunked(x)
+cov_chunked(x)
+cov_chunked(x)
 Rprof(NULL)
 
 # So it spends an enormous amount of time inside is.data.frame.
 summaryRprof("cov_chunked.out")
-
 
 library(profvis)
 
@@ -68,3 +68,43 @@ profvis({
     cc = cov_chunked(x)
 })
 
+############################################################
+
+# Figure out how this gets called
+newcounter = function()
+{
+    count = 0
+    function() count <<- count + 1
+}
+
+count1 = newcounter()
+
+trace(is.data.frame, count1)
+
+cov_chunked(x)
+
+# The chunked version calls is.data.frame 110 times for 10 chunks
+# And 6 times for 2 chunks
+environment(count1)$count
+
+# While the base version calls it 2 times
+cov(x)
+
+# This makes total sense, because a version with k chunks calls
+# cov() (k + 1) * k / 2 times => (k + 1) * k calls to is.data.frame.
+# Then I can't get around the number of times is.data.frame is called
+
+untrace(is.data.frame)
+
+# Then is is.data.frame() just super slow?
+# cov_chunked takes around 265 ms for the 2 chunk case, calling
+# is.data.frame 6 times. This means is.data.frame should take around 20 ms:
+0.5 * 265 / 6
+# Which is absurdly slow. So something else is going on, and I don't know
+# what. Some sanity checks:
+
+# Takes less than a microsecond
+microbenchmark(is.data.frame(x), times = 10L)
+
+# Takes less than a microsecond
+microbenchmark(inherits(x, "data.frame"), times = 10L)

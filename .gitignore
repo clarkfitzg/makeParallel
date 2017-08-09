@@ -35,3 +35,6 @@ vignettes/*.pdf
 # Ignoring for now since laptop and desktop are on different versions of
 # Roxygen
 *.Rd
+
+# Profile files
+*.out
