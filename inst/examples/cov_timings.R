@@ -8,7 +8,7 @@ library(autoparallel)
 source("covariance.R")
 
 
-n = 1e6
+n = 5e6
 p = 10L
 set.seed(38290)
 x = matrix(rnorm(n * p), nrow = n)
@@ -48,7 +48,7 @@ bm(cov(x))
 # 78 ms for n = 1e6, p = 5
 # 1.14 s for n = 1e7, p = 5
 # 326 ms for n = 1e6, p = 10
-bm(cov_chunked(x))
+bm(cov_chunked(x, nchunks = 2L))
 
 # 96 ms for n = 1e6, p = 5
 # 0.967 s for n = 1e7, p = 5
