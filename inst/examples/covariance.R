@@ -11,13 +11,13 @@
 # This index splitting should really be considered as a parameter to be
 # tuned for performance reasons. As a first pass I think it's reasonable to
 # attempt to automatically parallelize this.
-cov_chunked = function(x, nchunks = 2L)
+cov_chunked = function(x, nchunks = 10L)
 {
 
     p = ncol(x)
     indices = parallel::splitIndices(p, nchunks)
 
-    diagonal_blocks = lapply(indices, function(idx) cov(x[, idx]))
+    diagonal_blocks = lapply(indices, function(idx) cov(x[, idx, drop = FALSE]))
 
     upper_right_indices = combn(indices, 2, simplify = FALSE)
 
