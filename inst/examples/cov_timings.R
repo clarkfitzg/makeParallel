@@ -21,13 +21,15 @@ ccp = cov_chunked_parallel(x)
 # Recording lower quartile times
 
 bm = function(code, times = 10L, file = "benchmarks.txt"){
-    bm = microbenchmark(code, times = times)
+    expr = substitute(code)
+    bm = microbenchmark(list = list(expr), times = times)
     print(bm)
-    bmdf = as.data.frame(bm)
-    common = data.frame(n = n
+    obs = data.frame(expr = deparse(expr)
+                     , time = bm[, "time"]
+                     , n = n
                      , p = p
                      , systime = Sys.time()
-                     , sysname = Sys.info()["sysname"]
+                     , sysname = unname(Sys.info()["sysname"])
                      )
     write.table(obs, file, append = TRUE, row.names = FALSE, col.names = FALSE)
 }
@@ -36,27 +38,25 @@ bm = function(code, times = 10L, file = "benchmarks.txt"){
 # 1.16 s for n = 1e7, p = 5
 # 267 ms for n = 1e6, p = 10 Strange- formerly was 812 for same paramaters
 # => something I don't understand here.
-microbenchmark(cov_matrix(x), times = 10L)
-
 bm(cov_matrix(x))
 
 # 31 ms for n = 1e6, p = 5
 # 0.314 s for n = 1e7, p = 5
 # 93 ms for n = 1e6, p = 10 (timings very consistent)
-m = microbenchmark(cov(x), times = 10L)
+bm(cov(x))
 
 # 78 ms for n = 1e6, p = 5
 # 1.14 s for n = 1e7, p = 5
 # 326 ms for n = 1e6, p = 10
-microbenchmark(cov_chunked(x, nchunks = 2L), times = 10L)
+bm(cov_chunked(x))
 
 # 96 ms for n = 1e6, p = 5
 # 0.967 s for n = 1e7, p = 5
 # 235 ms for n = 1e6, p = 10
-microbenchmark(cov_chunked_parallel(x, nchunks = 2L), times = 10L)
+bm(cov_chunked_parallel(x, nchunks = 2L))
 
 # 564 ms for n = 1e6, p = 10
-microbenchmark(cov_chunked_parallel(x, nchunks = 10L), times = 10L)
+bm(cov_chunked_parallel(x, nchunks = 10L))
 
 
 # Why is the speed of cov_chunked(x) so much slower than cov(x) for large
