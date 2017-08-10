@@ -12,7 +12,19 @@ included with R since R 2.14, provides the core functionality to do
 multiprocessing.
 [foreach](https://cran.r-project.org/web/packages/foreach/index.html) and
 [futures](https://cran.r-project.org/web/packages/future/index.html) are
-CRAN packages that offer additional abstractions.
+CRAN packages that offer additional abstractions and system interfaces.
+
+## simple example
+
+The following base R code can execute in parallel because each call
+to `mean(X[[i]])` is independent:
+
+```{R}
+lapply(mean, X)
+```
+
+But because of the overhead in parallelism we don't know ahead of time if
+it's worth changing our program to get a faster version.
 
 ## high level
 
@@ -23,9 +35,9 @@ code for a given parallel programming model.
 
 Opportunities for parallelism are found through analysis of base R's apply
 family of functions using the [CodeDepends
-package](https://cran.r-project.org/web/packages/CodeDepends/index.html)
-The apply family includes \texttt{lapply, apply, sapply, tapply, by,
-mapply, Map, vapply, outer, by, replicate}. These are all variants of the
+package](https://cran.r-project.org/web/packages/CodeDepends/index.html).
+The apply family includes `lapply, apply, sapply, tapply, by,
+mapply, Map, vapply, outer, by, replicate`. These are all variants of the
 map reduce computational model which has been successful for implementing
 large scale parallel systems.
 
