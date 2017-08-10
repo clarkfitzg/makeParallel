@@ -1,30 +1,43 @@
 # autoparallel
 
-experimental library to make serial R code parallel
+_experimental library to transform serial R code into parallel_
 
-## Interactive use case
+If you would like to write parallel R today then you should start with a
+well established package. The CRAN Task View: [High-Performance and
+Parallel Computing with
+R](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
+provides a comprehensive review of available software.
+[parallel](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf),
+included with R since R 2.14, provides the core functionality to do
+multiprocessing.
+[foreach](https://cran.r-project.org/web/packages/foreach/index.html) and
+[futures](https://cran.r-project.org/web/packages/future/index.html) are
+CRAN packages that offer additional abstractions.
 
-```{R}
-library(autoparallel)
+## high level
 
-# Suppose docs is a large list of (XML) documents
-docs = list(letters, letters, LETTERS)
+The main idea is to transform serial R programs written in base R into
+parallel programs. This automatic program tranformation differs from
+current parallel technologies which require the user to explicitly write
+code for a given parallel programming model.
 
-do = parallelize(docs, workers = 2)
-```
+Opportunities for parallelism are found through analysis of base R's apply
+family of functions using the [CodeDepends
+package](https://cran.r-project.org/web/packages/CodeDepends/index.html)
+The apply family includes \texttt{lapply, apply, sapply, tapply, by,
+mapply, Map, vapply, outer, by, replicate}. These are all variants of the
+map reduce computational model which has been successful for implementing
+large scale parallel systems.
 
-`parallelize` returns a closure that maintains server state. It evaluates expressions
-much like `eval` and `parallel::clusterEvalq`.
+Performance profiling measures how long the program spends executing each
+part of the code. The profiling together with estimates of the overhead on
+the particular machine allow us to determine if it's actually worth it to
+parallelize a given R expression.  If the parallel version is slower then
+the expression should be left in serial form.
 
-```{R}
-getfirst = function(doc) doc[1:5]
+The broader goal is to incorporate more intelligence into the system,
+freeing the user to write higher level code that also performs better.
 
-do(lapply(docs, getfirst))
-```
+## examples
 
-The line above will do the equivalent of `lapply(docs, getfirst)`, but more
-efficiently in parallel on the distributed data set. 
-
-To implement later is when `getfirst()` or dependencies of `getfirst` change then
-these should be exported to the cluster. First pass is to just export
-the one function each time.
+See the vignettes in this package, or look in `inst/examples`.

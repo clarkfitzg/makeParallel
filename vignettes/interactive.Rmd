@@ -7,6 +7,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+# Interactive
+
 This example is to show how one can use `autoparallel` for interactive use.
 
 We'll start with a basic example.
@@ -132,10 +134,10 @@ This would be useful to see the warnings that may come from our code, for exampl
 ```{r}
 
 # Check how many we're about to bring back
-do(sum(grepl("rEMAND", appeals)))
+do(sum(grepl("REMAND", appeals)))
 
 # Bring them back from the workers
-remand <- do(appeals[grepl("rEMAND", appeals)])
+remand <- do(appeals[grepl("REMAND", appeals)])
 
 length(remand)
 
@@ -157,3 +159,30 @@ The cluster is available as an attribute on the parallel evaluator object.
 parallel::stopCluster(attr(do, "cluster"))
 
 ```
+
+## From old intro:
+
+```{R}
+library(autoparallel)
+
+# Suppose docs is a large list of (XML) documents
+docs = list(letters, letters, LETTERS)
+
+do = parallelize(docs, workers = 2)
+```
+
+`parallelize` returns a closure that maintains server state. It evaluates expressions
+much like `eval` and `parallel::clusterEvalq`.
+
+```{R}
+getfirst = function(doc) doc[1:5]
+
+do(lapply(docs, getfirst))
+```
+
+The line above will do the equivalent of `lapply(docs, getfirst)`, but more
+efficiently in parallel on the distributed data set. 
+
+To implement later is when `getfirst()` or dependencies of `getfirst` change then
+these should be exported to the cluster. First pass is to just export
+the one function each time.
