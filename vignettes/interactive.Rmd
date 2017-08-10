@@ -1,10 +1,17 @@
-Fri Aug  4 16:26:05 PDT 2017
+---
+title: "autoparallel-interactive"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel-interactive}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
 
 This example is to show how one can use `autoparallel` for interactive use.
 
 We'll start with a basic example.
 
-```{R}
+```{r}
 
 library(autoparallel)
 
@@ -18,7 +25,7 @@ do
 The parallel evaluator named `do` splits `x` into approximately equal parts
 so that one can run code in parallel.
 
-```{R}
+```{r}
 
 lapply(x, head)
 
@@ -26,8 +33,8 @@ do(lapply(x, head))
 
 ```
 
-Calling the same code through `do` produces the same result as the base R
-case. Under the hood `do` sent the code to different R processes for
+Calling the same code through `do` produces the same result as the base r
+case. Under the hood `do` sent the code to different r processes for
 evaluation. 
 
 This is meant for interactively building functions and analysis on large
@@ -35,7 +42,7 @@ data sets. The interactive feature is sending functions from one's global
 workspace to the parallel workers. We can see the results of the improved /
 debugged version of the function as we work on them.
 
-```{R}
+```{r}
 
 # An analysis function
 myfun = function(x) x[1:2]
@@ -57,21 +64,21 @@ Veterans Administration (VA) Court appeals are one such example. Each file
 contains the summary of a court case. 
 One can download a handful from the VA servers as follows:
 
-```{R}
+```{r}
 
 datadir = "~/data/vets/appeals_sample"
 
 fnames = paste0("1719", 100:266, ".txt")
 urls = paste0("https://www.va.gov/vetapp17/files3/", fnames)
 
-Map(download.file, urls, paste0(datadir, fnames))
+#Map(download.file, urls, paste0(datadir, fnames))
 
 ```
 
 The file names themselves are small, so we can cheaply distribute them
 among the parallel workers.
 
-```{R}
+```{r}
 
 filenames = list.files(datadir, full.names = TRUE)
 length(filenames)
@@ -83,7 +90,7 @@ do = parallelize(filenames)
 The following code actually loads the data contained in the files and
 assigns the result into `appeals` on the cluster. 
 
-```{R}
+```{r}
 
 do({
     appeals <- lapply(filenames, readLines)
@@ -100,7 +107,7 @@ the large data set from the workers back to the manager.
 The code above only assigned `appeals` to the global environment of the
 workers. It does not exist in the manager process.
 
-```{R}
+```{r}
 
 # FALSE
 "appeals" %in% ls()
@@ -108,9 +115,9 @@ workers. It does not exist in the manager process.
 ```
 
 The parallel evaluator allows us to compute on it with the same code that
-can be used for serial R.
+can be used for serial r.
 
-```{R}
+```{r}
 
 do(length(appeals))
 do(class(appeals))
@@ -122,13 +129,13 @@ for further evidence. If they're a reasonably small subset we may choose to
 bring them back into the manager process for further non parallel analysis.
 This would be useful to see the warnings that may come from our code, for example.
 
-```{R}
+```{r}
 
 # Check how many we're about to bring back
-do(sum(grepl("REMAND", appeals)))
+do(sum(grepl("rEMAND", appeals)))
 
 # Bring them back from the workers
-remand <- do(appeals[grepl("REMAND", appeals)])
+remand <- do(appeals[grepl("rEMAND", appeals)])
 
 length(remand)
 
@@ -145,7 +152,7 @@ worker.
 When finished it's a good idea to shut down the cluster.
 The cluster is available as an attribute on the parallel evaluator object.
 
-```{R}
+```{r}
 
 parallel::stopCluster(attr(do, "cluster"))
 

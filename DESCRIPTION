@@ -15,9 +15,12 @@ Imports:
     igraph
 Suggests:
     roxygen2,
+    knitr,
+    rmarkdown,
     testthat
 Description: Examines R code and automatically generates parallel versions.
 License: MIT
 URL: https://github.com/clarkfitzg/autoparallel
 BugReports: https://github.com/clarkfitzg/autoparallel
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr

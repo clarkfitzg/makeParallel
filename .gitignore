@@ -36,5 +36,5 @@ vignettes/*.pdf
 # Roxygen
 *.Rd
 
-# Profile files
+# Profiling files
 *.out
