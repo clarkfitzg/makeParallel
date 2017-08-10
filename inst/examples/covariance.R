@@ -52,3 +52,25 @@ cov_matrix = function(x)
     xc = scale(x, center = TRUE, scale = FALSE)
     (t(xc) %*% xc) / (n - 1)
 }
+
+
+# loop version, uses symmetry
+cov_loop = function(x)
+{
+    p = ncol(x)
+    n = nrow(x)
+
+    # Center x:
+    for(i in 1:p){
+        x[, i] = x[, i] - mean(x[, i])
+    }
+
+    output = matrix(numeric(p*p), nrow = p)
+    for(i in 1:p){
+        for(j in i:p){
+            covij = sum(x[, i] * x[, j]) / (n - 1)
+            output[i, j] = covij
+            output[j, i] = covij
+        }
+    }
+}

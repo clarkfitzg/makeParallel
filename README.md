@@ -24,7 +24,7 @@ lapply(mean, X)
 ```
 
 But because of the overhead in parallelism we don't know ahead of time if
-it's worth changing our program to get a faster version.
+a parallel version will be faster.
 
 ## high level
 
