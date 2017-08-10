@@ -73,4 +73,5 @@ cov_loop = function(x)
             output[j, i] = covij
         }
     }
+    output
 }

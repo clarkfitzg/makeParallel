@@ -17,6 +17,7 @@ c0 = cov(x)
 cm = cov_matrix(x)
 cc = cov_chunked(x)
 ccp = cov_chunked_parallel(x)
+ccl = cov_loop(x)
 
 # Recording lower quartile times
 
@@ -58,6 +59,8 @@ bm(cov_chunked_parallel(x, nchunks = 2L))
 # 564 ms for n = 1e6, p = 10
 bm(cov_chunked_parallel(x, nchunks = 10L))
 
+# Seems like some other system load happening?
+bm(cov_loop(x))
 
 # Why is the speed of cov_chunked(x) so much slower than cov(x) for large
 # n? I would expect that the time to deal with the blocking is amortized by
