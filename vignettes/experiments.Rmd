@@ -21,7 +21,42 @@ This is how the `apply` transformation works.
 
 Is this always the case? Not if one block of code takes much longer- then
 there's a load balancing issue and the load balancing tools in the parallel
-package should probably be used.
+package should probably be used. Random selection of pieces to execute may
+help in this regard.
+
+```{R}
+
+library(microbenchmark)
+
+x = seq(1e6)
+
+bm1 = microbenchmark(lapply(x, function(xi) NULL), times = 10L)
+
+# Lower quartile 463 ms
+bm1
+
+bm2 = microbenchmark(parallel::mclapply(x, function(xi) NULL, mc.cores = 2L), times = 10L)
+
+# Lower quartile 499 ms
+bm2
+
+cl = parallel::makeCluster(2L)
+
+bm3 = microbenchmark(parallel::parLapply(cl, x, function(xi) NULL), times = 10L)
+
+# Lower quartile 552 ms
+bm3
+
+```
+
+These times are similar. I just looked at the source of
+`parallel::mclapply` and saw that it indeed already does this chunking for
+efficiency that I had in mind here. And `parallel::parLapply` even uses
+`parallel::splitIndices`.
+
+This implies that it's unnecessary to take any pains to chunk the
+`apply` calls as I did previously. Instead I can simply feed them straight in
+to the corresponding version in `parallel`.
 
 ## 2 Loop Reordering
 
