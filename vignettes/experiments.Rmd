@@ -63,6 +63,12 @@ to the corresponding version in `parallel`.
 What are necessary and sufficient conditions to be able to run lapply calls
 in parallel? Can we detect programmatically if they are satisfied?
 
+The `lapply` calls a function rather than a statement. Most functions called
+with `lapply` are probably pure, meaning they have no side effects. This is
+a sufficient condition to say we can fully reorder statements. But it's
+stronger than we need.
+
+
 ## 3 Data Motion
 
 Can we look at the code and prevent data motion? For example:
