@@ -67,12 +67,9 @@ bm(cov_loop(x))
 # the larger data set.
 # Lets explore this further.
 
+
 Rprof("cov_chunked.out")
-cov_chunked(x)
-cov_chunked(x)
-cov_chunked(x)
-cov_chunked(x)
-cov_chunked(x)
+replicate(10, cov_chunked(x))
 Rprof(NULL)
 
 # So it spends an enormous amount of time inside is.data.frame.

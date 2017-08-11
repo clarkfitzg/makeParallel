@@ -1,0 +1,51 @@
+---
+title: "autoparallel-experiments"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel-interactive}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Experiments
+
+Motivation for the tools inside `autoparallel`.
+
+## 1 Fast Functions
+
+If the function that `lapply()` calls is fast, then I expect a direct
+translation to `mclapply()` will be slower. I expect that one can improve
+the speed by splitting the lapply call into the number of chunks to match
+the number of workers and then calling something like `mclapply(lapply(...))`.
+This is how the `apply` transformation works.
+
+Is this always the case? Not if one block of code takes much longer- then
+there's a load balancing issue and the load balancing tools in the parallel
+package should probably be used.
+
+## 2 Loop Reordering
+
+What are necessary and sufficient conditions to be able to run lapply calls
+in parallel? Can we detect programmatically if they are satisfied?
+
+## 3 Data Motion
+
+Can we look at the code and prevent data motion? For example:
+
+
+```{R}
+
+x = as.list(1:10)
+y = lapply(x, function(xi) 2 * xi)
+sy = Reduce(`+`, y)                 # Push partially to worker
+z = lapply(y, function(yi) yi - 3)  # Never bring to manager
+sz = Reduce(`+`, z)                 # Push to worker
+
+```
+
+Assume the `Reduce` function is associative and these data sizes are
+prohibitively large for moving. Then it would be a win here to split the
+`lapply` calls as above and push the `Reduce` into the workers. `z` also
+never needs to come back to the manager.
+
+Related question, how large is too large?
