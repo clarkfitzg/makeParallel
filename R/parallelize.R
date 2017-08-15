@@ -29,16 +29,7 @@ parallelize = function(x = NULL
 {
 
     varname = deparse(substitute(x))
-
-    #TODO- Don't need for fork clusters
-    #TODO- Only send parts necessary for each worker
-    parallel::clusterExport(cl, varname)
-
-    indices = parallel::splitIndices(length(x), length(cl))
-
-    # Each worker only sees their own indices
-    parallel::clusterApply(cl, indices, assign_local_subset
-                 , globalname = varname, localname = varname)
+    assign_workers(cl, varname)
 
     evaluator = function(expr, simplify = c, verbose = FALSE)
     {
@@ -85,12 +76,37 @@ print.parallel_evaluator = function(x)
 }
 
 
-assign_local_subset = function(index, globalname, localname)
+#' Assign Variable Subset On Cluster
+#'
+#' Partition the variable into chunks and distribute each chunk to a
+#' parallel worker.
+#'
+#' @export
+#' @param cl SNOW cluster
+#' @param manager_varname string naming variable to be exported
+#' @param worker_varname string naming variable to be assigned to the
+#'      global workspace of the worker node
+assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
 {
-    x = get(globalname)
-    assign(localname, x[index], envir = .GlobalEnv)
+    #TODO- Don't need for fork clusters
+    #TODO- Only send parts necessary for each worker
+    parallel::clusterExport(cl, manager_varname)
+
+    indices = parallel::splitIndices(length(x), length(cl))
+
+    # Each worker only sees their own indices
+    parallel::clusterApply(cl, indices, assign_one
+                 , manager_varname = varname, worker_varname = varname)
+}
+
+
+assign_one = function(index, manager_varname, worker_varname)
+{
+    x = get(manager_varname)
+    assign(worker_varname, x[index], envir = .GlobalEnv)
     NULL
 }
+
 
 # Keeping this around just in case:
 #' The current version sends all the global functions to the parallel
