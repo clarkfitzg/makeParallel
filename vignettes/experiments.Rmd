@@ -11,7 +11,7 @@ vignette: >
 
 Motivation for the tools inside `autoparallel`.
 
-## 1 Fast Functions
+## Fast Functions
 
 If the function that `lapply()` calls is fast, then I expect a direct
 translation to `mclapply()` will be slower. I expect that one can improve
@@ -58,7 +58,7 @@ This implies that it's unnecessary to take any pains to chunk the
 `apply` calls as I did previously. Instead I can simply feed them straight in
 to the corresponding version in `parallel`.
 
-## 2 Loop Reordering
+## Loop Reordering
 
 What are necessary and sufficient conditions to be able to run lapply calls
 in parallel? Can we detect programmatically if they are satisfied?
@@ -66,10 +66,12 @@ in parallel? Can we detect programmatically if they are satisfied?
 The `lapply` calls a function rather than a statement. Most functions called
 with `lapply` are probably pure, meaning they have no side effects. This is
 a sufficient condition to say we can fully reorder statements. But it's
-stronger than we need.
+stronger than we need. For example, each function could write to a unique
+file. Then the function is not pure, because it writes to a file, but it
+may run in parallel, because the files are different.
 
 
-## 3 Data Motion
+## Data Motion
 
 Can we look at the code and prevent data motion? For example:
 
@@ -77,9 +79,9 @@ Can we look at the code and prevent data motion? For example:
 ```{R}
 
 x = as.list(1:10)
-y = lapply(x, function(xi) 2 * xi)
+y = Map(x, function(xi) 2 * xi)
 sy = Reduce(`+`, y)                 # Push partially to worker
-z = lapply(y, function(yi) yi - 3)  # Never bring to manager
+z = Map(y, function(yi) yi - 3)  # Never bring to manager
 sz = Reduce(`+`, z)                 # Push to worker
 
 ```
@@ -90,3 +92,21 @@ prohibitively large for moving. Then it would be a win here to split the
 never needs to come back to the manager.
 
 Related question, how large is too large?
+
+
+## Statistical Examples
+
+__L1 regression using ADMM__ 
+This is the example that I wanted to use for the traffic data.
+Followed [Boyd's
+work](https://web.stanford.edu/~boyd/papers/admm/least_abs_deviations/lad.html) here.
+Essentially the algorithm caches a matrix decomposition, reusing it in each
+iteration. General ADMM follows a scatter / gather pattern with the
+parallelism, assuming the objective function of `x` to be minimized can be split
+into `n` independent minimizations on `x_i`, where `n` is the abstract number of
+workers.
+
+For simple L1 regression the `x` updates reduce to a matrix vector multiply
+which can be expressed with backsolves. It would be quite difficult to
+improve on a tuned LAPACK backsolve using parallelism. So this example
+isn't going to work.

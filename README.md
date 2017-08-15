@@ -10,9 +10,18 @@ provides a comprehensive review of available software.
 [parallel](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf),
 included with R since R 2.14, provides the core functionality to do
 multiprocessing.
-[foreach](https://cran.r-project.org/web/packages/foreach/index.html) and
-[futures](https://cran.r-project.org/web/packages/future/index.html) are
-CRAN packages that offer additional abstractions and system interfaces.
+
+## related work
+
+Bengstton's
+[futures](https://cran.r-project.org/web/packages/future/index.html)
+provides a mechanism for parallel asynchronous evaluation of R functions
+across different systems.
+
+Böhringer's
+[parallelize.dynamic](https://cran.r-project.org/package=parallelize.dynamic)
+provides the `parallelize_call()` function to dynamically parallelize a
+single function call.
 
 ## simple example
 
