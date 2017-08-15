@@ -91,7 +91,7 @@ depend_graph = function(script, add_source = FALSE)
     }
     if (n == 1){
         # Graph with one node, no edges.
-        return(make_graph(numeric(), n = 1))
+        return(igraph::make_graph(numeric(), n = 1))
     }
 
     inputs = lapply(info, slot, "inputs")
@@ -117,14 +117,14 @@ depend_graph = function(script, add_source = FALSE)
     edges = unlist(edges)
 
     if(add_source){
-        g = make_graph(edges + 1, n = n + 1)
+        g = igraph::make_graph(edges + 1, n = n + 1)
         g = add_source_node(g)
     } else {
-        g = make_graph(edges, n = n)
+        g = igraph::make_graph(edges, n = n)
     }
 
     # Removes multiple edges
-    simplify(g)
+    igraph::simplify(g)
 }
 
 

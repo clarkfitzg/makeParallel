@@ -1,0 +1,11 @@
+# Assumptions
+
+I may want to make some of the following assumptions, depending on
+convenience.
+
+Input in a canonical form. Have to say precisely what this means. For
+example:
+
+- `<-` is used for assignment rather than `=` or `assign`
+- All statements in the program are necessary, in the sense that they lead
+  to something with a side effect.

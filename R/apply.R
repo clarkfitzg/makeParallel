@@ -112,6 +112,7 @@ benchmark_parallel = function(statement, times = 10L)
 #'
 #' Only looks at the top level expression.
 #'
+#' @export
 #' @param expr expression
 #' @param apply_func vector of apply names
 #' @return integer 1 for \code{apply(x, ...}, 3 for \code{y <- apply(x,
