@@ -29,7 +29,7 @@ parallelize = function(x = NULL
 {
 
     varname = deparse(substitute(x))
-    assign_workers(cl, varname)
+    indices = assign_workers(cl, varname)
 
     evaluator = function(expr, simplify = c, verbose = FALSE)
     {
@@ -86,9 +86,10 @@ print.parallel_evaluator = function(x)
 #' @param manager_varname string naming variable to be exported
 #' @param worker_varname string naming variable to be assigned to the
 #'      global workspace of the worker node
+#' @return indices list of partitioning indices
 assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
 {
-    #TODO- Don't need for fork clusters
+    #TODO- Don't need for an initial fork cluster
     #TODO- Only send parts necessary for each worker
     parallel::clusterExport(cl, manager_varname)
 
@@ -96,7 +97,10 @@ assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
 
     # Each worker only sees their own indices
     parallel::clusterApply(cl, indices, assign_one
-                 , manager_varname = varname, worker_varname = varname)
+                 , manager_varname = manager_varname
+                 , worker_varname = worker_varname)
+
+    indices
 }
 
 

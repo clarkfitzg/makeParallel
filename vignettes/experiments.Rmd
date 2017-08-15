@@ -73,6 +73,8 @@ may run in parallel, because the files are different.
 
 ## Data Motion
 
+Related question, how large is too large for movement?
+
 Can we look at the code and prevent data motion? For example:
 
 
@@ -91,7 +93,24 @@ prohibitively large for moving. Then it would be a win here to split the
 `lapply` calls as above and push the `Reduce` into the workers. `z` also
 never needs to come back to the manager.
 
-Related question, how large is too large?
+I thought this example was completely artificial, but looking back at it I
+realize that it's very similar to the general pattern of ADMM. The
+difference is that ADMM does iterative updates. Consider section 10 on the
+[abstract implementation for
+ADMM](http://stanford.edu/~boyd/papers/pdf/admm_distr_stats.pdf) in Boyd's
+book. It would be something like:
+
+```{R}
+
+for(i in 1:N){
+    u = Map(mu, u, x, z = z)
+    x = Map(mx, u, x, z = z)
+    ubar = Reduce(ru, u)
+    xbar = Reduce(rx, x)
+    z = fz(ubar, xbar)
+}
+
+```
 
 
 ## Statistical Examples
