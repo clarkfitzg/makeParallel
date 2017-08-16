@@ -1,3 +1,12 @@
+---
+title: "autoparallel-assumptions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel-assumptions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
 # Assumptions
 
 I may want to make some of the following assumptions, depending on
@@ -9,3 +18,5 @@ example:
 - `<-` is used for assignment rather than `=` or `assign`
 - All statements in the program are necessary, in the sense that they lead
   to something with a side effect.
+
+This can probably be done through preprocessing.

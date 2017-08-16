@@ -58,7 +58,7 @@ apply_parallel = function(statement)
 #' parallel, then returns the faster version based on the median timing.
 #'
 #' It may be nice to return more, or log the profiling.
-#' The statment is evaluated in the global environment to simulate running
+#' The statement is evaluated in the global environment to simulate running
 #' the script.
 #'
 #' @param statement a single R statment
