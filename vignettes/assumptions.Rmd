@@ -18,5 +18,7 @@ example:
 - `<-` is used for assignment rather than `=` or `assign`
 - All statements in the program are necessary, in the sense that they lead
   to something with a side effect.
+- Existing `for` loops are unavoidable, ie. they do something like
+  iterative updates. Otherwise they should be `lapply` type calls.
 
 This can probably be done through preprocessing.

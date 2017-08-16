@@ -136,20 +136,6 @@ apply_location = function(expr, apply_func = "apply")
 }
 
 
-#' Find Expressions Using \code{apply}
-#'
-#' Not sure I need this.
-#' Only looks at the top level expression.
-#'
-#' @param expr expression
-#' @return logical locations of apply
-#' @export
-find_apply = function(expr)
-{
-    sapply(expr, apply_location)
-}
-
-
 #' Convert A Script To Parallel Through Benchmarking
 #'
 #' Benchmarking is used to determine if it's worth it go parallel.

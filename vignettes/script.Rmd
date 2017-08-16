@@ -63,9 +63,10 @@ r2 = parallel::mclapply(x, fslow)
 
 To transform it:
 
-
 ```{R}
 
-autoparallel::benchmark_transform("simple.R", output = "simple2.R")
+library(autoparallel)
+
+benchmark_transform("simple.R", output = "simple2.R")
 
 ```
