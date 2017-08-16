@@ -110,7 +110,8 @@ benchmark_parallel = function(statement, times = 10L)
 
 #' Find Location Of Apply In Parse Tree
 #'
-#' Only looks at the top level expression.
+#' Only looks at the top level expression. Finds at most one place to
+#' parallelize
 #'
 #' @export
 #' @param expr expression

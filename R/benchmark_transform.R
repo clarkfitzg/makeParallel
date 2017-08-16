@@ -1,3 +1,13 @@
+apply_funcs = data.frame(serial = c("mapply", "lapply", "Map"))
+apply_funcs[, "parallel"] = paste0("parallel::", apply_funcs[, "serial"])
+
+
+#' Convert apply_funcs from serial to parallel version
+serial_to_parallel = function(expr, loc){
+    # TODO
+}
+
+
 #' Transform Program To Parallel Based On Benchmarks
 #' 
 #' @param input_file string naming a slow R script
@@ -6,12 +16,41 @@
 #' @export
 benchmark_transform = function(input_file, output_file)
 {
+
     program = CodeDepends::readScript(input_file)
 
-    # If we can't find any place to parallelize then take the easy out
-    apply_locs = sapply(expr, apply_location, apply_)
+    # Probably want to use this later:
+    #inputs = CodeDepends::getInputs(program)
+    #funcs = lapply(inputs, function(x) names(x@functions))
+
+    apply_locs = sapply(program, apply_location, apply_func = apply_funcs[, "serial"])
+
+    if(sum(apply_locs) == 0){
+        message("Did not see top level apply functions")
+        return(program)
+    }
+
+    newprogram = program
+
+    for(i in seq_along(program)){
+        expr = program[[i]]
+        apply_loc = apply_locs[i]
+        if(apply_loc == 0){
+            print(expr)
+            # Must evaluate in case subsequent expressions depend on this
+            eval(expr, globalenv())
+        } else {
+            print("Benchmarking:")
+            print(expr)
+            par_expr = serial_to_parallel(expr, apply_loc)
+            # TODO
+        }
+    }
 }
 
+
+# For developing
+input_file = "~/dev/autoparallel/vignettes/simple.R"
 
 #' Find Location Of Functions In Parse Tree
 #'
