@@ -72,30 +72,36 @@ nworkers = function()
 #' @param loc used for internal recursive calls
 #' @param found used for internal recursive calls
 #' @return address list of integer vectors, possibly empty
+#' @export
 find_call = function(expr, funcname, loc = integer(), found = list())
 {
     if(length(loc) == 0){
-        # Not a recursive call
+        # This is the first call, ie no recursion has yet taken place
         funcname = as.symbol(funcname)
     }
 
-    for(i in seq_along(expr)){
-        loc = c(loc, i)
-        e = expr[[i]]
+    if(typeof(expr) != "language"){
+        # We're at a leaf node, all done with the search
+        return(list())
+    }
 
-        if(typeof(e) == "language"){
-        # Otherwise it will be a leaf node, so can be ignored
-            if(class(e) == "call"){
-                if(e[[1]] == funcname){
-                    found = c(found, c(loc, 1L))
-                }
-            }
-            # Continue recursion
-            for(subexpr in e){
-                recurse_found = Recall(subexpr, funcname, loc)
-                found = c(found, recurse_found)
-            }
+    if(class(expr) == "call"){
+        if(expr[[1]] == funcname){
+            found = c(found, list(c(loc, 1L)))
         }
     }
+
+    # Continue recursion
+    for(i in seq_along(expr)){
+        subexpr = expr[[i]]
+        recurse_found = Recall(subexpr, funcname, c(loc, i))
+        found = c(found, recurse_found)
+    }
+
+    #for(i in seq_along(expr)){
+    #    loc = c(loc, i)
+    #    e = expr[[i]]
+
+    #}
     found
 }

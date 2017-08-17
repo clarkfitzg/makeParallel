@@ -22,7 +22,7 @@ test_that("replacing functions", {
 test_that("find_call", {
 
     e0 = quote(sapply(x, f))
-    expect_equal(find_call(e1, "lapply"), list())
+    expect_equal(find_call(e0, "lapply"), list())
 
     e1 = quote(lapply(x, f))
     expect_equal(find_call(e1, "lapply"), list(1L))
