@@ -1,4 +1,5 @@
-apply_funcs = data.frame(serial = c("mapply", "lapply", "Map"))
+apply_funcs = data.frame(serial = c("mapply", "lapply", "Map")
+                         , stringsAsFactors = FALSE)
 apply_funcs[, "parallel"] = paste0("parallel::", apply_funcs[, "serial"])
 
 
@@ -6,6 +7,10 @@ apply_funcs[, "parallel"] = paste0("parallel::", apply_funcs[, "serial"])
 serial_to_parallel = function(expr, loc){
     # TODO
 }
+
+
+# For developing
+input_file = "~/dev/autoparallel/vignettes/simple.R"
 
 
 #' Transform Program To Parallel Based On Benchmarks
@@ -23,9 +28,18 @@ benchmark_transform = function(input_file, output_file)
     #inputs = CodeDepends::getInputs(program)
     #funcs = lapply(inputs, function(x) names(x@functions))
 
-    apply_locs = sapply(program, apply_location, apply_func = apply_funcs[, "serial"])
+    found = lapply(program, function(statement){
+        sapply(apply_funcs[, "serial"], function(fname){
+                   find_call(statement, fname)
+        })
+    })
 
-    if(sum(apply_locs) == 0){
+    #TODO: Tomorrow- write the parallel transformer that operates on
+    #this named list
+
+    nonefound = is.null(rapply(found, any, how = "unlist"))
+
+    if(nonefound){
         message("Did not see top level apply functions")
         return(program)
     }
@@ -47,9 +61,5 @@ benchmark_transform = function(input_file, output_file)
         }
     }
 }
-
-
-# For developing
-input_file = "~/dev/autoparallel/vignettes/simple.R"
 
 
