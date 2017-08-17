@@ -52,18 +52,4 @@ benchmark_transform = function(input_file, output_file)
 # For developing
 input_file = "~/dev/autoparallel/vignettes/simple.R"
 
-#' Find Location Of Functions In Parse Tree
-#'
-#' Recursively searches the expression to find explicit uses of functions
-#'
-#' @export
-#' @param expr unevaluated R code
-#' @param func_names character vector of functions to search for
-#' @return TODO: how to represent precise location in parse tree? Need something
-#' like a token address. Does this already exist?
-findfuncs = function(expr, funcs)
-{
-   #TODO
-}
-
 

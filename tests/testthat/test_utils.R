@@ -16,6 +16,22 @@ test_that("replacing functions", {
 
     sub_one_docall(expr, list(apply = quote(FANCY_APPLY)))
 
+})
+
+
+test_that("find_call", {
+
+    e0 = quote(sapply(x, f))
+    expect_equal(find_call(e1, "lapply"), list())
+
+    e1 = quote(lapply(x, f))
+    expect_equal(find_call(e1, "lapply"), list(1L))
+
+    e2 = quote(y <- lapply(x, f))
+    expect_equal(find_call(e2, "lapply"), list(c(3L, 1L)))
+
+    e3 = quote(y <- c(lapply(x, f1), lapply(x, f2)))
+    expect_equal(find_call(e3, "lapply"), list(c(3L, 2L, 1L), c(3L, 3L, 1L)))
 
 })
 

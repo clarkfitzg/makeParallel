@@ -1,0 +1,31 @@
+
+Initially I'm thinking to find and transform the first instance of `lapply`
+family functions that is discovered in each statement. This should help
+avoid nested parallelism. But consider this single statement:
+
+```{R}
+f(lapply(x, gx), lapply(y, gy))
+```
+
+Suppose the most efficient code is:
+
+```{R}
+f(lapply(x, gx), mclapply(y, gy))
+```
+
+Then with the current design we cannot discover this. One way around might
+be to rewrite the original code as:
+
+```{R}
+f_arg1 = lapply(x, gx)
+f_arg2 = lapply(y, gy)
+f(f_arg1, f_arg2)
+rm(f_arg1)
+rm(f_arg2)
+```
+
+This effectively removes one layer of nested function calls, allowing us to
+examine all arguments. Does anything stop us from doing this recursively?
+Of course it's possible to go too far with this idea, inlining code and
+recursing into the bodies of built in functions. Modifying built in
+functions seems excessively complicated and error prone.

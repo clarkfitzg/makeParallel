@@ -62,14 +62,29 @@ nworkers = function()
 
 #' Find Function Call
 #'
-#' Performs a breadth first search of the parse tree, returning the
-#' location of the first time the function is called.
+#' Search a parse tree, returning a list of locations where
+#' the function is called.
 #'
-#' @param expr expression
-#' @param funcname character
-#' @return address integer vector giving address of found function call,
-#'      and NULL if no such function calls found
-find_call = function(expr, funcname)
+#' Implementation based loosely on \code{codeDepends::walkCode}.
+#'
+#' @param expr R language expression
+#' @param funcname symbol or character naming the function
+#' @param loc used for internal recursive calls
+#' @param found used for internal recursive calls
+#' @return address list of integer vectors, possibly empty
+find_call = function(expr, funcname, state = NULL)
 {
+    if(is.null(state)){
+        # Not a recursive call
+        state = 1L
+        funcname = as.symbol(funcname)
+    }
+    for(e in expr){
+        if(typeof(e) == "language"){
+            if(class(e) == "call"){
+                if(e[[1]] == funcname)
+            }
+        }
 
+    }
 }
