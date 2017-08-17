@@ -60,3 +60,16 @@ nworkers = function()
 }
 
 
+#' Find Function Call
+#'
+#' Performs a breadth first search of the parse tree, returning the
+#' location of the first time the function is called.
+#'
+#' @param expr expression
+#' @param funcname character
+#' @return address integer vector giving address of found function call,
+#'      and NULL if no such function calls found
+find_call = function(expr, funcname)
+{
+
+}
