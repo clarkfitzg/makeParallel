@@ -65,27 +65,37 @@ nworkers = function()
 #' Search a parse tree, returning a list of locations where
 #' the function is called.
 #'
-#' Implementation based loosely on \code{codeDepends::walkCode}.
+#' Implementation based loosely on \code{codetools::walkCode}.
 #'
 #' @param expr R language expression
 #' @param funcname symbol or character naming the function
 #' @param loc used for internal recursive calls
 #' @param found used for internal recursive calls
 #' @return address list of integer vectors, possibly empty
-find_call = function(expr, funcname, state = NULL)
+find_call = function(expr, funcname, loc = integer(), found = list())
 {
-    if(is.null(state)){
+    if(length(loc) == 0){
         # Not a recursive call
-        state = 1L
         funcname = as.symbol(funcname)
     }
-    for(e in expr){
+
+    for(i in seq_along(expr)){
+        loc = c(loc, i)
+        e = expr[[i]]
+
         if(typeof(e) == "language"){
+        # Otherwise it will be a leaf node, so can be ignored
             if(class(e) == "call"){
-                if(e[[1]] == funcname)
-                    NULL
+                if(e[[1]] == funcname){
+                    found = c(found, c(loc, 1L))
+                }
+            }
+            # Continue recursion
+            for(subexpr in e){
+                recurse_found = Recall(subexpr, funcname, loc)
+                found = c(found, recurse_found)
             }
         }
-
     }
+    found
 }
