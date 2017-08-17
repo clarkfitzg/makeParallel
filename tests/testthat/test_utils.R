@@ -33,6 +33,9 @@ test_that("find_call", {
     e3 = quote(y <- c(lapply(x, f1), lapply(x, f2)))
     expect_equal(find_call(e3, "lapply"), list(c(3L, 2L, 1L), c(3L, 3L, 1L)))
 
+    e4 = quote(y <- lapply(lapply(x, f), g))
+    expect_equal(find_call(e4, "lapply"), list(c(3L, 1L), c(3L, 2L, 1L)))
+
 })
 
 

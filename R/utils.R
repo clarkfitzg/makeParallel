@@ -98,10 +98,5 @@ find_call = function(expr, funcname, loc = integer(), found = list())
         found = c(found, recurse_found)
     }
 
-    #for(i in seq_along(expr)){
-    #    loc = c(loc, i)
-    #    e = expr[[i]]
-
-    #}
     found
 }
