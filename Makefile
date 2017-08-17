@@ -5,9 +5,12 @@ RFILES!= ls R/*.R
 TESTFILES!= ls tests/testthat/test*.R
 VIGNETTES!= ls vignettes/*.Rmd
 
-all: $(RFILES) $(TESTFILES)
+install: $(RFILES)
 	R -e "roxygen2::roxygenize()"
 	R CMD INSTALL .
+
+test: $(TESTFILES)
+	make install
 	cd tests && Rscript testthat.R && cd ..
 
 vignettes: $(VIGNETTES)

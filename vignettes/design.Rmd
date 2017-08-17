@@ -1,3 +1,4 @@
+## multiple calls
 
 Initially I'm thinking to find and transform the first instance of `lapply`
 family functions that is discovered in each statement. This should help
@@ -29,3 +30,55 @@ examine all arguments. Does anything stop us from doing this recursively?
 Of course it's possible to go too far with this idea, inlining code and
 recursing into the bodies of built in functions. Modifying built in
 functions seems excessively complicated and error prone.
+
+
+## code not executed
+
+Note: this all seems like a second order consideration. 
+Suppose the user writes:
+
+```{R}
+f = function(x) lapply(x, g)
+
+f(y)
+f(z)
+```
+
+It may be the case that the fastest way to run `f(y)` is by changing `lapply`
+to `mclapply`, while the fastest way to run `f(z)` is to just keep the
+`lapply`.
+
+There's no point in benchmarking `function(x) lapply(x, g)`, because the
+`lapply` does not run there. We could statically analyze the code to see if
+it runs, or we could actually run it and do something like `trace(lapply)`.
+
+We could work around it
+by inlining user defined functions. One obvious issue there is clobbering
+global variables, ie:
+
+```{R}
+
+f = function(x){
+    z = 10
+    x + z
+}
+z = 20
+f(5)
+
+```
+
+If we just inline the code it becomes:
+
+```{R}
+
+z = 20
+z = 10
+x = 5
+x + z
+
+```
+
+So we need to do something more clever, ie. create a new frame for
+evaluation. By the time we do that we're on our way to recreating functions
+:) Then maybe it makes more sense to just handle functions as a special
+case.

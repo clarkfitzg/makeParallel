@@ -83,6 +83,7 @@ find_call = function(expr, funcname, state = NULL)
         if(typeof(e) == "language"){
             if(class(e) == "call"){
                 if(e[[1]] == funcname)
+                    NULL
             }
         }
 
