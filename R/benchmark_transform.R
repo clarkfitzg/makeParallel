@@ -37,9 +37,13 @@ input_file = "~/dev/autoparallel/vignettes/simple.R"
 #' 
 #' @param input_file string naming a slow R script
 #' @param output_file where to save the parallelized script
+#' @param nbenchmarks number of benchmarks to run
+#' @param threshold_time seconds if code runs under this time then don't
+#'      even bother with a comparison to parallel code
 #' @return transformed program
 #' @export
-benchmark_transform = function(input_file, output_file)
+benchmark_transform = function(input_file, output_file
+        , nbenchmarks = 3L, threshold_time = 0.001)
 {
 
     program = CodeDepends::readScript(input_file)
@@ -53,11 +57,14 @@ benchmark_transform = function(input_file, output_file)
     nonefound = all(sapply(pcode, is.null))
 
     if(nonefound){
-        message("Did not see top level apply functions")
+        print("Did not see top level apply functions. Stopping now.\n")
         return(program)
     }
 
     newprogram = program
+
+    # Convert to nanoseconds for comparison with microbenchmark
+    threshold_time = threshold_time / 1e9
 
     for(i in seq_along(program)){
         expr = program[[i]]
@@ -65,11 +72,21 @@ benchmark_transform = function(input_file, output_file)
         if(is.null(pexpr)){
             print(expr)
             # Must evaluate in case subsequent expressions depend on this
-            eval(expr, globalenv())
+            eval(expr)
         } else {
             print("Benchmarking:")
             print(expr)
-            # TODO
+            # TODO consider gc(), global evaluation, writing over args, etc
+            ser_time = microbenchmark(list = expr, times = nbenchmarks)[, "time"]
+            if(max(ser_time) < threshold_time){
+                print("Serial code is faster than threshold.")
+                next
+            }
+
+            par_time = microbenchmark(list = pexpr, times = nbenchmarks)[, "time"]
+
+            decision = t.test(ser_time, par_time, alternative = "less")
+
         }
     }
 }
