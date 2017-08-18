@@ -38,12 +38,15 @@ input_file = "~/dev/autoparallel/vignettes/simple.R"
 #' @param input_file string naming a slow R script
 #' @param output_file where to save the parallelized script
 #' @param nbenchmarks number of benchmarks to run
-#' @param threshold_time seconds if code runs under this time then don't
-#'      even bother with a comparison to parallel code
+#' @param threshold_time seconds if serial version runs under this time then don't
+#'      even bother with a comparison to parallel
+#' @param threshold_pvalue used for t test decision to choose parallel
+#'      over serial
 #' @return transformed program
 #' @export
-benchmark_transform = function(input_file, output_file
-        , nbenchmarks = 3L, threshold_time = 0.001)
+benchmark_transform = function(input_file, output_file = NULL
+        , nbenchmarks = 3L, threshold_time = 0.001
+        , threshold_pvalue = 0.001)
 {
 
     program = CodeDepends::readScript(input_file)
@@ -57,7 +60,7 @@ benchmark_transform = function(input_file, output_file
     nonefound = all(sapply(pcode, is.null))
 
     if(nonefound){
-        print("Did not see top level apply functions. Stopping now.\n")
+        cat("Did not see top level apply functions. Stopping now.\n")
         return(program)
     }
 
@@ -69,24 +72,39 @@ benchmark_transform = function(input_file, output_file
     for(i in seq_along(program)){
         expr = program[[i]]
         pexpr = pcode[[i]]
+        cat("\n\n\n\n")
+        print(expr)
         if(is.null(pexpr)){
-            print(expr)
             # Must evaluate in case subsequent expressions depend on this
             eval(expr)
         } else {
-            print("Benchmarking:")
-            print(expr)
+            cat("\nBenchmarking serial...\n")
             # TODO consider gc(), global evaluation, writing over args, etc
-            ser_time = microbenchmark(list = expr, times = nbenchmarks)[, "time"]
+            ser_time = microbenchmark(list = list(expr), times = nbenchmarks)[, "time"]
             if(max(ser_time) < threshold_time){
-                print("Serial code is faster than threshold.")
+                cat("Using serial version since it is faster than threshold.\n")
                 next
             }
 
-            par_time = microbenchmark(list = pexpr, times = nbenchmarks)[, "time"]
+            cat("Benchmarking parallel...\n")
+
+            par_time = microbenchmark(list = list(pexpr), times = nbenchmarks)[, "time"]
 
             decision = t.test(ser_time, par_time, alternative = "less")
+            print(decision)
 
+            if(decision$p.value < threshold_pvalue) {
+                cat("Using parallel version.\n")
+                newprogram[[i]] = pexpr
+            } else {
+                cat("Using serial version.\n")
+            }
         }
     }
+
+    if(!is.null(output_file)){
+        NULL
+    }
+
+    newprogram
 }

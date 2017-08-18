@@ -85,3 +85,30 @@ So we need to do something more clever, ie. create a new frame for
 evaluation. By the time we do that we're on our way to recreating functions
 :) Then maybe it makes more sense to just handle functions as a special
 case.
+
+
+## evaluation
+
+Definitely need to be more careful about when and how the expressions are
+evaluated when benchmarking the script. One way might be to evaluate
+everything in a specially created
+environment inheriting from the global environment.
+
+We could also look at the code more closely to determine if it's acceptable
+to evaluate it many times for a benchmark. For example, the following is
+not:
+
+```{R}
+
+x = lapply(x, f)
+
+```
+
+This could be handled by SSA.
+
+
+## parse tree
+
+Thinking about the difference between parse trees and abstract syntax trees
+(AST). One advantage to sticking with the parse tree is that we don't
+unnecessarily change code when writing a transformed version back out to a file.
