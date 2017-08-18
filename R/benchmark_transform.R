@@ -45,8 +45,8 @@ input_file = "~/dev/autoparallel/vignettes/simple.R"
 #' @return transformed program
 #' @export
 benchmark_transform = function(input_file, output_file = NULL
-        , nbenchmarks = 3L, threshold_time = 0.001
-        , threshold_pvalue = 0.001)
+        , nbenchmarks = 5L, threshold_time = 0.001
+        , threshold_pvalue = 0.01)
 {
 
     program = CodeDepends::readScript(input_file)
@@ -90,7 +90,7 @@ benchmark_transform = function(input_file, output_file = NULL
 
             par_time = microbenchmark(list = list(pexpr), times = nbenchmarks)[, "time"]
 
-            decision = t.test(ser_time, par_time, alternative = "less")
+            decision = t.test(ser_time, par_time, alternative = "greater")
             print(decision)
 
             if(decision$p.value < threshold_pvalue) {
