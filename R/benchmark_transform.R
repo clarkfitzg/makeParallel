@@ -1,29 +1,29 @@
 apply_funcs = data.frame(serial = c("mapply", "lapply", "Map")
                          , stringsAsFactors = FALSE)
-apply_funcs[, "parallel"] = paste0("parallel::", apply_funcs[, "serial"])
-
-
-#' Convert apply_funcs from serial to parallel version
-serial_to_parallel = function(expr, locs){
-    # TODO
-}
+apply_funcs[, "parallel"] = paste0("parallel::mc", apply_funcs[, "serial"])
 
 
 #' Find and paralleize the first use of an apply function
-parallelize_first_apply = function(expr, .apply_funcs = apply_funcs)
-{
-    finds = sapply(.apply_funcs[, "serial"], function(fname){
+parallelize_first_apply = function(expr
+    , ser_funcs = apply_funcs[, "serial"]
+    , par_funcs = apply_funcs[, "parallel"]
+){
+    finds = sapply(ser_funcs, function(fname){
         find_call(expr, fname)
     })
 
-    # Want either 0 or 1 places in the parse tree to change
+    # list with 0 or 1 elements
     first = lapply(finds, head, 1)
     first = head(do.call(c, first), 1)
 
     if(0 == length(first)){
         NULL
     } else {
+        index = first[[1]]
         parexpr = expr
+        pcode = par_funcs[ser_funcs == names(first)]
+        pcode = parse(text = pcode)[[1]]
+        parexpr[[index]] = pcode
         parexpr
     }
 }

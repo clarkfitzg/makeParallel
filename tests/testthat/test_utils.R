@@ -39,6 +39,14 @@ test_that("find_call", {
 })
 
 
+test_that("tree methods", {
+
+    tree = list(list(list(1, 2, 3), 4), 5)
+    actual = tree[[c(1, 1, 2)]]
+    expect_equal(actual, 2)
+
+})
+
 
 if(FALSE){
 
