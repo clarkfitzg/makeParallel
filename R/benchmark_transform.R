@@ -3,7 +3,7 @@ apply_funcs = data.frame(serial = c("mapply", "lapply", "Map")
 apply_funcs[, "parallel"] = paste0("parallel::mc", apply_funcs[, "serial"])
 
 
-#' Find and paralleize the first use of an apply function
+#' Find and parallelize the first use of an apply function
 parallelize_first_apply = function(expr
     , ser_funcs = apply_funcs[, "serial"]
     , par_funcs = apply_funcs[, "parallel"]
@@ -16,7 +16,7 @@ parallelize_first_apply = function(expr
     first = lapply(finds, head, 1)
     first = head(do.call(c, first), 1)
 
-    if(0 == length(first)){
+    if(length(first) == 0){
         NULL
     } else {
         index = first[[1]]
@@ -48,9 +48,9 @@ benchmark_transform = function(input_file, output_file)
     #inputs = CodeDepends::getInputs(program)
     #funcs = lapply(inputs, function(x) names(x@functions))
 
-    found = lapply(program, first_apply)
+    pcode = lapply(program, parallelize_first_apply)
 
-    nonefound = all(sapply(found, `[[`, "nonefound"))
+    nonefound = all(sapply(pcode, is.null))
 
     if(nonefound){
         message("Did not see top level apply functions")
@@ -61,18 +61,15 @@ benchmark_transform = function(input_file, output_file)
 
     for(i in seq_along(program)){
         expr = program[[i]]
-        apply_loc = apply_locs[i]
-        if(apply_loc == 0){
+        pexpr = pcode[[i]]
+        if(is.null(pexpr)){
             print(expr)
             # Must evaluate in case subsequent expressions depend on this
             eval(expr, globalenv())
         } else {
             print("Benchmarking:")
             print(expr)
-            par_expr = serial_to_parallel(expr, apply_loc)
             # TODO
         }
     }
 }
-
-
