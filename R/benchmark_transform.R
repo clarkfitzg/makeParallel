@@ -29,10 +29,6 @@ parallelize_first_apply = function(expr
 }
 
 
-# For developing
-input_file = "~/dev/autoparallel/vignettes/simple.R"
-
-
 #' Transform Program To Parallel Based On Benchmarks
 #' 
 #' @param input_file string naming a slow R script
@@ -101,9 +97,13 @@ benchmark_transform = function(input_file, output_file = NULL
             }
         }
     }
-
+ 
     if(!is.null(output_file)){
-        NULL
+        sink(output_file)
+        for(expr in newprogram){
+            print(expr)
+        }
+        sink()
     }
 
     newprogram
