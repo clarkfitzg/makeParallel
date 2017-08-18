@@ -4,8 +4,28 @@ apply_funcs[, "parallel"] = paste0("parallel::", apply_funcs[, "serial"])
 
 
 #' Convert apply_funcs from serial to parallel version
-serial_to_parallel = function(expr, loc){
+serial_to_parallel = function(expr, locs){
     # TODO
+}
+
+
+#' Find and paralleize the first use of an apply function
+parallelize_first_apply = function(expr, .apply_funcs = apply_funcs)
+{
+    finds = sapply(.apply_funcs[, "serial"], function(fname){
+        find_call(expr, fname)
+    })
+
+    # Want either 0 or 1 places in the parse tree to change
+    first = lapply(finds, head, 1)
+    first = head(do.call(c, first), 1)
+
+    if(0 == length(first)){
+        NULL
+    } else {
+        parexpr = expr
+        parexpr
+    }
 }
 
 
@@ -28,16 +48,9 @@ benchmark_transform = function(input_file, output_file)
     #inputs = CodeDepends::getInputs(program)
     #funcs = lapply(inputs, function(x) names(x@functions))
 
-    found = lapply(program, function(statement){
-        sapply(apply_funcs[, "serial"], function(fname){
-                   find_call(statement, fname)
-        })
-    })
+    found = lapply(program, first_apply)
 
-    #TODO: Tomorrow- write the parallel transformer that operates on
-    #this named list
-
-    nonefound = is.null(rapply(found, any, how = "unlist"))
+    nonefound = all(sapply(found, `[[`, "nonefound"))
 
     if(nonefound){
         message("Did not see top level apply functions")

@@ -31,6 +31,9 @@ Of course it's possible to go too far with this idea, inlining code and
 recursing into the bodies of built in functions. Modifying built in
 functions seems excessively complicated and error prone.
 
+One issue with this approach is that argument evaluation is forced rather
+than lazy.
+
 
 ## code not executed
 
