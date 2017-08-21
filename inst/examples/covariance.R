@@ -1,4 +1,3 @@
-
 # Compute sample covariance for columns of a matrix
 
 
@@ -24,6 +23,50 @@ cov_chunked = function(x, nchunks = 2L)
     upper_right_blocks = lapply(upper_right_indices, function(index){
             cov(x[, index[[1]]], x[, index[[2]]])
     })
+
+    # All computation is done, just assemble the results in the right way
+    output = matrix(numeric(p*p), nrow = p)
+    for(i in seq_along(indices)){
+        idx = indices[[i]]
+        output[idx, idx] = diagonal_blocks[[i]]
+    }
+    for(i in seq_along(upper_right_indices)){
+        index = upper_right_indices[[i]]
+        output[index[[1]], index[[2]]] = upper_right_blocks[[i]]
+        output[index[[2]], index[[1]]] = t(upper_right_blocks[[i]])
+    }
+    output
+}
+
+
+split_columns = function(x, nchunks = 2L)
+{
+    p = ncol(x)
+    indices = parallel::splitIndices(p, nchunks)
+
+    chunks = lapply(indices, function(idx) x[, idx, drop = FALSE])
+
+    list(indices = indices, chunks = chunks)
+}
+
+
+# Chunking has already been handled
+# I'm hoping that prechunking, and referencing that, will be faster
+# indices is redundant here, can be computed from xchunks
+cov_prechunked = function(xchunks, indices)
+{
+
+    diagonal_blocks = lapply(xchunks, cov)
+
+    # TODO: come back here
+    upper_right_indices = combn(length(xchunks), 2, simplify = FALSE)
+
+    upper_right_blocks = lapply(upper_right_indices, function(index){
+            cov(x[, index[[1]]], x[, index[[2]]])
+    })
+
+
+    p = max(tail(indices, 1)[[1]])
 
     # All computation is done, just assemble the results in the right way
     output = matrix(numeric(p*p), nrow = p)

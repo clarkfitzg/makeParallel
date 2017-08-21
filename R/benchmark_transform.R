@@ -37,7 +37,7 @@ parallelize_first_apply = function(expr
 #' @param threshold_time seconds if serial version runs under this time then don't
 #'      even bother with a comparison to parallel
 #' @param threshold_pvalue used for t test decision to choose parallel
-#'      over serial
+#'      over serial.
 #' @return transformed program
 #' @export
 benchmark_transform = function(input_file, output_file = NULL
