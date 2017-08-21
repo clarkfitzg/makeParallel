@@ -20,6 +20,10 @@ cov_chunked = function(x, nchunks = 2L)
 
     upper_right_indices = combn(indices, 2, simplify = FALSE)
 
+    # This is more awkward than a nested for loop. But I'm doing it so that
+    # I can use lapply and make the easier transform. Something more
+    # natural might be to write the for loop and transform that into an
+    # lapply type call.
     upper_right_blocks = lapply(upper_right_indices, function(index){
             cov(x[, index[[1]]], x[, index[[2]]])
     })
@@ -50,23 +54,24 @@ split_columns = function(x, nchunks = 2L)
 }
 
 
-# Chunking has already been handled
-# I'm hoping that prechunking, and referencing that, will be faster
-# indices is redundant here, can be computed from xchunks
+# Assume chunking has already been handled
+# I'm hoping that prechunking, and referencing that, will be faster.
 cov_prechunked = function(xchunks, indices)
 {
 
+    p = max(tail(indices, 1)[[1]])
     diagonal_blocks = lapply(xchunks, cov)
 
-    # TODO: come back here
-    upper_right_indices = combn(length(xchunks), 2, simplify = FALSE)
+    ij = combn(length(xchunks), 2, simplify = FALSE)
 
-    upper_right_blocks = lapply(upper_right_indices, function(index){
-            cov(x[, index[[1]]], x[, index[[2]]])
+    upper_right_blocks = lapply(ij, function(x){
+        i = x[1]
+        j = x[2]
+        list(idx1 = indices[[i]]
+             idx2 = indices[[j]]
+             , cov = cov(xchunks[[i]], xchunks[[j]])
+             )
     })
-
-
-    p = max(tail(indices, 1)[[1]])
 
     # All computation is done, just assemble the results in the right way
     output = matrix(numeric(p*p), nrow = p)
@@ -74,10 +79,9 @@ cov_prechunked = function(xchunks, indices)
         idx = indices[[i]]
         output[idx, idx] = diagonal_blocks[[i]]
     }
-    for(i in seq_along(upper_right_indices)){
-        index = upper_right_indices[[i]]
-        output[index[[1]], index[[2]]] = upper_right_blocks[[i]]
-        output[index[[2]], index[[1]]] = t(upper_right_blocks[[i]])
+    for(x in upper_right_blocks){
+        output[x$idx1, x$idx2] = x$cov
+        output[x$idx2, x$idx1] = t(x$cov)
     }
     output
 }
