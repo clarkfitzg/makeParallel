@@ -8,8 +8,8 @@ library(autoparallel)
 source("covariance.R")
 
 
-n = 5e6
-p = 10L
+n = 1e5
+p = 100L
 set.seed(38290)
 x = matrix(rnorm(n * p), nrow = n)
 
@@ -18,6 +18,12 @@ cm = cov_matrix(x)
 cc = cov_chunked(x)
 ccp = cov_chunked_parallel(x)
 ccl = cov_loop(x)
+
+xc = split_columns(x, nchunks = 4L)
+
+cpc = cov_prechunked(xc$chunks, xc$indices)
+
+max(abs(c0 - cpc))
 
 # Recording lower quartile times
 
@@ -62,6 +68,12 @@ bm(cov_chunked_parallel(x, nchunks = 10L))
 # Seems like some other system load happening?
 bm(cov_loop(x))
 
+# Together these add up to the time for cov_chunked. But cov_prechunked is
+# still twice as slow as regular cov.
+bm(split_columns(x, nchunks = 4L))
+bm(cov_prechunked(xc$chunks, xc$indices))
+
+
 # Why is the speed of cov_chunked(x) so much slower than cov(x) for large
 # n? I would expect that the time to deal with the blocking is amortized by
 # the larger data set.
@@ -69,7 +81,8 @@ bm(cov_loop(x))
 
 
 Rprof("cov_chunked.out")
-replicate(10, cov_chunked(x))
+#replicate(10, cov_chunked(x))
+replicate(10, cov_prechunked(xc$chunks, xc$indices))
 Rprof(NULL)
 
 # So it spends an enormous amount of time inside is.data.frame.

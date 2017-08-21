@@ -55,7 +55,10 @@ split_columns = function(x, nchunks = 2L)
 
 
 # Assume chunking has already been handled
-# I'm hoping that prechunking, and referencing that, will be faster.
+# This is faster, but it depends on the ratio of how much computation is
+# done relative to copying. Ie, it depends on n and p. I would think that
+# this should be as efficient as possible relative to builtin cov, then we
+# can do it in parallel.
 cov_prechunked = function(xchunks, indices)
 {
 
@@ -68,7 +71,7 @@ cov_prechunked = function(xchunks, indices)
         i = x[1]
         j = x[2]
         list(idx1 = indices[[i]]
-             idx2 = indices[[j]]
+             , idx2 = indices[[j]]
              , cov = cov(xchunks[[i]], xchunks[[j]])
              )
     })
