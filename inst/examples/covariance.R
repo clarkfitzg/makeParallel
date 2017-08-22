@@ -1,3 +1,4 @@
+library(autoparallel)
 # Compute sample covariance for columns of a matrix
 
 
@@ -65,8 +66,10 @@ cov_prechunked = function(xchunks, indices)
     p = max(tail(indices, 1)[[1]])
     diagonal_blocks = lapply(xchunks, cov)
 
+    # Equivalent to:
+    # for i, 1 <= i <= n
+    #   for j, i < j <= n
     ij = combn(length(xchunks), 2, simplify = FALSE)
-
     upper_right_blocks = lapply(ij, function(x){
         i = x[1]
         j = x[2]

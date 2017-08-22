@@ -15,13 +15,16 @@ multiprocessing.
 
 Bengstton's
 [futures](https://cran.r-project.org/web/packages/future/index.html)
-provides a mechanism for parallel asynchronous evaluation of R functions
+provides a mechanism for parallel asynchronous evaluation of R code
 across different systems.
 
 Böhringer's
 [parallelize.dynamic](https://cran.r-project.org/package=parallelize.dynamic)
 provides the `parallelize_call()` function to dynamically parallelize a
 single function call.
+
+Wang's [valor](https://github.com/wanghc78/valor) vectorizes `lapply` calls
+into single function calls.
 
 ## simple example
 

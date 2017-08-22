@@ -11,11 +11,12 @@ vignette: >
 
 Parallelism is useful if it improves the speed of a slow program. If speed
 doesn't improve then parallelism is an unnecessary complication.
-`autoparallel` provides ways to determine if parallelism will help a
-program along with the transformation.
+`autoparallel` transforms programs from serial into multicore parallel, and
+then benchmarks the modified program to determine if the transformation
+increases the speed.
 
-The word 'program' means a collection of valid R statements. This could be
-a script or a function.
+The word 'program' means a collection of valid R statements. Typically this
+means a script or a function.
 
 ## Basic Transformations
 
