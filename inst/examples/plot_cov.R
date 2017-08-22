@@ -22,6 +22,6 @@ percent_efficiency = function(n, p, times = 5L){
 set.seed(2318)
 grid$eff = Map(percent_efficiency, grid$n, grid$p)
 
-levelplot(eff ~ n * p, grid
+levelplot(eff ~ n * p, grid, scales = list(log = 10)
           , main = "percent efficiency of chunked cov() on n x p matrix")
 
