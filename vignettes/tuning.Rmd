@@ -40,17 +40,18 @@ p = 200
 typical_x = matrix(rnorm(n * p), nrow = n)
 
 # A tuning parameter for the performance optimization
-nchunks_param = tune_param(c(2L, 4L, 8L, 16L))
+nchunks_param = tune_param(list(2L, 4L, 8L, 16L))
 
 cov_tuned = tune(cov_with_prechunk, x = typical_x, nchunks = nchunks_param)
+
 ```
 
 This `cov_tuned()` is now a version of `cov_with_prechunk()` that has been
 specialized to work with inputs similar to `typical_x`. Specifically, new
 arguments should share with `typical_x` the same `class`, `typeof`, `dim`,
-and presence of NA's / NULL's. Because `nchunks` was only a performance
-tuning parameter that is unnecessary for computing the result it is omitted
-from the formal parameters for `cov_tuned()`.
+and presence of NA's / NULL's. Because `nchunks` was a performance
+tuning parameter the tuned function can have the default set for the
+fastest value that was discovered.
 
 The tuned code should then run faster on the expected input (or at least no
 slower!):
