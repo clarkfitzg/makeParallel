@@ -19,8 +19,7 @@ percent_efficiency = function(nchunks, times = 5L){
     baseline = microbenchmark(cov(x), times = times)$time
     t_chunked = microbenchmark(cov_chunked(x, nchunks), times = times)$time
 
-    xc = split_columns(x, nchunks)
-    t_prechunked = microbenchmark(cov_prechunked(xc$chunks, xc$indices), times = times)$time
+    t_prechunked = microbenchmark(cov_with_prechunk(x, nchunks), times = times)$time
 
     # Hopefully doing it a few times and taking the best will eliminate
     # things like gc()
@@ -32,7 +31,8 @@ percent_efficiency = function(nchunks, times = 5L){
 
 set.seed(2318)
 
-nchunks = round(seq(from = 2, to = p, length.out = 10))
+#nchunks = round(seq(from = 2, to = p, length.out = 10))
+nchunks = 2 * (1:10)
 
 times = lapply(nchunks, percent_efficiency)
 
@@ -41,6 +41,7 @@ times = do.call(rbind, times)
 png("efficiency_by_chunks.png")
 
 plot(nchunks, times$prechunked
+     , ylim = range(times)
      , main = sprintf("Efficiency for chunked cov() on %i x %i matrix", n, p)
      , ylab = "percent efficiency (100% ideal)"
      , xlab = "number of chunks"

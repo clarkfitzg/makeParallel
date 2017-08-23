@@ -55,6 +55,13 @@ split_columns = function(x, nchunks = 2L)
 }
 
 
+cov_with_prechunk = function(x, nchunks = 2L)
+{
+    xsplit = split_columns(x, nchunks)
+    cov_prechunked(xsplit$chunks, xsplit$indices)
+}
+
+
 # Assume chunking has already been handled
 # This is faster, but it depends on the ratio of how much computation is
 # done relative to copying. Ie, it depends on n and p. I would think that

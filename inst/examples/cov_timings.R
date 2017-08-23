@@ -14,16 +14,18 @@ set.seed(38290)
 x = matrix(rnorm(n * p), nrow = n)
 
 c0 = cov(x)
+
 cm = cov_matrix(x)
 cc = cov_chunked(x)
 ccp = cov_chunked_parallel(x)
 ccl = cov_loop(x)
 
 xc = split_columns(x, nchunks = 4L)
-
 cpc = cov_prechunked(xc$chunks, xc$indices)
 
-max(abs(c0 - cpc))
+cwpc = cov_with_prechunk(x)
+
+max(abs(c0 - cwpc))
 
 # Recording lower quartile times
 
