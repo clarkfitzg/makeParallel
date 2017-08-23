@@ -40,7 +40,7 @@ p = 200
 typical_x = matrix(rnorm(n * p), nrow = n)
 
 # A tuning parameter for the performance optimization
-nchunks_param = tune_param(par = 2L, lower = 2L, upper = ncol(typical_x), class = "integer"))
+nchunks_param = tune_param(c(2L, 4L, 8L, 16L))
 
 cov_tuned = tune(cov_with_prechunk, x = typical_x, nchunks = nchunks_param)
 ```
@@ -52,8 +52,8 @@ and presence of NA's / NULL's. Because `nchunks` was only a performance
 tuning parameter that is unnecessary for computing the result it is omitted
 from the formal parameters for `cov_tuned()`.
 
-If the optimization was successful then the tuned code should run faster on
-the expected input (or at least no slower!):
+The tuned code should then run faster on the expected input (or at least no
+slower!):
 
 ```{R}
 
@@ -66,6 +66,19 @@ microbenchmark(cov_tuned(typical_x), times = 5L)
 ```
 
 ## future ideas
+
+Rather than specifying a finite set of parameters to try,
+more generally we would prefer to treat this as a constrained optimization
+problem. The objective function to minimize is the total run time of the
+function, which may be highly variable. But we can measure it as many times
+as we like. Then it may become something like a stochastic mixed integer
+optimization problem.
+
+```{R}
+
+# nchunks_param = tune_param(par = 2L, lower = 2L, upper = ncol(typical_x), class = "integer"))
+
+```
 
 We can also increase speed by removing or modifying code inside the
 function that doesn't apply based on the characteristics of the sample
