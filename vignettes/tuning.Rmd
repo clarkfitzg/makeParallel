@@ -1,0 +1,68 @@
+---
+title: "autoparallel-tuning"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel-tuning}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Tuning
+
+Consider computing a sample covariance matrix with `cov()`, included with R
+in the `stats` package. In the `inst/examples` directory of this package
+there is a version with this signature:
+
+```
+cov_with_prechunk = function(x, nchunks = 2L){ ...
+```
+
+`cov_with_prechunk()` does the same computation as `cov()`, but internally
+it breaks a matrix `x` into chunks and uses `lapply()` over these chunks.
+This `lapply()` makes `cov_with_prechunk()` amenable to automatic
+parallelization.
+
+The parameter `nchunks` determines the number of `chunks`, which in turn
+determines the level of parallelism. `nchunks` doesn't affect the numerical
+result; it's only used for performance tuning. 
+
+Suppose we will be using `cov_with_prechunk()` many times on similar data
+inputs. Hence we would like a faster, parallel version with the number of
+chunks tuned to our specific system and data inputs.
+
+```{R}
+library(autoparallel)
+
+n = 2000
+p = 200
+
+# The type of data input we expect, and thus would like to tune for.
+typical_x = matrix(rnorm(n * p), nrow = n)
+
+# A tuning parameter for the performance optimization
+nchunks_param = tune_param(par = 2L, lower = 2L, upper = ncol(typical_x), class = "integer"))
+
+cov_tuned = tune(cov_with_prechunk, x = typical_x, nchunks = nchunks_param)
+```
+
+This `cov_tuned()` is now a version of `cov_with_prechunk()` that has been
+specialized to work with inputs similar to `typical_x`. Specifically, new
+arguments should share with `typical_x` the same `class`, `typeof`, `dim`,
+and presence of NA's / NULL's.
+
+IDEA: We can also increase speed by removing or modifying code inside the
+function that doesn't apply based on the characteristics of the sample
+data. For example, if we know that the class of the input is numeric we can
+turn off or remove a bunch of code, ie. inside `stats::cov`:
+
+```
+    if (is.data.frame(y))
+        y <- as.matrix(y)
+    if (is.data.frame(x))
+        x <- as.matrix(x)
+    if (!is.matrix(x) && is.null(y))
+        stop("supply both 'x' and 'y' or a matrix-like 'x'")
+    stopifnot(is.numeric(x) || is.logical(x), is.atomic(x))
+```
+We make stronger assumptions on the class of the input- these could be
+tested, or the tests could even be omitted for increased performance.
