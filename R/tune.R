@@ -16,6 +16,8 @@
 #' # f2 should now have 0.01 as the default argument for t
 tune = function(FUN, ...)
 {
+    NEWFUN = FUN
+    NEWFUN
 }
 
 

@@ -75,6 +75,8 @@ function, which may be highly variable. But we can measure it as many times
 as we like. Then it may become something like a stochastic mixed integer
 optimization problem.
 
+Duncan's idea: How about live functions that adapt as they see new input?
+
 ```{R}
 
 # nchunks_param = tune_param(par = 2L, lower = 2L, upper = ncol(typical_x), class = "integer"))
