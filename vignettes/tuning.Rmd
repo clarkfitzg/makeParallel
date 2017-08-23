@@ -48,12 +48,30 @@ cov_tuned = tune(cov_with_prechunk, x = typical_x, nchunks = nchunks_param)
 This `cov_tuned()` is now a version of `cov_with_prechunk()` that has been
 specialized to work with inputs similar to `typical_x`. Specifically, new
 arguments should share with `typical_x` the same `class`, `typeof`, `dim`,
-and presence of NA's / NULL's.
+and presence of NA's / NULL's. Because `nchunks` was only a performance
+tuning parameter that is unnecessary for computing the result it is omitted
+from the formal parameters for `cov_tuned()`.
 
-IDEA: We can also increase speed by removing or modifying code inside the
+If the optimization was successful then the tuned code should run faster on
+the expected input (or at least no slower!):
+
+```{R}
+
+library(microbenchmark)
+
+microbenchmark(cov_with_prechunk(typical_x), times = 5L)
+
+microbenchmark(cov_tuned(typical_x), times = 5L)
+
+```
+
+## future ideas
+
+We can also increase speed by removing or modifying code inside the
 function that doesn't apply based on the characteristics of the sample
-data. For example, if we know that the class of the input is numeric we can
-turn off or remove a bunch of code, ie. inside `stats::cov`:
+data. We can dispatch methods more directly if we know what they will be.
+For example, if we know that the class of the input is numeric we can turn
+off or remove a bunch of code, ie. inside `stats::cov`:
 
 ```
     if (is.data.frame(y))
@@ -66,3 +84,6 @@ turn off or remove a bunch of code, ie. inside `stats::cov`:
 ```
 We make stronger assumptions on the class of the input- these could be
 tested, or the tests could even be omitted for increased performance.
+
+We could look through all the code in R and several packages to see which
+conditions are most often tested, and then target those first.
