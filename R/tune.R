@@ -16,6 +16,10 @@
 #' # f2 should now have 0.01 as the default argument for t
 tune = function(FUN, ...)
 {
+    args = list(...)
+    params_to_tune = sapply(args, function(x) !is.null(attr(x, "tune")))
+    if(sum(params_to_tune) > 1) stop("Multiple tuning parameters not yet implemented")
+
     NEWFUN = FUN
     NEWFUN
 }
