@@ -29,23 +29,10 @@ parallelize_first_apply = function(expr
 }
 
 
-#' Transform Program To Parallel Based On Benchmarks
-#' 
-#' @param input_file string naming a slow R script
-#' @param output_file where to save the parallelized script
-#' @param nbenchmarks number of benchmarks to run
-#' @param threshold_time seconds if serial version runs under this time then don't
-#'      even bother with a comparison to parallel
-#' @param threshold_pvalue used for t test decision to choose parallel
-#'      over serial.
-#' @return transformed program
-#' @export
-benchmark_transform = function(input_file, output_file = NULL
-        , nbenchmarks = 5L, threshold_time = 0.001
-        , threshold_pvalue = 0.01)
+#' Workhorse Function To Transform To Multicore
+benchmark_transform_work = function(program
+        , nbenchmarks, threshold_time, threshold_pvalue)
 {
-
-    program = CodeDepends::readScript(input_file)
 
     # Probably want to use this later:
     #inputs = CodeDepends::getInputs(program)
@@ -97,7 +84,31 @@ benchmark_transform = function(input_file, output_file = NULL
             }
         }
     }
- 
+    program
+}
+
+
+#' Transform Program To Parallel Based On Benchmarks
+#' 
+#' @param input_file string naming a slow R script
+#' @param output_file where to save the parallelized script
+#' @param nbenchmarks number of benchmarks to run
+#' @param threshold_time seconds if serial version runs under this time then don't
+#'      even bother with a comparison to parallel
+#' @param threshold_pvalue used for t test decision to choose parallel
+#'      over serial.
+#' @return transformed program
+#' @export
+benchmark_transform = function(input_file, output_file = NULL
+        , nbenchmarks = 5L, threshold_time = 0.001
+        , threshold_pvalue = 0.01)
+{
+
+    program = CodeDepends::readScript(input_file)
+
+    newprogram = benchmark_transform_work(program, nbenchmarks,
+                                          threshold_time, threshold_pvalue)
+
     if(!is.null(output_file)){
         sink(output_file)
         for(expr in newprogram){

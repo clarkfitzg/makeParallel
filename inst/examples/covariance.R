@@ -104,6 +104,18 @@ cov_chunked_parallel = cov_chunked
 body(cov_chunked_parallel) = sub_expr(body(cov_chunked), list(lapply = quote(parallel::mclapply)))
 
 
+cov_prechunked_parallel = cov_prechunked
+body(cov_prechunked_parallel) = sub_expr(body(cov_prechunked), list(lapply = quote(parallel::mclapply)))
+
+
+cov_with_prechunk_parallel = function(x, nchunks = 2L)
+{
+    xsplit = split_columns(x, nchunks)
+    cov_prechunked_parallel(xsplit$chunks, xsplit$indices)
+}
+
+
+
 # matrix based calculation
 # Naive because it doesn't use the symmetry of the result
 cov_matrix = function(x)

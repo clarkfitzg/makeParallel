@@ -25,7 +25,9 @@ cpc = cov_prechunked(xc$chunks, xc$indices)
 
 cwpc = cov_with_prechunk(x)
 
-max(abs(c0 - cwpc))
+cwpcp = cov_with_prechunk_parallel(x)
+
+max(abs(c0 - cwpcp))
 
 # Recording lower quartile times
 

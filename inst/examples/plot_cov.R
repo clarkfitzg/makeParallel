@@ -16,7 +16,10 @@ percent_efficiency = function(n, p, times = 5L, nchunks = 2L){
 
     x = matrix(rnorm(n * p), nrow = n)
     baseline = microbenchmark(cov(x), times = times)$time
+
     t_chunked = microbenchmark(cov_chunked(x, nchunks), times = times)$time
+
+    t_parallel_chunked = microbenchmark(cov_with_prechunk_parallel(x), times = times)$time
 
     xc = split_columns(x, nchunks)
     t_prechunked = microbenchmark(cov_prechunked(xc$chunks, xc$indices), times = times)$time
@@ -26,6 +29,7 @@ percent_efficiency = function(n, p, times = 5L, nchunks = 2L){
     baseline = 100 * min(baseline)
     data.frame(chunked = baseline / min(t_chunked)
                , prechunked = baseline / min(t_prechunked)
+               , parallel_chunked = baseline / min(t_parallel_chunked)
                )
 }
 
@@ -48,3 +52,14 @@ prechunked_plot = levelplot(prechunked ~ n * p, grid, scales = list(log = 10)
 trellis.device(device="png", filename="cov_prechunked_efficiency.png")
 print(prechunked_plot)
 dev.off()
+
+
+# Could use a better color scheme here
+parallel_chunked_plot = levelplot(parallel_chunked ~ n * p, grid, scales = list(log = 10)
+          , main = "percent efficiency of parallel cov() on n x p matrix")
+
+trellis.device(device="png", filename="cov_prechunked_parallel_eff.png")
+print(parallel_chunked_plot)
+dev.off()
+
+
