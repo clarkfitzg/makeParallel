@@ -1,7 +1,7 @@
 test_that("basic function tuning", {
 
-f = function(x, t){
-    if(x > 0) Sys.sleep(t^2)
+f = function(x, t=0.1){
+    if(x > 0) Sys.sleep(abs(t))
     x
 }
 
