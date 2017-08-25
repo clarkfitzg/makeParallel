@@ -33,6 +33,8 @@ percent_efficiency = function(n, p, times = 5L, nchunks = 2L){
                )
 }
 
+
+
 set.seed(2318)
 
 times = Map(percent_efficiency, grid$n, grid$p)
@@ -63,3 +65,44 @@ print(parallel_chunked_plot)
 dev.off()
 
 
+############################################################
+# Generalizing the above
+############################################################
+
+
+
+plot_pe = function(expr)
+{
+    exponents = seq(from = 1, to = 4, length.out = 12)
+    n = round(10^exponents)
+    p = n[n <= 1000]
+    grid = expand.grid(n = n, p = p)
+
+    # Pulling this func in because mapply isn't playing nicely with passing in
+    # the expression as an argument
+    percent_efficiency2 = function(n, p, times = 5L)
+    {
+        x = matrix(rnorm(n * p), nrow = n)
+        baseline = microbenchmark(cov(x), times = times)$time
+        alternate = microbenchmark(list = list(expr), times = times)$time
+        100 * min(baseline) / min(alternate)
+    }
+
+    times = mapply(percent_efficiency2, grid$n, grid$p)
+
+    grid$times = times
+    plot = levelplot(times ~ n * p, grid, scales = list(log = 10)
+          , main = "percent efficiency of alternate cov() on n x p matrix")
+    list(data = grid, plot = plot)
+}
+
+pexpr = quote(cov_with_prechunk_parallel(x, nchunks = 4L))
+
+parallel = plot_pe(pexpr)
+
+# TODO: Explain these plots and fit it into a model along with the
+# computational complexity of cov.
+
+trellis.device(device="png", filename="cov_prechunked_parallel_eff.png")
+print(parallel$plot)
+dev.off()
