@@ -1,0 +1,12 @@
+Computing the covariance between two data vectors of length $n$ requires
+$O(n)$ operations. A sample $n \times p$ covariance matrix requires
+$(p + 1)p / 2$ vector covariances. So the whole covariance matrix needs
+$$
+    O(n) frac{(p + 1) p}{2}
+$$
+Suppose we model wall time required for an $n \times p$ sample covariance
+calculation as:
+$$
+    t = c + b n (p + 1) p / 2 + \epsilon
+$$
+where $c$ is the constant overhead and $\epsilon$ is the random error.
