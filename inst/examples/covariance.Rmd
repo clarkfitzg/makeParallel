@@ -1,12 +1,96 @@
 Computing the covariance between two data vectors of length $n$ requires
 $O(n)$ operations. A sample $n \times p$ covariance matrix requires
 $(p + 1)p / 2$ vector covariances. So the whole covariance matrix needs
+
 $$
     O(n) frac{(p + 1) p}{2}
 $$
+
 Suppose we model wall time required for an $n \times p$ sample covariance
 calculation as:
+
 $$
     t = c + b n (p + 1) p / 2 + \epsilon
 $$
+
 where $c$ is the constant overhead and $\epsilon$ is the random error.
+
+
+```{R}
+
+cov_times = read.csv("cov_times.csv")
+cov_times$complexity = with(cov_times, n * (p + 1) * p / 2)
+
+fit_baseline = lm(baseline ~ complexity, cov_times)
+fit_chunked = lm(chunked ~ complexity, cov_times)
+fit_parallel_chunked = lm(parallel_chunked ~ complexity, cov_times)
+
+```
+
+The `baseline` model uses the builtin `cov()` function, while the chunked
+version builds on `cov()` by partitioning the sample matrix into groups of
+columns.
+
+Side note: great QQ plot here.
+```{R}
+
+#png("qq_baseline.png")
+plot(fit_baseline, which = 2)
+#dev.off()
+
+```
+
+If the coefficients for complexity are similar this is good for the model.
+
+```{R}
+
+confint(fit_baseline)
+confint(fit_chunked)
+
+```
+
+They're reasonably close at 1.2 and 1.3. The units are in nanoseconds. What
+does this mean in terms of processor speed and actual number of operations?
+The clock speed is around 3 GHz, so a single clock cycle takes around 1 / 3
+nanoseconds. Really understanding this will require significant low level
+knowledge, and depends on how the code was compiled. I also need to know
+exactly how the covariance is computed. But without considering all this I
+can see that the coefficient for computational complexity is on the same
+order as a single clock cycle.
+
+Parallelism should cut the computational complexity coefficient
+approximately in half, because this experiment was done with 2 cores.
+
+```{R}
+
+confint(fit_parallel_chunked)
+
+# This is not nearly as symmetrical as the others.
+plot(fit_parallel_chunked, which = 2)
+
+```
+
+Hmmm, doesn't cut it in half. Overhead in the intercept is around $1.4
+\times 10^7$ nanoseconds = 14 milliseconds. This is consistent with each
+use of parallel taking around 1 ms. But it would be better to model this in
+terms of $n$ and $p$.
+
+We can also ask, for what values of computational complexity will the
+parallel version be faster?
+
+```{R}
+
+cov_times$parallel_faster = cov_times$parallel_chunked < cov_times$baseline
+
+plot(cov_times$complexity, cov_times$parallel_faster, log = "x")
+
+fit2 = glm(parallel_faster ~ complexity, family = "binomial"
+        , data = cov_times)
+
+curve(predict(fit2, data.frame(complexity=x), type="resp"), add=TRUE)
+
+summary(fit2)
+
+```
+
+TODO: Look at outlying cases. What makes them exceptional?

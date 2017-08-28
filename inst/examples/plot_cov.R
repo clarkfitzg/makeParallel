@@ -10,7 +10,7 @@ exponents = seq(from = 1, to = 4, length.out = 12)
 n = round(10^exponents)
 p = n[n <= 1000]
 
-grid = expand.grid(n = n, p = p)
+np_grid = expand.grid(n = n, p = p)
 
 percent_efficiency = function(n, p, times = 5L, nchunks = 2L){
 
@@ -34,12 +34,33 @@ percent_efficiency = function(n, p, times = 5L, nchunks = 2L){
 }
 
 
+time_efficiency = function(n, p, times = 5L, nchunks = 4L){
+
+    x = matrix(rnorm(n * p), nrow = n)
+    baseline = microbenchmark(cov(x), times = times)$time
+
+    t_chunked = microbenchmark(cov_chunked(x, nchunks), times = times)$time
+
+    t_parallel_chunked = microbenchmark(cov_with_prechunk_parallel(x), times = times)$time
+
+    xc = split_columns(x, nchunks)
+    t_prechunked = microbenchmark(cov_prechunked(xc$chunks, xc$indices), times = times)$time
+
+    # Hopefully doing it a few times and taking the best will eliminate
+    # things like gc()
+    data.frame(baseline = min(baseline)
+               , chunked = min(t_chunked)
+               , prechunked = min(t_prechunked)
+               , parallel_chunked = min(t_parallel_chunked)
+               )
+}
+
 
 set.seed(2318)
 
 times = Map(percent_efficiency, grid$n, grid$p)
 
-grid = cbind(grid, do.call(rbind, times))
+grid = cbind(np_grid, do.call(rbind, times))
 
 chunked_plot = levelplot(chunked ~ n * p, grid, scales = list(log = 10)
           , main = "percent efficiency of chunked cov() on n x p matrix")
@@ -63,6 +84,16 @@ parallel_chunked_plot = levelplot(parallel_chunked ~ n * p, grid, scales = list(
 trellis.device(device="png", filename="cov_prechunked_parallel_eff.png")
 print(parallel_chunked_plot)
 dev.off()
+
+
+# For later data analysis
+walltimes = Map(time_efficiency, grid$n, grid$p)
+
+w2 = do.call(rbind, walltimes)
+
+cov_times = cbind(np_grid, w2)
+
+write.csv(cov_times, "cov_times.csv")
 
 
 ############################################################
