@@ -32,6 +32,7 @@ lda2 = function(X0, groups)
     chol(Sigma)
 
     d = sapply(1:k, di, means = means, Sigma = Sigma)
+    d = d / 2
 
     out = list(Sigma = Sigma, d = d, means = means)
     class(out) = "lda2"
@@ -68,7 +69,7 @@ colnames(X0) = paste0("X", 1:p)
 
 groups = rep(1:k, length.out = n)
 
-X = Matrix(rnorm(50 * p), ncol = p)
+X = Matrix(rnorm(10000 * p), ncol = p)
 
 Xd = as.data.frame(as.matrix(X))
 colnames(Xd) = colnames(X0)
@@ -83,7 +84,7 @@ fit2 = lda2(X0, groups)
 
 p1 = predict(fit2, X)
 
-# They're off in a few, but I don't know exactly why.
+# 1 in 10000 is off, but not sure why.
 # This is in the docs:
 #
 #     This version centres the linear discriminants so that the weighted
@@ -96,6 +97,9 @@ mean(p0 == p1)
 
 # Timings
 ############################################################
+
+if(FALSE)
+{
 
 library(microbenchmark)
 
@@ -110,10 +114,11 @@ microbenchmark(lda2(X0, groups), times = 10L)
 #
 # Also 48% in `by`. Which means it's quite inefficient, considering that
 # column means can be computed in place with exactly one loop through the
-# data.
+# data. I'll bet data.table is really good at this.
 
 Rprof("lda.out")
 replicate(100, lda2(X0, groups))
 Rprof(NULL)
 
 summaryRprof("lda.out")
+}
