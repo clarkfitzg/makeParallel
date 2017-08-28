@@ -94,3 +94,14 @@ summary(fit2)
 ```
 
 TODO: Look at outlying cases. What makes them exceptional?
+
+```{R}
+
+outliers = abs(residuals(fit2)) > 3
+
+cov_times[outliers, ]
+
+```
+
+This one has $n = 2848, p = 433$, and all the times around 0.3 seconds.
+Probably just random that the parallel version took longer.
