@@ -24,10 +24,12 @@ xc = split_columns(x, nchunks = 4L)
 cpc = cov_prechunked(xc$chunks, xc$indices)
 
 cwpc = cov_with_prechunk(x)
-
 cwpcp = cov_with_prechunk_parallel(x)
 
-max(abs(c0 - cwpcp))
+cmp = cov_Matrix_pkg(x)
+
+
+max(abs(c0 - cmp))
 
 # Recording lower quartile times
 

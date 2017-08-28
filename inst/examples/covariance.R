@@ -115,7 +115,6 @@ cov_with_prechunk_parallel = function(x, nchunks = 2L)
 }
 
 
-
 # matrix based calculation
 # Naive because it doesn't use the symmetry of the result
 cov_matrix = function(x)
@@ -123,6 +122,16 @@ cov_matrix = function(x)
     n = nrow(x)
     xc = scale(x, center = TRUE, scale = FALSE)
     (t(xc) %*% xc) / (n - 1)
+}
+
+
+# Use the Matrix package
+cov_Matrix_pkg = function(x)
+{
+    require(Matrix)
+    n = nrow(x)
+    xc = scale(x, center = TRUE, scale = FALSE)
+    crossprod(Matrix(xc)) / (n - 1)
 }
 
 

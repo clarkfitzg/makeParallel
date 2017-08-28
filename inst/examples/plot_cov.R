@@ -93,7 +93,7 @@ w2 = do.call(rbind, walltimes)
 
 cov_times = cbind(np_grid, w2)
 
-write.csv(cov_times, "cov_times.csv")
+write.csv(cov_times, "cov_times.csv", row.names = FALSE)
 
 
 ############################################################
