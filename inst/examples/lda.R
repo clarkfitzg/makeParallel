@@ -4,34 +4,116 @@ library(Matrix)
 
 source("covariance.R")
 
-n = 100
-p = 5
-X0 = matrix(rnorm(n * p), ncol = p)
-
-groups = rep(1:4, length.out = n)
-
-# Each row contains a group mean
-means = by(X0, groups, colMeans)
-means = do.call(rbind, means)
-means = Matrix(means)
-
-Sigma = cov_Matrix_pkg(X0)
-
-# Cholesky decompositions are cached. Doing it here so it propagates into
-# the functions.
-chol(Sigma)
-
-
 # LDA computations
 
-X = Matrix(rnorm(n * p), ncol = p)
-
 # One component in LDA calc
-di = function(i, .X = X, .Sigma = Sigma)
+di = function(i, means, Sigma)
 {
-    xi = .X[1, ]
-    a = solve(.Sigma, xi)
-    xi %*% a
+    xi = means[i, ]
+    # This isn't storing the matrix factorization. Maybe solving for a
+    # vector doesn't require this?
+    a = solve(Sigma, xi)
+    as.numeric(xi %*% a)
 }
 
-di(1)
+
+lda2 = function(X0, groups)
+{
+
+    # Each row contains a group mean
+    means = by(X0, groups, colMeans)
+    means = do.call(rbind, means)
+    means = Matrix(means)
+
+    Sigma = cov_Matrix_pkg(X0)
+
+    # Cholesky decompositions are cached. Doing it here so it propagates into
+    # the functions.
+    chol(Sigma)
+
+    d = sapply(1:k, di, means = means, Sigma = Sigma)
+
+    out = list(Sigma = Sigma, d = d, means = means)
+    class(out) = "lda2"
+    out
+}
+
+
+
+predict.lda2 = function(fit, X)
+{
+    Sigma = fit$Sigma
+    d = fit$d
+    means = fit$means
+
+    Sigma_inv_Xt = solve(Sigma, t(X))
+    obj = means %*% Sigma_inv_Xt - d
+    maxs = apply(obj, 2, which.max)
+    maxs
+}
+
+
+# Testing data:
+############################################################
+
+library(MASS)
+
+n = 10000
+p = 50
+k = 4
+
+set.seed(891234)
+X0 = matrix(rnorm(n * p), ncol = p)
+colnames(X0) = paste0("X", 1:p)
+
+groups = rep(1:k, length.out = n)
+
+X = Matrix(rnorm(50 * p), ncol = p)
+
+Xd = as.data.frame(as.matrix(X))
+colnames(Xd) = colnames(X0)
+X0groups = data.frame(X0, groups)
+
+
+fit = lda(groups ~ ., X0groups)
+
+p0 = as.integer(predict(fit, Xd)$class)
+
+fit2 = lda2(X0, groups)
+
+p1 = predict(fit2, X)
+
+# They're off in a few, but I don't know exactly why.
+# This is in the docs:
+#
+#     This version centres the linear discriminants so that the weighted
+#     mean (weighted by ‘prior’) of the group centroids is at the
+#     origin.
+#
+
+mean(p0 == p1)
+
+
+# Timings
+############################################################
+
+library(microbenchmark)
+
+microbenchmark(lda(groups ~ ., X0groups), times = 10L)
+
+microbenchmark(lda2(X0, groups), times = 10L)
+
+# So we get a speedup of 2-3 x
+
+# How much time is spent in covariance calc?
+# Over 40%
+#
+# Also 48% in `by`. Which means it's quite inefficient, considering that
+# column means can be computed in place with exactly one loop through the
+# data.
+
+Rprof("lda.out")
+replicate(100, lda2(X0, groups))
+Rprof(NULL)
+
+summaryRprof("lda.out")
