@@ -8,28 +8,22 @@ library(autoparallel)
 source("covariance.R")
 
 
-n = 1e5
-p = 100L
+n = 5e6
+p = 10L
 set.seed(38290)
 x = matrix(rnorm(n * p), nrow = n)
 
-c0 = cov(x)
 
+index = 1:5
+microbenchmark(x[, index, drop = FALSE], times = 5L)
+
+c0 = cov(x)
 cm = cov_matrix(x)
+
 cc = cov_chunked(x)
+
 ccp = cov_chunked_parallel(x)
 ccl = cov_loop(x)
-
-xc = split_columns(x, nchunks = 4L)
-cpc = cov_prechunked(xc$chunks, xc$indices)
-
-cwpc = cov_with_prechunk(x)
-cwpcp = cov_with_prechunk_parallel(x)
-
-cmp = cov_Matrix_pkg(x)
-
-
-max(abs(c0 - cmp))
 
 # Recording lower quartile times
 
@@ -56,12 +50,12 @@ bm(cov_matrix(x))
 # 31 ms for n = 1e6, p = 5
 # 0.314 s for n = 1e7, p = 5
 # 93 ms for n = 1e6, p = 10 (timings very consistent)
-bm(cov(x))
+bm(cov(x), times = 1L)
 
 # 78 ms for n = 1e6, p = 5
 # 1.14 s for n = 1e7, p = 5
 # 326 ms for n = 1e6, p = 10
-bm(cov_chunked(x, nchunks = 2L))
+bm(cov_chunked(x, nchunks = 2L), times = 1L)
 
 # 96 ms for n = 1e6, p = 5
 # 0.967 s for n = 1e7, p = 5
@@ -74,21 +68,13 @@ bm(cov_chunked_parallel(x, nchunks = 10L))
 # Seems like some other system load happening?
 bm(cov_loop(x))
 
-# Together these add up to the time for cov_chunked. But cov_prechunked is
-# still twice as slow as regular cov.
-bm(split_columns(x, nchunks = 4L))
-bm(cov_prechunked(xc$chunks, xc$indices))
-
-
 # Why is the speed of cov_chunked(x) so much slower than cov(x) for large
 # n? I would expect that the time to deal with the blocking is amortized by
 # the larger data set.
 # Lets explore this further.
 
-
 Rprof("cov_chunked.out")
-#replicate(10, cov_chunked(x))
-replicate(10, cov_prechunked(xc$chunks, xc$indices))
+replicate(10, cov_chunked(x))
 Rprof(NULL)
 
 # So it spends an enormous amount of time inside is.data.frame.
