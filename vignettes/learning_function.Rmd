@@ -55,28 +55,22 @@ extract the ordinary least squares coefficients.
 
 ```{R}
 
-# Standard user facing R implementation
-ols = function (data)
-{
-    fit = lm(y ~ . -1, data = data)
-    coef(fit)
-}
-
 # Direct implementation of formula
-ols_naive = function (data)
+ols_naive = function (X, y)
 {
-    ycol = (colnames(data) == "y")
-    y = as.matrix(data[, ycol])
-    X = as.matrix(data[, !ycol])
-    XtXinv = solve(t(X) %*% X)
-    XtXinv %*% t(X) %*% y
+    if(ncol(X) == 2){
+        X = X[, 2]
+        b1 = cov(X, y) / var(X)
+        b0 = mean(y) - b1 * mean(X)
+        c(b0, b1)
+    } else {
+        XtXinv = solve(t(X) %*% X)
+        XtXinv %*% t(X) %*% y
+    }
 }
 
-ols_clever = function (data)
+ols_clever = function (X, y)
 {
-    ycol = (colnames(data) == "y")
-    y = as.matrix(data[, ycol])
-    X = as.matrix(data[, !ycol])
     XtX = crossprod(X)
     Xty = crossprod(X, y)
     solve(XtX, Xty)
@@ -84,41 +78,52 @@ ols_clever = function (data)
 
 ```
 
-The naive direct implementation of the formula is much faster for some small
-data sets:
+Before timing we may not be sure which of these implementations are faster.
+Then we can pass both implementations into `learn_func` and let it figure
+it out for us.
+
+```{R}
+
+library(autoparallel)
+
+ols = learn_func(ols_naive, ols_clever)
+
+```
+
+`ols()` is a function with the same signature (or a superset of the
+signatures?) of `ols_naive()` and `ols_clever()`. 
+
+## Ideas
+
+- `ols()` will try different implementations
+- `ols()` times itself
+- `ols()` detects easily parallelizable parts of code and can change them.
+
 
 ```{R}
 
 library(microbenchmark)
 
-n0 = 100
-p0 = 2
-X0 = matrix(rnorm(n0 * p0), nrow = n0)
-y0 = rnorm(n0)
-smalldata = data.frame(X0, y = y0)
+n = 1e6
+p = 1
+ones = rep(1, n)
+X = matrix(c(ones, rnorm(n * p)), nrow = n)
+y = rnorm(n)
 
-microbenchmark(ols(smalldata), ols_naive(smalldata), times = 10)
+beta_naive = ols_naive(X, y)
+beta_clever = ols_clever(X, y)
 
-```
+max(abs(beta_naive - beta_clever))
 
-While for larger data sets the naive version is again much faster, totally
-wrecking the point I was trying to make. D'oh!
-
-```{R}
-
-n1 = 10000
-p1 = 500
-X1 = matrix(rnorm(n1 * p1), nrow = n1)
-y1 = rnorm(n1)
-medium_data = data.frame(X1, y = y1)
-
-beta0 = ols(medium_data)
-beta1 = ols_naive(medium_data)
-beta2 = ols_clever(medium_data)
-
-max(abs(beta0 - beta1))
-max(abs(beta0 - beta2))
-
-microbenchmark(ols_clever(medium_data), ols_naive(medium_data), times = 10)
+microbenchmark(ols_clever(X, y), ols_naive(X, y), times = 10)
 
 ```
+
+
+
+## Related ideas
+
+Is there a way to "merge" functions? In the OLS case for least squares I
+give three implementations. Some may work better on special cases. Could we
+pull all of that logic into one function? That's somewhat what I'm doing
+here.
