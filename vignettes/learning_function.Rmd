@@ -20,7 +20,6 @@ to call a function $f(X)$. There may be several possible efficient
 implementations of a function $f$. Which is most efficient may depend on the
 computer system and the values of $n$ and $p$.
 
-This package includes a function
 
 ## Current concepts
 
@@ -46,3 +45,63 @@ version of `dotprod` specialized to these argument types, and then it will
 call it on these arguments. When `dotprod()` is subsequently called with other
 floating point arguments the same precompiled version will be discovered
 and used again.
+
+## Tuning function
+
+`autoparallel` lets us improve functions using `learn_func()`. The simplest
+way to use `learn_func()` is to pass multiple implementations as arguments.
+Consider the following two implementations of linear regression which
+extract the ordinary least squares coefficients.
+
+```{R}
+
+# Standard user facing R implementation
+ols = function (data)
+{
+    fit = lm(y ~ ., data = data)
+    coef(fit)
+}
+
+# Direct implementation of formula
+ols_naive = function (data)
+{
+    ycol = (colnames(data) == "y")
+    y = as.matrix(data[, ycol])
+    X = as.matrix(data[, !ycol])
+    XtXinv = solve(t(X) %*% X)
+    XtXinv %*% t(X) %*% y
+}
+
+```
+
+The naive direct implementation of the formula is much faster for some small
+data sets:
+
+```{R}
+
+library(microbenchmark)
+
+n0 = 100
+p0 = 2
+X0 = matrix(rnorm(n0 * p0), nrow = n0)
+y0 = rnorm(n0)
+smalldata = data.frame(X0, y = y0)
+
+microbenchmark(ols(smalldata), ols_naive(smalldata), times = 10)
+
+```
+
+While for larger data sets the naive version is again much faster, totally
+wrecking the point I was trying to make. D'oh!
+
+```{R}
+
+n1 = 10000
+p1 = 500
+X1 = matrix(rnorm(n1 * p1), nrow = n1)
+y1 = rnorm(n1)
+medium_data = data.frame(X0, y = y0)
+
+microbenchmark(ols(medium_data), ols_naive(medium_data), times = 10)
+
+```
