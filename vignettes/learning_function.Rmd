@@ -58,7 +58,7 @@ extract the ordinary least squares coefficients.
 # Standard user facing R implementation
 ols = function (data)
 {
-    fit = lm(y ~ ., data = data)
+    fit = lm(y ~ . -1, data = data)
     coef(fit)
 }
 
@@ -70,6 +70,16 @@ ols_naive = function (data)
     X = as.matrix(data[, !ycol])
     XtXinv = solve(t(X) %*% X)
     XtXinv %*% t(X) %*% y
+}
+
+ols_clever = function (data)
+{
+    ycol = (colnames(data) == "y")
+    y = as.matrix(data[, ycol])
+    X = as.matrix(data[, !ycol])
+    XtX = crossprod(X)
+    Xty = crossprod(X, y)
+    solve(XtX, Xty)
 }
 
 ```
@@ -100,8 +110,15 @@ n1 = 10000
 p1 = 500
 X1 = matrix(rnorm(n1 * p1), nrow = n1)
 y1 = rnorm(n1)
-medium_data = data.frame(X0, y = y0)
+medium_data = data.frame(X1, y = y1)
 
-microbenchmark(ols(medium_data), ols_naive(medium_data), times = 10)
+beta0 = ols(medium_data)
+beta1 = ols_naive(medium_data)
+beta2 = ols_clever(medium_data)
+
+max(abs(beta0 - beta1))
+max(abs(beta0 - beta2))
+
+microbenchmark(ols_clever(medium_data), ols_naive(medium_data), times = 10)
 
 ```
