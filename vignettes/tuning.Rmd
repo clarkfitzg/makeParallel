@@ -49,7 +49,7 @@ cov_tuned = tune(cov_with_prechunk, x = typical_x, nchunks = nchunks_param)
 This `cov_tuned()` is now a version of `cov_with_prechunk()` that has been
 specialized to work with inputs similar to `typical_x`. Specifically, new
 arguments should share with `typical_x` the same `class`, `typeof`, `dim`,
-and presence of NA's / NULL's. Because `nchunks` was a performance
+and presence of NA's / NULL's. TODO: revisit these assumptions. Because `nchunks` was a performance
 tuning parameter the tuned function can have the default set for the
 fastest value that was discovered.
 

@@ -1,0 +1,48 @@
+---
+title: "autoparallel-learning-functions"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel-learning-functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Learning functions
+
+Tue Aug 29 10:37:03 PDT 2017
+
+Imagine functions that get better as they are used. 
+What if functions could adapt themselves to different arguments?
+
+As a simple example, consider statistical computation on an $n \times p$
+matrix $X$, ie. we have $n$ $p$ dimensional observations. Suppose we want
+to call a function $f(X)$. There may be several possible efficient
+implementations of a function $f$. Which is most efficient may depend on the
+computer system and the values of $n$ and $p$.
+
+This package includes a function
+
+## Current concepts
+
+Learning functions already
+exist; any function that caches results or intermediate computations will
+be faster when called with the same arguments the second time. A prominent
+and well executed example is R's matrix package, which caches matrix
+decompositions for subsequent use.
+
+Another example from different languages is JIT compilation. A function
+is written in a general way, for example:
+
+```{R}
+dotprod = function (x, y)
+{
+    sum(x * y)
+}
+```
+
+With JIT compilation when `dotprod()` is first called with both `x, y`
+double precision floating point number then it will take time to compile a
+version of `dotprod` specialized to these argument types, and then it will
+call it on these arguments. When `dotprod()` is subsequently called with other
+floating point arguments the same precompiled version will be discovered
+and used again.
