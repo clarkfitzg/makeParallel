@@ -84,6 +84,8 @@ fit2 = lda2(X0, groups)
 
 p1 = predict(fit2, X)
 
+
+mean(p0 == p1)
 # 1 in 10000 is off, but not sure why.
 # This is in the docs:
 #
@@ -91,8 +93,6 @@ p1 = predict(fit2, X)
 #     mean (weighted by ‘prior’) of the group centroids is at the
 #     origin.
 #
-
-mean(p0 == p1)
 
 
 # Timings
@@ -115,10 +115,17 @@ microbenchmark(lda2(X0, groups), times = 10L)
 # Also 48% in `by`. Which means it's quite inefficient, considering that
 # column means can be computed in place with exactly one loop through the
 # data. I'll bet data.table is really good at this.
+#
+# scale() is also a big offender at 19%, half the time of the covariance
+# calc. The inefficient part of scale() is in the sweep() function. All we
+# really need to do is subtract the column means
 
 Rprof("lda.out")
 replicate(100, lda2(X0, groups))
 Rprof(NULL)
 
 summaryRprof("lda.out")
+
 }
+
+
