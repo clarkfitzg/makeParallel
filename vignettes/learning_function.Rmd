@@ -60,8 +60,11 @@ ols_naive = function (X, y)
 {
     if(ncol(X) == 2){
         X = X[, 2]
-        b1 = cov(X, y) / var(X)
-        b0 = mean(y) - b1 * mean(X)
+        mX = mean(X)
+        my = mean(y)
+        Xcentered = X - mX
+        b1 = sum(Xcentered * (y - my)) / sum(Xcentered^2)
+        b0 = my - b1 * mX
         c(b0, b1)
     } else {
         XtXinv = solve(t(X) %*% X)
@@ -104,7 +107,7 @@ signatures?) of `ols_naive()` and `ols_clever()`.
 
 library(microbenchmark)
 
-n = 1e6
+n = 100
 p = 1
 ones = rep(1, n)
 X = matrix(c(ones, rnorm(n * p)), nrow = n)
@@ -115,7 +118,7 @@ beta_clever = ols_clever(X, y)
 
 max(abs(beta_naive - beta_clever))
 
-microbenchmark(ols_clever(X, y), ols_naive(X, y), times = 10)
+microbenchmark(ols_naive(X, y), ols_clever(X, y), times = 10)
 
 ```
 
