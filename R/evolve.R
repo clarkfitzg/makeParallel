@@ -42,8 +42,39 @@ evolve = function (func, ..., complexity = nrow_first_arg, model = lm)
 }
 
 
-#' Count the number of rows in the first argument
-nrow_first_arg = function (...)
+#' The length of the first argument
+length_first_arg = function (...)
 {
-    nrow(list(...)[[1]])
+    length(list(...)[[1]])
+}
+
+
+#' Record Microbenchmarking Data
+#' 
+#' Create a version of a function which records microbenchmarking data along with
+#' argument metadata
+#' 
+#' @param func original function to be timed
+#' @param arg_metadata function to be called with the same arguments as
+#' func, should return a numeric vector of fixed size
+#' @return function that records how it's called
+#' @export
+track_usage = function (func, arg_metadata = length_first_arg)
+{
+    timings = NULL
+    newfunc = function (...)
+    {
+        time = microbenchmark::microbenchmark(out <- func(...), times = 1L)$time
+        metadata = arg_metadata(...)
+
+        # Record the observation that was just made
+        obs <- data.frame(nanoseconds = time, metadata)
+        timings <<- rbind(timings, obs)
+
+        # The function updates itself
+        attr(newfunc, "timings") <<- timings
+
+        out
+    }
+    newfunc
 }
