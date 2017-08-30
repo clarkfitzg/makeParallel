@@ -46,7 +46,7 @@ call it on these arguments. When `dotprod()` is subsequently called with other
 floating point arguments the same precompiled version will be discovered
 and used again.
 
-## This implme
+## Implementation
 
 `autoparallel` lets us improve functions using `evolve()`. The simplest
 way to use `evolve()` is to pass multiple implementations as arguments.
@@ -103,6 +103,28 @@ signatures?) of `ols_naive()` and `ols_clever()`.
 - `ols()` times itself
 - `ols()` detects easily parallelizable parts of code and can change them.
 
+## A Statistical Problem
+
+Every function evaluation produces an answer along with the accompanying
+time. Suppose we have a finite set of $I$ implementations and $D$
+sizes of data which determine the actual computational complexity.
+Then we can model the wall time to run the function in a fully general way as:
+
+$$
+    t = \mu(i, d) + \epsilon(i, d)
+$$
+
+$\mu(i, d), i \in I, d \in D$ is the true mean time while $\epsilon(i, d)$
+is a random variable.
+
+The overarching goal is to choose an implementation $i \in I$ which
+minimizes the time required to solve a problem of size $d \in D$.
+
+Looking back at the `ols()` example, $I$ = `{ols_naive, ols_clever}`, while
+$D$ could be anything, but suppose we are only interested in problems with
+$n \in \{ 100, 500 \}$ and $p \in \{1, 30\}$.
+
+This is an updating / online learning problem.
 
 
 ```{R}
