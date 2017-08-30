@@ -6,6 +6,6 @@ f2 = track_usage(f)
 
 f2(50)
 
-expect_true(is.data.frame(attr(f2, "timings")))
+expect_true(is.data.frame(get_timings(f2)))
 
 })

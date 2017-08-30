@@ -49,6 +49,14 @@ length_first_arg = function (...)
 }
 
 
+#' Get Usage Timings From Closure
+#' @export
+get_timings = function(usage_tracking_func)
+{
+    get("timings", envir = environment(usage_tracking_func))
+}
+
+
 #' Record Microbenchmarking Data
 #' 
 #' Create a version of a function which records microbenchmarking data along with
@@ -70,9 +78,6 @@ track_usage = function (func, arg_metadata = length_first_arg)
         # Record the observation that was just made
         obs <- data.frame(nanoseconds = time, metadata)
         timings <<- rbind(timings, obs)
-
-        # The function updates itself
-        attr(newfunc, "timings") <<- timings
 
         out
     }
