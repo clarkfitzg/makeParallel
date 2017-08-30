@@ -1,13 +1,13 @@
 ---
-title: "autoparallel-learning-functions"
+title: "autoparallel-evolve"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{autoparallel-learning-functions}
+  %\VignetteIndexEntry{autoparallel-evolve}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-# Learning functions
+# Evolving functions
 
 Tue Aug 29 10:37:03 PDT 2017
 
@@ -46,10 +46,10 @@ call it on these arguments. When `dotprod()` is subsequently called with other
 floating point arguments the same precompiled version will be discovered
 and used again.
 
-## Tuning function
+## This implme
 
-`autoparallel` lets us improve functions using `learn_func()`. The simplest
-way to use `learn_func()` is to pass multiple implementations as arguments.
+`autoparallel` lets us improve functions using `evolve()`. The simplest
+way to use `evolve()` is to pass multiple implementations as arguments.
 Consider the following two implementations of linear regression which
 extract the ordinary least squares coefficients.
 
@@ -82,14 +82,14 @@ ols_clever = function (X, y)
 ```
 
 Before timing we may not be sure which of these implementations are faster.
-Then we can pass both implementations into `learn_func` and let it figure
+Then we can pass both implementations into `evolve()` and let it figure
 it out for us.
 
 ```{R}
 
 library(autoparallel)
 
-ols = learn_func(ols_naive, ols_clever)
+ols = evolve(ols_naive, ols_clever)
 
 ```
 
@@ -98,9 +98,11 @@ signatures?) of `ols_naive()` and `ols_clever()`.
 
 ## Ideas
 
-- `ols()` will try different implementations
+- `ols()` will try different implementations. This implies that there must
+  be different possible implementations to try.
 - `ols()` times itself
 - `ols()` detects easily parallelizable parts of code and can change them.
+
 
 
 ```{R}
@@ -122,6 +124,7 @@ microbenchmark(ols_naive(X, y), ols_clever(X, y), times = 10)
 
 ```
 
+With these numbers the naive version is slightly better.
 
 
 ## Related ideas

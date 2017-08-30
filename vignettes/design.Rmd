@@ -112,3 +112,21 @@ This could be handled by SSA.
 Thinking about the difference between parse trees and abstract syntax trees
 (AST). One advantage to sticking with the parse tree is that we don't
 unnecessarily change code when writing a transformed version back out to a file.
+
+## ideas:
+
+How about using `%>%` to chain together pipeline parallelism? This requires
+some kind of vectorized operation though. I could also see transforming
+code that uses `%>%` into normal code using created intermediate variables
+for debugging, ie:
+
+```
+# Input:
+x %>% f %>% g
+
+# Output:
+x2 = f(x)
+g(x2)
+```
+
+Then we can possibly create a pipelined version of this.
