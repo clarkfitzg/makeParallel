@@ -14,30 +14,24 @@
 #' @param model statistical model of time as a noisy function of complexity.
 #' @return evolving function
 #' @export
-evolve = function (func, ..., complexity = nrow_first_arg, model = lm)
+evolve = function (func, ..., complexity = length_first_arg, model = lm)
 {
-    funcs = c(list(func), list(...))
-
-    # Start out with lists of NULL
-    models = vector(length(funcs), mode = "list")
-    timings = vector(length(funcs), mode = "list")
-
-    # TODO: Better design may be to separate this into separate functions
-    # that record how they are used.
+    funcs = lapply(c(list(func), list(...)), track_usage)
 
     function (...)
     {
-        # For development
+        # TODO: For development
         i = 1
+        f = funcs[[i]]
 
-        t = microbenchmark::microbenchmark(out <- funcs[[i]](...), times = 1L)$time
+        out = f(...)
 
-        # Record the observation that was just made
-        obs <- data.frame(time = t, complexity = complexity)
-        timings[[i]] <<- rbind(timings[[i]], obs)
+        timings = get_timings(f)
 
-        # Update the corresponding model
-        models[[i]] <<- model(time ~ ., data = timings[[i]])
+        newmodel = model(nanoseconds ~ ., data = timings)
+        update_model(f, newmodel)
+
+        out
     }
 }
 
@@ -51,16 +45,24 @@ length_first_arg = function (...)
 
 #' Get Usage Timings From Closure
 #' @export
-get_timings = function(usage_tracking_func)
+get_timings = function(f)
 {
-    get("timings", envir = environment(usage_tracking_func))
+    get("timings", envir = environment(f))
+}
+
+
+#' Put A New Model In Function Environment
+update_model = function(f, model)
+{
+    assign("model", model, environment(f))
 }
 
 
 #' Record Microbenchmarking Data
 #' 
 #' Create a version of a function which records microbenchmarking data along with
-#' argument metadata
+#' argument metadata. Other information about the function is also stored
+#' in the closure environment, such as the model.
 #' 
 #' @param func original function to be timed
 #' @param arg_metadata function to be called with the same arguments as
@@ -70,7 +72,8 @@ get_timings = function(usage_tracking_func)
 track_usage = function (func, arg_metadata = length_first_arg)
 {
     timings = NULL
-    newfunc = function (...)
+    model = NULL
+    wrapped_func = function (...)
     {
         time = microbenchmark::microbenchmark(out <- func(...), times = 1L)$time
         metadata = arg_metadata(...)
@@ -81,5 +84,5 @@ track_usage = function (func, arg_metadata = length_first_arg)
 
         out
     }
-    newfunc
+    wrapped_func
 }
