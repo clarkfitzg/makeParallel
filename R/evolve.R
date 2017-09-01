@@ -19,7 +19,7 @@
 #' @export
 evolve = function (func, ..., arg_metadata = length_first_arg, model = lm)
 {
-    funcs = lapply(c(list(func), list(...)), track_usage, arg_metadata = arg_metadata)
+    funcs = lapply(c(list(func), list(...)), smartfunc, arg_metadata = arg_metadata)
 
     function (...)
     {
@@ -87,7 +87,7 @@ update_model = function(f, model)
 #' func, should return a numeric vector of fixed size
 #' @return function that records how it's called
 #' @export
-track_usage = function (func, arg_metadata)
+smartfunc = function (func, arg_metadata = length_first_arg)
 {
     timings = NULL
     model = NULL
