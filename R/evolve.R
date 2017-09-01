@@ -10,28 +10,23 @@
 #' must be capable of fitting and predicting based only a single
 #' observation.
 #' 
-#' @param func reference implementation of the function to be evolved
+#' @param f reference implementation of the function to be evolved
 #' @param ... different implementations of the reference function
 #' @param arg_metadata function to be called with the same arguments as the
 #'  implementation functions. Should return a single row of a data.frame.
 #' @param model function, statistical model of time as a noisy function of complexity.
 #' @return evolving function
 #' @export
-evolve = function (func, ..., arg_metadata = length_first_arg, model = lm)
+evolve = function (f, ..., arg_metadata = length_first_arg, model = lm)
 {
-    funcs = lapply(c(list(func), list(...)), smartfunc, arg_metadata = arg_metadata)
+    funcs = lapply(c(list(f), list(...)), smartfunc
+                   , arg_metadata = arg_metadata, model = model)
 
     function (...)
     {
-        # TODO: For development
-        i = 1
-        f = funcs[[i]]
-
-        out = f(...)
-
-        timings = get_timings(f)
-
-        out
+        expected_times = sapply(funcs, predict, ...)
+        fastest_f = funcs[[which.min(expected_times)]]
+        fastest_f(...)
     }
 }
 
@@ -55,7 +50,7 @@ get_timings = function(f)
 #' @export
 predict.smartfunc = function(f, ...)
 {
-    # We wait until the model will be used to update it.
+    # Wait until the model will be used to update it.
     update(f)
     fenv = environment(f)
     fitted_model = get("fitted_model", envir = fenv)
