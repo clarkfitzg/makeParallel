@@ -51,7 +51,7 @@ get_timings = function(f)
 }
 
 
-#' Predict Time Required To Run
+#' Predict Time Required To Run In Nanoseconds
 #' @export
 predict.smartfunc = function(f, ...)
 {
