@@ -31,9 +31,6 @@ evolve = function (func, ..., arg_metadata = length_first_arg, model = lm)
 
         timings = get_timings(f)
 
-        newmodel = model(nanoseconds ~ ., data = timings)
-        update_model(f, newmodel)
-
         out
     }
 }
@@ -58,21 +55,37 @@ get_timings = function(f)
 #' @export
 predict.smartfunc = function(f, ...)
 {
-    model = get("model", f)
+    # We wait until the model will be used to update it.
+    update(f)
+    fenv = environment(f)
+    fitted_model = get("fitted_model", envir = fenv)
 
-    # If the model is NULL, then this implementation hasn't yet been tried
-    if(is.null(model)) return -Inf
+    # If the model is NULL, then this implementation hasn't yet been tried.
+    # Convenient to return -Inf since this will be a minimum
+    if(is.null(fitted_model)) return(-Inf)
 
     arg_metadata = get("arg_metadata", envir = environment(f))
-
-    predict(model, arg_metadata(...))
+    predict(fitted_model, arg_metadata(...))
 }
 
 
-#' Put A New Model In Function Environment
-update_model = function(f, model)
+#' Update The Model Predicting Wall Time
+#' 
+#' Updates the model in place through the environment. Not sure if this is
+#' ideal.
+update.smartfunc = function(f)
 {
-    assign("model", model, environment(f))
+    fenv = environment(f)
+    model_current = get("model_current", envir = fenv)
+    if(model_current) return()
+
+    model = get("model", envir = fenv)
+    timings = get("timings", envir = fenv)
+
+    fitted_model = model(nanoseconds ~ ., data = timings)
+
+    assign("fitted_model", fitted_model, fenv)
+    assign("model_current", TRUE, fenv)
 }
 
 
@@ -87,18 +100,22 @@ update_model = function(f, model)
 #' func, should return a numeric vector of fixed size
 #' @return function that records how it's called
 #' @export
-smartfunc = function (func, arg_metadata = length_first_arg)
+smartfunc = function (func, arg_metadata = length_first_arg, model = lm)
 {
     timings = NULL
-    model = NULL
+    fitted_model = NULL
+    # This flag records whether the model has been fitted to the most recently
+    # observed data
+    model_current = TRUE
     wrapped_func = function (...)
     {
         time = microbenchmark::microbenchmark(out <- func(...), times = 1L)$time
         metadata = arg_metadata(...)
 
         # Record the observation that was just made
-        obs <- data.frame(nanoseconds = time, metadata)
+        obs = data.frame(nanoseconds = time, metadata)
         timings <<- rbind(timings, obs)
+        model_current <<- FALSE
 
         out
     }

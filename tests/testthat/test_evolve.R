@@ -25,10 +25,9 @@ f2 = smartfunc(f)
 
 f2(50)
 
-time_expected = predict(f2, 20)
-
-expect_lt(time_expected, sleeptime + epsilon)
+time_expected = predict(f2, 100)
 
 expect_gt(time_expected, sleeptime - epsilon)
+expect_lt(time_expected, sleeptime + epsilon)
 
 })
