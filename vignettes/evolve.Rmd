@@ -212,6 +212,20 @@ I could possibly inject `{` into the code and then use it, but this seems
 more intrusive than necessary, since any code without `{` will be quite
 simple.
 
+```{R}
+
+library(autoparallel)
+n = 200
+p = 50
+x = matrix(rnorm(n * p), nrow = n)
+
+trace_timings(cov)
+
+cov(x)
+
+```
+
+
 ## Related ideas
 
 Is there a way to "merge" functions? In the OLS case for least squares I

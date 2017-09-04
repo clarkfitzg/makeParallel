@@ -119,15 +119,24 @@ smartfunc = function (func, arg_metadata = length_first_arg, model = lm)
 }
 
 
+# Doesn't work
 #' @export
-current_trace = 0L
+init = function()
+{
+    # Write all these to users global workspace
+    .ap <<- new.env()
+    .ap$current_trace <<- 0L
+    .ap$timings <<- data.frame()
+}
+
 
 # Not sure if this is the best way to create a mutable variable.
 # Nevermind, needs to be run later. Loading the package must override this
 # setting.
 #unlockBinding("current_trace", environment())
 
-timings = data.frame()
+
+#timings = data.frame()
 #timings = data.frame(funcname = character()
 #                     , start = as.POSIXct(vector())
 #                     , stop = as.POSIXct(vector())
@@ -138,14 +147,14 @@ timings = data.frame()
 tracer_factory = function (func, arg_metadata)
 {
     funcname = deparse(substitute(func))
-    current_trace <<- current_trace + 1L
-    id = current_trace
+    .ap$current_trace <<- .ap$current_trace + 1L
+    id = .ap$current_trace
     list(start = function(){
-        timings[id, "funcname"] <<- funcname
-        timings[id, "start"] <<- Sys.time()
+        .ap$timings[id, "funcname"] <<- funcname
+        .ap$timings[id, "start"] <<- Sys.time()
     },
     stop = function(){
-        timings[id, "stop"] <<- Sys.time()
+        .ap$timings[id, "stop"] <<- Sys.time()
     })
 }
 
@@ -160,6 +169,9 @@ trace_timings = function (func, arg_metadata = length_first_arg, model = lm)
     # TODO: reread the docs
     trace(func, tracer = tracer$start, exit = tracer$stop, at = 1L, where = globalenv())
 }
+
+
+
 
 #
 #arg_grabber = function()
