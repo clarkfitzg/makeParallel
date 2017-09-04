@@ -117,3 +117,61 @@ smartfunc = function (func, arg_metadata = length_first_arg, model = lm)
     class(wrapped_func) = c("smartfunc", class(wrapped_func))
     wrapped_func
 }
+
+
+#' @export
+current_trace = 0L
+
+# Not sure if this is the best way to create a mutable variable.
+# Nevermind, needs to be run later. Loading the package must override this
+# setting.
+#unlockBinding("current_trace", environment())
+
+timings = data.frame()
+#timings = data.frame(funcname = character()
+#                     , start = as.POSIXct(vector())
+#                     , stop = as.POSIXct(vector())
+#                     , stringsAsFactors = FALSE)
+
+#' Return tracing functions that use a global variable to issue unique
+#' ID's to keep track of which call the function is currently in.
+tracer_factory = function (func, arg_metadata)
+{
+    funcname = deparse(substitute(func))
+    current_trace <<- current_trace + 1L
+    id = current_trace
+    list(start = function(){
+        timings[id, "funcname"] <<- funcname
+        timings[id, "start"] <<- Sys.time()
+    },
+    stop = function(){
+        timings[id, "stop"] <<- Sys.time()
+    })
+}
+
+
+#' Trace Based Timings For Builtin Functions
+#'
+#' Can turn off with untrace(func)
+#' @export
+trace_timings = function (func, arg_metadata = length_first_arg, model = lm)
+{
+    tracer = tracer_factory(func)
+    # TODO: reread the docs
+    trace(func, tracer = tracer$start, exit = tracer$stop, at = 1L, where = globalenv())
+}
+
+#
+#arg_grabber = function()
+#{
+#    #call = match.call()
+#    call = match.call(definition = sys.function(sys.parent())
+#               , call = sys.call(sys.parent())
+#               , expand.dots = TRUE
+#               , envir = parent.frame(2L))
+#    call
+#}
+#
+#f = function(a = 1, b = 2) arg_grabber()
+#
+#f(3, 4)

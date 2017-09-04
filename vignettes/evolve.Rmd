@@ -46,6 +46,21 @@ call it on these arguments. When `dotprod()` is subsequently called with other
 floating point arguments the same precompiled version will be discovered
 and used again.
 
+### When to use
+
+Let's be very clear about when this should be used. Parallelism introduces
+an overhead on the order of a ms, so there's no point timing operations
+that require less time than that.
+
+Some of the implementation may rely on `Sys.time()`, which has
+a certain level of precision.
+
+The instrumentation when put into place causes a small amount of overhead
+(exactly how much?) that will affect the functions being timed. This means
+that small timings will be unreliable.
+
+No point in trying to go further with the precision.
+
 ## Implementation
 
 `autoparallel` lets us improve functions using `evolve()`. The simplest
@@ -148,6 +163,54 @@ microbenchmark(ols_naive(X, y), ols_clever(X, y), times = 10)
 
 With these numbers the naive version is slightly better.
 
+
+## Builtin functions
+
+Suppose one wants to do the same timing and predictions for a function in
+base R. Take `crossprod(X)` as an example, which computes the matrix $X^T
+X$. Let $X$ is an $n \times p$ matrix of real numbers. `crossprod(X)` can
+use the symmetry of the result, so it needs `n p (p + 1) / 2` floating
+point operations.
+
+```{R}
+
+# Include y to match the signature for crossprod()
+crossprod_flops = function(x, y)
+{
+    n = nrow(x)
+    p = ncol(x)
+    n * p * (p + 1) / 2
+}
+
+trace_timings(crossprod, arg_metadata = crossprod_flops)
+
+n = 100
+p = 4
+x = matrix(rnorm(n * p), nrow = n)
+crossprod(x)
+
+n = 200
+p = 50
+x = matrix(rnorm(n * p), nrow = n)
+crossprod(x)
+
+```
+
+Actually the current tracing implementation won't work because:
+
+```
+Error in .makeTracedFunction(def, tracer, exit, at, print, doEdit) :
+cannot use 'at' argument unless the function body has the form '{ ... }'
+> crossprod
+function (x, y = NULL)
+.Internal(crossprod(x, y))
+<bytecode: 0x7ff2aa133f40>
+<environment: namespace:base>
+```
+
+I could possibly inject `{` into the code and then use it, but this seems
+more intrusive than necessary, since any code without `{` will be quite
+simple.
 
 ## Related ideas
 
