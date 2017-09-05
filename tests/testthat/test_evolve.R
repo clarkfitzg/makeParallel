@@ -59,6 +59,7 @@ expect_equal(f(5), "fast")
 
 
 
+# All details subject to change
 test_that(".ap global variable is populated", {
 
 # This will likely change to something more automatic.
@@ -75,7 +76,9 @@ cov(x)
 
 untrace(cov)
 
-# Details subject to change
-expect_equal(nrow(.ap$cov), 2)
+timings = .ap$cov
+expect_equal(nrow(timings), 2)
+
+timings$
 
 })

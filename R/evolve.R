@@ -38,14 +38,6 @@ length_first_arg = function (...)
 }
 
 
-#' Get Usage Timings From Closure
-#' @export
-get_timings = function(f)
-{
-    get("timings", envir = environment(f))
-}
-
-
 #' Predict Time Required To Run In Nanoseconds
 #' @export
 predict.smartfunc = function(f, ...)
