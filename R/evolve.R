@@ -147,16 +147,24 @@ init = function()
 #' for nested calls.
 #'
 #' @param funcname character
+#' @param arg_metadata function
 tracer_factory = function (funcname, arg_metadata)
 {
-    .ap$current_trace <<- .ap$current_trace + 1L
-    id = .ap$current_trace
+
+    id = if(funcname %in% ls(.ap)){
+        # Saves from erasing existing timings
+        nrow(.ap[[funcname]])
+    } else {
+        .ap[[funcname]] <<- data.frame()
+        0L
+    }
+
+    # Tracer will call these functions:
     list(start = function(){
-        .ap$timings[id, "funcname"] <<- funcname
-        .ap$timings[id, "start"] <<- Sys.time()
-    },
-    stop = function(){
-        .ap$timings[id, "stop"] <<- Sys.time()
+        id <<- id + 1L
+        .ap[[funcname]][id, "start"] <<- Sys.time()
+    }, stop = function(){
+        .ap[[funcname]][id, "stop"] <<- Sys.time()
     })
 }
 

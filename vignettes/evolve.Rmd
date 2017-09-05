@@ -215,13 +215,16 @@ simple.
 ```{R}
 
 library(autoparallel)
-n = 200
-p = 50
+init()
+
+n = 20
+p = 2
 x = matrix(rnorm(n * p), nrow = n)
 
 trace_timings(cov)
 
 cov(x)
+
 
 ```
 
