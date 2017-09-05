@@ -142,32 +142,6 @@ init = function()
 #                     , stop = as.POSIXct(vector())
 #                     , stringsAsFactors = FALSE)
 
-#' Return tracing functions that use a global variable to issue unique
-#' ID's to keep track of which call the function is currently in. Useful
-#' for nested calls.
-#'
-#' @param funcname character
-#' @param arg_metadata function
-tracer_factory = function (funcname, arg_metadata)
-{
-
-    id = if(funcname %in% ls(.ap)){
-        # Saves from erasing existing timings
-        nrow(.ap[[funcname]])
-    } else {
-        .ap[[funcname]] <<- data.frame()
-        0L
-    }
-
-    # Tracer will call these functions:
-    list(start = function(){
-        id <<- id + 1L
-        .ap[[funcname]][id, "start"] <<- Sys.time()
-    }, stop = function(){
-        .ap[[funcname]][id, "stop"] <<- Sys.time()
-    })
-}
-
 
 #' Trace Based Timings For Builtin Functions
 #'
@@ -175,10 +149,31 @@ tracer_factory = function (funcname, arg_metadata)
 #' @export
 trace_timings = function (func, arg_metadata = length_first_arg, model = lm)
 {
-    funcname = substitute(func)
-    tracer = tracer_factory(deparse(funcname))
-    # TODO: reread the docs
-    trace(funcname, tracer = tracer$start, exit = tracer$stop, where = globalenv())
+    funcname_symbol = substitute(func)
+    funcname = deparse(funcname_symbol)
+
+    id = if(funcname %in% ls(.ap)){
+        # Saves from erasing existing timings
+        nrow(.ap[[funcname]])
+    } else {
+        .ap[[funcname]] <<- data.frame(start = as.POSIXct(vector())
+                     , stop = as.POSIXct(vector())
+                     , stringsAsFactors = FALSE)
+        0L
+    }
+
+    start = function(){
+        id <<- id + 1L
+        .ap[[funcname]][id, "start"] <<- Sys.time()
+    }
+
+    stop = function(){
+        # Writing to the last NA should handle nesting
+        last_NA = tail(which(is.na(.ap[[funcname]][, "stop"])), 1L)
+        .ap[[funcname]][last_NA, "stop"] <<- Sys.time()
+    }
+
+    trace(funcname_symbol, tracer = start, exit = stop, where = globalenv())
 }
 
 

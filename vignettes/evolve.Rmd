@@ -225,6 +225,8 @@ trace_timings(cov)
 
 cov(x)
 
+cov(cov(x))
+
 
 ```
 
