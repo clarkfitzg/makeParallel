@@ -124,7 +124,7 @@ smartfunc = function (func, arg_metadata = length_first_arg, model = lm)
 init = function()
 {
     # Write all these to users global workspace
-    .ap <<- new.env()
+    assign(".ap", new.env(), globalenv())
     .ap$current_trace <<- 0L
     .ap$timings <<- data.frame()
 }
@@ -143,10 +143,12 @@ init = function()
 #                     , stringsAsFactors = FALSE)
 
 #' Return tracing functions that use a global variable to issue unique
-#' ID's to keep track of which call the function is currently in.
-tracer_factory = function (func, arg_metadata)
+#' ID's to keep track of which call the function is currently in. Useful
+#' for nested calls.
+#'
+#' @param funcname character
+tracer_factory = function (funcname, arg_metadata)
 {
-    funcname = deparse(substitute(func))
     .ap$current_trace <<- .ap$current_trace + 1L
     id = .ap$current_trace
     list(start = function(){
@@ -165,9 +167,10 @@ tracer_factory = function (func, arg_metadata)
 #' @export
 trace_timings = function (func, arg_metadata = length_first_arg, model = lm)
 {
-    tracer = tracer_factory(func)
+    funcname = substitute(func)
+    tracer = tracer_factory(deparse(funcname))
     # TODO: reread the docs
-    trace(func, tracer = tracer$start, exit = tracer$stop, at = 1L, where = globalenv())
+    trace(funcname, tracer = tracer$start, exit = tracer$stop, where = globalenv())
 }
 
 
