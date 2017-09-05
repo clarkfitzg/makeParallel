@@ -17,7 +17,7 @@
 #' @param model function, statistical model of time as a noisy function of complexity.
 #' @return evolving function
 #' @export
-evolve = function (f, ..., arg_metadata = length_first_arg, model = lm)
+evolve = function (f, ..., arg_metadata = length_first_param, model = lm)
 {
     funcs = lapply(c(list(f), list(...)), smartfunc
                    , arg_metadata = arg_metadata, model = model)
@@ -31,10 +31,11 @@ evolve = function (f, ..., arg_metadata = length_first_arg, model = lm)
 }
 
 
-#' The length of the first argument
-length_first_arg = function (...)
+#' The length of the first formal parameter
+#'
+length_first_param = function (...)
 {
-    data.frame(length_first_arg = length(list(...)[[1]]))
+    data.frame(length_first_param = length(list(...)[[1]]))
 }
 
 
@@ -87,7 +88,7 @@ update.smartfunc = function(f)
 #' func, should return a numeric vector of fixed size
 #' @return function that records how it's called
 #' @export
-smartfunc = function (func, arg_metadata = length_first_arg, model = lm)
+smartfunc = function (func, arg_metadata = length_first_param, model = lm)
 {
     timings = NULL
     fitted_model = NULL
@@ -139,7 +140,7 @@ init = function()
 #'
 #' Can turn off with untrace(func)
 #' @export
-trace_timings = function (func, arg_metadata = length_first_arg, model = lm)
+trace_timings = function (func, arg_metadata = length_first_param, model = lm)
 {
     funcname_symbol = substitute(func)
     funcname = deparse(funcname_symbol)
@@ -179,18 +180,16 @@ startstop = function(funcname, arg_metadata, model){
 }
 
 
+arg_grabber = function()
+{
+    call = match.call(definition = sys.function(sys.parent())
+               , call = sys.call(sys.parent())
+               , expand.dots = TRUE
+               , envir = parent.frame(2L))
+    call
+}
 
-#
-#arg_grabber = function()
-#{
-#    #call = match.call()
-#    call = match.call(definition = sys.function(sys.parent())
-#               , call = sys.call(sys.parent())
-#               , expand.dots = TRUE
-#               , envir = parent.frame(2L))
-#    call
-#}
-#
-#f = function(a = 1, b = 2) arg_grabber()
-#
-#f(3, 4)
+
+f = function(a = 1, b = 2, ...) arg_grabber()
+
+call = f(sum(1, 2), 4, a = 'dots!')

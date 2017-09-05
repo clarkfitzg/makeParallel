@@ -6,7 +6,9 @@ f2 = smartfunc(f)
 
 f2(50)
 
-expect_true(is.data.frame(get_timings(f2)))
+timings = get("timings", environment(f2))
+
+expect_true(is.data.frame(timings))
 
 })
 
@@ -69,16 +71,15 @@ n = 20
 p = 2
 x = matrix(rnorm(n * p), nrow = n)
 
-trace_timings(cov)
+trace_timings(crossprod)
 
-cov(x)
-cov(x)
+crossprod(x)
+crossprod(x)
 
-untrace(cov)
+untrace(crossprod)
 
-timings = .ap$cov
+timings = .ap$crossprod
 expect_equal(nrow(timings), 2)
 
-timings$
 
 })
