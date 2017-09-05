@@ -152,6 +152,14 @@ trace_timings = function (func, arg_metadata = length_first_arg, model = lm)
     funcname_symbol = substitute(func)
     funcname = deparse(funcname_symbol)
 
+    ss = startstop(funcname)
+
+    #trace(funcname_symbol, tracer = start, exit = stop, where = globalenv())
+    trace(funcname_symbol, tracer = ss$start, exit = ss$stop, where = globalenv())
+}
+
+
+startstop = function(funcname){
     id = if(funcname %in% ls(.ap)){
         # Saves from erasing existing timings
         nrow(.ap[[funcname]])
@@ -161,6 +169,7 @@ trace_timings = function (func, arg_metadata = length_first_arg, model = lm)
                      , stringsAsFactors = FALSE)
         0L
     }
+
 
     start = function(){
         id <<- id + 1L
@@ -173,7 +182,7 @@ trace_timings = function (func, arg_metadata = length_first_arg, model = lm)
         .ap[[funcname]][last_NA, "stop"] <<- Sys.time()
     }
 
-    trace(funcname_symbol, tracer = start, exit = stop, where = globalenv())
+    list(start = start, stop = stop)
 }
 
 

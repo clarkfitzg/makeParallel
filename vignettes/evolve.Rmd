@@ -225,6 +225,8 @@ trace_timings(cov)
 
 cov(x)
 
+cov(Sys.sleep(2))
+
 cov(cov(x))
 
 
