@@ -56,3 +56,26 @@ f(4)
 expect_equal(f(5), "fast")
 
 })
+
+
+
+test_that(".ap global variable is populated", {
+
+# This will likely change to something more automatic.
+autoparallel::init()
+
+n = 20
+p = 2
+x = matrix(rnorm(n * p), nrow = n)
+
+trace_timings(cov)
+
+cov(x)
+cov(x)
+
+untrace(cov)
+
+# Details subject to change
+expect_equal(nrow(.ap$cov), 2)
+
+})

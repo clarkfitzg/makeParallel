@@ -152,14 +152,16 @@ trace_timings = function (func, arg_metadata = length_first_arg, model = lm)
     funcname_symbol = substitute(func)
     funcname = deparse(funcname_symbol)
 
-    ss = startstop(funcname)
+    ss = startstop(funcname, arg_metadata, model)
 
     #trace(funcname_symbol, tracer = start, exit = stop, where = globalenv())
     trace(funcname_symbol, tracer = ss$start, exit = ss$stop, where = globalenv())
 }
 
 
-startstop = function(funcname){
+#' This works around error in hasTsp(x), not sure why that was happening in
+#' first place.
+startstop = function(funcname, arg_metadata, model){
     id = if(funcname %in% ls(.ap)){
         # Saves from erasing existing timings
         nrow(.ap[[funcname]])
@@ -169,7 +171,6 @@ startstop = function(funcname){
                      , stringsAsFactors = FALSE)
         0L
     }
-
 
     start = function(){
         id <<- id + 1L
@@ -184,7 +185,6 @@ startstop = function(funcname){
 
     list(start = start, stop = stop)
 }
-
 
 
 
