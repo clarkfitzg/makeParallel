@@ -179,7 +179,7 @@ crossprod_flops = function(x, y)
 {
     n = nrow(x)
     p = ncol(x)
-    n * p * (p + 1) / 2
+    data.frame(npp = n * p * (p + 1) / 2)
 }
 
 trace_timings(crossprod, arg_metadata = crossprod_flops)
@@ -196,6 +196,21 @@ crossprod(x)
 
 ```
 
+## Design for Trace based timings
+
+The `arg_metadata` function captures the relevant metadata for an
+operation. To make a custom `arg_metadata` functions, as with the
+`crossprod_flops()` above, it seems reasonable to match the signature of
+the function which is being timed. This could be verified. Then the design
+issue is how to access and use these variables from within the functions
+that are used in `trace()`? Note that these functions cannot have any
+parameters. Therefore we must discover the arguments from within the
+functions themselves.
+
+TODO- come back here
+
+The default just counts the number of rows for the first
+argument. 
 
 ## Related ideas
 

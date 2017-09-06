@@ -71,15 +71,23 @@ n = 20
 p = 2
 x = matrix(rnorm(n * p), nrow = n)
 
-trace_timings(crossprod)
+# Include y to match the signature for crossprod()
+crossprod_flops = function(x, y)
+{
+    n = nrow(x)
+    p = ncol(x)
+    data.frame(npp = n * p * (p + 1) / 2)
+}
+
+trace_timings(crossprod, arg_metadata = crossprod_flops)
 
 crossprod(x)
 crossprod(x)
-
-untrace(crossprod)
 
 timings = .ap$crossprod
+
 expect_equal(nrow(timings), 2)
 
+expect_true("npp" %in% colnames(timings))
 
 })
