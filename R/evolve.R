@@ -166,11 +166,11 @@ startstop = function(funcname, arg_metadata, model){
 
     # This assumes that the signatures match from the arg_metadata
     params = lapply(formalArgs(arg_metadata), as.symbol)
-    metadata_call = as.call(c(arg_metadata, args))
+    metadata_call = as.call(c(as.name("arg_metadata"), params))
 
     start = function(){
         id <<- nrow(.ap[[funcname]]) + 1L
-        #.ap[[funcname]][id, "arg_metadata"] <<- eval(metadata_call)
+        .ap[[funcname]][id, "arg_metadata"] <<- eval(metadata_call)
         .ap[[funcname]][id, "start"] <<- Sys.time()
     }
 
@@ -192,13 +192,13 @@ startstop = function(funcname, arg_metadata, model){
 #               , envir = parent.frame(2L))
 #    call
 #}
-#
-#
+
+
 #f = function(a, b = 2, ...) NULL
 #
 #params = lapply(formalArgs(f), as.symbol)
 #
-#call_list = c(f, args)
+#call_list = c(as.name("f"), params)
 #
 #call = as.call(call_list)
 #

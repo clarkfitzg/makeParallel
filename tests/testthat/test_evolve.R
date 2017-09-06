@@ -79,7 +79,10 @@ crossprod_flops = function(x, y)
     n * p * (p + 1) / 2
 }
 
+#debug(autoparallel:::startstop)
+
 trace_timings(crossprod, arg_metadata = crossprod_flops)
+
 
 crossprod(x)
 
