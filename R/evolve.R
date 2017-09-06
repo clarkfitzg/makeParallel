@@ -169,16 +169,27 @@ startstop = function(funcname, metadata_func, model){
     metadata_call = as.call(c(as.name("metadata_func"), params))
 
     start = function(){
+        # The actual function evaluation frame
+        frame = parent.frame()
+        # Stick this function in so evaluation can find it.
+        frame$metadata_func = metadata_func
+        md = eval(metadata_call, frame)
+
+        # Record it by appending a new row to the timings
         id = nrow(.ap[[funcname]]) + 1L
-        md = eval(metadata_call, parent.frame())
         .ap[[funcname]][id, "metadata"] <<- md
+
+        # Conceptually, starting timer should be last step
         .ap[[funcname]][id, "start"] <<- Sys.time()
     }
 
     stop = function(){
+        # Conceptually, stopping timer should be first step
+        stoptime = Sys.time()
+
         # Writing to the last NA should handle nesting
         last_NA = tail(which(is.na(.ap[[funcname]][, "stop"])), 1L)
-        .ap[[funcname]][last_NA, "stop"] <<- Sys.time()
+        .ap[[funcname]][last_NA, "stop"] <<- stoptime
     }
 
     list(start = start, stop = stop)

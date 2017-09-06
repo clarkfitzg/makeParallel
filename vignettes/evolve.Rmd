@@ -182,7 +182,7 @@ crossprod_flops = function(x, y)
     data.frame(npp = n * p * (p + 1) / 2)
 }
 
-trace_timings(crossprod, arg_metadata = crossprod_flops)
+trace_timings(crossprod, metadata_func = crossprod_flops)
 
 n = 100
 p = 4
@@ -198,8 +198,8 @@ crossprod(x)
 
 ## Design for Trace based timings
 
-The `arg_metadata` function captures the relevant metadata for an
-operation. To make a custom `arg_metadata` functions, as with the
+The `metadata_func` function captures the relevant metadata for an
+operation. To make a custom `metadata_func` functions, as with the
 `crossprod_flops()` above, it seems reasonable to match the signature of
 the function which is being timed. This could be verified. Then the design
 issue is how to access and use these variables from within the functions
@@ -221,6 +221,9 @@ am = function(a) ...
 Similarly, `f(g(x))` lets us evaluate `am(a)`. Thinking more on this, we
 can just evaluate the default signature. One issue that may come up is
 finding the wrong values inside the intermediate closure. 
+Another issue is where to evaluate the signature? Inside the body of the
+function where the tracing happens. But `metadata_func()` does not exist
+there. So we can put it there.
 
 
 
