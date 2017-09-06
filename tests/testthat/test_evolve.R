@@ -83,10 +83,11 @@ crossprod_flops = function(x, y)
 
 trace_timings(crossprod, metadata_func = crossprod_flops)
 
-
 crossprod(x)
 
 crossprod(x)
+
+untrace(crossprod)
 
 timings = .ap$crossprod
 
@@ -95,3 +96,25 @@ expect_equal(nrow(timings), 2)
 expect_gte(ncol(timings), 3)
 
 })
+
+
+test_that("defaults for trace_timings", {
+
+
+n = 20
+x = rnorm(n)
+y = rnorm(n)
+
+trace_timings(cov)
+
+cov(x, y)
+
+untrace(cov)
+
+timings = .ap$cov
+
+expect_equal(timings$metadata, length(x))
+
+
+})
+

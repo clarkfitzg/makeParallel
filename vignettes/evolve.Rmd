@@ -222,15 +222,23 @@ Similarly, `f(g(x))` lets us evaluate `am(a)`. Thinking more on this, we
 can just evaluate the default signature. One issue that may come up is
 finding the wrong values inside the intermediate closure. 
 Another issue is where to evaluate the signature? Inside the body of the
-function where the tracing happens. But `metadata_func()` does not exist
-there. So we can put it there.
+function where the tracing happens. `metadata_func()` does not exist
+there. We can put it there.
+
+The more general case is a single function such as the default
+`length_first_arg()`, which must be capable of handling different argument
+signatures. First off we need to assume that there is at least one
+argument, since otherwise we can't make any predictions based on
+characteristics of the arguments.
+
+For the trace based method, one way to implement `length_first_arg()` is as
+a function with zero parameters that reaches through to its parent. This
+approach won't work for the S3 methods currently using `...` though. So maybe the
+best way is to rewrite it all to use the trace implementation, since that
+is more general. Then I don't have to have two implementations.
 
 
 
-In the more general case of the different argument signatures...
-
-The default just counts the number of rows for the first
-argument. 
 
 ## Related ideas
 

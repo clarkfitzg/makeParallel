@@ -39,6 +39,29 @@ length_first_param = function (...)
 }
 
 
+#' The length of the first formal parameter
+#'
+#' This trace based implementation assumes it will be called inside the
+#' function. May be able to use dynGet() too.
+length_first_param_trace = function ()
+{
+    func = eval(sys.call(1L)[[1]])
+    firstarg = formalArgs(func)[1]
+    length(get(firstarg))
+}
+
+#
+#f = function(x, y)
+#{
+#    # Should do same thing as length(x)
+#    length_first_param_trace()
+#}
+#
+#x = 20
+#f(1:5)
+#
+
+
 #' Predict Time Required To Run In Nanoseconds
 #' @export
 predict.smartfunc = function(f, ...)
@@ -112,10 +135,10 @@ smartfunc = function (func, metadata_func = length_first_param, model = lm)
 }
 
 
-# Doesn't work
 #' @export
 init = function()
 {
+    # TODO: Check if exists so we don't write over.
     # Write all these to users global workspace
     assign(".ap", new.env(), globalenv())
     .ap$current_trace <<- 0L
@@ -140,7 +163,7 @@ init = function()
 #'
 #' Can turn off with untrace(func)
 #' @export
-trace_timings = function (func, metadata_func = length_first_param, model = lm)
+trace_timings = function (func, metadata_func = length_first_param_trace, model = lm)
 {
     funcname_symbol = substitute(func)
     funcname = deparse(funcname_symbol)
@@ -194,6 +217,8 @@ startstop = function(funcname, metadata_func, model){
 
     list(start = start, stop = stop)
 }
+
+
 
 #
 #arg_grabber = function()
