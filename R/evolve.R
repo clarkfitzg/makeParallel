@@ -169,8 +169,9 @@ startstop = function(funcname, arg_metadata, model){
     metadata_call = as.call(c(as.name("arg_metadata"), params))
 
     start = function(){
-        id <<- nrow(.ap[[funcname]]) + 1L
-        .ap[[funcname]][id, "arg_metadata"] <<- eval(metadata_call)
+        id = nrow(.ap[[funcname]]) + 1L
+        md = eval(metadata_call, parent.frame())
+        .ap[[funcname]][id, "arg_metadata"] <<- md
         .ap[[funcname]][id, "start"] <<- Sys.time()
     }
 
