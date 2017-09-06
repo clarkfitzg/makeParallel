@@ -76,7 +76,7 @@ crossprod_flops = function(x, y)
 {
     n = nrow(x)
     p = ncol(x)
-    data.frame(npp = n * p * (p + 1) / 2)
+    n * p * (p + 1) / 2
 }
 
 trace_timings(crossprod, arg_metadata = crossprod_flops)
@@ -88,6 +88,6 @@ timings = .ap$crossprod
 
 expect_equal(nrow(timings), 2)
 
-expect_true("npp" %in% colnames(timings))
+expect_gte(ncol(timings), 3)
 
 })

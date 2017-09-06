@@ -207,7 +207,24 @@ that are used in `trace()`? Note that these functions cannot have any
 parameters. Therefore we must discover the arguments from within the
 functions themselves.
 
-TODO- come back here
+If the formal parameters match then we can directly lift the arguments from
+the calling function. Some care is needed to respect lazy evaluation. Here
+are some considerations. In the following let `f` be the function and `am()` be the
+corresponding argument metadata function with the same signature as `f`.
+
+```
+f = function(a) ...
+am = function(a) ...
+```
+
+`f(x)` is the same as `f(a = x)`, so we can evaluate `am(a)`.
+Similarly, `f(g(x))` lets us evaluate `am(a)`. Thinking more on this, we
+can just evaluate the default signature. One issue that may come up is
+finding the wrong values inside the intermediate closure. 
+
+
+
+In the more general case of the different argument signatures...
 
 The default just counts the number of rows for the first
 argument. 

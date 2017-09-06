@@ -153,20 +153,24 @@ trace_timings = function (func, arg_metadata = length_first_param, model = lm)
 
 
 #' This works around error in hasTsp(x), not sure why that was happening in
-#' first place.
+#' first place. 
+#' May try to reorganize later.
 startstop = function(funcname, arg_metadata, model){
-    id = if(funcname %in% ls(.ap)){
-        # Saves from erasing existing timings
-        nrow(.ap[[funcname]])
-    } else {
+
+    if(!(funcname %in% ls(.ap))){
         .ap[[funcname]] <<- data.frame(start = as.POSIXct(vector())
                      , stop = as.POSIXct(vector())
+                     , arg_metadata = list()
                      , stringsAsFactors = FALSE)
-        0L
     }
 
+    # This assumes that the signatures match from the arg_metadata
+    params = lapply(formalArgs(arg_metadata), as.symbol)
+    metadata_call = as.call(c(arg_metadata, args))
+
     start = function(){
-        id <<- id + 1L
+        id <<- nrow(.ap[[funcname]]) + 1L
+        .ap[[funcname]][id, "arg_metadata"] <<- eval(metadata_call)
         .ap[[funcname]][id, "start"] <<- Sys.time()
     }
 
@@ -190,6 +194,12 @@ arg_grabber = function()
 }
 
 
-f = function(a = 1, b = 2, ...) arg_grabber()
+f = function(a, b = 2, ...) NULL
 
-call = f(sum(1, 2), 4, a = 'dots!')
+params = lapply(formalArgs(f), as.symbol)
+
+call_list = c(f, args)
+
+call = as.call(call_list)
+
+eval(call)
