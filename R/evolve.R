@@ -160,7 +160,7 @@ startstop = function(funcname, arg_metadata, model){
     if(!(funcname %in% ls(.ap))){
         .ap[[funcname]] <<- data.frame(start = as.POSIXct(vector())
                      , stop = as.POSIXct(vector())
-                     , arg_metadata = list()
+                     , arg_metadata = numeric()
                      , stringsAsFactors = FALSE)
     }
 
@@ -170,7 +170,7 @@ startstop = function(funcname, arg_metadata, model){
 
     start = function(){
         id <<- nrow(.ap[[funcname]]) + 1L
-        .ap[[funcname]][id, "arg_metadata"] <<- eval(metadata_call)
+        #.ap[[funcname]][id, "arg_metadata"] <<- eval(metadata_call)
         .ap[[funcname]][id, "start"] <<- Sys.time()
     }
 
@@ -183,23 +183,23 @@ startstop = function(funcname, arg_metadata, model){
     list(start = start, stop = stop)
 }
 
-
-arg_grabber = function()
-{
-    call = match.call(definition = sys.function(sys.parent())
-               , call = sys.call(sys.parent())
-               , expand.dots = TRUE
-               , envir = parent.frame(2L))
-    call
-}
-
-
-f = function(a, b = 2, ...) NULL
-
-params = lapply(formalArgs(f), as.symbol)
-
-call_list = c(f, args)
-
-call = as.call(call_list)
-
-eval(call)
+#
+#arg_grabber = function()
+#{
+#    call = match.call(definition = sys.function(sys.parent())
+#               , call = sys.call(sys.parent())
+#               , expand.dots = TRUE
+#               , envir = parent.frame(2L))
+#    call
+#}
+#
+#
+#f = function(a, b = 2, ...) NULL
+#
+#params = lapply(formalArgs(f), as.symbol)
+#
+#call_list = c(f, args)
+#
+#call = as.call(call_list)
+#
+#eval(call)

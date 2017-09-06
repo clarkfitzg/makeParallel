@@ -82,6 +82,7 @@ crossprod_flops = function(x, y)
 trace_timings(crossprod, arg_metadata = crossprod_flops)
 
 crossprod(x)
+
 crossprod(x)
 
 timings = .ap$crossprod
