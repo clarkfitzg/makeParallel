@@ -12,15 +12,15 @@
 #' 
 #' @param f reference implementation of the function to be evolved
 #' @param ... different implementations of the reference function
-#' @param arg_metadata function to be called with the same arguments as the
+#' @param metadata_func function to be called with the same arguments as the
 #'  implementation functions. Should return a single row of a data.frame.
 #' @param model function, statistical model of time as a noisy function of complexity.
 #' @return evolving function
 #' @export
-evolve = function (f, ..., arg_metadata = length_first_param, model = lm)
+evolve = function (f, ..., metadata_func = length_first_param, model = lm)
 {
     funcs = lapply(c(list(f), list(...)), smartfunc
-                   , arg_metadata = arg_metadata, model = model)
+                   , metadata_func = metadata_func, model = model)
 
     function (...)
     {
@@ -52,8 +52,8 @@ predict.smartfunc = function(f, ...)
     # Convenient to return -Inf since this will be a minimum
     if(is.null(fitted_model)) return(-Inf)
 
-    arg_metadata = get("arg_metadata", envir = environment(f))
-    predict(fitted_model, arg_metadata(...))
+    metadata_func = get("metadata_func", envir = environment(f))
+    predict(fitted_model, metadata_func(...))
 }
 
 
@@ -84,11 +84,11 @@ update.smartfunc = function(f)
 #' get put in the closure environment, such as the model.
 #' 
 #' @param func original function to be timed
-#' @param arg_metadata function to be called with the same arguments as
+#' @param metadata_func function to be called with the same arguments as
 #' func, should return a numeric vector of fixed size
 #' @return function that records how it's called
 #' @export
-smartfunc = function (func, arg_metadata = length_first_param, model = lm)
+smartfunc = function (func, metadata_func = length_first_param, model = lm)
 {
     timings = NULL
     fitted_model = NULL
@@ -98,7 +98,7 @@ smartfunc = function (func, arg_metadata = length_first_param, model = lm)
     wrapped_func = function (...)
     {
         time = microbenchmark::microbenchmark(out <- func(...), times = 1L)$time
-        metadata = arg_metadata(...)
+        metadata = metadata_func(...)
 
         # Record the observation that was just made
         obs = data.frame(nanoseconds = time, metadata)
@@ -140,12 +140,12 @@ init = function()
 #'
 #' Can turn off with untrace(func)
 #' @export
-trace_timings = function (func, arg_metadata = length_first_param, model = lm)
+trace_timings = function (func, metadata_func = length_first_param, model = lm)
 {
     funcname_symbol = substitute(func)
     funcname = deparse(funcname_symbol)
 
-    ss = startstop(funcname, arg_metadata, model)
+    ss = startstop(funcname, metadata_func, model)
 
     #trace(funcname_symbol, tracer = start, exit = stop, where = globalenv())
     trace(funcname_symbol, tracer = ss$start, exit = ss$stop, where = globalenv())
@@ -155,23 +155,23 @@ trace_timings = function (func, arg_metadata = length_first_param, model = lm)
 #' This works around error in hasTsp(x), not sure why that was happening in
 #' first place. 
 #' May try to reorganize later.
-startstop = function(funcname, arg_metadata, model){
+startstop = function(funcname, metadata_func, model){
 
     if(!(funcname %in% ls(.ap))){
         .ap[[funcname]] <<- data.frame(start = as.POSIXct(vector())
                      , stop = as.POSIXct(vector())
-                     , arg_metadata = numeric()
+                     , metadata = numeric()
                      , stringsAsFactors = FALSE)
     }
 
-    # This assumes that the signatures match from the arg_metadata
-    params = lapply(formalArgs(arg_metadata), as.symbol)
-    metadata_call = as.call(c(as.name("arg_metadata"), params))
+    # This assumes that the signatures match from the metadata_func
+    params = lapply(formalArgs(metadata_func), as.symbol)
+    metadata_call = as.call(c(as.name("metadata_func"), params))
 
     start = function(){
         id = nrow(.ap[[funcname]]) + 1L
         md = eval(metadata_call, parent.frame())
-        .ap[[funcname]][id, "arg_metadata"] <<- md
+        .ap[[funcname]][id, "metadata"] <<- md
         .ap[[funcname]][id, "start"] <<- Sys.time()
     }
 
