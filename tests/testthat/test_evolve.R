@@ -1,3 +1,21 @@
+
+# Include y to match the signature for crossprod()
+crossprod_flops = function(x, y)
+{
+    n = nrow(x)
+    p = ncol(x)
+    (2*n - 1) * p * (p + 1) / 2
+}
+
+n = 20
+p = 2
+x = matrix(rnorm(n * p), nrow = n)
+x2 = matrix(rnorm(2 * n * p), nrow = n)
+ 
+
+
+############################################################
+
 test_that("get_timings", {
 
 f = function(x) 20
@@ -11,6 +29,22 @@ timings = get("timings", environment(f2))
 expect_true(is.data.frame(timings))
 
 })
+
+
+
+test_that("smartfunc with metadata function", {
+
+cp = smartfunc(crossprod, crossprod_flops)
+
+replicate(10, cp(x))
+replicate(10, cp(x2))
+
+predict(cp, x)
+
+environment(cp)
+
+})
+
 
 
 test_that("prediction of smartfunc", {
@@ -57,6 +91,7 @@ f(4)
 
 expect_equal(f(5), "fast")
 
+
 })
 
 
@@ -66,18 +101,6 @@ test_that(".ap global variable is populated", {
 
 # This will likely change to something more automatic.
 autoparallel::init()
-
-n = 20
-p = 2
-x = matrix(rnorm(n * p), nrow = n)
-
-# Include y to match the signature for crossprod()
-crossprod_flops = function(x, y)
-{
-    n = nrow(x)
-    p = ncol(x)
-    n * p * (p + 1) / 2
-}
 
 #debug(autoparallel:::startstop)
 

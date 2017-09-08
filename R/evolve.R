@@ -13,7 +13,8 @@
 #' @param f reference implementation of the function to be evolved
 #' @param ... different implementations of the reference function
 #' @param metadata_func function to be called with the same arguments as the
-#'  implementation functions. Should return a single row of a data.frame.
+#'  implementation functions. Should return a single row of a data.frame or a vector which
+#'  can be coerced to such.
 #' @param model function, statistical model of time as a noisy function of complexity.
 #' @return evolving function
 #' @export
@@ -76,7 +77,25 @@ predict.smartfunc = function(f, ...)
     if(is.null(fitted_model)) return(-Inf)
 
     metadata_func = get("metadata_func", envir = environment(f))
-    predict(fitted_model, metadata_func(...))
+    # TODO: handle vector output
+    metadata = metadata_func(...)
+    predictor = to_row(metadata)
+    predict(fitted_model, predictor)
+}
+
+
+#' Make Into Row Of data.frame
+#'
+to_row = function(metadata)
+{
+    if(is.data.frame(metadata) && nrow(metadata) == 1){
+        metadata
+    }
+    else if(is.vector(metadata)){
+        as.data.frame(t(metadata))
+    } else {
+        stop("Not able to convert into data.frame with one row")
+    }
 }
 
 
@@ -122,9 +141,10 @@ smartfunc = function (func, metadata_func = length_first_param, model = lm)
     {
         time = microbenchmark::microbenchmark(out <- func(...), times = 1L)$time
         metadata = metadata_func(...)
+        predictor = to_row(metadata)
 
         # Record the observation that was just made
-        obs = data.frame(nanoseconds = time, metadata)
+        obs = data.frame(nanoseconds = time, predictor)
         timings <<- rbind(timings, obs)
         model_current <<- FALSE
 
