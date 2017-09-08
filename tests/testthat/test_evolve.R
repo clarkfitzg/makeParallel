@@ -123,7 +123,8 @@ expect_gte(ncol(timings), 3)
 
 test_that("defaults for trace_timings", {
 
-skip("Internal use of parent.frame() is not compatible with testthat I believe")
+skip("The way I'm using parent.frame() and eval() internally is not
+     compatible with testthat I believe")
 
 n = 20
 x = rnorm(n)
@@ -135,10 +136,9 @@ cov(x, y)
 
 untrace(cov)
 
+autoparallel::init()
 timings = .ap$cov
 
 expect_equal(timings$metadata, length(x))
 
-
 })
-
