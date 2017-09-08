@@ -220,6 +220,7 @@ startstop = function(funcname, metadata_func, model){
 
         # Record it by appending a new row to the timings
         id = nrow(.ap[[funcname]]) + 1L
+        # TODO: generalize this beyond a scalar here.
         .ap[[funcname]][id, "metadata"] <<- md
 
         # Conceptually, starting timer should be last step
