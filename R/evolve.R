@@ -195,9 +195,8 @@ trace_timings = function (func, metadata_func = length_first_param_trace, model 
 }
 
 
-#' This works around error in hasTsp(x), not sure why that was happening in
-#' first place. 
-#' May try to reorganize later.
+#' Separating this functionality works around error in hasTsp(x), not sure
+#' why that was happening in first place.  May try to reorganize later.
 startstop = function(funcname, metadata_func, model){
 
     if(!(funcname %in% ls(.ap))){
