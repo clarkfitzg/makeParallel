@@ -1,3 +1,39 @@
+## schedule
+
+I told Norm that I would talk about "Automatic Parallelization of R Code"
+at JSM in July 2018. I also told Joe Rickert that I would talk to BARUG in
+the fall. For both it would be nice to have a reasonably stable package
+with minimal dependencies. And the package should be on CRAN.
+
+My general philosophy is that it's better to have one or two well thought
+out, simple, interfaces than many half baked ones. 
+Extensibility is also
+good.
+Currently the package has a bunch of half baked stuff!
+
+I'd also only like to include stuff that I would use myself.
+
+I can use the next month or so to get this to a point where it can be
+packaged and put on CRAN.
+
+Then what will the core features be?
+
+- `do(...)` for interactive parallelism. This could be extended a bit to
+  handle `Reduce()`.
+- automatically parallelize / accelerate functions or scripts. This should
+  work with fork and SNOW clusters.
+
+I like the idea of just doing functions, since it should be straightforward
+to make a script into a function. Saying I'm going to modify the code to
+speed up the function frees me to do many things beyond transforming
+`lapply` type calls to parallel. For example, I can eliminate unnecessary
+computation and do task parallelism also. It even opens up the door for
+compilation.
+
+The limits of what I'm targeting should be made very clear. For example, I
+want to initially stay clear of plotting, because parallel plotting is
+insane.
+
 ## multiple calls
 
 Initially I'm thinking to find and transform the first instance of `lapply`
@@ -130,3 +166,21 @@ g(x2)
 ```
 
 Then we can possibly create a pipelined version of this.
+
+Is it possible to take an expression and modify the evaluation based on the
+variables that appear? Probably not without modifying the evaluator.
+Let `x` be some big parallel object. Then I want this code ran in the REPL:
+
+```
+f(x)
+```
+
+To notice that the special variable `x` was used, and then evaluate
+it as if I had typed this code:
+
+```
+do(f(x))
+```
+
+Hmmm... not easy to do in the interactive case, but quite possible if I'm
+modifying a script.
