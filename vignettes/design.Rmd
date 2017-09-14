@@ -16,6 +16,10 @@ I'd also only like to include stuff that I would use myself.
 I can use the next month or so to get this to a point where it can be
 packaged and put on CRAN.
 
+The premise of the modified functions is: You are running code on a machine with many
+cores. Your code might be more efficient in parallel. Maybe not, you don't
+know. But you'd like to find out and save the more efficient version.
+
 Then what will the core features be?
 
 - `do(...)` for interactive parallelism. This could be extended a bit to
