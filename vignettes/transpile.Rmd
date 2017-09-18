@@ -1,0 +1,24 @@
+---
+title: "autoparallel-transpile"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel-transpile}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Transpile
+
+_Transpile_ here refers to translating and changing code to make it more
+efficient. Consider this simple script:
+
+```{R}
+
+d = read.csv("data.csv")
+
+hist(d[, 1])
+
+```
+
+This script only uses the first column of `d`, which means that all the
+other columns were unnecessary. We can the
