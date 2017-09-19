@@ -89,8 +89,10 @@ need.
 
 ```{R}
 
+# 11-12 seconds for 4 threads
+# 30 seconds for 1 thread
 system.time(containers <- data.table::fread("~/data/CargoDescriptions2015.csv"
-                    , select = "container_number"))
+                    , select = "container_number", nThread = 4L))
 
 
 system.time(num_container <- uniqueN(containers))
@@ -105,7 +107,7 @@ seconds.
 Side note: this requires a full scan of a file that's around 5 GB. It
 happened in 12 seconds. The file was not cached in memory. This means my
 laptop SSD is able to load data into memory with a rate of at least 5 GB /
-12 seconds = 400 MB / second. This sounds reasonable, but can I verify this?
+12 seconds = 400 MB / second. This sounds reasonable, but can I verify?
 
 The moral of the story is that the exact same calculations
 can be computed more efficiently if we know ahead of time what is necessary.
@@ -115,16 +117,37 @@ the columns we need through the `colClasses` parameter to `read.table`.
 
 ```{R}
 
+# 607 seconds
 system.time(cargo <- read.table("~/data/CargoDescriptions2015.csv"
     , header = TRUE, sep = ",", quote = "\"", comment.char = ""
-    , colClasses = c("NULL", "character", "NULL", "NULL", "NULL")
+    , colClasses = c("numeric", "character", "integer", "integer", "character")
     ))
 
+# 493 seconds
 system.time(containers <- read.table("~/data/CargoDescriptions2015.csv"
     , header = TRUE, sep = ",", quote = "\"", comment.char = ""
     , colClasses = c("NULL", "character", "NULL", "NULL", "NULL")
     ))
 
+# 2.96 seconds. 3X faster in base R than data.table.
+system.time(num_container <- length(unique(containers[, 1])))
+
 ```
 
+These read times suggest that perhaps it would be desirable to just transform
+regular R code into `data.table` or `iotools` if IO is the bottleneck.
 
+
+
+## Design
+
+If external packages such as `data.table` are being used, can we preserve
+these calls? This requires understanding the semantics of the library functions
+to use. So we'd have to do it custom for every package that we depend on.
+Unless these packages provide drop in replacement for the target
+statements.
+
+More generally we could keep the calls that read everything in and then
+remove what we don't need immediately after. This helps with saving memory,
+but probably won't help with performance otherwise. In other words, we
+might see a difference if we're up against memmory limits.
