@@ -7,6 +7,16 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+Todo: Data analysis workflow where at first you're not sure what you want.
+
+Idea: You could even work totally in the interpreter, and provide a
+function such as `save_last_statement()`. This function would look through all
+previous correct statements executed through the interpreter and use them
+to create the minimal script necessary to reproduce that last statement.
+The idea is that as you explore a data set you probably enter many more
+statemenets than you actually need, because you're not sure at first what
+you're after.
+
 # Transpile
 
 _Transpile_ here refers to translating and changing code to make it more
@@ -21,4 +31,97 @@ hist(d[, 1])
 ```
 
 This script only uses the first column of `d`, which means that all the
-other columns were unnecessary. We can the
+other columns were unnecessary. This optimization only matters when
+`data.csv` is sufficiently large.
+
+In general we'd like to do all the preprocessing as early as possible,
+saving only what we need.
+
+## Example
+
+Consider the `CargoDescriptions2015.csv` data set. This is a 5.3 GB file
+with 5 columns describing goods which arrived in the United States via shipping
+containers in 2015.  
+
+Suppose we want to count the number of unique
+containers. The naive way is to read in the entire data set. Using the high
+performance multi-threaded `fread` function from `data.table`.
+
+```{R}
+
+system.time(cargo <- data.table::fread("~/data/CargoDescriptions2015.csv"))
+
+```
+
+This takes 2 minutes, 35 seconds on a 2016 Macbook Pro with 8 cores and
+uses 5.5 GB of memory in the R process.
+
+Since we're already using `data.table` lets use that to answer the original
+question.
+
+```{R}
+
+system.time(num_container <- uniqueN(cargo[, "container_number"]))
+
+nrow(cargo) / num_container
+
+```
+
+This takes between 9 and 10 seconds. We see that on average each container
+appears about 5 times.
+
+Can we do this faster with `data.table` by reading in only a subset of the
+columns? To realistically time this we first need to remove this file from
+the file cache.
+
+```
+$ vmtouch -ve CargoDescriptions2015.csv
+Evicting CargoDescriptions2015.csv
+
+           Files: 1
+     Directories: 0
+   Evicted Pages: 1383045 (5G)
+         Elapsed: 0.24117 seconds
+```
+
+Now lets see how long `data.table` takes to read just the columns that we
+need.
+
+```{R}
+
+system.time(containers <- data.table::fread("~/data/CargoDescriptions2015.csv"
+                    , select = "container_number"))
+
+
+system.time(num_container <- uniqueN(containers))
+
+```
+
+Selecting the column at the data load step reduces the load time from 2.5
+minutes to 12 seconds, which is more than an order of magnitude
+improvement. This brings the total program run time from 165 seconds to 22
+seconds.
+
+Side note: this requires a full scan of a file that's around 5 GB. It
+happened in 
+
+The moral of the story is that the exact same calculations
+can be computed more efficiently if we know ahead of time what is necessary.
+
+For comparison, let's measure the same operation in base R. We can select
+the columns we need through the `colClasses` parameter to `read.table`.
+
+```{R}
+
+system.time(cargo <- read.table("~/data/CargoDescriptions2015.csv"
+    , header = TRUE, sep = ",", quote = "\""
+    , colClasses = strsplit("int character int int character", " ")
+    ))
+
+system.time(containers <- read.table("~/data/CargoDescriptions2015.csv"
+    , header = TRUE, sep = ",", quote = "\""
+    , colClasses = strsplit("NULL character NULL NULL NULL", " ")
+    ))
+
+```
+
