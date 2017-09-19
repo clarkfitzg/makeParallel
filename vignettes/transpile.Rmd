@@ -105,7 +105,7 @@ seconds.
 Side note: this requires a full scan of a file that's around 5 GB. It
 happened in 12 seconds. The file was not cached in memory. This means my
 laptop SSD is able to load data into memory with a rate of at least 5 GB /
-12 seconds = 400 MB / second. Can I verify this?
+12 seconds = 400 MB / second. This sounds reasonable, but can I verify this?
 
 The moral of the story is that the exact same calculations
 can be computed more efficiently if we know ahead of time what is necessary.
@@ -116,18 +116,15 @@ the columns we need through the `colClasses` parameter to `read.table`.
 ```{R}
 
 system.time(cargo <- read.table("~/data/CargoDescriptions2015.csv"
-    , header = TRUE, sep = ",", quote = "\""
-    , colClasses = strsplit("numeric character int int character", " ")
+    , header = TRUE, sep = ",", quote = "\"", comment.char = ""
+    , colClasses = c("NULL", "character", "NULL", "NULL", "NULL")
     ))
 
 system.time(containers <- read.table("~/data/CargoDescriptions2015.csv"
-    , header = TRUE, sep = ",", quote = "\""
-    , colClasses = strsplit("NULL character NULL NULL NULL", " ")
+    , header = TRUE, sep = ",", quote = "\"", comment.char = ""
+    , colClasses = c("NULL", "character", "NULL", "NULL", "NULL")
     ))
 
-# Error in scan(file = file, what = what, sep = sep, quote = quote, dec = dec,  :
-#   line 12268020 did not have 5 elements
-# Timing stopped at: 175.338 1.78 177.223
-
 ```
+
 
