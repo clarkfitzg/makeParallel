@@ -186,9 +186,67 @@ length(containers2)
 
 ```
 
-The second command seems to work, with the caveats above. This takes R down
-from 493 seconds to 98 seconds, a factor of 5. `data.table` is still a
-factor of 10 faster and much more robust.
+The second command seems to work, with the caveats above. This takes base R down
+from 493 seconds to 98 seconds, a factor of 5. It also should use much less
+memory because R only ever sees the column that it needs. `data.table` is still 
+10 times faster than this and much more robust.
+
+If I'm going to do something like this I need to be able to create these
+`cut` commands. It would be better to rely on as few external dependencies as
+possible, bash `cut` is not available on Windows. What if I used Python?
+That's another external dependency. It wouldn't surprise me if it was as
+fast as the cut command. Now I'm curious.
+
+```{R}
+
+system.time(containers2 <- scan(
+    pipe("python ~/data/select_column.py ~/data/CargoDescriptions2015.csv 2")
+    , what = character(), skip = 1, sep = "\n"
+))
+# Read 43754131 items
+#    user  system elapsed
+#    188.837   2.993 138.850
+
+```
+
+Of course introducing a dependency on another programming language is far
+from ideal. I wonder if there's a way to pipe the R commands to get
+pipeline parallelism?  Judging by the user and elapsed times here we did
+get some pipeline parallelism, both for the Bash and Python approaches.
+
+What is the limiting factor here? Preprocessing or other?
+I can find best case performance by just reading the file by itself.
+
+```{R}
+
+N = 43754131 
+
+system.time(containers2 <- scan("~/data/container_number.csv"
+    , what = character(), skip = 1, sep = "\n", n = N
+))
+
+# Read 43754131 items
+#    user  system elapsed
+#     70.371   0.517  70.899
+
+
+# scan() seems to have three parameters similar to `n`
+system.time(containers2 <- scan("~/data/container_number.csv"
+    , what = character(), skip = 1, sep = "\n", n = N, nlines = N
+))
+
+# Read 43754131 items
+#    user  system elapsed
+#     52.205   0.242  52.454
+#    user  system elapsed
+#     50.457   0.254  50.724
+#    user  system elapsed
+#     50.439   0.271  50.725
+
+```
+
+The times above are consistent even when I remove the file from cache. This
+makes sense based on what I saw above with `data.table`.
 
 
 ## Design
