@@ -148,6 +148,30 @@ Unless these packages provide drop in replacement for the target
 statements.
 
 More generally we could keep the calls that read everything in and then
-remove what we don't need immediately after. This helps with saving memory,
+remove what we don't need immediately after. Call this the "general
+approach" This helps with saving memory,
 but probably won't help with performance otherwise. In other words, we
-might see a difference if we're up against memmory limits.
+might see a difference if we're up against memory limits.
+
+What are the goals with this? Reducing memory pressure, increasing speed.
+Or should I just pick one?  Only for reading data?  And should I just
+depend on and tie myself to data.table?
+
+Ideally I don't make this specific to data.table.
+
+Suppose I take the general approach. In which cases will this help with
+memory pressure? The goal is to avoid making copies of a large data frame.
+I need to experiment to see exactly when this happens.
+
+The experiment shows that the unused columns in a data frame will not be
+copied. For a matrix they should be, but in my experience people are
+more likely to use a subset of the columns of a data frame versus a matrix.
+
+In the general case we read in the unused columns and then never copy them. 
+The only way this can alleviate memory pressure is if the program meets the
+following conditions:
+
+1. Has enough memory to contain the whole object in the first place
+2. Subsequently requires more memory than is available
+
+This seems rare to me.
