@@ -43,6 +43,8 @@ Consider the `CargoDescriptions2015.csv` data set. This is a 5.3 GB file
 with 5 columns describing goods which arrived in the United States via shipping
 containers in 2015.  
 
+### data.table
+
 Suppose we want to count the number of unique
 containers. The naive way is to read in the entire data set. Using the high
 performance multi-threaded `fread` function from `data.table`.
@@ -112,6 +114,9 @@ laptop SSD is able to load data into memory with a rate of at least 5 GB /
 The moral of the story is that the exact same calculations
 can be computed more efficiently if we know ahead of time what is necessary.
 
+
+### base R
+
 For comparison, let's measure the same operation in base R. We can select
 the columns we need through the `colClasses` parameter to `read.table`.
 
@@ -137,6 +142,43 @@ system.time(num_container <- length(unique(containers[, 1])))
 These read times suggest that perhaps it would be desirable to just transform
 regular R code into `data.table` or `iotools` if IO is the bottleneck.
 
+
+### with shell preprocessing
+
+Another way to potentially make R faster is to use the shell to select the
+column of interest.
+This approach is less robust than the others because it is unlikely to
+handle corner cases well, ie. escape characters and quoted strings
+containing the delimiter character.
+
+I'm expecting 43754131 observations.
+
+```{R}
+
+system.time(containers <- read.table(
+    pipe("cut -d , -f 2 ~/data/CargoDescriptions2015.csv")
+    , header = TRUE, sep = ",", quote = "\"", comment.char = ""
+    , colClasses = "character"
+))
+
+# Didn't work:
+#
+#Warning message:
+#In scan(file = file, what = what, sep = sep, quote = quote, dec = dec,  :
+#  EOF within quoted string
+#  > dim(containers)
+#  [1] 8294588       1
+
+
+system.time(containers2 <- scan(
+    pipe("cut -d , -f 2 ~/data/CargoDescriptions2015.csv")
+    , what = character(), skip = 1
+))
+
+# 8299037
+length(containers2)
+
+```
 
 
 ## Design
