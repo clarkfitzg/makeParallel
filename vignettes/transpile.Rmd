@@ -151,6 +151,10 @@ This approach is less robust than the others because it is unlikely to
 handle corner cases well, ie. escape characters and quoted strings
 containing the delimiter character.
 
+Running on the above data set I see issues with 
+value `"SACRAMENTO,"`, which gets incorrectly cut to
+`"SACRAMENTO`.
+
 I'm expecting 43754131 observations.
 
 ```{R}
@@ -168,17 +172,23 @@ system.time(containers <- read.table(
 #  EOF within quoted string
 #  > dim(containers)
 #  [1] 8294588       1
-
+#
 
 system.time(containers2 <- scan(
     pipe("cut -d , -f 2 ~/data/CargoDescriptions2015.csv")
-    , what = character(), skip = 1
+    , what = character(), skip = 1, sep = "\n"
 ))
+# Read 43754131 items
+#    user  system elapsed
+#    147.888   2.216  97.881
 
-# 8299037
 length(containers2)
 
 ```
+
+The second command seems to work, with the caveats above. This takes R down
+from 493 seconds to 98 seconds, a factor of 5. `data.table` is still a
+factor of 10 faster and much more robust.
 
 
 ## Design
@@ -195,7 +205,10 @@ approach" This helps with saving memory,
 but probably won't help with performance otherwise. In other words, we
 might see a difference if we're up against memory limits.
 
-What are the goals with this? Reducing memory pressure, increasing speed.
+__Possible Use Cases__
+
+- Reducing memory footprint
+- Increasing speed
 Or should I just pick one?  Only for reading data?  And should I just
 depend on and tie myself to data.table?
 
@@ -217,3 +230,4 @@ following conditions:
 2. Subsequently requires more memory than is available
 
 This seems rare to me.
+
