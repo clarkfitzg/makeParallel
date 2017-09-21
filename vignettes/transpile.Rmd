@@ -111,6 +111,12 @@ happened in 12 seconds. The file was not cached in memory. This means my
 laptop SSD is able to load data into memory with a rate of at least 5 GB /
 12 seconds = 400 MB / second. This sounds reasonable, but can I verify?
 
+Wed Sep 20 15:08:24 PDT 2017
+
+Just came back to this and found that using vmtouch can load this file into
+cached memory in 8 seconds, implying a rate of 625 MB / second. So what I
+saw previously is indeed reasonable.
+
 The moral of the story is that the exact same calculations
 can be computed more efficiently if we know ahead of time what is necessary.
 
@@ -246,7 +252,9 @@ system.time(containers2 <- scan("~/data/container_number.csv"
 ```
 
 The times above are consistent even when I remove the file from cache. This
-makes sense based on what I saw above with `data.table`.
+makes sense based on what I saw above with `data.table`. Then around 50
+seconds is a lower bound for how fast this load can happen with `scan`. The
+Python and bash `cut` versions are 2 to 3 times slower than this.
 
 
 ## Design
