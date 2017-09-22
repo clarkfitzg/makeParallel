@@ -343,7 +343,8 @@ wt = mtcars[[5]]
 ```
 
 __Name Replacement__ substitutes the names with integers, and converts all
-`data.frame` subsetting commands into single `[`.
+`data.frame` subsetting commands into single `[`. Assume that we know the
+column names.
 
 ```{R}
 
@@ -355,7 +356,8 @@ wt = mtcars[, 5]
 ```
 
 __Subset mapping__ maps the original indices to corresponding indices in the
-smaller `data.frame`.
+smaller `data.frame`. The index map is a sorted integer vector of the
+columns that are used.
 
 ```{R}
 
@@ -371,3 +373,13 @@ wt = .mtcars[, 4]   # This one changes
 
 ```
 
+What are the limitations of the approach that I've just outlined? 
+
+I haven't yet considered subsetting rows, there may be a way to do that
+efficiently.  A common way is to subset based on the value of some column.
+I could do this by keeping on open file pointer, reading a chunk of the
+data, subset it, add that subset to a list, then rbind the subsets
+together. This potentially lets R quickly process files larger than memory.
+
+Stepping back, R has many ways to write programs. To simplify tasks here we
+first put the code into a canonical form, and then do "surgery" on it.
