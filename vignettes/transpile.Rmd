@@ -17,6 +17,13 @@ The idea is that as you explore a data set you probably enter many more
 statemenets than you actually need, because you're not sure at first what
 you're after.
 
+Idea: Can we load only columns of a `data.frame` with R's `load` / `save`
+commands?
+
+Idea: `remove_nse()` function to replace nonstandard evaluation with
+equivalant standard evaluation call. Transforms `subset(mtcars, select = mpg)` into 
+`mtcars[, "mpg", drop = FALSE]`
+
 # Transpile
 
 _Transpile_ here refers to translating and changing code to make it more
@@ -296,4 +303,71 @@ following conditions:
 2. Subsequently requires more memory than is available
 
 This seems rare to me.
+
+
+## Implementation
+
+How can we tell which columns are used?
+
+```{R}
+
+library(CodeDepends)
+
+s = getInputs(readScript("columns.R"))
+
+```
+
+This doesn't seem all that helpful.
+
+Fri Sep 22 10:31:23 PDT 2017
+
+Thinking now that it's fine to depend on `data.table`.
+`data.table::fread` has a `select` parameter for column names. It would be
+more convenient for our purposes here if `select` took an integer vector of
+the column indices instead. Because not every text file has column names.
+
+For the moment I'm ignoring NSE such as `subset`.
+
+One approach is to take all the uses of column names and map them into
+integers. The code will go through three representations then:
+
+__Original__ including mixed names and integers:
+
+```{R}
+
+mpg = mtcars$mpg
+cyl = mtcars[, 2]
+disp = mtcars[, "disp"]
+wt = mtcars[[5]]
+
+```
+
+__Name Replacement__ substitutes the names with integers, and converts all
+`data.frame` subsetting commands into single `[`.
+
+```{R}
+
+mpg = mtcars[, 1]
+cyl = mtcars[, 2]
+disp = mtcars[, 3]
+wt = mtcars[, 5]
+
+```
+
+__Subset mapping__ maps the original indices to corresponding indices in the
+smaller `data.frame`.
+
+```{R}
+
+index_map = c(1, 2, 3, 5)
+
+# Assuming fread supports integers here
+.mtcars = fread(..., select = index_map)
+
+mpg = .mtcars[, 1]
+cyl = .mtcars[, 2]
+disp = .mtcars[, 3]
+wt = .mtcars[, 4]   # This one changes
+
+```
 
