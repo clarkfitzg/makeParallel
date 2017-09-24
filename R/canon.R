@@ -28,13 +28,22 @@ names_to_index = function(statement, names)
 #' @export
 dollar_to_index = function(statement, colnames)
 {
-
     template = quote(dframe[, index])
     column_name = deparse(statement[[3]])
-
     column_index = which(colnames == column_name)[1]
-
     sub_expr(template, list(dframe = statement[[2]], index = column_index))
-
 }
+
+
+#' D
+#'
+#' @export
+double_to_single_bracket = function(statement)
+{
+    template = quote(dframe[, index])
+    column_name = deparse(statement[[3]])
+    column_index = which(colnames == column_name)[1]
+    sub_expr(template, list(dframe = statement[[2]], index = column_index))
+}
+
 

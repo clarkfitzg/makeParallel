@@ -305,6 +305,38 @@ following conditions:
 This seems rare to me.
 
 
+## Assumptions
+
+Assume that column selections can be inferred by static code analysis. For
+example, we can do static analysis on the following:
+
+```{R}
+# Literals
+mtcars[, 1L]
+mtcars[, "mpg"]
+mtcars$mpg
+
+# Variables defined from literals. This use case requires
+# constant propagation
+cols = c("cyl", disp")
+mtcars[, cols]
+```
+
+While we cannot do static analysis on these:
+```{R}
+
+# Computed columns
+col = read.csv("something_external.csv")[1, 1]
+mtcars[, col]
+
+# Random columns
+mtcars[, min(rpois(1, 1) + 1, ncol(mtcars))]
+```
+
+So we assume that the column selection is a literal after constant
+propagation.
+
+
 ## Implementation
 
 How can we tell which columns are used?
@@ -321,15 +353,20 @@ This doesn't seem all that helpful.
 
 Fri Sep 22 10:31:23 PDT 2017
 
+For the moment I'm ignoring NSE such as `subset`.
+
 Thinking now that it's fine to depend on `data.table`.
 `data.table::fread` has a `select` parameter for column names. It would be
 more convenient for our purposes here if `select` took an integer vector of
-the column indices instead. Because not every text file has column names.
+the column indices instead. Indices are more general because:
 
-For the moment I'm ignoring NSE such as `subset`.
+- Not every text file has column names
+- Not every data frame has meaningful column names
+- Column names may not be unique
 
 One approach is to take all the uses of column names and map them into
-integers. The code will go through three representations then:
+integers.
+The code will go through three representations then:
 
 __Original__ including mixed names and integers:
 
