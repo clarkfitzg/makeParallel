@@ -25,14 +25,16 @@ names_to_index = function(statement, names)
 #' Replace Dollar With Square Bracket
 #'
 #' Designed for use only with a single call of the form \code{x$y}.
+#' @export
 dollar_to_index = function(statement, colnames)
 {
 
     template = quote(dframe[, index])
     column_name = deparse(statement[[3]])
 
-    column_index = which(colnames == column_name)
+    column_index = which(colnames == column_name)[1]
 
     sub_expr(template, list(dframe = statement[[2]], index = column_index))
 
 }
+

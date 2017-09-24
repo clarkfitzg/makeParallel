@@ -6,7 +6,7 @@ test_that("names_to_index helper functions", {
 
     transformed = dollar_to_index(code, letters)
 
-    expect_identical(dframe[, 2], transformed)
+    expect_identical(quote(dframe[, 2L]), transformed)
 
 })
 
