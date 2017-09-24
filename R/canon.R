@@ -22,9 +22,10 @@ names_to_index = function(statement, names)
 }
 
 
-#' Replace Dollar With Square Bracket
+#' Replace Dollar With Single Square Bracket
 #'
-#' Designed for use only with a single call of the form \code{x$y}.
+#' Designed for use only with a single call of the form \code{x$y}, where x
+#' is a data.frame.
 #' @export
 dollar_to_index = function(statement, colnames)
 {
@@ -37,12 +38,24 @@ dollar_to_index = function(statement, colnames)
 }
 
 
-#' D
-#'
 #' @export
-double_to_single_bracket = function(statement)
+double_to_single_bracket = function(statement, colnames)
 {
-    # Be careful here because `[[` supports recursive indexing.
+
+    template = quote(dframe[, index])
+
+    column = statement[[3]]
+
+    column_index = if(is.numeric(column)){
+        if(length(column) > 1) stop("Recursive indexing not currently supported")
+        column
+    } else if(is.character(column)){
+        which(colnames == column)[1]
+    } else {
+        stop("Expected character or numeric for `[[` indexing")
+    }
+
+    statement = sub_expr(template,
+            list(dframe = statement[[2]], index = column_index))
+    list(statement = statement, column_indices = column_index)
 }
-
-
