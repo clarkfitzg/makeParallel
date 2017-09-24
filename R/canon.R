@@ -31,7 +31,9 @@ dollar_to_index = function(statement, colnames)
     template = quote(dframe[, index])
     column_name = deparse(statement[[3]])
     column_index = which(colnames == column_name)[1]
-    sub_expr(template, list(dframe = statement[[2]], index = column_index))
+    statement = sub_expr(template,
+            list(dframe = statement[[2]], index = column_index))
+    list(statement = statement, column_indices = column_index)
 }
 
 
@@ -40,10 +42,7 @@ dollar_to_index = function(statement, colnames)
 #' @export
 double_to_single_bracket = function(statement)
 {
-    template = quote(dframe[, index])
-    column_name = deparse(statement[[3]])
-    column_index = which(colnames == column_name)[1]
-    sub_expr(template, list(dframe = statement[[2]], index = column_index))
+    # Be careful here because `[[` supports recursive indexing.
 }
 
 
