@@ -1,12 +1,18 @@
 # Fri Sep 22 11:26:16 PDT 2017
 # Tools to transform R code into a "canonical form"
 
+# Sun Sep 24 14:53:01 PDT 2017
+# Not currently worrying about:
+# - logical subsetting of columns
+# - non unique column names
+
+
 #' Replace Names With Indices
 #'
 #' @example
 #' code = 
-#' names_to_index(
-names_to_index = function(statement, names)
+#' names_to_ssb(
+names_to_ssb = function(statement, names)
 {
 
     # Maybe the way to implement this is through CodeDepends dollarhandler?
@@ -22,12 +28,12 @@ names_to_index = function(statement, names)
 }
 
 
-#' Replace Dollar With Single Square Bracket
+#' Replace $ with [
 #'
 #' Designed for use only with a single call of the form \code{x$y}, where x
 #' is a data.frame.
 #' @export
-dollar_to_index = function(statement, colnames)
+dollar_to_ssb = function(statement, colnames)
 {
     template = quote(dframe[, index])
     column_name = deparse(statement[[3]])
@@ -38,8 +44,10 @@ dollar_to_index = function(statement, colnames)
 }
 
 
+#' Replace [[ with [
+#'
 #' @export
-double_to_single_bracket = function(statement, colnames)
+double_to_ssb = function(statement, colnames)
 {
 
     template = quote(dframe[, index])
@@ -57,5 +65,39 @@ double_to_single_bracket = function(statement, colnames)
 
     statement = sub_expr(template,
             list(dframe = statement[[2]], index = column_index))
+    list(statement = statement, column_indices = column_index)
+}
+
+
+#' Replace column subset [ possibly using names with [ using integers
+#'
+#' @export
+single_to_ssb = function(statement, colnames)
+{
+
+    column = statement[[4]]
+
+    if(column[[1]] == quote(c)){
+        # This could easily get complicated...
+        # c(1L, "x")
+        # c(1L, f())
+        # Could check for calls to any other function besides c(), and
+        # raise an error.
+        # Related:
+        # 1:5
+
+        # TODO: Assume for the moment they're all literals:
+        column = eval(column)
+    }
+
+    column_index = if(is.numeric(column)){
+        column
+    } else if(is.character(column)){
+        which(colnames %in% column)
+    } else {
+        stop("Expected character or numeric for `[` indexing")
+    }
+
+    statement[[4]] = column_index
     list(statement = statement, column_indices = column_index)
 }
