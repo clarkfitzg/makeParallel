@@ -11,14 +11,28 @@ names_to_index = function(statement, names)
 
     # Maybe the way to implement this is through CodeDepends dollarhandler?
 
-    # Testing:
-    statement = quote(mtcars$mpg)
 
     col = CodeDepends::inputCollector(`$` = function(e, collector, ...) {
-        print("dollarhandler evaluated")
-        CodeDepends::defaultFuncHandlers$dollarhandler(e, collector, ...)
+        browser()
+        CodeDepends::defaultFuncHandlers$`$`(e, collector, ...)
     })
 
     a = CodeDepends::getInputs(statement, collector = col)   
+
+}
+
+
+#' Replace Dollar With Square Bracket
+#'
+#' Designed for use only with a single call of the form \code{x$y}.
+dollar_to_index = function(statement, colnames)
+{
+
+    template = quote(dframe[, index])
+    column_name = deparse(statement[[3]])
+
+    column_index = which(colnames == column_name)
+
+    sub_expr(template, list(dframe = statement[[2]], index = column_index))
 
 }

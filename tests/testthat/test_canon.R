@@ -1,12 +1,12 @@
 
 
-test_that("names_to_index", {
+test_that("names_to_index helper functions", {
 
-    code = quote(mtcars$mpg)
+    code = quote(dframe$b)
 
-    transformed = names_to_index(code, colnames(mtcars))
+    transformed = dollar_to_index(code, letters)
 
-    expect_identical(mtcars[, 1], transformed)
+    expect_identical(dframe[, 2], transformed)
 
 })
 
