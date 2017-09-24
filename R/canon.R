@@ -11,9 +11,12 @@ names_to_index = function(statement, names)
 
     # Maybe the way to implement this is through CodeDepends dollarhandler?
 
-    col = CodeDepends::inputCollector(dollarhandler = function(e, collector, ...) {
-        print(paste("Hello", asVarName(e)))
-        defaultFuncHandlers$dollarhandler(e, collector, ...)
+    # Testing:
+    statement = quote(mtcars$mpg)
+
+    col = CodeDepends::inputCollector(`$` = function(e, collector, ...) {
+        print("dollarhandler evaluated")
+        CodeDepends::defaultFuncHandlers$dollarhandler(e, collector, ...)
     })
 
     a = CodeDepends::getInputs(statement, collector = col)   
