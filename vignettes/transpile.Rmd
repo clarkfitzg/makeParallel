@@ -38,13 +38,16 @@ hist(d[, 1])
 ```
 
 This script only uses the first column of `d`, which means that all the
-other columns were unnecessary. This optimization only matters when
-`data.csv` is sufficiently large.
+other columns were unnecessary. If `data.csv` is sufficiently large then
+this program will spend an excessive amount of time reading data that are
+never used.
 
 In general we'd like to do all the preprocessing as early as possible,
 saving only what we need.
 
 ## Example
+
+TODO: cut this out into a blog post
 
 Consider the `CargoDescriptions2015.csv` data set. This is a 5.3 GB file
 with 5 columns describing goods which arrived in the United States via shipping
@@ -84,7 +87,9 @@ columns? To realistically time this we first need to remove this file from
 the file cache.
 
 ```
-$ vmtouch -ve CargoDescriptions2015.csv
+
+$ vmtouch -ve ~/data/CargoDescriptions2015.csv
+
 Evicting CargoDescriptions2015.csv
 
            Files: 1
@@ -98,34 +103,62 @@ need.
 
 ```{R}
 
-# 11-12 seconds for 4 threads
-# 30 seconds for 1 thread
 system.time(containers <- data.table::fread("~/data/CargoDescriptions2015.csv"
                     , select = "container_number", nThread = 4L))
 
+#   Mon Sep 25 09:56:55 PDT 2017
+#
+#   user  system elapsed
+#   107.664   5.942  32.428
+#   user  system elapsed
+#   110.753   6.008  33.163
 
 system.time(num_container <- uniqueN(containers))
 
 ```
 
 Selecting the column at the data load step reduces the load time from 2.5
-minutes to 12 seconds, which is more than an order of magnitude
-improvement. This brings the total program run time from 165 seconds to 22
-seconds.
+minutes to about 32 seconds. This brings the total program run time from
+165 seconds to around 40 seconds.
 
-Side note: this requires a full scan of a file that's around 5 GB. It
-happened in 12 seconds. The file was not cached in memory. This means my
-laptop SSD is able to load data into memory with a rate of at least 5 GB /
-12 seconds = 400 MB / second. This sounds reasonable, but can I verify?
-
-Wed Sep 20 15:08:24 PDT 2017
-
-Just came back to this and found that using vmtouch can load this file into
-cached memory in 8 seconds, implying a rate of 625 MB / second. So what I
-saw previously is indeed reasonable.
+Subsequent timings of this read in the same R session are much faster, even
+after forcing the file out of cache. I believe the reason for this is
+because on subsequent reads all the unique strings have already been stored
+in R's internal string / integer table. This would be simple enough to
+verify experimentally.
 
 The moral of the story is that the exact same calculations
 can be computed more efficiently if we know ahead of time what is necessary.
+
+
+### disk speed
+
+Side note: this requires a full scan of a file that's around 5 GB. It
+happened in 33 seconds. The file was not cached in memory. This means my
+laptop SSD is able to load data into memory with a rate of at least 5 GB /
+33 seconds = 150 MB / second. This sounds reasonable, but can I verify?
+
+Mon Sep 25 10:06:12 PDT 2017
+
+```
+
+$ vmtouch -ve ~/data/CargoDescriptions2015.csv
+Evicting /Users/clark/data/CargoDescriptions2015.csv
+
+           Files: 1
+     Directories: 0
+   Evicted Pages: 1383045 (5G)
+         Elapsed: 0.38839 seconds
+
+$ vmtouch -t ~/data/CargoDescriptions2015.csv
+           Files: 1
+     Directories: 0
+   Touched Pages: 1383045 (5G)
+         Elapsed: 7.9652 seconds
+```
+
+Just came back to this and found that vmtouch can load this file into
+cached memory in 8 seconds, implying a rate of 625 MB / second. 
 
 
 ### base R
@@ -202,13 +235,13 @@ length(containers2)
 The second command seems to work, with the caveats above. This takes base R down
 from 493 seconds to 98 seconds, a factor of 5. It also should use much less
 memory because R only ever sees the column that it needs. `data.table` is still 
-10 times faster than this and much more robust.
+3 times faster than this and much more robust.
 
-If I'm going to do something like this I need to be able to create these
+If I'm going to do something like this automatically I need to be able to create these
 `cut` commands. It would be better to rely on as few external dependencies as
 possible, bash `cut` is not available on Windows. What if I used Python?
 That's another external dependency. It wouldn't surprise me if it was as
-fast as the cut command. Now I'm curious.
+fast here as the cut command. Now I'm curious.
 
 ```{R}
 
@@ -228,7 +261,8 @@ pipeline parallelism?  Judging by the user and elapsed times here we did
 get some pipeline parallelism, both for the Bash and Python approaches.
 
 What is the limiting factor here? Preprocessing or other?
-I can find best case performance by just reading the file by itself.
+I can find best case performance by creating another file with only the
+column of interest and then reading that.
 
 ```{R}
 
@@ -247,19 +281,15 @@ system.time(containers2 <- scan("~/data/container_number.csv"
 system.time(containers2 <- scan("~/data/container_number.csv"
     , what = character(), skip = 1, sep = "\n", n = N, nlines = N
 ))
-
 # Read 43754131 items
 #    user  system elapsed
-#     52.205   0.242  52.454
-#    user  system elapsed
-#     50.457   0.254  50.724
-#    user  system elapsed
-#     50.439   0.271  50.725
+#     70.721   0.537  71.273
+
 
 ```
 
 The times above are consistent even when I remove the file from cache. This
-makes sense based on what I saw above with `data.table`. Then around 50
+makes sense based on what I saw above with `data.table`. Then around 70
 seconds is a lower bound for how fast this load can happen with `scan`. The
 Python and bash `cut` versions are 2 to 3 times slower than this.
 
@@ -308,7 +338,7 @@ This seems rare to me.
 ## Assumptions
 
 Assume that column selections can be inferred by static code analysis. For
-example, we can do static analysis on the following:
+example, we can statically analyze the following:
 
 ```{R}
 # Literals
@@ -322,7 +352,7 @@ cols = c("cyl", disp")
 mtcars[, cols]
 ```
 
-While we cannot do static analysis on these:
+While we cannot statically analyze these:
 ```{R}
 
 # Computed columns
@@ -337,19 +367,36 @@ So we assume that column selection is a literal after constant
 propagation.
 
 
+## Design For Minimal Use Case
+
+I'm going to start off getting something common and simple to work, and
+then generalize from there. The example from the beginning is as simple as
+possible.
+
+```{R}
+
+d = read.csv("data.csv")
+
+hist(d[, 2])
+
+```
+
+This should be transformed to the following:
+
+```{R}
+
+d = data.table::fread("data.csv")
+
+hist(d[, 1])
+
+```
+
+
+
 ## Implementation
 
 How can we tell which columns are used?
 
-```{R}
-
-library(CodeDepends)
-
-s = getInputs(readScript("columns.R"))
-
-```
-
-This doesn't seem all that helpful.
 
 Fri Sep 22 10:31:23 PDT 2017
 
@@ -399,8 +446,7 @@ after processing all statements we know which are used.
 __Subset mapping__ maps the original indices to corresponding indices in the
 smaller `data.frame`. The index map is a sorted integer vector of the
 columns that are used. This step cannot happen with the previous because
-it's necessary to know all the columns which are used before we can map
-them down.
+it's necessary to first know all the columns which will be used.
 
 ```{R}
 
