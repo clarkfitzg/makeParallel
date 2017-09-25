@@ -237,11 +237,11 @@ from 493 seconds to 98 seconds, a factor of 5. It also should use much less
 memory because R only ever sees the column that it needs. `data.table` is still 
 3 times faster than this and much more robust.
 
-If I'm going to do something like this automatically I need to be able to create these
-`cut` commands. It would be better to rely on as few external dependencies as
-possible, bash `cut` is not available on Windows. What if I used Python?
-That's another external dependency. It wouldn't surprise me if it was as
-fast here as the cut command. Now I'm curious.
+If I'm going to do something like this automatically I need to be able to
+create these `cut` commands. It would be better to rely on as few external
+dependencies as possible, bash `cut` is not available on Windows. What if I
+used Python?  That's another external dependency. It wouldn't surprise me
+if it was as fast here as the cut command. Now I'm curious.
 
 ```{R}
 
@@ -385,10 +385,43 @@ This should be transformed to the following:
 
 ```{R}
 
-d = data.table::fread("data.csv")
+d = data.table::fread("data.csv", select = 2)
 
 hist(d[, 1])
 
+```
+
+__Basic Steps__
+
+1. Infer that a data frame `d` is created by a call to `read.csv()`
+2. Identify all calls which subset `d` and transform them into a common
+   form.
+4. Find `usedcolumns` the set of all columns which are used
+5. Transform the `read.csv(...)` call into `data.table::fread(..., select =
+   usedcolumns)`
+6. Transform the calls which subset `d` into new indices.
+
+__More Advanced__
+
+Account for indirect use of variables. The following should infer that the
+4th column is used.
+
+```{R}
+d = read.csv("data.csv")
+d2 = d * 2
+d2[, 4]
+```
+
+Verify the indices subsetting `d` can be computed at the time of
+static analysis.
+
+Check if any commands imply that the whole data set must be loaded. For
+example:
+
+```{R}
+d = read.csv("data.csv")
+d[, 5] = 2
+write.csv(d, "data2.csv")  # Uses all columns of d
 ```
 
 
