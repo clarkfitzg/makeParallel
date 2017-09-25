@@ -77,17 +77,12 @@ single_to_ssb = function(statement, colnames)
 
     column = statement[[4]]
 
-    if(column[[1]] == quote(c)){
-        # This could easily get complicated...
-        # c(1L, "x")
-        # c(1L, f())
-        # Could check for calls to any other function besides c(), and
-        # raise an error.
-        # Related:
-        # 1:5
-
-        # TODO: Assume for the moment they're all literals:
-        column = eval(column)
+    if(class(column) == "call"){
+        if(only_literals(column)){
+            column = eval(column)
+        } else {
+            stop("Not a literal expression")
+        }
     }
 
     column_index = if(is.numeric(column)){

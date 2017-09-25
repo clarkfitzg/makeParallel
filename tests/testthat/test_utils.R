@@ -48,6 +48,19 @@ test_that("tree methods", {
 })
 
 
+test_that("only_literals", {
+
+    expect_true(only_literals(quote(1:5)))
+
+    expect_true(only_literals(quote(c(1, 4))))
+
+    expect_false(only_literals(quote(f(3))))
+
+    expect_false(only_literals(quote(1:n)))
+
+})
+
+
 if(FALSE){
 
 expr = parse(text = "

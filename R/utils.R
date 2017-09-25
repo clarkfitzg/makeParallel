@@ -100,3 +100,33 @@ find_call = function(expr, funcname, loc = integer(), found = list())
 
     found
 }
+
+
+#' Check if code only contains literal expressions
+#'
+#' If only literals and functions such as \code{:, c} then code can be
+#' evaluated regardless of context.  Assuming those functions haven't been
+#' redefined.
+only_literals = function(code)
+{
+
+    info = CodeDepends::getInputs(code)
+
+    if(length(info@inputs) > 0) {
+        return(FALSE)
+    }
+
+    funcs = names(info@functions)
+    ok = funcs %in% c("c", ":")
+    if(any(!ok)) {
+        return(FALSE)
+    }
+
+    # TODO: Other code can be safely literally evaluated, for example
+    # sapply(1:5, function(x) (x %% 2) == 0)
+    #
+    # So we could relax the above to check for funcs available through R's
+    # search path.
+
+    TRUE
+}

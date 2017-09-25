@@ -20,8 +20,11 @@ test_that("names_to_ssb helper functions", {
 
     code = quote(dframe[, c("b", "c")])
     transformed = single_to_ssb(code, letters)$statement
-
     expect_equal(quote(dframe[, 2:3]), transformed)
+
+    code = quote(dframe[, 4:7])
+    transformed = single_to_ssb(code, letters)$statement
+    expect_equal(quote(dframe[, 4:7]), transformed)
 
     code = quote(dframe[, c(2L, 4L)])
     transformed = single_to_ssb(code, letters)$statement
