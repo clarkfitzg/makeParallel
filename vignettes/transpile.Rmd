@@ -424,6 +424,11 @@ d[, 5] = 2
 write.csv(d, "data2.csv")  # Uses all columns of d
 ```
 
+Read subsets without corresponding variable assignments, for example:
+
+```{R}
+hist(read.csv("data.csv")[, 2])
+```
 
 
 ## Implementation
