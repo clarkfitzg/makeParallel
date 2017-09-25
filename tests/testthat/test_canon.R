@@ -37,3 +37,16 @@ test_that("names_to_ssb helper functions", {
 })
 
 
+test_that("canon_form", {
+
+    code = quote(dframe[condition, "b"])
+    actual = canon_form(code, "dframe", letters)
+
+    expect_true(actual$found)
+
+    code = quote(xxx[condition, "b"])
+    actual = canon_form(code, "dframe", letters)
+
+    expect_false(actual$found)
+
+})

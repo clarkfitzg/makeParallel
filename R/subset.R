@@ -11,24 +11,6 @@
 # 6. Transform the calls which subset `d` into new indices.
 
 
-# For testing
-code = parse(text = '
-    d = read.csv("data.csv")
-    hist(d[, 2])
-')
-
-
-info = lapply(code, CodeDepends::getInputs)
-
-# The CodeDepends output says when `read.csv` func is called, which is
-# helpful. But it doesn't let me see if the result of `read.csv` is
-# assigned to a variable, which is what I need.
-
-code2 = quote(x <- rnorm(n = read.csv("data.csv")))
-
-CodeDepends::getInputs(code2)
-
-
 #' 1. Infer that a data frame is created by a call to `read.csv()`
 #'
 #' @return logical Is this a top level call reading data and creating a data.frame?
@@ -41,12 +23,3 @@ data_read = function(statement, assigners = c("<-", "=", "assign")
     }
     FALSE
 }
-
-
-
-library(testthat)
-
-
-expect_true(data_read(quote(a <- read.csv("data.csv"))))
-
-expect_false(data_read(quote(f(x))))

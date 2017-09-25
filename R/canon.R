@@ -7,24 +7,19 @@
 # - non unique column names
 
 
-#' Replace Names With Indices
+
+# 2. Identify all calls which subset \code{varname} and transform them into a common
+# form
 #'
-#' @example
-#' code = 
-#' names_to_ssb(
-names_to_ssb = function(statement, names)
+#' @param statement code which may or may not be subsetting the data frame
+#' @param varname string containing name of data frame
+#' @return list with all relevant information
+canon_form = function(statement, varname, colnames)
 {
-
-    # Maybe the way to implement this is through CodeDepends dollarhandler?
-
-
-    col = CodeDepends::inputCollector(`$` = function(e, collector, ...) {
-        browser()
-        CodeDepends::defaultFuncHandlers$`$`(e, collector, ...)
-    })
-
-    a = CodeDepends::getInputs(statement, collector = col)   
-
+#    list(found = found
+#         , transformed = transformed
+#         , column_indices = column_indices
+#         )
 }
 
 

@@ -531,3 +531,19 @@ mtcars2$gear
 
 Stepping back, R has many ways to write programs. To simplify tasks here we
 first put the code into a canonical form, and then do "surgery" on it.
+
+
+## Side Notes
+
+
+info = lapply(code, CodeDepends::getInputs)
+
+# The CodeDepends output says when `read.csv` func is called, which is
+# helpful. But it doesn't let me see if the result of `read.csv` is
+# assigned to a variable, which is what I need.
+
+code2 = quote(x <- rnorm(n = read.csv("data.csv")))
+
+CodeDepends::getInputs(code2)
+
+
