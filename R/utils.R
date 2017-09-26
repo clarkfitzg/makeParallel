@@ -130,3 +130,12 @@ only_literals = function(code)
 
     TRUE
 }
+
+
+#' Find location of variable use
+#'
+#' Returns a list of vectors to all uses of the variable, and NULL if none
+#' are found
+findvar = function(statement, var)
+{
+}

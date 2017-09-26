@@ -19,6 +19,24 @@ test_that("replacing functions", {
 })
 
 
+test_that("findvar", {
+
+    expr = quote(x[1:5])
+    expect_equal(findvar(expr, "x"), list(2))
+
+    expr = quote(y[1:5])
+    expect_null(findvar(expr, "x"))
+
+    expr = quote(mean(x[1:5]))
+    expect_equal(findvar(expr, "x"), list(c(2, 2)))
+
+    expr = quote(mean(x[1:5]) + x)
+    expect_equal(findvar(expr, "x"), list(3, c(2, 2, 2)))
+
+})
+
+
+
 test_that("find_call", {
 
     e0 = quote(sapply(x, f))

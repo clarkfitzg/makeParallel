@@ -8,6 +8,7 @@
 
 
 
+
 # 2. Identify all calls which subset \code{varname} and transform them into a common
 # form
 #'
@@ -16,10 +17,23 @@
 #' @return list with all relevant information
 canon_form = function(statement, varname, colnames)
 {
-#    list(found = found
-#         , transformed = transformed
-#         , column_indices = column_indices
-#         )
+    default = list(found = FALSE
+         , transformed = statement
+         , column_indices = NULL
+         )
+
+    subset_func_names = c("[", "$", "[[")
+
+    # Early out, not a top level subset
+    if(!(as.character(statement[[1]]) %in% subset_func_names)) return(default)
+
+    # TODO: What about: y = x[, 1]
+    # A better way to do this is to find all place the variable of
+    # interest, say y, occurs and then work backwards from there, seeing if
+    # it's the argument to a subset func.
+
+    # Early out, not subsetting the variable of interest
+    if(!(as.character(statement[[2]]) %in% subset_func_names)) return(default)
 }
 
 
