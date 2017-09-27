@@ -30,6 +30,9 @@ test_that("findvar", {
     expr = quote(mean(x[1:5]))
     expect_equal(findvar(expr, "x"), list(c(2, 2)))
 
+    expr = quote(plot(dframe[, "d"]))
+    expect_equal(findvar(expr, "dframe"), list(c(2, 2)))
+
     expr = quote(mean(x[1:5]) + x)
     actual = findvar(expr, "x")
     # I don't care about the order of the elements of this list.
@@ -38,7 +41,6 @@ test_that("findvar", {
     # Don't match character vectors
     expr = quote(paste("x", "y"))
     expect_equal(findvar(expr, "y"), list())
-
 })
 
 
