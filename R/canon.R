@@ -15,6 +15,7 @@
 #' @param statement code which may or may not be subsetting the data frame
 #' @param varname string containing name of data frame
 #' @return list with all relevant information
+#' @export
 canon_form = function(statement, varname, colnames)
 {
     transformed = statement
@@ -32,18 +33,33 @@ canon_form = function(statement, varname, colnames)
         # transform it and record the indices.
 
         # TODO: Think more about:
+
         # Modifying the code as we go may affect the locations where the
         # variables where found. 
 
-        parent = transformed[[varloc[-length(varloc)]]]
-        funcname = as.character(parent[[1]])
-        if(funcname %in% names(subset_funcs)){
-            modified = subset_funcs[[funcname]](parent)
-            transformed[[varloc]] = modified$statement
-            column_indices = c(column_indices, modified$column_indices)
+        # What about code that implicitly uses all columns? Ie:
+        # plot(varname)
+        # If we see this we should just give up with the code rewriting.
+
+        if(length(varloc) == 1){
+            # Occurs in the root of tree
+            parent = statement
+            funcname = as.character(parent[[1]])
+            if(funcname %in% names(subset_funcs)){
+                modified = subset_funcs[[funcname]](parent, colnames)
+                transformed = modified$statement
+                column_indices = c(column_indices, modified$column_indices)
+            }
+
         }
 
+        #} else {
+        #    # Subtree
+        #    transformed[[varloc[-length(varloc)]]]
+        #}
+
     }
+
     list(transformed = transformed
          , column_indices = sort(unique(column_indices)))
 }
@@ -123,12 +139,4 @@ subset_funcs = list(`$` = dollar_to_ssb
                     , `[[` = double_to_ssb
                     , `[` = single_to_ssb
                     )
-
-
-##' Extract the part of the parse tree which subsets varname
-#subtree = function(varloc, statement, varname)
-#{
-#    parent = statement[[varloc[-length(varloc)]]]
-#
-#}
 

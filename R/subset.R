@@ -13,13 +13,19 @@
 
 #' 1. Infer that a data frame is created by a call to `read.csv()`
 #'
-#' @return logical Is this a top level call reading data and creating a data.frame?
+#' Currently only handles top level assignment.
+#'
+#' @return symbol name of data.frame, or NULL if none found
 data_read = function(statement, assigners = c("<-", "=", "assign")
                      , readers = c("read.csv", "read.table"))
 {
     if(as.character(statement[[1]]) %in% assigners){
         funcname = as.character(statement[[c(3, 1)]])
-        if(funcname %in% readers) return(TRUE)
+        if(funcname %in% readers){
+            return(as.symbol(statement[[2]]))
+        } 
     }
-    FALSE
+    NULL
 }
+
+

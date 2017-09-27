@@ -6,8 +6,8 @@ code = parse(text = '
 
 test_that("data_read", {
 
-expect_true(data_read(quote(a <- read.csv("data.csv"))))
+expect_equal(data_read(code[[1]]), quote(d))
 
-expect_false(data_read(quote(f(x))))
+expect_null(data_read(quote(f(x))))
 
 })
