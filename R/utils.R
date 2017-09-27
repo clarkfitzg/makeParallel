@@ -158,11 +158,10 @@ findvar = function(expr, var, loc = integer(), found = list())
     if(typeof(expr) != "language"){
         # We're at a leaf node
         if(is.symbol(expr) && expr == var){
-            found = loc
+            return(list(loc))
         } else {
-            found = NULL
+            return(list())
         }
-        return(found)
     }
 
     # Continue recursion

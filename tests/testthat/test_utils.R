@@ -31,7 +31,9 @@ test_that("findvar", {
     expect_equal(findvar(expr, "x"), list(c(2, 2)))
 
     expr = quote(mean(x[1:5]) + x)
-    expect_equal(findvar(expr, "x"), list(3, c(2, 2, 2)))
+    actual = findvar(expr, "x")
+    # I don't care about the order of the elements of this list.
+    expect_equal(actual, list(c(2, 2, 2), 3))
 
     # Don't match character vectors
     expr = quote(paste("x", "y"))
