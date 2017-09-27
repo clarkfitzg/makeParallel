@@ -500,6 +500,37 @@ wt = .mtcars[, 4]   # This one changes
 
 ```
 
+## Details
+
+Suppose that `x` is the data frame of interest. Consider the following
+reasonable code:
+
+```
+x[x[, "d"] > 10, "b"]
+```
+
+Replacing names gives us the following in standard form:
+
+x[x[, 4] > 10, 2]
+
+Because there is nested subsetting we need to respect the structure of the
+parse tree to correctly substitute these variables with indices.
+
+TODO: What is the issue in my mind? I don't want this to happen:
+```
+# First step updates the inner
+x[x[, 4] > 10, "b"]
+
+# Second step updates the outer based on the original statement
+x[x[, "d"] > 10, 2]
+```
+
+This leaves us with the task of having to merge the parse trees. We
+definitely want to avoid this. So we need to update the tree in place,
+incrementally. In the more general case it may happen that the locations of
+the parse tree change as it is modified.  Then we'll need a way to guarantee
+that nothing is overwritten. Maybe applying the changes depth first?
+
 
 ## Limitations
 

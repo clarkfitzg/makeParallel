@@ -28,6 +28,10 @@ canon_form = function(statement, varname, colnames)
         return(default)
     }
 
+    # Was one of the known subset functions called with varname as the
+    # first argument?
+
+    lapply(varlocs, 
 
 }
 
@@ -106,3 +110,12 @@ subset_funcs = list(`$` = dollar_to_ssb
                     , `[[` = double_to_ssb
                     , `[` = single_to_ssb
                     )
+
+
+#' Extract the part of the parse tree which subsets varname
+subtree = function(varloc, statement, varname)
+{
+    parent = statement[[varloc[-length(varloc)]]]
+
+}
+
