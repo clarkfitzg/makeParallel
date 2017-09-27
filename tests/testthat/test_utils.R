@@ -25,13 +25,17 @@ test_that("findvar", {
     expect_equal(findvar(expr, "x"), list(2))
 
     expr = quote(y[1:5])
-    expect_null(findvar(expr, "x"))
+    expect_equal(findvar(expr, "x"), list())
 
     expr = quote(mean(x[1:5]))
     expect_equal(findvar(expr, "x"), list(c(2, 2)))
 
     expr = quote(mean(x[1:5]) + x)
     expect_equal(findvar(expr, "x"), list(3, c(2, 2, 2)))
+
+    # Don't match character vectors
+    expr = quote(paste("x", "y"))
+    expect_equal(findvar(expr, "y"), list())
 
 })
 

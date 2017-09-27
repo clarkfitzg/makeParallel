@@ -62,7 +62,7 @@ nworkers = function()
 
 #' Find Function Call
 #'
-#' Search a parse tree, returning a list of locations where
+#' Search the parse tree for an expression, returning a list of locations where
 #' the function is called.
 #'
 #' Implementation based loosely on \code{codetools::walkCode}.
@@ -132,10 +132,44 @@ only_literals = function(code)
 }
 
 
-#' Find location of variable use
+# TODO: Share implementation of findvar with findcall
+
+
+#' Find locations of variable use
 #'
-#' Returns a list of vectors to all uses of the variable, and NULL if none
-#' are found
-findvar = function(statement, var)
+#' Returns a list of vectors to all uses of the variable.
+#'
+#' @param expr R language object
+#' @param var symbol or character naming the variable
+#' @param loc used for internal recursive calls
+#' @param found used for internal recursive calls
+#' @return address list of integer vectors, possibly empty
+#' @export
+findvar = function(expr, var, loc = integer(), found = list())
 {
+    if(length(loc) == 0){
+        # This is the first call, ie no recursion has yet taken place
+        var = as.symbol(var)
+    }
+
+    # Roughly following codetools::walkCode implementation.
+    # More difficult to get the locations using that.
+
+    if(typeof(expr) != "language"){
+        # We're at a leaf node
+        if(is.symbol(expr) && expr == var){
+            found = loc
+        } else {
+            found = NULL
+        }
+        return(found)
+    }
+
+    # Continue recursion
+    for(i in seq_along(expr)){
+        subexpr = expr[[i]]
+        recurse_found = Recall(subexpr, var, c(loc, i))
+        found = c(found, recurse_found)
+    }
+    found
 }
