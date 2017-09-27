@@ -24,6 +24,15 @@ Idea: `remove_nse()` function to replace nonstandard evaluation with
 equivalant standard evaluation call. Transforms `subset(mtcars, select = mpg)` into 
 `mtcars[, "mpg", drop = FALSE]`
 
+Idea: The idea of intrinsically useful statments keeps coming back. For
+example, one may have `head(dframe)` written somewhere in the code. This
+implies that all columns of `dframe` are needed. But it's likely the case
+that one never actually needed that call to `head(dframe)`; it was just
+being inspected interactively. Then it can be removed from the final
+product. So this would be another useful preprocessing step. As it stands,
+let's assume that this preprocessing has happened, so that all statements
+are strictly necessary.
+
 # Transpile
 
 _Transpile_ here refers to translating and changing code to make it more
@@ -501,6 +510,8 @@ wt = .mtcars[, 4]   # This one changes
 ```
 
 ## Details
+
+__Nested subsetting__
 
 Suppose that `x` is the data frame of interest. Consider the following
 reasonable code:

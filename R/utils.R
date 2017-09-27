@@ -145,6 +145,10 @@ only_literals = function(code)
 #' @param found used for internal recursive calls
 #' @return address list of integer vectors, possibly empty
 #' @export
+#' @examples
+#' findvar(quote(x + 1))    # 2
+#' #findvar(quote(x))       
+#' # The above won't work, since x is a symbol not a language object
 findvar = function(expr, var, loc = integer(), found = list())
 {
     if(length(loc) == 0){

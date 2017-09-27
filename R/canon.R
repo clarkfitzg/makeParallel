@@ -17,22 +17,35 @@
 #' @return list with all relevant information
 canon_form = function(statement, varname, colnames)
 {
-    default = list(transformed = statement
-         , column_indices = NULL
-         )
+    transformed = statement
+    column_indices = integer()
 
     varlocs = findvar(statement, varname)
 
-    # Early out, varname doesn't appear in the statement
+    # Early outs
     if(length(varlocs) == 0){
-        return(default)
+        list(transformed = transformed, column_indices = column_indices)
     }
 
-    # Was one of the known subset functions called with varname as the
-    # first argument?
+    for(varloc in varlocs){
+        # If the parent statement is a call to one of the subset funcs then
+        # transform it and record the indices.
 
-    lapply(varlocs, 
+        # TODO: Think more about:
+        # Modifying the code as we go may affect the locations where the
+        # variables where found. 
 
+        parent = transformed[[varloc[-length(varloc)]]]
+        funcname = as.character(parent[[1]])
+        if(funcname %in% names(subset_funcs)){
+            modified = subset_funcs[[funcname]](parent)
+            transformed[[varloc]] = modified$statement
+            column_indices = c(column_indices, modified$column_indices)
+        }
+
+    }
+    list(transformed = transformed
+         , column_indices = sort(unique(column_indices)))
 }
 
 
@@ -112,10 +125,10 @@ subset_funcs = list(`$` = dollar_to_ssb
                     )
 
 
-#' Extract the part of the parse tree which subsets varname
-subtree = function(varloc, statement, varname)
-{
-    parent = statement[[varloc[-length(varloc)]]]
-
-}
+##' Extract the part of the parse tree which subsets varname
+#subtree = function(varloc, statement, varname)
+#{
+#    parent = statement[[varloc[-length(varloc)]]]
+#
+#}
 

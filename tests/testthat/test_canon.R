@@ -48,6 +48,11 @@ test_that("canon_form", {
 #    actual = canon_form(code, "dframe", letters)
 #    expect_false(actual$found)
 
+    code = quote(dframe)
+    actual = canon_form(code, "dframe", letters)
+
+    expect_equal(actual$statement, code)
+
     code = quote(dframe[condition, "b"])
     actual = canon_form(code, "dframe", letters)
 
