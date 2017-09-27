@@ -56,19 +56,19 @@ test_that("canon_form", {
     code = quote(dframe[condition, c("b", "c")])
     actual = canon_form(code, "dframe", letters)
 
-    expect_equal(actual$statement, quote(dframe[condition, 2:3]))
+    expect_equal(actual$transformed, quote(dframe[condition, 2:3]))
     expect_equal(actual$column_indices, 2:3)
 
     code = quote(xxx[condition, "b"])
     actual = canon_form(code, "dframe", letters)
 
-    expect_equal(actual$statement, code)
-    expect_null(actual$column_indices)
+    expect_equal(actual$transformed, code)
+    expect_equal(length(actual$column_indices), 0)
 
     code = quote(dframe[dframe[, "d"] > 10, "b"])
     actual = canon_form(code, "dframe", letters)
 
-    expect_equal(actual$statement, quote(dframe[dframe[, 4] > 10, 2]))
+    expect_equal(actual$transformed, quote(dframe[dframe[, 4] > 10, 2]))
     expect_equal(actual$column_indices, c(2, 4))
 
 })
