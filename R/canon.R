@@ -17,23 +17,18 @@
 #' @return list with all relevant information
 canon_form = function(statement, varname, colnames)
 {
-    default = list(found = FALSE
-         , transformed = statement
+    default = list(transformed = statement
          , column_indices = NULL
          )
 
-    subset_func_names = c("[", "$", "[[")
+    varlocs = findvar(statement, varname)
 
-    # Early out, not a top level subset
-    if(!(as.character(statement[[1]]) %in% subset_func_names)) return(default)
+    # Early out, varname doesn't appear in the statement
+    if(length(varlocs) == 0){
+        return(default)
+    }
 
-    # TODO: What about: y = x[, 1]
-    # A better way to do this is to find all place the variable of
-    # interest, say y, occurs and then work backwards from there, seeing if
-    # it's the argument to a subset func.
 
-    # Early out, not subsetting the variable of interest
-    if(!(as.character(statement[[2]]) %in% subset_func_names)) return(default)
 }
 
 
@@ -105,3 +100,9 @@ single_to_ssb = function(statement, colnames)
     statement[[4]] = column_index
     list(statement = statement, column_indices = column_index)
 }
+
+
+subset_funcs = list(`$` = dollar_to_ssb
+                    , `[[` = double_to_ssb
+                    , `[` = single_to_ssb
+                    )
