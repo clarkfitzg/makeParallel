@@ -20,12 +20,16 @@ canon_form = function(statement, varname, colnames)
 {
     transformed = statement
     column_indices = integer()
+    index_locs = list()
 
     varlocs = findvar(statement, varname)
 
     # Early outs
     if(length(varlocs) == 0){
-        list(transformed = transformed, column_indices = column_indices)
+        list(transformed = transformed
+             , column_indices = column_indices
+             , index_locs = index_locs
+             )
     }
 
     for(varloc in varlocs){
@@ -64,6 +68,11 @@ canon_form = function(statement, varname, colnames)
                 transformed[[insertion_point]] = modified$statement
             }
 
+# 3. Record the locations inside the parse tree where the column indices
+#   are used. The locations are used later to substitute updated column
+#   indices once we read in a subset of the columns of the data.
+
+
             column_indices = c(column_indices, modified$column_indices)
         }
     }
@@ -71,6 +80,23 @@ canon_form = function(statement, varname, colnames)
     list(transformed = transformed
          , column_indices = sort(unique(column_indices)))
 }
+
+
+# TODO: Put the following in the docs for the functions
+# The following functions perform the work after we discover:
+#
+# 1. The location of the call ie. plot(x$y) should operate on x$y which is
+#   the 2nd element in the parse tree
+# 2. Which function to dispatch to, so we need to pick out `$` above
+#
+# These functions all do the same thing, for each of the special cases.
+# They do the following:
+#
+# 1. Transform the statement to a common form which uses only integer indices and
+#   single square brackets. The common form simplifies subsequent
+#   processing.
+# 2. Record all column indices which are used. This allows us to see which
+#   columns are needed at the end of a script.
 
 
 #' Replace $ with [
