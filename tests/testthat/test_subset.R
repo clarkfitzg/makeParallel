@@ -43,7 +43,9 @@ test_that("to_fread", {
     code = quote(read.csv("data.csv"))
     actual = to_fread(code, select = c(2L, 4L))
 
-    expect_equal(actual, quote(data.table::fread("data.csv", select = c(2L, 4L))))
+    expected = quote(data.table::fread("data.csv", select = c(2L, 4L)))
+
+    expect_equal(actual, expected)
 
 })
 

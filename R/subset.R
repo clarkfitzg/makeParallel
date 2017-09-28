@@ -31,8 +31,18 @@ data_read = function(statement, assigners = c("<-", "=", "assign")
 
 # 5. Transform the `read.csv(...)` call into `data.table::fread(..., select =
 #    usedcolumns)`
-to_fread = function(statement, select, readers = c("read.csv", "read.table"))
+# @xport
+to_fread = function(statement, select)
 {
+
+    transformed = statement
+
+    transformed[[1]] = quote(data.table::fread)
+
+    # Sometimes R just makes things too easy! So happy with this:
+    transformed[["select"]] = select
+
+    transformed
 }
 
 
