@@ -29,3 +29,8 @@ data_read = function(statement, assigners = c("<-", "=", "assign")
 }
 
 
+#
+# 6. Transform the calls which subset `d` into new indices.
+update_indices = function(statement, index_locs, index_map)
+{
+}

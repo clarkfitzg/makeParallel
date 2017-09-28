@@ -6,7 +6,7 @@
 # - logical subsetting of columns
 # - non unique column names
 
-
+# TODO: Go through this file and move comments into docs.
 
 
 # 2. Identify all calls which subset \code{varname} and transform them into a common
@@ -91,7 +91,6 @@ canon_form = function(statement, varname, colnames)
 }
 
 
-# TODO: Put the following in the docs for the functions
 # The following functions perform the work after we discover:
 #
 # 1. The location of the call ie. plot(x$y) should operate on x$y which is
