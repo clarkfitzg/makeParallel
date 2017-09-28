@@ -29,6 +29,13 @@ data_read = function(statement, assigners = c("<-", "=", "assign")
 }
 
 
+# 5. Transform the `read.csv(...)` call into `data.table::fread(..., select =
+#    usedcolumns)`
+to_fread = function(statement, select, readers = c("read.csv", "read.table"))
+{
+}
+
+
 # 6. Transform the calls which subset `d` into new indices.
 update_indices = function(statement, index_locs, index_map)
 {
@@ -52,4 +59,30 @@ update_indices = function(statement, index_locs, index_map)
         statement[[loc]] = converted
     }
     statement
+}
+
+
+#' Transform To Faster Reads
+#'
+#' Save time and memory by transforming a script to read only the columns
+#' of a data frame that are necessary for the remainder of the script.
+#'
+#'
+#' @param file passed to \code{base::parse}
+#' @param varname character naming the data frame of interest
+#' @param colnames column names for the data frame of interest
+#'
+#' @return transformed code
+#' @export
+read_faster = function(file, varname, colnames)
+{
+
+    script = parse(file)
+
+    standardized = lapply(script, canon_form, varname = varname, colnames = colnames)
+
+    column_indices = lapply(standardized, `[[`, "column_indices")
+    index_map = sort(unique(do.call(c, column_indices)))
+
+
 }

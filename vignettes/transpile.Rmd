@@ -400,7 +400,7 @@ hist(d[, 1])
 
 ```
 
-__Basic Steps__
+__Basic Steps__ Necessary for the minimal use case to work
 
 1. Infer that a data frame `d` is created by a call to `read.csv()`
 2. Identify all calls which subset `d` and transform them into a common
@@ -410,7 +410,9 @@ __Basic Steps__
    usedcolumns)`
 6. Transform the calls which subset `d` into new indices.
 
-__More Advanced__
+
+__More Advanced__ Functionality going beyond the minimal use case. I'll
+think about these once the basics are working.
 
 Account for indirect use of variables. The following should infer that the
 4th column is used.
