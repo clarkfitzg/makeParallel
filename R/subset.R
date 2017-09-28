@@ -32,9 +32,24 @@ data_read = function(statement, assigners = c("<-", "=", "assign")
 # 6. Transform the calls which subset `d` into new indices.
 update_indices = function(statement, index_locs, index_map)
 {
+    # for loops necessary for making incremental changes and avoiding the
+    # need to merge.
     for(loc in index_locs){
-        original = statement[[loc]]
-        statement[[loc]] = which(original == index_map)
+
+        # If it's not a literal scalar then we assume here it's something like
+        # x[, c(5, 20)] so that the inside can be evaluated.
+        # It's preferable to check this assumption in an earlier step
+        # rather than here because if the inside cannot be evaluated in a
+        # simple way then we don't actually know which columns are being used
+        # so this code should never run.
+
+        # It's important to evaluate the original code rather than
+        # just substituting, because the meaning could potentially change.
+        # I'm thinking of something like seq(1, 20, by = 4)
+
+        original = eval(statement[[loc]])
+        converted = sapply(original, function(x) which(x == index_map))
+        statement[[loc]] = converted
     }
     statement
 }

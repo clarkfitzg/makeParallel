@@ -29,4 +29,10 @@ test_that("update_indices", {
     actual = update_indices(code, list(4, c(3, 2, 4)), map)
 
     expect_equal(actual, quote(dframe[dframe[, 4L] > 10, 1:3]))
+
+    code = quote(plot(dframe[, c(11L, 13L)]))
+    actual = update_indices(code, list(c(2, 4)), map)
+
+    expect_equal(actual, quote(plot(dframe[, c(1L, 3L)])))
+
 })
