@@ -58,23 +58,27 @@ test_that("canon_form", {
 
     expect_equal(actual$transformed, quote(dframe[condition, 2:3]))
     expect_equal(actual$column_indices, 2:3)
+    expect_equal(actual$index_locs, list(4L))
 
     code = quote(xxx[condition, "b"])
     actual = canon_form(code, "dframe", letters)
 
     expect_equal(actual$transformed, code)
-    expect_equal(length(actual$column_indices), 0)
+    expect_equal(actual$column_indices, integer())
+    expect_equal(actual$index_locs, list())
 
     code = quote(plot(dframe[, "d"]))
     actual = canon_form(code, "dframe", letters)
 
     expect_equal(actual$transformed, quote(plot(dframe[, 4L])))
     expect_equal(actual$column_indices, 4)
+    expect_equal(actual$index_locs, list(c(2, 4)))
 
     code = quote(dframe[dframe[, "d"] > 10, "b"])
     actual = canon_form(code, "dframe", letters)
 
     expect_equal(actual$transformed, quote(dframe[dframe[, 4L] > 10, 2L]))
     expect_equal(actual$column_indices, c(2, 4))
+    expect_equal(actual$index_locs, list(4, c(3, 2, 4)))
 
 })
