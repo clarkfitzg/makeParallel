@@ -34,14 +34,10 @@ data_read = function(statement, assigners = c("<-", "=", "assign")
 # @xport
 to_fread = function(statement, select)
 {
-
     transformed = statement
-
     transformed[[1]] = quote(data.table::fread)
-
     # Sometimes R just makes things too easy! So happy with this:
     transformed[["select"]] = select
-
     transformed
 }
 
@@ -88,6 +84,8 @@ read_faster = function(file, varname, colnames)
 {
 
     script = parse(file)
+
+    slowread = findvar(
 
     standardized = lapply(script, canon_form, varname = varname, colnames = colnames)
 
