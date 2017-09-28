@@ -74,7 +74,7 @@ test_that("canon_form", {
     code = quote(dframe[dframe[, "d"] > 10, "b"])
     actual = canon_form(code, "dframe", letters)
 
-    expect_equal(actual$transformed, quote(dframe[dframe[, 4] > 10, 2]))
+    expect_equal(actual$transformed, quote(dframe[dframe[, 4L] > 10, 2L]))
     expect_equal(actual$column_indices, c(2, 4))
 
 })
