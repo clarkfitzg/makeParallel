@@ -48,6 +48,11 @@ canon_form = function(statement, varname, colnames)
 
         if(length(varloc) == 1){
             # Variable found in root of parse tree
+            # After I've written all this code around it I don't think
+            # it's even necessary, since this only happens with a line of
+            # the form: x[, 1L]
+            # which doesn't do anything in a script. It may be useful
+            # later, so I'll leave it all here.
             root = TRUE
             parent = transformed
         } else {
@@ -60,25 +65,29 @@ canon_form = function(statement, varname, colnames)
         funcname = as.character(parent[[1]])
         if(funcname %in% names(subset_funcs)){
             # Put this call into canonical form and update the transformed
-            # statement with it
+            # statement with it.
+
+            # Record the locations inside the parse tree where the
+            # column indices are used. The locations are used later to
+            # substitute updated column indices once we read in a subset of
+            # the columns of the data.
+
             modified = subset_funcs[[funcname]](parent, colnames)
             if(root){
                 transformed = modified$statement
+                index_locs = c(index_locs, list(4L))
             } else {
                 transformed[[insertion_point]] = modified$statement
+                index_locs = c(index_locs, list(c(insertion_point, 4L)))
             }
-
-# 3. Record the locations inside the parse tree where the column indices
-#   are used. The locations are used later to substitute updated column
-#   indices once we read in a subset of the columns of the data.
-
-
             column_indices = c(column_indices, modified$column_indices)
         }
     }
 
     list(transformed = transformed
-         , column_indices = sort(unique(column_indices)))
+         , column_indices = sort(unique(column_indices))
+         , index_locs = index_locs
+         )
 }
 
 
