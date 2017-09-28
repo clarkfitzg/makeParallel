@@ -35,29 +35,37 @@ canon_form = function(statement, varname, colnames)
         # TODO: Think more about:
 
         # Modifying the code as we go may affect the locations where the
-        # variables where found. 
+        # variables where found. To ensure correctness may need a breadth
+        # or depth first tree traversal.
 
         # What about code that implicitly uses all columns? Ie:
         # plot(varname)
         # If we see this we should just give up with the code rewriting.
 
         if(length(varloc) == 1){
-            # Occurs in the root of tree
-            parent = statement
-            funcname = as.character(parent[[1]])
-            if(funcname %in% names(subset_funcs)){
-                modified = subset_funcs[[funcname]](parent, colnames)
-                transformed = modified$statement
-                column_indices = c(column_indices, modified$column_indices)
-            }
-
+            # Variable found in root of parse tree
+            root = TRUE
+            parent = transformed
+        } else {
+            # Variable found deeper in tree
+            root = FALSE
+            insertion_point = varloc[-length(varloc)]
+            parent = transformed[[insertion_point]]
         }
 
-        #} else {
-        #    # Subtree
-        #    transformed[[varloc[-length(varloc)]]]
-        #}
+        funcname = as.character(parent[[1]])
+        if(funcname %in% names(subset_funcs)){
+            # Put this call into canonical form and update the transformed
+            # statement with it
+            modified = subset_funcs[[funcname]](parent, colnames)
+            if(root){
+                transformed = modified$statement
+            } else {
+                transformed[[insertion_point]] = modified$statement
+            }
 
+            column_indices = c(column_indices, modified$column_indices)
+        }
     }
 
     list(transformed = transformed

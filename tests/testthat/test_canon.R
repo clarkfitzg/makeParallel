@@ -68,7 +68,7 @@ test_that("canon_form", {
     code = quote(plot(dframe[, "d"]))
     actual = canon_form(code, "dframe", letters)
 
-    expect_equal(actual$transformed, quote(plot(dframe[, "d"])))
+    expect_equal(actual$transformed, quote(plot(dframe[, 4L])))
     expect_equal(actual$column_indices, 4)
 
     code = quote(dframe[dframe[, "d"] > 10, "b"])
