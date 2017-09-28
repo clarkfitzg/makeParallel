@@ -157,7 +157,8 @@ findvar = function(expr, var, loc = integer(), found = list())
     }
 
     # Roughly following codetools::walkCode implementation.
-    # More difficult to get the locations using that.
+    # It would be more trouble than it's worth to use walkCode to maintain
+    # current indices.
 
     if(typeof(expr) != "language"){
         # We're at a leaf node
@@ -170,6 +171,13 @@ findvar = function(expr, var, loc = integer(), found = list())
 
     # Continue recursion
     for(i in seq_along(expr)){
+
+        # Missing arguments, ie. the third element in x[, 10]
+        # Possibly there's a better way to test for this.
+        if(expr[[i]] == ""){
+            next
+        }
+
         subexpr = expr[[i]]
         recurse_found = Recall(subexpr, var, c(loc, i))
         found = c(found, recurse_found)

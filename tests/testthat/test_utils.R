@@ -30,8 +30,11 @@ test_that("findvar", {
     expr = quote(mean(x[1:5]))
     expect_equal(findvar(expr, "x"), list(c(2, 2)))
 
+    #TODO: Problem is the missing arg.
     expr = quote(plot(dframe[, "d"]))
-    expect_equal(findvar(expr, "dframe"), list(c(2, 2)))
+    actual = findvar(expr, "dframe")
+
+    expect_equal(actual, list(c(2, 2)))
 
     expr = quote(mean(x[1:5]) + x)
     actual = findvar(expr, "x")
