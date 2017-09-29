@@ -85,9 +85,9 @@ test_that("read_faster with nested subsetting and $, [, [[", {
     # The srcref info indicating the lines stays as an attribute.
     attributes(expected) = NULL
 
-    # TODO: This currently works fine. I just need a better utility to test
-    # for expression equality.
-    skip()
+    skip(" TODO: This currently works fine. I just need a better tool to test
+    for expression equality.")
+    
     expect_true(actual == expected)
 
 })

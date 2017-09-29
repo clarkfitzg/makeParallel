@@ -3,6 +3,7 @@ apply_funcs = data.frame(serial = c("mapply", "lapply", "Map")
 apply_funcs[, "parallel"] = paste0("parallel::mc", apply_funcs[, "serial"])
 
 
+# TODO: This can be rewritten with find_var
 #' Find and parallelize the first use of an apply function
 parallelize_first_apply = function(expr
     , ser_funcs = apply_funcs[, "serial"]
@@ -104,7 +105,7 @@ benchmark_transform = function(input_file, output_file = NULL
         , threshold_pvalue = 0.01)
 {
 
-    program = CodeDepends::readScript(input_file)
+    program = parse(input_file)
 
     newprogram = benchmark_transform_work(program, nbenchmarks,
                                           threshold_time, threshold_pvalue)

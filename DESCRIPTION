@@ -17,8 +17,14 @@ Suggests:
     roxygen2,
     knitr,
     rmarkdown,
-    testthat
-Description: Examines R code and automatically generates parallel versions.
+    testthat,
+    data.table
+Description: This package provides tools to automatically transform serial
+    R code into a parallel version. It does this through examination of R code
+    and timings. The primary intended use case is an R script that takes too
+    long (at least more than a second!) Other use cases include interactive
+    analysis of large data sets, detection of task parallelism, and
+    code transformations.
 License: MIT
 URL: https://github.com/clarkfitzg/autoparallel
 BugReports: https://github.com/clarkfitzg/autoparallel
