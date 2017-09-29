@@ -9,13 +9,12 @@
 # TODO: Go through this file and move comments into docs.
 
 
-# 2. Identify all calls which subset \code{varname} and transform them into a common
-# form
+#' Identify all calls which subset \code{varname} and transform them into a common
+#' form
 #'
 #' @param statement code which may or may not be subsetting the data frame
 #' @param varname string containing name of data frame
 #' @return list with all relevant information
-#' @export
 canon_form = function(statement, varname, colnames)
 {
     transformed = statement
@@ -111,7 +110,6 @@ canon_form = function(statement, varname, colnames)
 #'
 #' Designed for use only with a single call of the form \code{x$y}, where x
 #' is a data.frame.
-#' @export
 dollar_to_ssb = function(statement, colnames)
 {
     template = quote(dframe[, index])
@@ -125,7 +123,6 @@ dollar_to_ssb = function(statement, colnames)
 
 #' Replace [[ with [
 #'
-#' @export
 double_to_ssb = function(statement, colnames)
 {
 
@@ -150,7 +147,6 @@ double_to_ssb = function(statement, colnames)
 
 #' Replace column subset [ possibly using names with [ using integers
 #'
-#' @export
 single_to_ssb = function(statement, colnames)
 {
 

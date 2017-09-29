@@ -25,7 +25,6 @@ apply_column_chunk = function(expr)
 #'
 #' @param statement \code{apply()} function call
 #' @return modified parallel code
-#' @export
 apply_parallel = function(statement)
 {
 
@@ -108,12 +107,13 @@ benchmark_parallel = function(statement, times = 10L)
 }
 
 
+# TODO: Use findvar here
+
 #' Find Location Of Apply In Parse Tree
 #'
 #' Only looks at the top level expression. Finds at most one place to
 #' parallelize
 #'
-#' @export
 #' @param expr expression
 #' @param apply_func vector of apply names
 #' @return integer 1 for \code{apply(x, ...}, 3 for \code{y <- apply(x,

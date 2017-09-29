@@ -1,13 +1,13 @@
 #' Create Function That Learns To Make Itself Faster
 #' 
-#' This assumes that all implementations can share the same model for complexity. For
-#' example, computing the mean requires O(n) operations, so a linear model
-#' of the form time = a + bn is appropriate.
+#' This assumes that all implementations can share the same model for
+#' complexity. For example, computing the mean requires O(n) operations, so
+#' a linear model of the form time = a + bn is appropriate.
 #' 
-#' Each different implementation gets its own model to fit. The model
-#' should be capable of fitting with \code{fit = model(y ~ ., data = d)}
-#' and subsequently able to predict with \code{predict(fit, newdata)}. It
-#' must be capable of fitting and predicting based only a single
+#' Each different implementation gets its own model to fit. The call to fit
+#' the model must look like \code{fit = model(y ~ ., data = d)} and
+#' subsequently able to predict with \code{predict(fit, newdata)}. The
+#' model must be capable of fitting and predicting based only a single
 #' observation.
 #' 
 #' @param f reference implementation of the function to be evolved
@@ -15,7 +15,8 @@
 #' @param metadata_func function to be called with the same arguments as the
 #'  implementation functions. Should return a single row of a data.frame or a vector which
 #'  can be coerced to such.
-#' @param model function, statistical model of time as a noisy function of complexity.
+#' @param model function, statistical model of time as a noisy function 
+#'  of complexity.
 #' @return evolving function
 #' @export
 evolve = function (f, ..., metadata_func = length_first_param, model = lm)
@@ -34,6 +35,7 @@ evolve = function (f, ..., metadata_func = length_first_param, model = lm)
 
 #' The length of the first formal parameter
 #'
+#' @export
 length_first_param = function (...)
 {
     data.frame(length_first_param = length(list(...)[[1]]))
@@ -156,6 +158,8 @@ smartfunc = function (func, metadata_func = length_first_param, model = lm)
 
 
 #' @export
+# TODO: Figure out what this should do. Hopefully it doesn't need to be
+# here.
 init = function()
 {
     # TODO: Check if exists so we don't write over.
@@ -166,18 +170,8 @@ init = function()
 }
 
 
-# Not sure if this is the best way to create a mutable variable.
-# Nevermind, needs to be run later. Loading the package must override this
-# setting.
-#unlockBinding("current_trace", environment())
-
-
-#timings = data.frame()
-#timings = data.frame(funcname = character()
-#                     , start = as.POSIXct(vector())
-#                     , stop = as.POSIXct(vector())
-#                     , stringsAsFactors = FALSE)
-
+# TODO: I think the trace based one is more general, so I should probably
+# prefer that.
 
 #' Trace Based Timings For Builtin Functions
 #'
