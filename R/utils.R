@@ -158,9 +158,10 @@ findvar = function(expr, var, loc = integer(), found = list())
 
     # Roughly following codetools::walkCode implementation.
     # It would be more trouble than it's worth to use walkCode to maintain
-    # current indices.
+    # current indices. Further, walkCode doesn't work on expression
+    # objects.
 
-    if(typeof(expr) != "language"){
+    if(typeof(expr) != "language" && typeof(expr) != "expression" ){
         # We're at a leaf node
         if(is.symbol(expr) && expr == var){
             return(list(loc))
