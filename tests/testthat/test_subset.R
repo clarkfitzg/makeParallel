@@ -1,8 +1,3 @@
-code = parse(text = '
-    d = read.csv("data.csv")
-    hist(d[, 2])
-')
-
 
 test_that("data_read", {
 
@@ -52,6 +47,11 @@ test_that("to_fread", {
 
 test_that("read_faster", {
 
-    out = read_faster("hist.R", varname = "d", colnames = letters)
+    code = parse(text = '
+        d = read.csv("data.csv")
+        hist(d[, 2])
+    ')
+
+    out = read_faster(code, varname = "d", colnames = letters)
 
 })

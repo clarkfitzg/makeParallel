@@ -44,6 +44,15 @@ test_that("findvar", {
     # Don't match character vectors
     expr = quote(paste("x", "y"))
     expect_equal(findvar(expr, "y"), list())
+
+    expr = parse(text = '
+        d = read.csv("data.csv")
+        hist(d[, 2])
+    ')
+    actual = findvar(expr, "read.csv")
+
+    expect_equal(actual, list(c(1, 3, 1)))
+
 })
 
 
