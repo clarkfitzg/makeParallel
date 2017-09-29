@@ -97,8 +97,8 @@ read_faster = function(expression, varname, colnames)
 
     index_locs = lapply(analyzed, `[[`, "index_locs")
 
-    output = Map(update_indices, transformed, index_locs
-                 , index_map = index_map)
+    output = mapply(update_indices, transformed, index_locs
+                 , MoreArgs = list(index_map = index_map))
     output = as.expression(output)
 
     # TODO:
