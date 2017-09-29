@@ -10,6 +10,8 @@
 #    usedcolumns)`
 # 6. Transform the calls which subset `d` into new indices.
 
+assigners = c("<-", "=", "assign")
+
 
 #' 1. Infer that a data frame is created by a call to `read.csv()`
 #'
@@ -70,27 +72,59 @@ update_indices = function(statement, index_locs, index_map)
 
 #' Transform To Faster Reads
 #'
-#' Save time and memory by transforming a script to read only the columns
-#' of a data frame that are necessary for the remainder of the script.
+#' Reduce run time and memory use by transforming an expression to read only the
+#' columns of a data frame that are necessary for the remainder of the
+#' script.
 #'
-#'
-#' @param file passed to \code{base::parse}
+#' @param expression, for example as returned from \code{base::parse}
 #' @param varname character naming the data frame of interest
 #' @param colnames column names for the data frame of interest
 #'
 #' @return transformed code
 #' @export
-read_faster = function(file, varname, colnames)
+read_faster = function(expression, varname, colnames)
 {
+    # varname should be inferred, but I think it's better to put this logic
+    # in a user facing wrapper function because if there are multiple large
+    # reads we would like to call this function for each variable.
 
-    script = parse(file)
+    analyzed = lapply(expression, canon_form, varname = varname, colnames = colnames)
 
-    slowread = findvar(
-
-    standardized = lapply(script, canon_form, varname = varname, colnames = colnames)
-
-    column_indices = lapply(standardized, `[[`, "column_indices")
+    column_indices = lapply(analyzed, `[[`, "column_indices")
     index_map = sort(unique(do.call(c, column_indices)))
 
+    transformed = lapply(analyzed, `[[`, "transformed")
 
+    index_locs = lapply(analyzed, `[[`, "index_locs")
+
+    output = Map(update_indices, transformed, index_locs
+                 , index_map = index_map)
+    output = as.expression(output)
+
+    # TODO:
+    # - May want to move some of the following logic into a wrapper
+    #   function since some is common across variables.
+    # - Other read funcs
+
+    readlocs = findvar(output, "read.csv")
+
+    subset_read_inserted = FALSE
+
+    for(loc in readlocs){
+        parentloc = loc[-length(loc)]
+        parent = output[[parentloc]]
+        if(as.character(parent[[1]]) %in% assigners){
+            if(parent[[2]] == varname){
+                # TODO: Assuming here the assignment statment looks like
+                # x = read.csv(...)
+                output[[loc]] = to_fread(output[[loc]], select = index_map)
+                subset_read_inserted = TRUE
+                break
+            }
+        }
+    }
+
+    if(!subset_read_inserted) stop("Data reading call didn't change.")
+
+    output
 }
