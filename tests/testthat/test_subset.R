@@ -47,13 +47,41 @@ test_that("to_fread", {
 })
 
 
-test_that("read_faster", {
+test_that("basic read_faster", {
 
     code = parse(text = '
         d = read.csv("data.csv")
         hist(d[, 2])
     ')
 
-    out = read_faster(code, varname = "d", colnames = letters)
+    actual = read_faster(code, varname = "d", colnames = letters)
+
+    expected = parse(text = '
+        d = data.table::fread("data.csv", select = 2L)
+        hist(d[, 1L])
+    ')
+
+    expect_equal(actual, expected)
+
+})
+
+
+test_that("read_faster with nested subsetting and $, [, [[", {
+
+    code = parse(text = '
+        d = read.csv("data.csv")
+        plot(d$c, d[[1]])
+        plot(d[d[, 6] > 5, 5:7])
+    ')
+
+    actual = read_faster(code, varname = "d", colnames = letters)
+
+    expected = parse(text = '
+        d = data.table::fread("data.csv", select = c(1L, 3L, 5L, 6L, 7L))
+        plot(d[, 2L], d[, 1L])
+        plot(d[d[, 4L] > 5, 3:5])
+    ')
+
+    expect_equal(actual, expected)
 
 })

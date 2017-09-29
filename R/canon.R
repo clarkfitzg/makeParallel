@@ -135,7 +135,7 @@ double_to_ssb = function(statement, colnames)
 
     column_index = if(is.numeric(column)){
         if(length(column) > 1) stop("Recursive indexing not currently supported")
-        column
+        as.integer(column)
     } else if(is.character(column)){
         which(colnames == column)[1]
     } else {
@@ -165,7 +165,7 @@ single_to_ssb = function(statement, colnames)
     }
 
     column_index = if(is.numeric(column)){
-        column
+        as.integer(column)
     } else if(is.character(column)){
         which(colnames %in% column)
     } else {
@@ -181,4 +181,3 @@ subset_funcs = list(`$` = dollar_to_ssb
                     , `[[` = double_to_ssb
                     , `[` = single_to_ssb
                     )
-

@@ -39,7 +39,7 @@ to_fread = function(statement, select)
     transformed = statement
     transformed[[1]] = quote(data.table::fread)
     # Sometimes R just makes things too easy! So happy with this:
-    transformed[["select"]] = select
+    transformed[["select"]] = as.integer(select)
     transformed
 }
 
@@ -118,7 +118,9 @@ read_faster = function(expression, varname, colnames)
             if(parent[[2]] == varname){
                 # TODO: Assuming here the assignment statment looks like
                 # x = read.csv(...)
-                output[[loc]] = to_fread(output[[loc[-n]]], select = index_map)
+                insertion_loc = loc[-n]
+                output[[insertion_loc]] = to_fread(output[[insertion_loc]]
+                                                   , select = index_map)
                 subset_read_inserted = TRUE
                 break
             }
