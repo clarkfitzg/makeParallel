@@ -111,13 +111,14 @@ read_faster = function(expression, varname, colnames)
     subset_read_inserted = FALSE
 
     for(loc in readlocs){
-        parentloc = loc[-length(loc)]
+        n = length(loc)
+        parentloc = loc[-c(n-1, n)]
         parent = output[[parentloc]]
         if(as.character(parent[[1]]) %in% assigners){
             if(parent[[2]] == varname){
                 # TODO: Assuming here the assignment statment looks like
                 # x = read.csv(...)
-                output[[loc]] = to_fread(output[[loc]], select = index_map)
+                output[[loc]] = to_fread(output[[loc[-n]]], select = index_map)
                 subset_read_inserted = TRUE
                 break
             }

@@ -1,6 +1,8 @@
 
 test_that("data_read", {
 
+              skip("don't care about these yet")
+
 expect_equal(data_read(code[[1]]), quote(d))
 
 expect_null(data_read(quote(f(x))))
