@@ -40,42 +40,28 @@ nworkers = function()
 
 #' Find Function Call
 #'
-#' Search the parse tree for an expression, returning a list of locations where
-#' the function is called.
-#'
-#' Implementation based loosely on \code{codetools::walkCode}.
+#' Search the parse tree for an expression, returning a list of locations
+#' where the function is called. This only finds functions that are called
+#' directly, so it will not find the function \code{f} in \code{lapply(x,
+#' f)}, for example.
 #'
 #' @param expr R language expression
 #' @param funcname symbol or character naming the function
-#' @param loc used for internal recursive calls
-#' @param found used for internal recursive calls
-#' @return address list of integer vectors, possibly empty
-find_call = function(expr, funcname, loc = integer(), found = list())
+find_call = function(expr, funcname)
 {
-    if(length(loc) == 0){
-        # This is the first call, ie no recursion has yet taken place
-        funcname = as.symbol(funcname)
-    }
+    locs = find_var(expr, funcname)
 
-    if(typeof(expr) != "language"){
-        # We're at a leaf node, all done with the search
+    # This logic is based on what I've seen: everything in R is a
+    # function call and for the function to appear as element 1 it means it
+    # must have been called.
+
+    iscall = function(loc) loc[length(loc)] == 1L
+
+    calls = sapply(locs, iscall)
+    if(length(calls) == 0L){
         return(list())
     }
-
-    if(class(expr) == "call"){
-        if(expr[[1]] == funcname){
-            found = c(found, list(c(loc, 1L)))
-        }
-    }
-
-    # Continue recursion
-    for(i in seq_along(expr)){
-        subexpr = expr[[i]]
-        recurse_found = Recall(subexpr, funcname, c(loc, i))
-        found = c(found, recurse_found)
-    }
-
-    found
+    locs[calls]
 }
 
 
@@ -107,9 +93,6 @@ only_literals = function(code)
 
     TRUE
 }
-
-
-# TODO: Share implementation of find_var with findcall
 
 
 #' Find locations of variable use
