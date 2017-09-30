@@ -106,7 +106,7 @@ read_faster = function(expression, varname, colnames)
     #   function since some is common across variables.
     # - Other read funcs
 
-    readlocs = findvar(output, "read.csv")
+    readlocs = find_var(output, "read.csv")
 
     subset_read_inserted = FALSE
 

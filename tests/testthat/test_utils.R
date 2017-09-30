@@ -19,37 +19,37 @@ test_that("replacing functions", {
 })
 
 
-test_that("findvar", {
+test_that("find_var", {
 
     expr = quote(x[1:5])
-    expect_equal(findvar(expr, "x"), list(2))
+    expect_equal(find_var(expr, "x"), list(2))
 
     expr = quote(y[1:5])
-    expect_equal(findvar(expr, "x"), list())
+    expect_equal(find_var(expr, "x"), list())
 
     expr = quote(mean(x[1:5]))
-    expect_equal(findvar(expr, "x"), list(c(2, 2)))
+    expect_equal(find_var(expr, "x"), list(c(2, 2)))
 
     #TODO: Problem is the missing arg.
     expr = quote(plot(dframe[, "d"]))
-    actual = findvar(expr, "dframe")
+    actual = find_var(expr, "dframe")
 
     expect_equal(actual, list(c(2, 2)))
 
     expr = quote(mean(x[1:5]) + x)
-    actual = findvar(expr, "x")
+    actual = find_var(expr, "x")
     # I don't care about the order of the elements of this list.
     expect_equal(actual, list(c(2, 2, 2), 3))
 
     # Don't match character vectors
     expr = quote(paste("x", "y"))
-    expect_equal(findvar(expr, "y"), list())
+    expect_equal(find_var(expr, "y"), list())
 
     expr = parse(text = '
         d = read.csv("data.csv")
         hist(d[, 2])
     ')
-    actual = findvar(expr, "read.csv")
+    actual = find_var(expr, "read.csv")
 
     expect_equal(actual, list(c(1, 3, 1)))
 

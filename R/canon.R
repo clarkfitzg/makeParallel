@@ -21,7 +21,7 @@ canon_form = function(statement, varname, colnames)
     column_indices = integer()
     index_locs = list()
 
-    varlocs = findvar(statement, varname)
+    varlocs = find_var(statement, varname)
 
     # Early outs
     if(length(varlocs) == 0){

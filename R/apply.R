@@ -107,7 +107,7 @@ benchmark_parallel = function(statement, times = 10L)
 }
 
 
-# TODO: Use findvar here
+# TODO: Use find_var here
 
 #' Find Location Of Apply In Parse Tree
 #'

@@ -2,6 +2,7 @@
 NULL
 
 
+# TODO:
 #' Test Expressions For Equality
 same_expr = function(e1, e2)
 {
@@ -108,7 +109,7 @@ only_literals = function(code)
 }
 
 
-# TODO: Share implementation of findvar with findcall
+# TODO: Share implementation of find_var with findcall
 
 
 #' Find locations of variable use
@@ -121,10 +122,10 @@ only_literals = function(code)
 #' @param found used for internal recursive calls
 #' @return address list of integer vectors, possibly empty
 #' @examples
-#' findvar(quote(x + 1))    # 2
-#' #findvar(quote(x))       
+#' find_var(quote(x + 1))    # 2
+#' #find_var(quote(x))       
 #' # The above won't work, since x is a symbol not a language object
-findvar = function(expr, var, loc = integer(), found = list())
+find_var = function(expr, var, loc = integer(), found = list())
 {
     if(length(loc) == 0){
         # This is the first call, ie no recursion has yet taken place
