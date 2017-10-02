@@ -71,7 +71,7 @@ One can download a handful from the VA servers as follows:
 
 ```{r, echo = FALSE}
 
-setwd("~/data/vets/")
+datadir = "~/data/vets/vets_appeals"
 
 ```
 
@@ -105,10 +105,13 @@ assigns the result into `appeals` on the cluster.
 ```{r}
 
 do({
+
     appeals <- lapply(filenames, readLines)
+
     appeals <- sapply(appeals, paste, collapse = "\n")
     appeals <- enc2utf8(appeals)
     NULL
+
 })
 
 ```
