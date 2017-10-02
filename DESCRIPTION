@@ -1,7 +1,7 @@
 Package: autoparallel
 Version: 0.0.1
 Date: 2017-06-12
-Title: Automatically Parallelize R Apply Functions
+Title: analysis and generation of parallel R code
 Authors@R: person("Clark", "Fitzgerald", role = c("aut", "cre"),
                      email = "clarkfitzg@gmail.com")
 Author: Clark Fitzgerald [aut, cre]

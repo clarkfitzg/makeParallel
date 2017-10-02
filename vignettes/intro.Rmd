@@ -1,0 +1,35 @@
+---
+title: "autoparallel-introduction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel-introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Introduction
+
+This package is meant to simplify parallel programming in R by automating
+common tasks.
+
+My goal in creating this package was to produce something that I find
+personally useful.
+
+As data sizes and processor counts increase, parallelism becomes more
+important.
+
+Parallel programming can be challenging, because it requires further levels
+of expertise. The core of R is a functional language, and the functional
+paradigm is well suited to parallel programming. 
+
+R functions typically don't have side effects. They don't modify their
+arguments; instead they produce new objects. This is what makes R
+functional and what allows us to do parallel computing.
+
+## Prior Art
+
+SNOW, parallel packages now included with R as recommended packages.
+
+Bohringer's dynamic parallelization.
+
+Bengsston's futures.

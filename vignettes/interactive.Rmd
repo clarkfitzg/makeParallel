@@ -9,7 +9,10 @@ vignette: >
 
 # Interactive
 
-This example is to show how one can use `autoparallel` for interactive use.
+This vignette discusses the interactive use of this package.
+
+
+## Basic Example
 
 We'll start with a basic example.
 
@@ -63,17 +66,24 @@ do(lapply(x, myfun))
 
 A realistic example is working with many files simultaneously. The US
 Veterans Administration (VA) Court appeals are one such example. Each file
-contains the summary of a court case. 
+contains the summary of an appeal.
 One can download a handful from the VA servers as follows:
 
-```{r}
+```{r, echo = FALSE}
 
-datadir = "~/data/vets/appeals_sample"
+setwd("~/data/vets/")
+
+```
+
+```{r download, eval = FALSE}
+
+datadir = "vets_appeals"
+dir.create(datadir)
 
 fnames = paste0("1719", 100:266, ".txt")
 urls = paste0("https://www.va.gov/vetapp17/files3/", fnames)
 
-#Map(download.file, urls, paste0(datadir, fnames))
+Map(download.file, urls, fnames)
 
 ```
 

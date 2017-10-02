@@ -55,18 +55,14 @@ speed up the program if the following conditions hold:
 
 ## Ideas
 
-We start out with the following assumptions:
-
-1. There is a script that the user would like to run multiple times
-2. The execution time for the parallel paths does not vary wildly
-
+Suppose the user would like to run a script multiple times.
 The software essentially needs to do the following:
 
 1. run the script once, measuring time required to evaluate each
    expression, as well as the sizes of the resulting objects to be
    serialized
-2. infer the dependency structure of the code, ie. where task independent
-   threads are
+2. infer the dependency structure of the code, which determines where
+   and how statements can run in parallel
 3. solve an optimization problem specifying which statements ideally happen
    in parallel
 4. rewrite the code to use the optimal strategy

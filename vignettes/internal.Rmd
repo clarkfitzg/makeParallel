@@ -29,3 +29,20 @@ Write a function to check if code is IO bound.
 Are there cheaper ways to share read only copies of objects between
 processes in R? There's `bigmemory`, but what about something a little more
 generalized like the plasma object store?
+
+
+# Assumptions
+
+I may want to make some of the following assumptions, depending on
+convenience.
+
+Input in a canonical form. Have to say precisely what this means. For
+example:
+
+- `<-` is used for assignment rather than `=` or `assign`
+- All statements in the program are necessary, in the sense that they lead
+  to something with a side effect.
+- Existing `for` loops are unavoidable, ie. they do something like
+  iterative updates. Otherwise they should be `lapply` type calls.
+
+This can probably be done through preprocessing.
