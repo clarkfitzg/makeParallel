@@ -2,28 +2,28 @@ context("parallelize")
 
 # parallelize works off variables in the global environment
 # testthat does some other things here.
-assign("x", list(letters, LETTERS, 1:10), envir = .GlobalEnv)
+assign("y", list(letters, LETTERS, 1:10), envir = .GlobalEnv)
 
 
 test_that("basics with default", {
 
-    do = parallelize(x)
-    actual = do(lapply(x, head))
+    do = parallelize(y)
+    actual = do(lapply(y, head))
 
-    expect_identical(actual, lapply(x, head))
+    expect_identical(actual, lapply(y, head))
 
-    head2 = function(x) x[1:2]
+    head2 = function(y) y[1:2]
     assign("head2", head2, envir = .GlobalEnv)
 
-    actual = do(lapply(x, head2))
+    actual = do(lapply(y, head2))
 
-    expect_identical(actual, lapply(x, head2))
+    expect_identical(actual, lapply(y, head2))
 })
 
 
 test_that("finds global variables", {
 
-    do = parallelize(x, spec = 2L)
+    do = parallelize(y, spec = 2L)
     # assigning n must happen after cluster creation, otherwise forking
     # will send n
     assign("n", 10, envir = .GlobalEnv)

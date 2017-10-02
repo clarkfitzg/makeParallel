@@ -92,7 +92,9 @@ assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
     #TODO- Only send parts necessary for each worker
     parallel::clusterExport(cl, manager_varname)
 
-    indices = parallel::splitIndices(length(x), length(cl))
+    big_object = get(manager_varname)
+
+    indices = parallel::splitIndices(length(big_object), length(cl))
 
     # Each worker only sees their own indices
     parallel::clusterApply(cl, indices, assign_one
