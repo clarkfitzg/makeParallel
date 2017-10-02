@@ -3,7 +3,7 @@
 #RFILES := $(wildcard R/*.R)
 RFILES!= ls R/*.R
 TESTFILES!= ls tests/testthat/test*.R
-VIGNETTES!= ls vignettes/*.Rmd
+#VIGNETTES!= ls vignettes/*.Rmd
 
 install: $(RFILES)
 	R -e "roxygen2::roxygenize()"
@@ -13,9 +13,10 @@ test: $(TESTFILES)
 	make install
 	cd tests && Rscript testthat.R && cd ..
 
-vignettes: $(VIGNETTES)
+#vignettes: $(VIGNETTES)
+
+docs:
 	R -e "tools::buildVignettes(dir = '.')"
-	#R CMD Sweave 
 
 # Could make this more robust to do a better CRAN check, but no need yet.
 #build: $(RFILES)

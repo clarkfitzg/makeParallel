@@ -1,0 +1,31 @@
+---
+title: "autoparallel-internal"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel-internal}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Internal Design Documentation
+
+This document is not intended for users. It contains the following:
+
+- design decisions
+- TODO lists
+- possible ideas and extensions
+
+
+# TODO
+
+Estimate more precisely the costs of serialization. Is it much cheaper
+to do it directly vs using `mccollect()`?
+
+
+# Ideas
+
+Write a function to check if code is IO bound.
+
+Are there cheaper ways to share read only copies of objects between
+processes in R? There's `bigmemory`, but what about something a little more
+generalized like the plasma object store?

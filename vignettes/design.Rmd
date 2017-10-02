@@ -1,3 +1,14 @@
+---
+title: "autoparallel-design"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel-assumptions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# Design
+
 ## schedule
 
 I told Norm that I would talk about "Automatic Parallelization of R Code"

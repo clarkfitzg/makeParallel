@@ -10,12 +10,11 @@ vignette: >
 # Task Parallel
 
 Parallel infrastructure for computing on data generally centers around data
-parallelism. This means to call the same function on many
-different data (SIMD).
+parallelism. This means to call the same function on many different data-
+Same Instruction Multiple Data (SIMD).
 
-Independent tasks are also amenable to running in parallel. This is task
-parallelism. It means to call different functions on different data
-simultaneously.
+Independent tasks can also run in parallel. This is task parallelism. It
+means to call different functions on different data simultaneously.
 
 This can be done today through R's included `parallel` package:
 
@@ -25,38 +24,51 @@ This can be done today through R's included `parallel` package:
 library(parallel)
 
 # Begins asynchronous evaluation of rnorm(10)
-mcparallel(expr = rnorm(10))
+job1 = mcparallel(expr = rnorm(10))
 
 # This can happen before the above expression is finished
-x = rnorm(20)
+x = mean(1:10)
 
-# Collect the result from all parallel workers
-y = mccollect()[[1]]
+y = mccollect(job1)[[1]]
 
 ```
 
 This introduces overhead compared to standard serial evaluation, but it may
 speed up the program if the following conditions hold:
 
-- The system has available computing resources. This may not be the case
-  for linear algebra intensive work with a multithreaded BLAS / LAPACK,
-  which is included with versions of R such as [Microsoft R
-  Open](https://mran.microsoft.com/rro/#intelmkl1).
-- There are two or more long running tasks that can occur simultaneously.
+- The system has available computing resources, ie. processor cores which
+  are idle. If an R package uses threads through internal compiled code
+  then introducing parallelism on top of this will generally hurt rather than
+  help, because the processors must now compete for resources. Linear algebra
+  computations with a multithreaded BLAS / LAPACK are a common operation
+  with this effect.
+- There are two or more relatively long running tasks that can occur simultaneously.
   For a multicore fork based approach the tasks should take at least 10 ms,
   and [preferably much
   longer](https://www.kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html).
 - At least one task returns a relatively small object. This allows one to
   avoid the cost of serializing R objects between processes. For example,
-  it takes hundreds of milliseconds to serialize a vector of 10 million integers.
+  the code `1:1e8` generates a sequence of 100 million integers. This takes
+  10 times longer in parallel because the serialization time
+  far exceeds the time for actual computation.
 
-TODO: Estimate more precisely the costs of serialization. Is it much cheaper
-to do it directly vs using `mccollect()`?
 
 ## Ideas
 
-Write a function to check if code is IO bound.
+We start out with the following assumptions:
 
-Are there cheaper ways to share read only copies of objects between
-processes in R? There's `bigmemory`, but what about something a little more
-generalized like the plasma object store?
+1. There is a script that the user would like to run multiple times
+2. The execution time for the parallel paths does not vary wildly
+
+The software essentially needs to do the following:
+
+1. run the script once, measuring time required to evaluate each
+   expression, as well as the sizes of the resulting objects to be
+   serialized
+2. infer the dependency structure of the code, ie. where task independent
+   threads are
+3. solve an optimization problem specifying which statements ideally happen
+   in parallel
+4. rewrite the code to use the optimal strategy
+
+
