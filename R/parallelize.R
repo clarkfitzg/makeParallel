@@ -1,22 +1,29 @@
-#' Parallelized Data Evaluater
+#' Parallelized Data Evaluator
 #'
 #' Distributes data over a cluster and returns a closure capable of
 #' evaluating code in parallel. Designed for interactive use.
 #'
-#' The resulting evaluator analyzes the code as if it was executed
-#' within the global scope. Discovered global variables will be
-#' exported to the workers, which can be expensive if they are large.
+#' The resulting evaluator checks which variables are used in the code
+#' before it evaluates them. It searches for these variables and exports
+#' them to the cluster. An exception is the variable that the evaluator was
+#' created with; this is assumed to be large, so it will only be exported
+#' to the cluster once when the evaluator is created. 
 #'
+#' If variables are used in an expression which cannot be found in the
+#' local scope then it is assumed  that they are available at the worker
+#' nodes.
+#'
+#' TODO: How to avoid exporting the whole big object to every worker?
+#' It's better to just send the subset that it requires in the end.
 #'
 #' @export
-#' @param x An object one wants to perform parallel analysis on
+#' @param x An object one wants to perform parallel analysis on.
 #' @param cl SNOW cluster
 #' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
 #' @param ... additional arguments to \code{\link[parallel]{makeCluster}}
 #' @return parallel evaluator resembling \code{\link[base]{eval}}
 #' @examples
 #' x = list(1:10, 20:30)
-#' #TODO: doesn't work because of global environment
 #' do = parallelize("x")
 #' do(lapply(x, head))
 #' y = 20

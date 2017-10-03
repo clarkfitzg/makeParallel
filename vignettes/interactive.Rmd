@@ -10,7 +10,19 @@ vignette: >
 # Interactive
 
 This vignette discusses the interactive use of this package.
+The `parallel_evaluator` was designed to support the following specific use
+case (if you use it for other purposes, drop me a line I'm curious to
+hear about it).
 
+Suppose you have some large or unwieldy object in R which can conceptually
+be split into parts, such as the rows of a data frame or the elements of a
+list. You are analyzing this object, perhaps writing functions and
+debugging them as you go. The code takes too long to run. Most of what
+you're doing could happen in parallel on the parts, but you don't want to
+worry about all the issues that can arise with parallel code when you're in
+the middle of your interactive analysis. You want a system to manage all
+the details of the parallelism for you, so that you can focus on the
+analysis. Let the `parallel_evaluator` manage the details.
 
 ## Basic Example
 
@@ -105,13 +117,10 @@ assigns the result into `appeals` on the cluster.
 ```{r}
 
 do({
-
     appeals <- lapply(filenames, readLines)
-
     appeals <- sapply(appeals, paste, collapse = "\n")
     appeals <- enc2utf8(appeals)
     NULL
-
 })
 
 ```
@@ -124,13 +133,23 @@ workers. It does not exist in the manager process.
 
 ```{r}
 
-# FALSE
 "appeals" %in% ls()
 
 ```
 
-The parallel evaluator allows us to compute on it with the same code that
-can be used for serial r.
+However, if we subsequently create a variable called `appeals` in the
+manager process then the parallel evaluator will export it to the cluster,
+overriding the existing one.  
+
+```{R}
+
+ten = 10
+do(ten + 1, verbose = TRUE)
+
+```
+
+The parallel evaluator allows us to execute the same code that is
+used for serial R. In this case 
 
 ```{r}
 
