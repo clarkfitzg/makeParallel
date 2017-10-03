@@ -10,11 +10,8 @@
 #' created with; this is assumed to be large, so it will only be exported
 #' to the cluster once when the evaluator is created. 
 #'
-#' TODO: How to avoid exporting the whole big object to every worker?
-#' It's better to just send the subset that it requires in the end.
-#'
 #' @export
-#' @param x An object one wants to perform parallel analysis on.
+#' @param x An object to split and run parallel code on
 #' @param cl SNOW cluster
 #' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
 #' @param ... additional arguments to \code{\link[parallel]{makeCluster}}
@@ -24,7 +21,8 @@
 #' do = parallelize("x")
 #' do(lapply(x, head))
 #' y = 20
-#' do(x + y)
+#' do(x + y, verbose = TRUE)
+#' do(1:3, simplify = rbind)
 #' parallel::stopCluster(attr(do, "cluster"))
 parallelize = function(x = NULL
                        , cl = parallel::makeCluster(spec, ...)
@@ -33,7 +31,7 @@ parallelize = function(x = NULL
 {
 
     varname = deparse(substitute(x))
-    splits = assign_workers(cl, varname)
+    splits = assign_workers(cl, x, varname)
 
     evaluator = function(expr, simplify = c, verbose = FALSE)
     {
@@ -78,6 +76,7 @@ print.parallel_evaluator = function(x)
 {
     cat("parallel evaluator", "\n")
     cat("variable: ", attr(x, "varname"), "\n")
+    cat(formals(x), "\n")
 }
 
 
@@ -91,10 +90,8 @@ print.parallel_evaluator = function(x)
 #' @param worker_varname string naming variable to be assigned to the
 #'      global workspace of the worker node
 #' @return indices list of partitioning indices
-assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
+assign_workers = function(cl, x, worker_varname)
 {
-
-    x = get(manager_varname)
 
     N = if(is.data.frame(x)) nrow(x) else length(x)
 
@@ -111,12 +108,4 @@ assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
     }, worker_varname, chunks)
 
     splits
-}
-
-
-assign_one = function(index, manager_varname, worker_varname)
-{
-    x = get(manager_varname)
-    assign(worker_varname, x[index], envir = .GlobalEnv)
-    NULL
 }

@@ -18,11 +18,12 @@ Suppose you have some large or unwieldy object in R which can conceptually
 be split into parts, such as the rows of a data frame or the elements of a
 list. You are analyzing this object, perhaps writing functions and
 debugging them as you go. The code takes too long to run. Most of what
-you're doing could happen in parallel on the parts, but you don't want to
-worry about all the issues that can arise with parallel code when you're in
-the middle of your interactive analysis. You want a system to manage all
-the details of the parallelism for you, so that you can focus on the
-analysis. Let the `parallel_evaluator` manage the details.
+you're doing could happen in parallel after an appropriate split, but you
+don't want to worry about all the issues that can arise with parallel code
+when you're in the middle of your interactive analysis. You want a system
+to manage all the details of the parallelism for you, so that you can focus
+on the analysis. The `parallel_evaluator` is a system to manage the
+details.
 
 ## Basic Example
 
