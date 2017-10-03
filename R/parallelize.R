@@ -11,18 +11,21 @@
 #' to the cluster once when the evaluator is created. 
 #'
 #' @export
-#' @param x An object to split and run parallel code on
+#' @param x An object to split and run parallel code on. Typically a large
+#' data frame or list. Data frames are split into groups of rows, lists on
+#' elements.
 #' @param cl SNOW cluster
 #' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
 #' @param ... additional arguments to \code{\link[parallel]{makeCluster}}
 #' @return parallel evaluator resembling \code{\link[base]{eval}}
 #' @examples
-#' x = list(1:10, 20:30)
-#' do = parallelize("x")
+#' x = list(1:10, 21:30)
+#' do = parallelize(x)
 #' do(lapply(x, head))
 #' y = 20
-#' do(x + y, verbose = TRUE)
+#' do(x[[1]][1] + y, verbose = TRUE)
 #' do(1:3, simplify = rbind)
+#' do(1:3, simplify = FALSE)
 #' parallel::stopCluster(attr(do, "cluster"))
 parallelize = function(x = NULL
                        , cl = parallel::makeCluster(spec, ...)
@@ -48,8 +51,8 @@ parallelize = function(x = NULL
         exports = intersect(ls(globalenv()), used)
 
         if(verbose){
-            message("Sending the following variables to the cluster:\n"
-                    , exports)
+            message("Sending these variables to the cluster:\n"
+                    , paste(exports, collapse = ", "))
         }
         parallel::clusterExport(cl, exports, env = globalenv())
 
