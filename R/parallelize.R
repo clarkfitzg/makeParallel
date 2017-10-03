@@ -26,6 +26,8 @@
 #' do(x[[1]][1] + y, verbose = TRUE)
 #' do(1:3, simplify = rbind)
 #' do(1:3, simplify = FALSE)
+#' print(do)
+#' print.function(do)  # See parameters and attributes
 #' parallel::stopCluster(attr(do, "cluster"))
 parallelize = function(x = NULL
                        , cl = parallel::makeCluster(spec, ...)

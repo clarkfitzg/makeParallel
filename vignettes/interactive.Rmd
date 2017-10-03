@@ -10,9 +10,6 @@ vignette: >
 # Interactive
 
 This vignette discusses the interactive use of this package.
-The `parallel_evaluator` was designed to support the following specific use
-case (if you use it for other purposes, drop me a line I'm curious to
-hear about it).
 
 Suppose you have some large or unwieldy object in R which can conceptually
 be split into parts, such as the rows of a data frame or the elements of a
@@ -22,8 +19,8 @@ you're doing could happen in parallel after an appropriate split, but you
 don't want to worry about all the issues that can arise with parallel code
 when you're in the middle of your interactive analysis. You want a system
 to manage all the details of the parallelism for you, so that you can focus
-on the analysis. The `parallel_evaluator` is a system to manage the
-details.
+on the analysis. The `parallel_evaluator` (subsequently referred to as the
+_'evaluator'_) is a system to manage the details.
 
 ## Basic Example
 
@@ -33,15 +30,18 @@ We'll start with a basic example.
 
 library(autoparallel)
 
-x = list(1:10, letters, LETTERS)
+x = list(1:10, rnorm(10), rep(pi, 10))
 
 do = parallelize(x)
 do
 
 ```
 
-The parallel evaluator named `do` splits `x` into approximately equal parts
-so that one can run code in parallel.
+Calling `parallelize` split `x` into approximately equal parts
+so that one can run code in parallel using the resulting evaluator `do`.
+
+Calling `lapply` on a list through `do` produces the same result as the
+base R case:
 
 ```{r}
 
@@ -51,14 +51,23 @@ do(lapply(x, head))
 
 ```
 
-Calling the same code through `do` produces the same result as the base r
-case. Under the hood `do` sent the code to different r processes for
-evaluation. 
+There's nothing special about the use of `lapply()` above. We can evaluate
+arbitrary code.
 
-This is meant for interactively building functions and analysis on large
-data sets. The interactive feature is sending functions from one's global
-workspace to the parallel workers. We can see the results of the improved /
-debugged version of the function as we work on them.
+```{R}
+
+y = 20
+z = 30
+do(y + z, verbose = TRUE)
+
+```
+
+This is designed for interactively building functions and analysis on large
+data sets, or data sets that take too long to run. The interactive feature
+is sending variables, including functions, from the manager's global
+workspace to the parallel workers every time they are used. This allows us
+to see the results of the improved / debugged version of the function as we
+work on them.
 
 ```{r}
 
@@ -72,6 +81,62 @@ myfun = function(x) x[1:4]
 
 # Now we see the new results of myfun
 do(lapply(x, myfun))
+
+```
+
+## Limitations
+
+`autoparallel` is not currently designed to work with multiple large
+objects.  Rather, it was designed for a single large object to be
+distributed to the workers when the evaluator is created.  The following
+code will be slow because it serializes a large (400 MB) object to each of
+the workers:
+
+```{r, eval = FALSE}
+
+# Any large R object
+big = 1:1e8
+
+object.size(big)
+
+# BAD IDEA: this sends `big` over every time
+do(sum(big + x[[1]][1]))
+
+```
+
+## Details
+
+Under the hood, the evaluator is a closure with a couple attributes. The
+most notable attributes are the variable name and the cluster. We can
+inspect all this by printing the evaluator as a function.
+
+Under the hood `do` sent the code to different R processes for
+evaluation. 
+
+```{R}
+
+print.function(do)
+
+```
+
+The default simplifying function is `c()`. We can also bring back results
+without simplifying.
+
+```{R}
+
+do(lapply(x, head), simplify = FALSE)
+
+```
+
+
+## Cleaning up
+
+When finished it's a good idea to shut down the cluster.
+The cluster is an attribute on the evaluator.
+
+```{r}
+
+parallel::stopCluster(attr(do, "cluster"))
 
 ```
 
@@ -139,7 +204,7 @@ workers. It does not exist in the manager process.
 ```
 
 However, if we subsequently create a variable called `appeals` in the
-manager process then the parallel evaluator will export it to the cluster,
+manager process then the evaluator will export it to the cluster,
 overriding the existing one.  
 
 ```{R}
@@ -149,7 +214,7 @@ do(ten + 1, verbose = TRUE)
 
 ```
 
-The parallel evaluator allows us to execute the same code that is
+The evaluator allows us to execute the same code that is
 used for serial R. In this case 
 
 ```{r}
@@ -182,40 +247,8 @@ relatively small vector of file names and having each worker independently
 load the files that it needed, thus keeping the data in place on that
 worker.
 
-## Cleaning up
-
-When finished it's a good idea to shut down the cluster.
-The cluster is available as an attribute on the parallel evaluator object.
-
-```{r}
+```{R}
 
 parallel::stopCluster(attr(do, "cluster"))
 
 ```
-
-## From old intro:
-
-```{R}
-library(autoparallel)
-
-# Suppose docs is a large list of (XML) documents
-docs = list(letters, letters, LETTERS)
-
-do = parallelize(docs, workers = 2)
-```
-
-`parallelize` returns a closure that maintains server state. It evaluates expressions
-much like `eval` and `parallel::clusterEvalq`.
-
-```{R}
-getfirst = function(doc) doc[1:5]
-
-do(lapply(docs, getfirst))
-```
-
-The line above will do the equivalent of `lapply(docs, getfirst)`, but more
-efficiently in parallel on the distributed data set. 
-
-To implement later is when `getfirst()` or dependencies of `getfirst` change then
-these should be exported to the cluster. First pass is to just export
-the one function each time.
