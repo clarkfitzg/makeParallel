@@ -102,6 +102,17 @@ test_that("only_literals", {
 })
 
 
+test_that("even_split", {
+
+    actual = even_split(6, 2)    
+    expect_equal(actual, c(1, 1, 1, 2, 2, 2))
+
+    actual = even_split(7, 2)    
+    expect_equal(actual, c(1, 1, 1, 1, 2, 2, 2))
+
+})
+
+
 if(FALSE){
 
 expr = parse(text = "

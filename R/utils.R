@@ -144,3 +144,9 @@ find_var = function(expr, var, loc = integer(), found = list())
     }
     found
 }
+
+
+#' Approximately Even Split
+even_split = function(n_elements, n_groups)
+{
+}

@@ -101,11 +101,13 @@ assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
 
     indices = parallel::splitIndices(length(big_object), length(cl))
 
-    #TODO: Back here
+
+    chunks = split(big_object, indices)
+
     clusterMap(cl, function(x, value){
-        assign(name, value)
+        assign(x, value)
         NULL
-    })
+    }, worker_varname, chunks)
 
 
     # Each worker only sees their own indices
