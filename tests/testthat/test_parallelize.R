@@ -8,6 +8,7 @@ assign("y", list(letters, LETTERS, 1:10), envir = .GlobalEnv)
 test_that("basics with default", {
 
     do = parallelize(y)
+
     actual = do(lapply(y, head))
 
     expect_identical(actual, lapply(y, head))

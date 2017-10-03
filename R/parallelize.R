@@ -106,7 +106,7 @@ assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
     # 2nd order consideration.
 
     parallel::clusterMap(cl, function(x, value){
-        assign(x, value)
+        assign(x, value, envir = .GlobalEnv)
         NULL
     }, worker_varname, chunks)
 
