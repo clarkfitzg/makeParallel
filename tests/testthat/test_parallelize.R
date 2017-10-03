@@ -1,6 +1,9 @@
 context("parallelize")
 
-y = list(letters, LETTERS, 1:10)
+# parallelize works off variables in the global environment
+# testthat does some other things here.
+assign("y", list(letters, LETTERS, 1:10), envir = .GlobalEnv)
+
 
 test_that("basics with default", {
 
@@ -10,6 +13,7 @@ test_that("basics with default", {
     expect_identical(actual, lapply(y, head))
 
     head2 = function(y) y[1:2]
+    assign("head2", head2, envir = .GlobalEnv)
 
     actual = do(lapply(y, head2))
 

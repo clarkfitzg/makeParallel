@@ -3,15 +3,12 @@
 #' Distributes data over a cluster and returns a closure capable of
 #' evaluating code in parallel. Designed for interactive use.
 #'
-#' The resulting evaluator checks which variables are used in the code
-#' before it evaluates them. It searches for these variables and exports
-#' them to the cluster. An exception is the variable that the evaluator was
+#' The resulting object (called the evaluator) checks which variables are used in the code
+#' before it evaluates them. It searches for these variables in the global
+#' environment and exports all that it finds
+#' to the cluster. An exception is the variable that the evaluator was
 #' created with; this is assumed to be large, so it will only be exported
 #' to the cluster once when the evaluator is created. 
-#'
-#' If variables are used in an expression which cannot be found in the
-#' local scope then it is assumed  that they are available at the worker
-#' nodes.
 #'
 #' TODO: How to avoid exporting the whole big object to every worker?
 #' It's better to just send the subset that it requires in the end.
@@ -51,6 +48,7 @@ parallelize = function(x = NULL
         # frequently
         used = used[used != varname]
         exports = intersect(ls(globalenv()), used)
+
         if(verbose){
             message("Sending the following variables to the cluster:\n"
                     , exports)
@@ -103,6 +101,13 @@ assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
 
     indices = parallel::splitIndices(length(big_object), length(cl))
 
+    #TODO: Back here
+    clusterMap(cl, function(x, value){
+        assign(name, value)
+        NULL
+    })
+
+
     # Each worker only sees their own indices
     parallel::clusterApply(cl, indices, assign_one
                  , manager_varname = manager_varname
@@ -118,4 +123,3 @@ assign_one = function(index, manager_varname, worker_varname)
     assign(worker_varname, x[index], envir = .GlobalEnv)
     NULL
 }
-
