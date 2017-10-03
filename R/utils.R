@@ -147,6 +147,12 @@ find_var = function(expr, var, loc = integer(), found = list())
 
 
 #' Approximately Even Split
+#'
+#' @param n_elements integer number of elements to split
+#' @param n_groups integer number of resulting groups
+#' @return integer vector for use as splitting factor in \code{\link[base]{split}}
 even_split = function(n_elements, n_groups)
 {
+    splits = rep(seq(n_groups), (n_elements %/% n_groups) + 1)
+    sort(splits[1:n_elements])
 }

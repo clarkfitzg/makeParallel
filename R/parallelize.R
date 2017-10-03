@@ -33,7 +33,7 @@ parallelize = function(x = NULL
 {
 
     varname = deparse(substitute(x))
-    indices = assign_workers(cl, varname)
+    splits = assign_workers(cl, varname)
 
     evaluator = function(expr, simplify = c, verbose = FALSE)
     {
@@ -66,7 +66,7 @@ parallelize = function(x = NULL
         evaluated
     }
     attr(evaluator, "cluster") = cl
-    attr(evaluator, "indices") = indices
+    attr(evaluator, "splits") = splits
     attr(evaluator, "varname") = varname
     class(evaluator) = c("parallel_evaluator", class(evaluator))
     evaluator
@@ -93,29 +93,24 @@ print.parallel_evaluator = function(x)
 #' @return indices list of partitioning indices
 assign_workers = function(cl, manager_varname, worker_varname = manager_varname)
 {
-    #TODO- Don't need for an initial fork cluster
-    #TODO- Only send parts necessary for each worker
-    parallel::clusterExport(cl, manager_varname)
 
-    big_object = get(manager_varname)
+    x = get(manager_varname)
 
-    indices = parallel::splitIndices(length(big_object), length(cl))
+    N = if(is.data.frame(x)) nrow(x) else length(x)
 
+    splits = even_split(N, length(cl))
 
-    chunks = split(big_object, indices)
+    chunks = split(x, splits)
 
-    clusterMap(cl, function(x, value){
+    # This can be done more efficiently for a fork cluster, but that's a
+    # 2nd order consideration.
+
+    parallel::clusterMap(cl, function(x, value){
         assign(x, value)
         NULL
     }, worker_varname, chunks)
 
-
-    # Each worker only sees their own indices
-    parallel::clusterApply(cl, indices, assign_one
-                 , manager_varname = manager_varname
-                 , worker_varname = worker_varname)
-
-    indices
+    splits
 }
 
 
