@@ -70,11 +70,15 @@ update_indices = function(statement, index_locs, index_map)
 }
 
 
+assigners = c("<-", "=", "assign")
+readers = c("read.csv", "read.table")
+
+
 #' Transform To Faster Reads
 #'
 #' Reduce run time and memory use by transforming an expression to read only the
 #' columns of a data frame that are necessary for the remainder of the
-#' script.
+#' expression.
 #'
 #' @param expression, for example as returned from \code{base::parse}
 #' @param varname character naming the data frame of interest
@@ -82,12 +86,50 @@ update_indices = function(statement, index_locs, index_map)
 #'
 #' @return transformed code
 #' @export
-read_faster = function(expression, varname, colnames)
+read_faster = function(expression, varname = NULL, colnames = NULL)
 {
-    # varname should be inferred, but I think it's better to put this logic
-    # in a user facing wrapper function because if there are multiple large
-    # reads we would like to call this function for each variable.
 
+    # Easy out if both are specified
+    if(is.null(varname) && is.null(colnames)){
+        return(read_faster_work(expression, varname, colnames))
+    }
+
+    if(is.null(varname) || is.null(colnames)){
+        stop("Must specify both varname and colnames.")
+    }
+
+    out = expression
+    for(reader in readers){
+        readlocs = find_var(expression, reader)
+        for(loc in readlocs){
+            depth = length(loc)
+            possible_assign = expression[[loc[-c(depth - 1, depth)]]]
+            if(as.character(possible_assign[[1]]) %in% assigners){
+                varname = possible_assign[[2]]
+                # TODO: 
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# INFER COLNAMES
+#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                out = read_faster_work(out, varname, colnames = letters)
+            }
+        }
+    }
+    out
+}
+
+
+#' Infer Names And Columns Of Data Frames
+#'
+#'
+#' @return list, with each element a list containing data frame variable
+#'  names and column names
+infer_read_var = function(expression)
+{
+}
+
+
+read_faster_work = function(expression, varname, colnames)
+{
     analyzed = lapply(expression, canon_form, varname = varname, colnames = colnames)
 
     column_indices = lapply(analyzed, `[[`, "column_indices")

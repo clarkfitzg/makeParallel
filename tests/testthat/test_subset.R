@@ -47,6 +47,22 @@ test_that("to_fread", {
 })
 
 
+#test_that("infer_read_var", {
+#
+#    code = parse(text = '
+#                 d = read.csv("data.csv")
+#                 head(d[, 1])
+#                 ')
+#
+#    actual = infer_read_var(code)
+#
+#    expected = list(list(varname = "d", colnames = NULL))
+#
+#    expect_equal(actual, expected)
+#
+#})
+
+
 test_that("basic read_faster", {
 
     code = parse(text = '

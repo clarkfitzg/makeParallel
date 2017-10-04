@@ -113,6 +113,21 @@ d[, 5] = 2
 write.csv(d, "data2.csv")  # Uses all columns of d
 ```
 
+Handle variables which are redefined. This could likely be done through a
+single static assignment (SSA) preprocessing step. For example, the
+following is problematic because we must restrict the code analysis and
+transformations to `x` before it is redefined:
+
+```{R}
+
+x = read.csv("data.csv")
+print(x[1, 1])
+x = list(1, 2, 3)
+print(x[[1]])
+
+```
+
+
 ### Nice to Have
 
 _These tasks are less critical._
