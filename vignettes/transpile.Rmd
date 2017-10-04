@@ -73,8 +73,26 @@ read_faster(parse(text = '
     hist(d[, rpois(1, 1)])
 '), "d")
 
+```
+
+### Inferring column names
+
+If the code does not use subsets based on column names then it doesn't
+matter what the column names are. 
+
+If the column names are initially specified, ie:
+
+```{R, eval = FALSE}
+
+d = read.table("data.csv", col.names = c("a", "b", "c"))
 
 ```
+
+then we know the column names.
+
+Lastly, if `header = TRUE` we can try to look at the data itself to infer
+the column names. We can only try, because the location of the data may
+not be the same as the location where `read_faster()` is called.
 
 
 ## Future Work
@@ -121,7 +139,7 @@ a = b = read.csv("data.csv")
 ```
 
 Further column selection operations including non standard evaluation such
-as using `subset`.
+as using `subset`, or `lm(y ~ x, data)`.
 
 TODO: Return to this point, continue editing down into user facing manual.
 Design stuff can live in the other doc.

@@ -66,6 +66,26 @@ test_that("basic read_faster", {
 })
 
 
+test_that("inference of variable arguments", {
+
+    code = parse(text = '
+        d = read.csv("data.csv")
+        hist(d[, 2])
+    ')
+
+    expected = parse(text = '
+        d = data.table::fread("data.csv", select = 2L)
+        hist(d[, 1L])
+    ')
+
+    actual = read_faster(code)
+
+    expect_equal(actual, expected)
+
+
+})
+
+
 test_that("read_faster with nested subsetting and $, [, [[", {
 
     code = parse(text = '
