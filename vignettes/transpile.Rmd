@@ -7,38 +7,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Todo: Data analysis workflow where at first you're not sure what you want.
-
-Idea: You could even work totally in the interpreter, and provide a
-function such as `save_last_statement()`. This function would look through all
-previous correct statements executed through the interpreter and use them
-to create the minimal script necessary to reproduce that last statement.
-The idea is that as you explore a data set you probably enter many more
-statemenets than you actually need, because you're not sure at first what
-you're after.
-
-Idea: Can we load only columns of a `data.frame` with R's `load` / `save`
-commands?
-
-Idea: `remove_nse()` function to replace nonstandard evaluation with
-equivalant standard evaluation call. Transforms `subset(mtcars, select = mpg)` into 
-`mtcars[, "mpg", drop = FALSE]`
-
-Idea: The idea of intrinsically useful statments keeps coming back. For
-example, one may have `head(dframe)` written somewhere in the code. This
-implies that all columns of `dframe` are needed. But it's likely the case
-that one never actually needed that call to `head(dframe)`; it was just
-being inspected interactively. Then it can be removed from the final
-product. So this would be another useful preprocessing step. As it stands,
-let's assume that this preprocessing has happened, so that all statements
-are strictly necessary.
-
-# Transpile
-
 _Transpile_ here refers to translating and changing code to make it more
 efficient. Consider this simple script:
 
-```{R}
+```{R, eval = FALSE}
 
 d = read.csv("data.csv")
 
@@ -54,374 +26,62 @@ never used.
 In general we'd like to do all the preprocessing as early as possible,
 saving only what we need.
 
-## Example
-
-TODO: cut this out into a blog post
-
-Consider the `CargoDescriptions2015.csv` data set. This is a 5.3 GB file
-with 5 columns describing goods which arrived in the United States via shipping
-containers in 2015.  
-
-### data.table
-
-Suppose we want to count the number of unique
-containers. The naive way is to read in the entire data set. Using the high
-performance multi-threaded `fread` function from `data.table`.
-
 ```{R}
 
-system.time(cargo <- data.table::fread("~/data/CargoDescriptions2015.csv"))
+library(autoparallel)
+
+script = parse(text = '
+    d = read.csv("data.csv")
+    hist(d[, 2])
+    ')
+
+# TODO: Infer and remove 2nd argument.
+read_faster(script, "d")
 
 ```
 
-This takes 2 minutes, 35 seconds on a 2016 Macbook Pro with 8 cores and
-uses 5.5 GB of memory in the R process.
 
-Since we're already using `data.table` lets use that to answer the original
-question.
+## Static Analysis
 
-```{R}
+`read_faster()` uses static code analysis to infer which columns are
+required to run the complete script.  For example, we can statically
+analyze literals and evaluate simple functions such as `c()`:
 
-system.time(num_container <- uniqueN(cargo[, "container_number"]))
-
-nrow(cargo) / num_container
-
-```
-
-This takes between 9 and 10 seconds. We see that on average each container
-appears about 5 times.
-
-Can we do this faster with `data.table` by reading in only a subset of the
-columns? To realistically time this we first need to remove this file from
-the file cache.
-
-```
-
-$ vmtouch -ve ~/data/CargoDescriptions2015.csv
-
-Evicting CargoDescriptions2015.csv
-
-           Files: 1
-     Directories: 0
-   Evicted Pages: 1383045 (5G)
-         Elapsed: 0.24117 seconds
-```
-
-Now lets see how long `data.table` takes to read just the columns that we
-need.
-
-```{R}
-
-system.time(containers <- data.table::fread("~/data/CargoDescriptions2015.csv"
-                    , select = "container_number", nThread = 4L))
-
-#   Mon Sep 25 09:56:55 PDT 2017
-#
-#   user  system elapsed
-#   107.664   5.942  32.428
-#   user  system elapsed
-#   110.753   6.008  33.163
-
-system.time(num_container <- uniqueN(containers))
-
-```
-
-Selecting the column at the data load step reduces the load time from 2.5
-minutes to about 32 seconds. This brings the total program run time from
-165 seconds to around 40 seconds.
-
-Subsequent timings of this read in the same R session are much faster, even
-after forcing the file out of cache. I believe the reason for this is
-because on subsequent reads all the unique strings have already been stored
-in R's internal string / integer table. This would be simple enough to
-verify experimentally.
-
-The moral of the story is that the exact same calculations
-can be computed more efficiently if we know ahead of time what is necessary.
-
-
-### disk speed
-
-Side note: this requires a full scan of a file that's around 5 GB. It
-happened in 33 seconds. The file was not cached in memory. This means my
-laptop SSD is able to load data into memory with a rate of at least 5 GB /
-33 seconds = 150 MB / second. This sounds reasonable, but can I verify?
-
-Mon Sep 25 10:06:12 PDT 2017
-
-```
-
-$ vmtouch -ve ~/data/CargoDescriptions2015.csv
-Evicting /Users/clark/data/CargoDescriptions2015.csv
-
-           Files: 1
-     Directories: 0
-   Evicted Pages: 1383045 (5G)
-         Elapsed: 0.38839 seconds
-
-$ vmtouch -t ~/data/CargoDescriptions2015.csv
-           Files: 1
-     Directories: 0
-   Touched Pages: 1383045 (5G)
-         Elapsed: 7.9652 seconds
-```
-
-Just came back to this and found that vmtouch can load this file into
-cached memory in 8 seconds, implying a rate of 625 MB / second. 
-
-
-### base R
-
-For comparison, let's measure the same operation in base R. We can select
-the columns we need through the `colClasses` parameter to `read.table`.
-
-```{R}
-
-# 607 seconds
-system.time(cargo <- read.table("~/data/CargoDescriptions2015.csv"
-    , header = TRUE, sep = ",", quote = "\"", comment.char = ""
-    , colClasses = c("numeric", "character", "integer", "integer", "character")
-    ))
-
-# 493 seconds
-system.time(containers <- read.table("~/data/CargoDescriptions2015.csv"
-    , header = TRUE, sep = ",", quote = "\"", comment.char = ""
-    , colClasses = c("NULL", "character", "NULL", "NULL", "NULL")
-    ))
-
-# 2.96 seconds. 3X faster in base R than data.table.
-system.time(num_container <- length(unique(containers[, 1])))
-
-```
-
-These read times suggest that perhaps it would be desirable to just transform
-regular R code into `data.table` or `iotools` if IO is the bottleneck.
-
-
-### with shell preprocessing
-
-Another way to potentially make R faster is to use the shell to select the
-column of interest.
-This approach is less robust than the others because it is unlikely to
-handle corner cases well, ie. escape characters and quoted strings
-containing the delimiter character.
-
-Running on the above data set I see issues with 
-value `"SACRAMENTO,"`, which gets incorrectly cut to
-`"SACRAMENTO`.
-
-I'm expecting 43754131 observations.
-
-```{R}
-
-system.time(containers <- read.table(
-    pipe("cut -d , -f 2 ~/data/CargoDescriptions2015.csv")
-    , header = TRUE, sep = ",", quote = "\"", comment.char = ""
-    , colClasses = "character"
-))
-
-# Didn't work:
-#
-#Warning message:
-#In scan(file = file, what = what, sep = sep, quote = quote, dec = dec,  :
-#  EOF within quoted string
-#  > dim(containers)
-#  [1] 8294588       1
-#
-
-system.time(containers2 <- scan(
-    pipe("cut -d , -f 2 ~/data/CargoDescriptions2015.csv")
-    , what = character(), skip = 1, sep = "\n"
-))
-# Read 43754131 items
-#    user  system elapsed
-#    147.888   2.216  97.881
-
-length(containers2)
-
-```
-
-The second command seems to work, with the caveats above. This takes base R down
-from 493 seconds to 98 seconds, a factor of 5. It also should use much less
-memory because R only ever sees the column that it needs. `data.table` is still 
-3 times faster than this and much more robust.
-
-If I'm going to do something like this automatically I need to be able to
-create these `cut` commands. It would be better to rely on as few external
-dependencies as possible, bash `cut` is not available on Windows. What if I
-used Python?  That's another external dependency. It wouldn't surprise me
-if it was as fast here as the cut command. Now I'm curious.
-
-```{R}
-
-system.time(containers2 <- scan(
-    pipe("python ~/data/select_column.py ~/data/CargoDescriptions2015.csv 2")
-    , what = character(), skip = 1, sep = "\n"
-))
-# Read 43754131 items
-#    user  system elapsed
-#    188.837   2.993 138.850
-
-```
-
-Of course introducing a dependency on another programming language is far
-from ideal. I wonder if there's a way to pipe the R commands to get
-pipeline parallelism?  Judging by the user and elapsed times here we did
-get some pipeline parallelism, both for the Bash and Python approaches.
-
-What is the limiting factor here? Preprocessing or other?
-I can find best case performance by creating another file with only the
-column of interest and then reading that.
-
-```{R}
-
-N = 43754131 
-
-system.time(containers2 <- scan("~/data/container_number.csv"
-    , what = character(), skip = 1, sep = "\n", n = N
-))
-
-# Read 43754131 items
-#    user  system elapsed
-#     70.371   0.517  70.899
-
-
-# scan() seems to have three parameters similar to `n`
-system.time(containers2 <- scan("~/data/container_number.csv"
-    , what = character(), skip = 1, sep = "\n", n = N, nlines = N
-))
-# Read 43754131 items
-#    user  system elapsed
-#     70.721   0.537  71.273
-
-
-```
-
-The times above are consistent even when I remove the file from cache. This
-makes sense based on what I saw above with `data.table`. Then around 70
-seconds is a lower bound for how fast this load can happen with `scan`. The
-Python and bash `cut` versions are 2 to 3 times slower than this.
-
-
-## Design
-
-If external packages such as `data.table` are being used, can we preserve
-these calls? This requires understanding the semantics of the library functions
-to use. So we'd have to do it custom for every package that we depend on.
-Unless these packages provide drop in replacement for the target
-statements.
-
-More generally we could keep the calls that read everything in and then
-remove what we don't need immediately after. Call this the "general
-approach" This helps with saving memory,
-but probably won't help with performance otherwise. In other words, we
-might see a difference if we're up against memory limits.
-
-__Possible Use Cases__
-
-- Reducing memory footprint
-- Increasing speed
-Or should I just pick one?  Only for reading data?  And should I just
-depend on and tie myself to data.table?
-
-Ideally I don't make this specific to data.table.
-
-Suppose I take the general approach. In which cases will this help with
-memory pressure? The goal is to avoid making copies of a large data frame.
-I need to experiment to see exactly when this happens.
-
-The experiment shows that the unused columns in a data frame will not be
-copied. For a matrix they should be, but in my experience people are
-more likely to use a subset of the columns of a data frame versus a matrix.
-
-In the general case we read in the unused columns and then never copy them. 
-The only way this can alleviate memory pressure is if the program meets the
-following conditions:
-
-1. Has enough memory to contain the whole object in the first place
-2. Subsequently requires more memory than is available
-
-This seems rare to me.
-
-
-## Assumptions
-
-Assume that column selections can be inferred by static code analysis. For
-example, we can statically analyze the following:
-
-```{R}
-# Literals
-mtcars[, 1L]
+```{R, eval = FALSE}
+mtcars[, c(1L, 3L)]
 mtcars[, "mpg"]
 mtcars$mpg
+```
 
-# Variables defined from literals. This use case requires
-# constant propagation
+Through constant propagation we can also handle variables defined from
+literals:
+
+```{R, eval = FALSE}
 cols = c("cyl", disp")
 mtcars[, cols]
 ```
 
-While we cannot statically analyze these:
-```{R}
+While we cannot statically analyze code where the value isn't known until
+runtime.
 
-# Computed columns
-col = read.csv("something_external.csv")[1, 1]
-mtcars[, col]
+```{R, eval = FALSE}
 
-# Random columns
-mtcars[, min(rpois(1, 1) + 1, ncol(mtcars))]
-```
+# TODO: Decide. Currently this fails, but could just as easily have it be a
+# warning.
+read_faster(parse(text = '
+    d = read.csv("data.csv")
+    hist(d[, rpois(1, 1)])
+'), "d")
 
-So we assume that column selection is a literal after constant
-propagation.
-
-
-## Design For Minimal Use Case
-
-I'm going to start off getting something common and simple to work, and
-then generalize from there. The example from the beginning is as simple as
-possible.
-
-```{R}
-
-d = read.csv("data.csv")
-
-hist(d[, 2])
 
 ```
 
-This should be transformed to the following:
 
-```{R}
+## Future Work
 
-d = data.table::fread("data.csv", select = 2)
+### Necessary 
 
-hist(d[, 1])
-
-```
-
-__Basic Steps__ Necessary for the minimal use case to work
-
-1. Infer that a data frame `d` is created by a call to `read.csv()`
-2. Identify all calls which subset `d` and transform them into a common
-   form.
-4. Find `usedcolumns` the set of all columns which are used
-5. Transform the `read.csv(...)` call into `data.table::fread(..., select =
-   usedcolumns)`
-6. Transform the calls which subset `d` into new indices.
-
-
-__More Advanced__ Functionality going beyond the minimal use case. I'll
-think about these once the basics are working.
-
-Account for indirect use of variables. The following should infer that the
-4th column is used.
-
-```{R}
-d = read.csv("data.csv")
-d2 = d * 2
-d2[, 4]
-```
+_These tasks should be completed before a public release._
 
 Verify the indices subsetting `d` can be computed at the time of
 static analysis.
@@ -433,6 +93,19 @@ example:
 d = read.csv("data.csv")
 d[, 5] = 2
 write.csv(d, "data2.csv")  # Uses all columns of d
+```
+
+### Nice to Have
+
+_These tasks are less critical._
+
+Account for indirect use of variables. The following should infer that the
+4th column is used.
+
+```{R, eval = FALSE}
+d = read.csv("data.csv")
+d2 = d * 2
+d2[, 4]
 ```
 
 Read subsets without corresponding variable assignments, for example:
@@ -447,6 +120,11 @@ More complicated forms of assignment
 a = b = read.csv("data.csv")
 ```
 
+Further column selection operations including non standard evaluation such
+as using `subset`.
+
+TODO: Return to this point, continue editing down into user facing manual.
+Design stuff can live in the other doc.
 
 ## Implementation
 

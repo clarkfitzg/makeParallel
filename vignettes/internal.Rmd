@@ -30,6 +30,32 @@ Are there cheaper ways to share read only copies of objects between
 processes in R? There's `bigmemory`, but what about something a little more
 generalized like the plasma object store?
 
+Data analysis workflow where at first you're not sure what you want.
+
+Idea: You could even work totally in the interpreter, and provide a
+function such as `save_last_statement()`. This function would look through all
+previous correct statements executed through the interpreter and use them
+to create the minimal script necessary to reproduce that last statement.
+The idea is that as you explore a data set you probably enter many more
+statemenets than you actually need, because you're not sure at first what
+you're after.
+
+Idea: Can we load only columns of a `data.frame` with R's `load` / `save`
+commands?
+
+Idea: `remove_nse()` function to replace nonstandard evaluation with
+equivalant standard evaluation call. Transforms `subset(mtcars, select = mpg)` into 
+`mtcars[, "mpg", drop = FALSE]`
+
+Idea: The idea of intrinsically useful statments keeps coming back. For
+example, one may have `head(dframe)` written somewhere in the code. This
+implies that all columns of `dframe` are needed. But it's likely the case
+that one never actually needed that call to `head(dframe)`; it was just
+being inspected interactively. Then it can be removed from the final
+product. So this would be another useful preprocessing step. As it stands,
+let's assume that this preprocessing has happened, so that all statements
+are strictly necessary.
+
 
 # Assumptions
 
@@ -46,3 +72,320 @@ example:
   iterative updates. Otherwise they should be `lapply` type calls.
 
 This can probably be done through preprocessing.
+
+
+# Transpile
+
+_Transpile_ here refers to translating and changing code to make it more
+efficient. Consider this simple script:
+
+```{R, eval = FALSE}
+
+d = read.csv("data.csv")
+
+hist(d[, 1])
+
+```
+
+This script only uses the first column of `d`, which means that all the
+other columns were unnecessary. If `data.csv` is sufficiently large then
+this program will spend an excessive amount of time reading data that are
+never used.
+
+In general we'd like to do all the preprocessing as early as possible,
+saving only what we need.
+
+## Design
+
+If external packages such as `data.table` are being used, can we preserve
+these calls? This requires understanding the semantics of the library functions
+to use. So we'd have to do it custom for every package that we depend on.
+Unless these packages provide drop in replacement for the target
+statements.
+
+More generally we could keep the calls that read everything in and then
+remove what we don't need immediately after. Call this the "general
+approach" This helps with saving memory,
+but probably won't help with performance otherwise. In other words, we
+might see a difference if we're up against memory limits.
+
+__Possible Use Cases__
+
+- Reducing memory footprint
+- Increasing speed
+Or should I just pick one?  Only for reading data?  And should I just
+depend on and tie myself to data.table?
+
+Ideally I don't make this specific to data.table.
+
+Suppose I take the general approach. In which cases will this help with
+memory pressure? The goal is to avoid making copies of a large data frame.
+I need to experiment to see exactly when this happens.
+
+The experiment shows that the unused columns in a data frame will not be
+copied. For a matrix they should be, but in my experience people are
+more likely to use a subset of the columns of a data frame versus a matrix.
+
+In the general case we read in the unused columns and then never copy them. 
+The only way this can alleviate memory pressure is if the program meets the
+following conditions:
+
+1. Has enough memory to contain the whole object in the first place
+2. Subsequently requires more memory than is available
+
+This seems rare to me.
+
+
+## Assumptions
+
+Assume that column selections can be inferred by static code analysis. For
+example, we can statically analyze the following:
+
+```{R}
+# Literals
+mtcars[, 1L]
+mtcars[, "mpg"]
+mtcars$mpg
+
+# Variables defined from literals. This use case requires
+# constant propagation
+cols = c("cyl", disp")
+mtcars[, cols]
+```
+
+While we cannot statically analyze these:
+```{R}
+
+# Computed columns
+col = read.csv("something_external.csv")[1, 1]
+mtcars[, col]
+
+# Random columns
+mtcars[, min(rpois(1, 1) + 1, ncol(mtcars))]
+```
+
+So we assume that column selection is a literal after constant
+propagation.
+
+
+## Design For Minimal Use Case
+
+I'm going to start off getting something common and simple to work, and
+then generalize from there. The example from the beginning is as simple as
+possible.
+
+```{R}
+
+d = read.csv("data.csv")
+
+hist(d[, 2])
+
+```
+
+This should be transformed to the following:
+
+```{R}
+
+d = data.table::fread("data.csv", select = 2)
+
+hist(d[, 1])
+
+```
+
+__Basic Steps__ Necessary for the minimal use case to work
+
+1. Infer that a data frame `d` is created by a call to `read.csv()`
+2. Identify all calls which subset `d` and transform them into a common
+   form.
+4. Find `usedcolumns` the set of all columns which are used
+5. Transform the `read.csv(...)` call into `data.table::fread(..., select =
+   usedcolumns)`
+6. Transform the calls which subset `d` into new indices.
+
+
+__More Advanced__ Functionality going beyond the minimal use case. I'll
+think about these once the basics are working.
+
+Account for indirect use of variables. The following should infer that the
+4th column is used.
+
+```{R}
+d = read.csv("data.csv")
+d2 = d * 2
+d2[, 4]
+```
+
+Verify the indices subsetting `d` can be computed at the time of
+static analysis.
+
+Check if any commands imply that the whole data set must be loaded. For
+example:
+
+```{R}
+d = read.csv("data.csv")
+d[, 5] = 2
+write.csv(d, "data2.csv")  # Uses all columns of d
+```
+
+Read subsets without corresponding variable assignments, for example:
+
+```{R}
+hist(read.csv("data.csv")[, 2])
+```
+
+More complicated forms of assignment
+
+```{R}
+a = b = read.csv("data.csv")
+```
+
+
+## Implementation
+
+How can we tell which columns are used?
+
+
+Fri Sep 22 10:31:23 PDT 2017
+
+For the moment I'm ignoring NSE such as `subset`.
+
+Thinking now that it's fine to depend on `data.table`.
+`data.table::fread` has a `select` parameter for column names. It would be
+more convenient for our purposes here if `select` took an integer vector of
+the column indices instead. Indices are more general because:
+
+- Not every text file has column names
+- Not every data frame has meaningful column names
+- Column names may not be unique
+
+One approach is to take all the uses of column names and map them into
+integers.
+The code will go through three representations then:
+
+__Original__ including mixed names and integers:
+
+```{R}
+
+mpg = mtcars$mpg
+cyl = mtcars[, 2]
+disp = mtcars[, "disp"]
+wt = mtcars[[5]]
+
+```
+
+__Name Replacement__ substitutes the names with integers, and converts all
+`data.frame` subsetting commands into single `[`. Assume that we know the
+column names.
+
+```{R}
+
+mpg = mtcars[, 1]
+cyl = mtcars[, 2]
+disp = mtcars[, 3]
+wt = mtcars[, 5]
+
+```
+
+As we replace names we can update the set of variables which are used, so that
+after processing all statements we know which are used.
+
+
+__Subset mapping__ maps the original indices to corresponding indices in the
+smaller `data.frame`. The index map is a sorted integer vector of the
+columns that are used. This step cannot happen with the previous because
+it's necessary to first know all the columns which will be used.
+
+```{R}
+
+index_map = c(1, 2, 3, 5)
+
+# Suppose fread supports integers here
+.mtcars = fread(..., select = index_map)
+
+mpg = .mtcars[, 1]
+cyl = .mtcars[, 2]
+disp = .mtcars[, 3]
+wt = .mtcars[, 4]   # This one changes
+
+```
+
+## Details
+
+__Nested subsetting__
+
+Suppose that `x` is the data frame of interest. Consider the following
+reasonable code:
+
+```
+x[x[, "d"] > 10, "b"]
+```
+
+Replacing names gives us the following in standard form:
+
+x[x[, 4] > 10, 2]
+
+Because there is nested subsetting we need to respect the structure of the
+parse tree to correctly substitute these variables with indices.
+
+TODO: What is the issue in my mind? I don't want this to happen:
+```
+# First step updates the inner
+x[x[, 4] > 10, "b"]
+
+# Second step updates the outer based on the original statement
+x[x[, "d"] > 10, 2]
+```
+
+This leaves us with the task of having to merge the parse trees. We
+definitely want to avoid this. So we need to update the tree in place,
+incrementally. In the more general case it may happen that the locations of
+the parse tree change as it is modified.  Then we'll need a way to guarantee
+that nothing is overwritten. Maybe applying the changes depth first?
+
+
+## Limitations
+
+What are the limitations of the approach that I've just outlined? 
+
+It's really only designed for data frames. So it would be a little
+dangerous if I _think_ something is a data frame, when in fact it's a list.
+Then if I replace `[[` and `$` with `[` it won't work. I can get around
+this by focusing on functions that return data frames, for example
+`read.csv()`.
+
+I haven't yet considered subsetting rows, there may be a way to do that
+efficiently.  A common way is to subset based on the value of some column.
+I could do this by keeping on open file pointer, reading a chunk of the
+data, subset it, add that subset to a list, then rbind the subsets
+together. This potentially lets R quickly process files larger than memory.
+
+How to get every column which is used when new copies of the data frame
+are created? For example:
+
+```{R}
+
+mtcars2 = mtcars[possible_subset, ]
+
+# Now `gear` column must be read in.
+mtcars2$gear
+
+```
+
+Stepping back, R has many ways to write programs. To simplify tasks here we
+first put the code into a canonical form, and then do "surgery" on it.
+
+
+## Side Notes
+
+
+info = lapply(code, CodeDepends::getInputs)
+
+# The CodeDepends output says when `read.csv` func is called, which is
+# helpful. But it doesn't let me see if the result of `read.csv` is
+# assigned to a variable, which is what I need.
+
+code2 = quote(x <- rnorm(n = read.csv("data.csv")))
+
+CodeDepends::getInputs(code2)
+
+

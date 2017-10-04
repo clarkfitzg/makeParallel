@@ -81,7 +81,6 @@ print.parallel_evaluator = function(x)
 {
     cat("parallel evaluator", "\n")
     cat("variable: ", attr(x, "varname"), "\n")
-    cat(formals(x), "\n")
 }
 
 

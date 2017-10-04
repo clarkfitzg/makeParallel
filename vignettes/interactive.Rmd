@@ -62,6 +62,8 @@ do(y + z, verbose = TRUE)
 
 ```
 
+## Interactive
+
 This is designed for interactively building functions and analysis on large
 data sets, or data sets that take too long to run. The interactive feature
 is sending variables, including functions, from the manager's global
@@ -83,6 +85,9 @@ myfun = function(x) x[1:4]
 do(lapply(x, myfun))
 
 ```
+
+The user does not have to explicitly and manually send the variables over.
+
 
 ## Limitations
 
@@ -110,9 +115,6 @@ Under the hood, the evaluator is a closure with a couple attributes. The
 most notable attributes are the variable name and the cluster. We can
 inspect all this by printing the evaluator as a function.
 
-Under the hood `do` sent the code to different R processes for
-evaluation. 
-
 ```{R}
 
 print.function(do)
@@ -128,10 +130,14 @@ do(lapply(x, head), simplify = FALSE)
 
 ```
 
+`do` sent the code to 2 different R processes for evaluation, so we will
+always see a list of length 2 before the results are simplified.
+
 
 ## Cleaning up
 
-When finished it's a good idea to shut down the cluster.
+When finished it's a good idea to shut down the cluster. This also happens
+automatically when the R session is terminated.
 The cluster is an attribute on the evaluator.
 
 ```{r}
@@ -178,7 +184,10 @@ do = parallelize(filenames)
 ```
 
 The following code actually loads the data contained in the files and
-assigns the result into `appeals` on the cluster. 
+assigns the result into `appeals` on the cluster. It's efficient because
+the reads happen in parallel, rather than creating a bottleneck in the
+manager process. Furthermore, by having the workers do their own loading we
+do not have to serialize the data between processes..
 
 ```{r}
 
@@ -215,7 +224,8 @@ do(ten + 1, verbose = TRUE)
 ```
 
 The evaluator allows us to execute the same code that is
-used for serial R. In this case 
+used for serial R. Again, we see a vector of length 2 because we're running
+the code on chunks of the data residing in 2 R processes.
 
 ```{r}
 
