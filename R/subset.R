@@ -10,8 +10,6 @@
 #    usedcolumns)`
 # 6. Transform the calls which subset `d` into new indices.
 
-assigners = c("<-", "=", "assign")
-
 
 #' 1. Infer that a data frame is created by a call to `read.csv()`
 #'
@@ -89,12 +87,14 @@ readers = c("read.csv", "read.table")
 read_faster = function(expression, varname = NULL, colnames = NULL)
 {
 
+    nulls = c(is.null(varname), is.null(colnames))
+
     # Easy out if both are specified
-    if(is.null(varname) && is.null(colnames)){
+    if(all(!nulls)){
         return(read_faster_work(expression, varname, colnames))
     }
 
-    if(is.null(varname) || is.null(colnames)){
+    if(any(!nulls)){
         stop("Must specify both varname and colnames.")
     }
 

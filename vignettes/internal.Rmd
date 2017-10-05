@@ -343,6 +343,26 @@ the parse tree change as it is modified.  Then we'll need a way to guarantee
 that nothing is overwritten. Maybe applying the changes depth first?
 
 
+__Algorithm For Code Modification__
+
+The goal is to automate this to the greatest extent possible.
+Here's the approach:
+
+1. Find every instance of the calls to be replaced, ie. `read.csv()` and
+   `read.table()`. These calls should return data frames.
+2. For each call to be replaced, do the following:
+   1. Check that the output of the call is assigned to a variable. If not,
+      then proceed to the next iteration. If so, then call that variable
+      `var`.
+   2. Attempt to infer the column names for `var`. This may be discovered
+      in the read call, ie. `read.table("data.txt", col.names = c("a",
+      "b")), or it 
+   2. Find all uses of `var` in the code following the assignment. 
+   3. Transform calls that subset `var` into a common form: `var[, int]`
+      where `int` is an integer vector.
+
+colnames?
+
 ## Limitations
 
 What are the limitations of the approach that I've just outlined? 
