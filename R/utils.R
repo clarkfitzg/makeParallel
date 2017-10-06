@@ -2,10 +2,10 @@
 NULL
 
 
-# TODO:
 #' Test Expressions For Equality
 same_expr = function(e1, e2)
 {
+    all(mapply(`==`, e1, e2))
 }
 
 
