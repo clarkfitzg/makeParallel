@@ -125,7 +125,9 @@ read_faster = function(expression, varname = NULL, colnames = NULL)
 #' c("a", "b", "c")} this returns \code{c("a", "b", "c")}. If \code{header
 #' = TRUE} it attempts to look for the file to read the column names.
 #'
-#' @return character vector of column names
+#'
+#' @return character vector of column names, or NULL if they can't be
+#'  determined
 infer_colnames = function(expression)
 {
 
@@ -135,6 +137,16 @@ infer_colnames = function(expression)
         return(eval_literal(passed))
     }
 
+    # Attempt to read the header of the actual file.
+    try({
+        e2 = expression
+        e2[["nrows"]] = 1L
+        # Fails if the file can't be read
+        dframe = eval_literal(e2)
+        return(colnames(dframe))
+    })
+
+    # Column names are unknown
     NULL
 }
 
