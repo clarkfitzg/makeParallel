@@ -70,6 +70,18 @@ test_that("infer_colnames", {
 
     expect_equal(actual, c("a", "b"))
     
+    #fname = system.file("tests/testthat/tiny.csv", package = "autoparallel")
+    #code = substitute(quote(read.csv(fname)))
+    code = quote(read.csv("tiny.csv"))
+    actual = infer_colnames(code)
+
+    expect_equal(actual, c("one", "two", "three"))
+
+    code = quote(read.csv("some_file_that_doesnt_exist"))
+    actual = infer_colnames(code)
+
+    expect_null(actual, c("one", "two", "three"))
+
 })
 
 

@@ -135,6 +135,7 @@ infer_colnames = function(expression)
         return(eval_literal(passed))
     }
 
+    NULL
 }
 
 
