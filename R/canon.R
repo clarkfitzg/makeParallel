@@ -14,8 +14,9 @@
 #'
 #' @param statement code which may or may not be subsetting the data frame
 #' @param varname string containing name of data frame
+#' @param colnames optional character vector mapping names to integers
 #' @return list with all relevant information
-canon_form = function(statement, varname, colnames)
+canon_form = function(statement, varname, colnames = NULL)
 {
     transformed = statement
     column_indices = integer()
@@ -112,6 +113,9 @@ canon_form = function(statement, varname, colnames)
 #' is a data.frame.
 dollar_to_ssb = function(statement, colnames)
 {
+    if(is.null(colnames)){
+        stop("colnames has not been specified, cannot replace names")
+    }
     template = quote(dframe[, index])
     column_name = deparse(statement[[3]])
     column_index = which(colnames == column_name)[1]
@@ -134,6 +138,9 @@ double_to_ssb = function(statement, colnames)
         if(length(column) > 1) stop("Recursive indexing not currently supported")
         as.integer(column)
     } else if(is.character(column)){
+        if(is.null(colnames)){
+            stop("colnames has not been specified, cannot replace names")
+        }
         which(colnames == column)[1]
     } else {
         stop("Expected character or numeric for `[[` indexing")
@@ -163,6 +170,9 @@ single_to_ssb = function(statement, colnames)
     column_index = if(is.numeric(column)){
         as.integer(column)
     } else if(is.character(column)){
+        if(is.null(colnames)){
+            stop("colnames has not been specified, cannot replace names")
+        }
         which(colnames %in% column)
     } else {
         stop("Expected character or numeric for `[` indexing")

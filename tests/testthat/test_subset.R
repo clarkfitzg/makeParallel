@@ -94,6 +94,7 @@ test_that("basic read_faster", {
     ')
 
     actual = read_faster(code, varname = "d", colnames = letters)
+    actual2 = read_faster(code)
 
     expected = parse(text = '
         d = data.table::fread("data.csv", select = 2L)
@@ -101,6 +102,7 @@ test_that("basic read_faster", {
     ')
 
     expect_equal(actual, expected)
+    expect_equal(actual2, expected)
 
 })
 

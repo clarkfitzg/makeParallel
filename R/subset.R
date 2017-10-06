@@ -106,11 +106,7 @@ read_faster = function(expression, varname = NULL, colnames = NULL)
             possible_assign = expression[[loc[-c(depth - 1, depth)]]]
             if(as.character(possible_assign[[1]]) %in% assigners){
                 varname = possible_assign[[2]]
-                colnames = infer_colnames[[3]]
-                # TODO: 
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-# INFER COLNAMES
-#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                colnames = infer_colnames(possible_assign[[3]])
                 out = read_faster_work(out, varname, colnames = colnames)
             }
         }
@@ -124,7 +120,6 @@ read_faster = function(expression, varname = NULL, colnames = NULL)
 #' Given an expression such as \code{read.table("data.txt", col.names =
 #' c("a", "b", "c")} this returns \code{c("a", "b", "c")}. If \code{header
 #' = TRUE} it attempts to look for the file to read the column names.
-#'
 #'
 #' @return character vector of column names, or NULL if they can't be
 #'  determined
