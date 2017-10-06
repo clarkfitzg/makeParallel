@@ -133,12 +133,17 @@ infer_colnames = function(expression)
     }
 
     # Attempt to read the header of the actual file.
-    try({
+    tryCatch({
         e2 = expression
         e2[["nrows"]] = 1L
-        # Fails if the file can't be read
         dframe = eval_literal(e2)
         return(colnames(dframe))
+    }, error = function(e) {
+        # If the file doesn't exist then raise the error. Otherwise,
+        # there's a different problem.
+        if(!grepl("cannot open the connection", e)){
+            stop(e)
+        }
     })
 
     # Column names are unknown
