@@ -63,6 +63,17 @@ test_that("to_fread", {
 #})
 
 
+test_that("infer_colnames", {
+
+    code = quote(read.table("data.csv", col.names = c("a", "b")))
+    actual = infer_colnames(code)
+
+    expect_equal(actual, c("a", "b"))
+    
+})
+
+
+
 test_that("basic read_faster", {
 
     code = parse(text = '

@@ -60,7 +60,7 @@ update_indices = function(statement, index_locs, index_map)
         # just substituting, because the meaning could potentially change.
         # I'm thinking of something like seq(1, 20, by = 4)
 
-        original = eval(statement[[loc]])
+        original = eval_literal(statement[[loc]])
         converted = sapply(original, function(x) which(x == index_map))
         statement[[loc]] = converted
     }
@@ -106,11 +106,12 @@ read_faster = function(expression, varname = NULL, colnames = NULL)
             possible_assign = expression[[loc[-c(depth - 1, depth)]]]
             if(as.character(possible_assign[[1]]) %in% assigners){
                 varname = possible_assign[[2]]
+                colnames = infer_colnames[[3]]
                 # TODO: 
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 # INFER COLNAMES
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                out = read_faster_work(out, varname, colnames = letters)
+                out = read_faster_work(out, varname, colnames = colnames)
             }
         }
     }
@@ -118,13 +119,22 @@ read_faster = function(expression, varname = NULL, colnames = NULL)
 }
 
 
-#' Infer Names And Columns Of Data Frames
+#' Infer Column Names
 #'
+#' Given an expression such as \code{read.table("data.txt", col.names =
+#' c("a", "b", "c")} this returns \code{c("a", "b", "c")}. If \code{header
+#' = TRUE} it attempts to look for the file to read the column names.
 #'
-#' @return list, with each element a list containing data frame variable
-#'  names and column names
-infer_read_var = function(expression)
+#' @return character vector of column names
+infer_colnames = function(expression)
 {
+
+    # Easy case when they are passed explicitly to the read call.
+    passed = expression[["col.names"]]
+    if(!is.null(passed)){
+        return(eval_literal(passed))
+    }
+
 }
 
 

@@ -156,3 +156,11 @@ even_split = function(n_elements, n_groups)
     splits = rep(seq(n_groups), (n_elements %/% n_groups) + 1)
     sort(splits[1:n_elements])
 }
+
+
+#' Evaluate Simple R Expressions
+eval_literal = function(code)
+{
+    # TODO: Implement me!
+    eval(code)
+}
