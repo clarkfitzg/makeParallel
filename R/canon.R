@@ -91,6 +91,17 @@ canon_form = function(statement, varname, colnames = NULL)
 }
 
 
+#' Check for and handle missing column names
+handle_missing_colnames = function(colnames)
+{
+    if(is.null(colnames)){
+        stop("
+The colnames are needed, but cannot be determined.
+This may be because the data file is in a different relative directory.
+")}
+    }
+
+
 # The following functions perform the work after we discover:
 #
 # 1. The location of the call ie. plot(x$y) should operate on x$y which is
@@ -113,9 +124,7 @@ canon_form = function(statement, varname, colnames = NULL)
 #' is a data.frame.
 dollar_to_ssb = function(statement, colnames)
 {
-    if(is.null(colnames)){
-        stop("colnames has not been specified, cannot replace names")
-    }
+    handle_missing_colnames(colnames)
     template = quote(dframe[, index])
     column_name = deparse(statement[[3]])
     column_index = which(colnames == column_name)[1]
@@ -138,9 +147,7 @@ double_to_ssb = function(statement, colnames)
         if(length(column) > 1) stop("Recursive indexing not currently supported")
         as.integer(column)
     } else if(is.character(column)){
-        if(is.null(colnames)){
-            stop("colnames has not been specified, cannot replace names")
-        }
+        handle_missing_colnames(colnames)
         which(colnames == column)[1]
     } else {
         stop("Expected character or numeric for `[[` indexing")
@@ -170,9 +177,7 @@ single_to_ssb = function(statement, colnames)
     column_index = if(is.numeric(column)){
         as.integer(column)
     } else if(is.character(column)){
-        if(is.null(colnames)){
-            stop("colnames has not been specified, cannot replace names")
-        }
+        handle_missing_colnames(colnames)
         which(colnames %in% column)
     } else {
         stop("Expected character or numeric for `[` indexing")

@@ -132,7 +132,7 @@ infer_colnames = function(expression)
         return(eval_literal(passed))
     }
 
-    # file is the first arg. Haven't fully thought through more general
+    # file is the first arg. Haven't fully thought about more general
     # file like objects here.
     filename = eval_literal(expression[[2L]])
 

@@ -56,6 +56,9 @@ product. So this would be another useful preprocessing step. As it stands,
 let's assume that this preprocessing has happened, so that all statements
 are strictly necessary.
 
+Idea: Transform code written with `%>%` into regular R saving intermediate
+variables so that it can be debugged.
+
 
 # Assumptions
 
@@ -348,20 +351,38 @@ __Algorithm For Code Modification__
 The goal is to automate this to the greatest extent possible.
 Here's the approach:
 
-1. Find every instance of the calls to be replaced, ie. `read.csv()` and
-   `read.table()`. These calls should return data frames.
-2. For each call to be replaced, do the following:
-   1. Check that the output of the call is assigned to a variable. If not,
-      then proceed to the next iteration. If so, then call that variable
-      `var`.
-   2. Attempt to infer the column names for `var`. This may be discovered
-      in the read call, ie. `read.table("data.txt", col.names = c("a",
-      "b")), or it 
-   2. Find all uses of `var` in the code following the assignment. 
-   3. Transform calls that subset `var` into a common form: `var[, int]`
-      where `int` is an integer vector.
+First preprocess the script.
+- Single static assignment should be used so that variables aren't written
+  over.
+- Unnecessary statements should be removed.
 
-colnames?
+Find every instance of the calls to be replaced, ie. `read.csv()` and
+`read.table()`. These calls should return data frames.
+For each call (referred to below as `readcall`) to be replaced, do the following:
+
+1. Check that the output of the call is assigned to a variable. If not,
+   then proceed to the next iteration. If so, then call that variable
+   `var`.
+2. Attempt to infer the column names for `var`. 
+   1. First check if they are passed explicitly in the read call, ie.
+      `read.table("data.txt", col.names = c("a", "b")).
+   2. If the above fails, inject the argument `nrows = 1` into the call so
+      that only 1 row is read. Attempt to evaluate the code and determine
+      the column names.  
+   3. If everything fails then record the column names as unknown.
+2. Find all uses of `var` in the code following the assignment. 
+3. Transform calls that subset `var` into a common form: `var[, i]` where
+   `i` is an integer vector. If the column names remain unknown but are
+   used to subset then raise an error.
+4. Determine `index_map`, a vector representing the set of all columns
+  of the data which were used
+5. Transform `readcall` into something of the form `data.table::fread(...,
+   select = index_map)`
+5. Use `index_map` to map the code of the form `var[, i]` into `var[, i*]`
+   representing a subset of the data frame.
+
+  
+
 
 ## Limitations
 
