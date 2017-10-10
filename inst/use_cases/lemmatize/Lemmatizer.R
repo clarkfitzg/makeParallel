@@ -1,8 +1,9 @@
 # Clark: Original file consists of 80K entries to lemmatize. They can all
 # happen in parallel.
-# The challenge to automatically parallelize this on Windows is to realize 
+# The challenge to automatically parallelize this on Windows is to know
+# what code must be executed before the main lapply function can run.
 
-# Clark- this takes about 0.5 seconds. It's 9327 words, which is much
+# Clark: this takes about 0.5 seconds. It's 9327 words, which is much
 # longer than any letter of recommendation. Do it 80K times and it becomes 11
 # hours. But Jared was talking about 100 hours for the whole dataset. What
 # am I missing?
@@ -12,12 +13,24 @@
 library(koRpus)
 # options(warn = -1)
 
+# Clark: 
 fname = "goodnightmoon.csv"
 doc = read.csv(fname, header = TRUE, stringsAsFactors = FALSE)
+
 
 # The only things you need to modify
 LemmatizerSourceDir = '/home/clark/dev/tree-tagger'   # Where the lemmatizer source files live
 
+
+# Clark: CodeDepends doesn't identify any outputs, updates, or side effects
+# based on the code below. To do this it needs to recurse inside the body
+# of the function.
+
+# Clark: This function manipulates the private environment koRpus:::.koRpus.env
+# CodeDepends doesn't help me to understand what it's doing.
+s = CodeDepends::getInputs(body(set.kRp.env))
+
+#s = CodeDepends::getInputs(quote(
 # Set the koRpus environment
 set.kRp.env(TT.cmd = "manual",
             lang = 'en',
@@ -28,6 +41,7 @@ set.kRp.env(TT.cmd = "manual",
             encoding = 'UTF-8',
             TT.options = list(path = LemmatizerSourceDir,
                               preset = 'en'))
+#))
 
 # This function will take in a character vector and output a data frame
 lemmatize = function(txt){
