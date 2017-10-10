@@ -44,6 +44,19 @@ test_that("to_fread", {
 
     expect_equal(actual, expected)
 
+    code = quote(read.csv("data.csv", col.names = c("a", "b", "c", "d")))
+    actual = to_fread(code, select = c(2L, 4L), remove_col.names = TRUE)
+
+    expect_equal(actual, expected)
+
+    # This is ambiguous if the length of the col.names is different from
+    # the length of the select. I could check and raise an error.
+    actual = to_fread(code, select = 1:4, remove_col.names = FALSE)
+
+    expected = quote(data.table::fread("data.csv"
+        , select = 1:4, col.names = c("a", "b", "c", "d")))
+
+    expect_equal(actual, expected)
 })
 
 
@@ -145,6 +158,16 @@ test_that("read_faster with nested subsetting and $, [, [[", {
 
     # The srcref info indicating the lines stays as an attribute.
     attributes(expected) = NULL
+
+    expect_true(same_expr(actual, expected))
+
+    code_implicit = parse(text = '
+        d = read.table("data.csv", col.names = c("a", "b", "c", "d", "e", "f", "g", "h"))
+        plot(d$c, d[[1]])
+        plot(d[d[, 6] > 5, 5:7])
+    ')
+
+    actual = read_faster(code_implicit)
 
     expect_true(same_expr(actual, expected))
 

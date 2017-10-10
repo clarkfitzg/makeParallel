@@ -32,12 +32,15 @@ data_read = function(statement, assigners = c("<-", "=", "assign")
 # 5. Transform the `read.csv(...)` call into `data.table::fread(..., select =
 #    usedcolumns)`
 # @xport
-to_fread = function(statement, select)
+to_fread = function(statement, select, remove_col.names = TRUE)
 {
     transformed = statement
     transformed[[1]] = quote(data.table::fread)
     # Sometimes R just makes things too easy! So happy with this:
     transformed[["select"]] = as.integer(select)
+    if(remove_col.names && !is.null(transformed[["col.names"]])){
+        transformed[["col.names"]] = NULL
+    }
     transformed
 }
 
@@ -107,7 +110,7 @@ read_faster = function(expression, varname = NULL, colnames = NULL)
             if(as.character(possible_assign[[1]]) %in% assigners){
                 varname = possible_assign[[2]]
                 colnames = infer_colnames(possible_assign[[3]])
-                out = read_faster_work(out, varname, colnames = colnames)
+                out = read_faster_work(out, varname, colnames = colnames, reader = reader)
             }
         }
     }
@@ -137,7 +140,7 @@ infer_colnames = function(expression)
     filename = eval_literal(expression[[2L]])
 
     if(file.exists(filename)){
-        # Assuming that it accepts and uses the parameter `nrow`
+        # Assuming that it accepts and uses the parameter `nrows`
         expression[["nrows"]] = 1L
         dframe = eval_literal(expression)
         return(colnames(dframe))
@@ -148,7 +151,7 @@ infer_colnames = function(expression)
 }
 
 
-read_faster_work = function(expression, varname, colnames)
+read_faster_work = function(expression, varname, colnames, reader = "read.csv")
 {
     analyzed = lapply(expression, canon_form, varname = varname, colnames = colnames)
 
@@ -168,7 +171,7 @@ read_faster_work = function(expression, varname, colnames)
     #   function since some is common across variables.
     # - Other read funcs
 
-    readlocs = find_var(output, "read.csv")
+    readlocs = find_var(output, reader)
 
     subset_read_inserted = FALSE
 
