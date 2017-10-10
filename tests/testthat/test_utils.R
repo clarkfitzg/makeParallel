@@ -53,6 +53,14 @@ test_that("find_var", {
 
     expect_equal(actual, list(c(1, 3, 1)))
 
+    expr = parse(text = '
+        f = function(end) area(sin, start, end)
+        f(x)
+    ')
+    actual = find_var(expr, "x")
+
+    expect_equal(actual, list(c(2, 2)))
+
 })
 
 

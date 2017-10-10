@@ -59,6 +59,41 @@ are strictly necessary.
 Idea: Transform code written with `%>%` into regular R saving intermediate
 variables so that it can be debugged.
 
+Is it possible to tell a priori if code uses the RNG? If we knew it didn't
+I'd feel better about evaluating it on the workers in parallel.
+
+Idea: Detecting the use of global variables inside functions and modifying
+them. For example:
+```
+x = 10
+f = function(y) y + x
+```
+This should become
+```
+x = 10
+f = function(y, .x = x) y + .x
+```
+
+Idea: Computing the same things when they can't change. Here's a real
+example:
+```
+y[f(x), 1] = y[f(x), 2]
+```
+This should become:
+```
+tmp = f(x)
+y[tmp, 1] = y[tmp, 2]
+rm(tmp)
+```
+
+More generally with the above two examples I can think of all kinds of ways
+that R code could be improved if it was written quickly or by a novice. We
+could do two things: identify things that might be mistakes, similar to
+`pyflakes`, and offer to programmatically rewrite the code.
+
+Idea: For the functions that parallelize things based on timings we could
+have a "timeout" where if it takes over a certain threshold time to run the
+whole script then we just stop and parallelize what we can from there.
 
 # Assumptions
 
@@ -415,6 +450,63 @@ mtcars2$gear
 Stepping back, R has many ways to write programs. To simplify tasks here we
 first put the code into a canonical form, and then do "surgery" on it.
 
+
+# SNOW
+
+forking is easier than SNOW clusters, since forked workers all
+have a consistent, current state. 
+
+Here's an R script:
+```
+
+code = parse(text = '
+library(MASS)
+start = 0
+f = function(end) area(sin, start, end)
+d = as.list(1:5)
+lapply(d, f)
+')
+
+# Experimenting
+autoparallel:::snow_fork(code)
+
+```
+It's not sufficient to substitute `parallel::parLapply` in for `lapply`,
+because the workers will not load the `MASS` library or have the `start`
+variable. The following works:
+
+```{R}
+
+library(parallel)
+cl = makeCluster(2L)
+
+code = parse(text = "
+library(MASS)
+start = 0
+f = function(end) area(sin, start, end)
+")
+
+eval(code)
+clusterCall(cl, eval, code, .GlobalEnv)
+
+d = as.list(1:5)
+
+out = parLapply(cl, d, f)
+
+# Check that it's the same:
+all.equal(out, lapply(d, f))
+
+```
+
+This suggests the approach of evaluating all code before we reach the `lapply`
+statement. We need several assumptions about the code:
+1. It's necessary to run
+2. It will do the same thing on each worker (not the case for random things)
+3. It won't take so long to run that we lose the subsequent benefit of
+  parallelism.
+
+We can probably check the first two conditions. It's not easy to know how
+long it will take the whole thing to run though.
 
 ## Side Notes
 

@@ -45,6 +45,10 @@ LemmatizerSourceDir = '/home/clark/dev/tree-tagger'   # Where the lemmatizer sou
 # Perhaps just into the functions from the package environments.  
 
 # Clark: set.kRp.env manipulates the private environment koRpus:::.koRpus.env
+# For a SNOW cluster the only reasonable way to achieve the same result is
+# to actually evaluate this code, since we aren't going to try to fool
+# around with private variables in a sealed namespace.
+#
 # CodeDepends doesn't help me to understand what it's doing.
 #s = CodeDepends::getInputs(body(set.kRp.env))
 
@@ -73,15 +77,22 @@ lemmatize = function(txt){
   return(results)
 } 
 
-# Clark: The following few lines are where he's developing the function to
-# use.
+# Clark: The lines between this point and the GSRLem definition are where
+# he's developing the function to use.
+# They're not necessary, and should be removed in a preprocessing step.
 
 # Run the lemmatizer!
 LemmatizedDF = lemmatize(doc[1, "paragraph"])
 
 # Clean Data
 LemmatizedDF$lemma = as.character(LemmatizedDF$lemma)
+
 LemmatizedDF[which(LemmatizedDF$lemma == "<unknown>"), "lemma"] = LemmatizedDF[which(LemmatizedDF$lemma == "<unknown>"), "token"]
+# Clark: He computes the same condition twice here, when it can't change.
+# Unlikely to be a bottleneck in this code, but more generally it could be.
+# We could detect and change this to:
+#cond = LemmatizedDF$lemma == "<unknown>"
+#LemmatizedDF[cond, "lemma"] = LemmatizedDF[cond, "token"]
 
 paste(LemmatizedDF$lemma, collapse = " ")
 
