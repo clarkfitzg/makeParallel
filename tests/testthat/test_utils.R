@@ -53,13 +53,20 @@ test_that("find_var", {
 
     expect_equal(actual, list(c(1, 3, 1)))
 
+
     expr = parse(text = '
-        f = function(end) area(sin, start, end)
+        f = function(end, start = x) area(sin, start, end)
         f(x)
     ')
+
+    # expr[[c(1, 3, 2, 2)]] = as.symbol("z")
+    # TODO: Running the above results in `expr` still printing `x`, but
+    # code evaluates as if it were changed to `z`.
+    # I don't know what's happening.
+
     actual = find_var(expr, "x")
 
-    expect_equal(actual, list(c(2, 2)))
+    expect_equal(actual, list(c(1, 3, 2, 2), c(2, 2)))
 
 })
 
