@@ -2,6 +2,23 @@
 # happen in parallel.
 # The challenge to automatically parallelize this on Windows is to know
 # what code must be executed before the main lapply function can run.
+#
+# Without analyzing the code we could just run all the code before the
+# `lapply`. Further this has the structure:
+#
+# code
+# f = function() ... lapply()
+# f()
+#
+# So we would like to: 
+#   - create an appropriate cluster
+#   - execute the code in the first part on the manager and all the workers
+#   - change the lapply to parallel::parLapply
+#
+# This general strategy won't work with nested `lapply` calls.
+# Also don't want to blindly replace every lapply with a parallel version.
+# Maybe could have user hints about where to parallelize?
+
 
 # Clark: this takes about 0.5 seconds. It's 9327 words, which is much
 # longer than any letter of recommendation. Do it 80K times and it becomes 11
@@ -24,11 +41,12 @@ LemmatizerSourceDir = '/home/clark/dev/tree-tagger'   # Where the lemmatizer sou
 
 # Clark: CodeDepends doesn't identify any outputs, updates, or side effects
 # based on the code below. To do this it needs to recurse inside the body
-# of the function.
+# of the function. But how far do we proceed examining function bodies?
+# Perhaps just into the functions from the package environments.  
 
-# Clark: This function manipulates the private environment koRpus:::.koRpus.env
+# Clark: set.kRp.env manipulates the private environment koRpus:::.koRpus.env
 # CodeDepends doesn't help me to understand what it's doing.
-s = CodeDepends::getInputs(body(set.kRp.env))
+#s = CodeDepends::getInputs(body(set.kRp.env))
 
 #s = CodeDepends::getInputs(quote(
 # Set the koRpus environment
