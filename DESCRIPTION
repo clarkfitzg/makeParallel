@@ -11,8 +11,7 @@ Depends:
 Imports:
     parallel,
     CodeDepends,
-    microbenchmark,
-    igraph
+    microbenchmark
 Suggests:
     roxygen2,
     knitr,

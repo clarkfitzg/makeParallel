@@ -3,9 +3,10 @@
 #
 # pass in an R script to build and visualize a code dependency graph
 
-library(autoparallel)
 library(igraph)
 library(CodeDepends)
+
+source("depend_graph.R")
 
 script_name = commandArgs(trailingOnly=TRUE)
 
