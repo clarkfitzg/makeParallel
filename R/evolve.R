@@ -157,17 +157,9 @@ smartfunc = function (func, metadata_func = length_first_param, model = lm)
 }
 
 
-#' @export
-# TODO: Figure out what this should do. Hopefully it doesn't need to be
-# here.
-init = function()
-{
-    # TODO: Check if exists so we don't write over.
-    # Write all these to users global workspace
-    assign(".ap", new.env(), globalenv())
-    .ap$current_trace <<- 0L
-    .ap$timings <<- data.frame()
-}
+env = new.env()
+env$timings <- data.frame()
+
 
 
 # TODO: I think the trace based one is more general, so I should probably
@@ -193,11 +185,12 @@ trace_timings = function (func, metadata_func = length_first_param_trace, model 
 #' why that was happening in first place.  May try to reorganize later.
 startstop = function(funcname, metadata_func, model){
 
-    if(!(funcname %in% ls(.ap))){
-        .ap[[funcname]] <<- data.frame(start = as.POSIXct(vector())
+    if(!(funcname %in% ls(env))){
+        assign(funcname, data.frame(start = as.POSIXct(vector())
                      , stop = as.POSIXct(vector())
                      , metadata = numeric()
                      , stringsAsFactors = FALSE)
+        , envir = env)
     }
 
     # This assumes that the signatures match from the metadata_func
@@ -212,21 +205,25 @@ startstop = function(funcname, metadata_func, model){
         md = eval(metadata_call, frame)
 
         # Record it by appending a new row to the timings
-        id = nrow(.ap[[funcname]]) + 1L
+        timings = env[[funcname]]
+        id = nrow(timings) + 1L
         # TODO: generalize this beyond a scalar here.
-        .ap[[funcname]][id, "metadata"] <<- md
+        timings[id, "metadata"] = md
 
         # Conceptually, starting timer should be last step
-        .ap[[funcname]][id, "start"] <<- Sys.time()
+        timings[id, "start"] = Sys.time()
+        assign(funcname, timings, envir = env)
     }
 
     stop = function(){
         # Conceptually, stopping timer should be first step
         stoptime = Sys.time()
 
+        timings = env[[funcname]]
         # Writing to the last NA should handle nesting
-        last_NA = tail(which(is.na(.ap[[funcname]][, "stop"])), 1L)
-        .ap[[funcname]][last_NA, "stop"] <<- stoptime
+        last_NA = tail(which(is.na(timings)), 1L)
+        timings[last_NA, "stop"] = stoptime
+        assign(funcname, timings, envir = env)
     }
 
     list(start = start, stop = stop)

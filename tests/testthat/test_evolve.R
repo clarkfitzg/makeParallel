@@ -97,10 +97,7 @@ expect_equal(f(5), "fast")
 
 
 # All details subject to change
-test_that(".ap global variable is populated", {
-
-# This will likely change to something more automatic.
-autoparallel::init()
+test_that("global timings exist", {
 
 #debug(autoparallel:::startstop)
 
@@ -112,7 +109,7 @@ crossprod(x)
 
 untrace(crossprod)
 
-timings = .ap$crossprod
+timings = env$crossprod
 
 expect_equal(nrow(timings), 2)
 
@@ -136,8 +133,7 @@ cov(x, y)
 
 untrace(cov)
 
-autoparallel::init()
-timings = .ap$cov
+timings = env$cov
 
 expect_equal(timings$metadata, length(x))
 
