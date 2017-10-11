@@ -45,6 +45,7 @@ test_that("to_fread", {
     expect_equal(actual, expected)
 
     code = quote(read.csv("data.csv", col.names = c("a", "b", "c", "d")))
+
     actual = to_fread(code, select = c(2L, 4L), remove_col.names = TRUE)
 
     expect_equal(actual, expected)
@@ -54,9 +55,10 @@ test_that("to_fread", {
     actual = to_fread(code, select = 1:4, remove_col.names = FALSE)
 
     expected = quote(data.table::fread("data.csv"
-        , select = 1:4, col.names = c("a", "b", "c", "d")))
+        , col.names = c("a", "b", "c", "d"), select = 1:4))
 
     expect_equal(actual, expected)
+
 })
 
 
@@ -107,6 +109,7 @@ test_that("basic read_faster", {
     ')
 
     actual = read_faster(code, varname = "d", colnames = letters)
+
     actual2 = read_faster(code)
 
     expected = parse(text = '

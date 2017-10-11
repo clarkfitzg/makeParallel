@@ -120,7 +120,10 @@ find_var = function(expr, var, loc = integer(), found = list())
     # current indices. Further, walkCode doesn't work on expression
     # objects.
 
-    if(typeof(expr) != "language" && typeof(expr) != "expression" ){
+    # branch means anything other than a leaf node here.
+    branch_types = c("language", "expression", "pairlist")
+    branch = typeof(expr) %in% branch_types
+    if(!branch){
         # We're at a leaf node
         if(is.symbol(expr) && expr == var){
             return(list(loc))
@@ -134,12 +137,13 @@ find_var = function(expr, var, loc = integer(), found = list())
 
         # Missing arguments, ie. the third element in x[, 10]
         # Possibly there's a better way to test for this.
-        if(expr[[i]] == ""){
+        # You CANNOT assign ei = expr[[i]], because it is interpreted as a
+        # missing argument in the following code.
+        if(typeof(expr[[i]]) == "symbol" && expr[[i]] == ""){
             next
         }
 
-        subexpr = expr[[i]]
-        recurse_found = Recall(subexpr, var, c(loc, i))
+        recurse_found = Recall(expr[[i]], var, c(loc, i))
         found = c(found, recurse_found)
     }
     found
