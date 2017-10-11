@@ -134,16 +134,14 @@ find_var = function(expr, var, loc = integer(), found = list())
 
     # Continue recursion
     for(i in seq_along(expr)){
+        ei = expr[[i]]
 
         # Missing arguments, ie. the third element in x[, 10]
-        # Possibly there's a better way to test for this.
-        # You CANNOT assign ei = expr[[i]], because it is interpreted as a
-        # missing argument in the following code.
-        if(typeof(expr[[i]]) == "symbol" && expr[[i]] == ""){
+        if(missing(ei)){
             next
         }
 
-        recurse_found = Recall(expr[[i]], var, c(loc, i))
+        recurse_found = Recall(ei, var, c(loc, i))
         found = c(found, recurse_found)
     }
     found
