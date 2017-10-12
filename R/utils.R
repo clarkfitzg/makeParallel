@@ -152,6 +152,23 @@ find_var = function(expr, var, loc = integer(), found = list())
 }
 
 
+#' Find All Symbols In Expression
+#'
+#' @param expr R language object
+all_symbols = function(expr)
+{
+    expr = as.expression(expr)
+    symbols = character()
+    walker = codetools::makeCodeWalker(leaf = function(e, w){
+        if(is.symbol(e)){
+            symbols <<- c(symbols, as.character(e))
+        }
+    })
+    lapply(expr, codetools::walkCode, walker)
+    unique(symbols)
+}
+
+
 #' Approximately Even Split
 #'
 #' @param n_elements integer number of elements to split

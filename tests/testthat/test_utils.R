@@ -95,6 +95,24 @@ test_that("find_call", {
 })
 
 
+test_that("all_symbols", {
+
+    e = quote(plot(x, y))
+    actual = sort(all_symbols(e))
+    expected = sort(c("plot", "x", "y"))
+
+    expect_equal(actual, expected)
+
+    # Using x as a function also. Yuck!
+    e = parse(text = "x(plot(x, y))
+              plot(x)")
+
+    actual = sort(all_symbols(e))
+    expect_equal(actual, expected)
+
+})
+
+
 test_that("tree methods", {
 
     tree = list(list(list(1, 2, 3), 4), 5)
