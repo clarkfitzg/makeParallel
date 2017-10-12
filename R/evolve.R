@@ -49,7 +49,7 @@ length_first_param = function (...)
 length_first_param_trace = function ()
 {
     func = eval(sys.call(1L)[[1]])
-    firstarg = formalArgs(func)[1]
+    firstarg = methods::formalArgs(func)[1]
     length(get(firstarg))
 }
 
@@ -194,7 +194,7 @@ startstop = function(funcname, metadata_func, model){
     }
 
     # This assumes that the signatures match from the metadata_func
-    params = lapply(formalArgs(metadata_func), as.symbol)
+    params = lapply(methods::formalArgs(metadata_func), as.symbol)
     metadata_call = as.call(c(as.name("metadata_func"), params))
 
     start = function(){
@@ -221,7 +221,7 @@ startstop = function(funcname, metadata_func, model){
 
         timings = env[[funcname]]
         # Writing to the last NA should handle nesting
-        last_NA = tail(which(is.na(timings)), 1L)
+        last_NA = tail(which(is.na(timings$stop)), 1L)
         timings[last_NA, "stop"] = stoptime
         assign(funcname, timings, envir = env)
     }
@@ -244,7 +244,7 @@ startstop = function(funcname, metadata_func, model){
 
 #f = function(a, b = 2, ...) NULL
 #
-#params = lapply(formalArgs(f), as.symbol)
+#params = lapply(methods::formalArgs(f), as.symbol)
 #
 #call_list = c(as.name("f"), params)
 #
