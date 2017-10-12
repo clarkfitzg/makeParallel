@@ -38,7 +38,7 @@ update_indices = function(statement, index_locs, index_map)
 
 
 assigners = c("<-", "=", "assign")
-readers = c("read.csv", "read.table")
+readfuncs = c("read.csv", "read.table")
 
 
 #' Transform To Faster Reads
@@ -48,34 +48,36 @@ readers = c("read.csv", "read.table")
 #' expression.
 #'
 #' @param expression, for example as returned from \code{base::parse}
-#' @param varname character naming the data frame of interest
-#' @param colnames column names for the data frame of interest
+#' @param varname character (optional) the name of the data frame of interest
+#' @param colnames character (optional) column names for \code{varname}
+#' @param readfunc character (optional) name of function originally used to
+#'  read the data.
 #' @return transformed code
 #' @export
-read_faster = function(expression, varname = NULL, colnames = NULL)
+read_faster = function(expression, varname = NULL, colnames = NULL, readfunc = NULL)
 {
 
-    nulls = c(is.null(varname), is.null(colnames))
+    nulls = sapply(list(varname, colnames, readfunc), is.null)
 
-    # Easy out if both are specified
+    # Easy out if all are specified
     if(all(!nulls)){
-        return(read_faster_work(expression, varname, colnames))
+        return(read_faster_work(expression, varname, colnames, readfunc))
     }
 
     if(any(!nulls)){
-        stop("Must specify both varname and colnames.")
+        stop("Must specify all or none of varname, colnames, readfunc")
     }
 
     out = expression
-    for(reader in readers){
-        readlocs = find_var(expression, reader)
+    for(readfunc in readfuncs){
+        readlocs = find_var(expression, readfunc)
         for(loc in readlocs){
             depth = length(loc)
             possible_assign = expression[[loc[-c(depth - 1, depth)]]]
             if(as.character(possible_assign[[1]]) %in% assigners){
                 varname = possible_assign[[2]]
                 colnames = infer_colnames(possible_assign[[3]])
-                out = read_faster_work(out, varname, colnames = colnames, reader = reader)
+                out = read_faster_work(out, varname, colnames = colnames, readfunc = readfunc)
             }
         }
     }
@@ -117,7 +119,7 @@ infer_colnames = function(expression)
 }
 
 
-read_faster_work = function(expression, varname, colnames, reader)
+read_faster_work = function(expression, varname, colnames, readfunc)
 {
     analyzed = lapply(expression, canon_form, varname = varname, colnames = colnames)
 
@@ -137,7 +139,7 @@ read_faster_work = function(expression, varname, colnames, reader)
     #   function since some is common across variables.
     # - Other read funcs
 
-    readlocs = find_var(output, reader)
+    readlocs = find_var(output, readfunc)
 
     subset_read_inserted = FALSE
 

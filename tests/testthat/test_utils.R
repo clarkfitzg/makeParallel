@@ -106,8 +106,8 @@ test_that("all_symbols", {
     # Using x as a function also. Yuck!
     e = parse(text = "x(plot(x, y))
               plot(x)")
-
     actual = sort(all_symbols(e))
+
     expect_equal(actual, expected)
 
 })

@@ -108,7 +108,7 @@ test_that("basic read_faster", {
         hist(d[, 2])
     ')
 
-    actual = read_faster(code, varname = "d", colnames = letters)
+    actual = read_faster(code, varname = "d", colnames = letters, readfunc = "read.csv")
 
     actual2 = read_faster(code)
 
@@ -151,7 +151,7 @@ test_that("read_faster with nested subsetting and $, [, [[", {
         plot(d[d[, 6] > 5, 5:7])
     ')
 
-    actual = read_faster(code, varname = "d", colnames = letters)
+    actual = read_faster(code, varname = "d", colnames = letters, readfunc = "read.csv")
 
     expected = parse(text = '
         d = data.table::fread("data.csv", select = c(1L, 3L, 5L, 6L, 7L))
