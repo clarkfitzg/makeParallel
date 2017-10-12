@@ -1,5 +1,5 @@
 # This is the target for the transformed program, ie.
-# whatever autoparallel spits out should look something like this.
+# whatever codedoctor spits out should look something like this.
 #
 # This requires an associative Reduce function, different from R.
 
@@ -9,7 +9,7 @@ cl = makeCluster(2L)
 
 x = as.list(1:10)
 
-autoparallel::assign_workers(cl, "x")
+codedoctor::assign_workers(cl, "x")
 
 
 # Relying on `{` returning the last statement, and the `=` assignment

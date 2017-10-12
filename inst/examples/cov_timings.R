@@ -4,7 +4,7 @@
 
 library(microbenchmark)
 
-library(autoparallel)
+library(codedoctor)
 source("covariance.R")
 
 

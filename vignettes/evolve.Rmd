@@ -1,8 +1,8 @@
 ---
-title: "autoparallel-evolve"
+title: "codedoctor-evolve"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{autoparallel-evolve}
+  %\VignetteIndexEntry{codedoctor-evolve}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -63,7 +63,7 @@ No point in trying to go further with the precision.
 
 ## Implementation
 
-`autoparallel` lets us improve functions using `evolve()`. The simplest
+`codedoctor` lets us improve functions using `evolve()`. The simplest
 way to use `evolve()` is to pass multiple implementations as arguments.
 Consider the following two implementations of linear regression which
 extract the ordinary least squares coefficients.
@@ -102,7 +102,7 @@ it out for us.
 
 ```{R}
 
-library(autoparallel)
+library(codedoctor)
 
 ols = evolve(ols_naive, ols_clever)
 

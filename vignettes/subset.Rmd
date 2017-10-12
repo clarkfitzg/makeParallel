@@ -1,8 +1,8 @@
 ---
-title: "autoparallel-transpile"
+title: "codedoctor-transpile"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{autoparallel-transpile}
+  %\VignetteIndexEntry{codedoctor-transpile}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -28,7 +28,7 @@ saving only what we need.
 
 ```{R}
 
-library(autoparallel)
+library(codedoctor)
 
 script = parse(text = '
     d = read.csv("data.csv")

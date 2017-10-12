@@ -1,8 +1,8 @@
 ---
-title: "autoparallel-script"
+title: "codedoctor-script"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{autoparallel-script}
+  %\VignetteIndexEntry{codedoctor-script}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -11,7 +11,7 @@ vignette: >
 
 Parallelism is useful if it improves the speed of a slow program. If speed
 doesn't improve then parallelism is an unnecessary complication.
-`autoparallel` transforms programs from serial into multicore parallel, and
+`codedoctor` transforms programs from serial into multicore parallel, and
 then benchmarks the modified program to determine if the transformation
 increases the speed.
 
@@ -66,7 +66,7 @@ To transform it:
 
 ```{R}
 
-library(autoparallel)
+library(codedoctor)
 
 benchmark_transform("simple.R", output = "simple2.R")
 

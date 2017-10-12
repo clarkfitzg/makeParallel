@@ -1,4 +1,4 @@
-# autoparallel
+# codedoctor
 
 _experimental library to transform serial R code into parallel_
 

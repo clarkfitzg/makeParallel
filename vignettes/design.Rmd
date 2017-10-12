@@ -1,8 +1,8 @@
 ---
-title: "autoparallel-design"
+title: "codedoctor-design"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{autoparallel-assumptions}
+  %\VignetteIndexEntry{codedoctor-assumptions}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

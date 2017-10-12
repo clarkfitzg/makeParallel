@@ -1,4 +1,4 @@
 library(testthat)
-library(autoparallel)
+library(codedoctor)
 
-test_check("autoparallel")
+test_check("codedoctor")

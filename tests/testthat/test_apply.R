@@ -1,4 +1,4 @@
-library(autoparallel)
+library(codedoctor)
 
 context("apply")
 

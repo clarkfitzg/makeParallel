@@ -1,8 +1,8 @@
 ---
-title: "autoparallel-tuning"
+title: "codedoctor-tuning"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{autoparallel-tuning}
+  %\VignetteIndexEntry{codedoctor-tuning}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -31,7 +31,7 @@ inputs. Hence we would like a faster, parallel version with the number of
 chunks tuned to our specific system and data inputs.
 
 ```{R}
-library(autoparallel)
+library(codedoctor)
 
 n = 2000
 p = 200
