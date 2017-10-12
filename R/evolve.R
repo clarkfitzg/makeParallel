@@ -69,6 +69,7 @@ length_first_param_trace = function ()
 #' @export
 predict.smartfunc = function(object, ...)
 {
+    f = object
     # Wait until the model will be used to update it.
     update(f)
     fenv = environment(f)
