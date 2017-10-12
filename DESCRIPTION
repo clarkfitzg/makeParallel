@@ -26,7 +26,7 @@ Description: This experimental package provides tools to automatically
     long (at least more than a second!) Other use cases include interactive
     analysis of large data sets, detection of task parallelism, and
     code transformations.
-License: MIT
+License: MIT + file LICENSE
 URL: https://github.com/clarkfitzg/autoparallel
 BugReports: https://github.com/clarkfitzg/autoparallel
 RoxygenNote: 6.0.1

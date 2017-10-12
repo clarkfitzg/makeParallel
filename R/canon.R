@@ -91,40 +91,42 @@ canon_form = function(statement, varname, colnames = NULL)
 }
 
 
-#' Check for and handle missing column names
-handle_missing_colnames = function(colnames)
+#' Check for and uniformly handle NULL column names
+#'
+#' @param colnames character or NULL
+check_colnames = function(colnames)
 {
     if(is.null(colnames)){
         stop("
 The colnames are needed, but cannot be determined.
 This may be because the data file is in a different relative directory.
 ")}
-    }
+}
 
 
-# The following functions perform the work after we discover:
-#
-# 1. The location of the call ie. plot(x$y) should operate on x$y which is
-#   the 2nd element in the parse tree
-# 2. Which function to dispatch to, so we need to pick out `$` above
-#
-# These functions all do the same thing, for each of the special cases.
-# They do the following:
-#
-# 1. Transform the statement to a common form which uses only integer indices and
-#   single square brackets. The common form simplifies subsequent
-#   processing.
-# 2. Record all column indices which are used. This allows us to see which
-#   columns are needed at the end of a script.
+#' The following functions perform the work after we discover:
+#'
+#' 1. The location of the call ie. plot(x$y) should operate on x$y which is
+#'   the 2nd element in the parse tree
+#' 2. Which function to dispatch to, so we need to pick out `$` above
+#'
+#' These functions all do the same thing, for each of the special cases.
+#' They do the following:
+#'
+#' 1. Transform the statement to a common form which uses only integer indices and
+#'   single square brackets. The common form simplifies subsequent
+#'   processing.
+#' 2. Record all column indices which are used. This allows us to see which
+#'   columns are needed at the end of a script.
+#' @name to_ssb
+NULL
 
 
 #' Replace $ with [
-#'
-#' Designed for use only with a single call of the form \code{x$y}, where x
-#' is a data.frame.
+#' @rdname to_ssb
 dollar_to_ssb = function(statement, colnames)
 {
-    handle_missing_colnames(colnames)
+    check_colnames(colnames)
     template = quote(dframe[, index])
     column_name = deparse(statement[[3]])
     column_index = which(colnames == column_name)[1]
@@ -135,7 +137,7 @@ dollar_to_ssb = function(statement, colnames)
 
 
 #' Replace [[ with [
-#'
+#' @rdname to_ssb
 double_to_ssb = function(statement, colnames)
 {
 
@@ -147,7 +149,7 @@ double_to_ssb = function(statement, colnames)
         if(length(column) > 1) stop("Recursive indexing not currently supported")
         as.integer(column)
     } else if(is.character(column)){
-        handle_missing_colnames(colnames)
+        check_colnames(colnames)
         which(colnames == column)[1]
     } else {
         stop("Expected character or numeric for `[[` indexing")
@@ -160,7 +162,7 @@ double_to_ssb = function(statement, colnames)
 
 
 #' Replace column subset [ possibly using names with [ using integers
-#'
+#' @rdname to_ssb
 single_to_ssb = function(statement, colnames)
 {
 
@@ -177,7 +179,7 @@ single_to_ssb = function(statement, colnames)
     column_index = if(is.numeric(column)){
         as.integer(column)
     } else if(is.character(column)){
-        handle_missing_colnames(colnames)
+        check_colnames(colnames)
         which(colnames %in% column)
     } else {
         stop("Expected character or numeric for `[` indexing")

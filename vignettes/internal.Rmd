@@ -95,6 +95,13 @@ Idea: For the functions that parallelize things based on timings we could
 have a "timeout" where if it takes over a certain threshold time to run the
 whole script then we just stop and parallelize what we can from there.
 
+Idea: Often we can tell statically which functions are being used, ie. `lm`
+is actually `stats::lm`. A preprocessing step could identify all of these
+and distinguish them. We have to be careful, since using `::` takes 2
+orders of magnitude more time than a simple lookup of an object in the base
+package. More generally I'm curious to know when it's safe to evaluate
+simple literal code such as `c(1, 3)`.
+
 # Assumptions
 
 I may want to make some of the following assumptions, depending on

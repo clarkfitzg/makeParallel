@@ -67,7 +67,7 @@ length_first_param_trace = function ()
 
 #' Predict Time Required To Run In Nanoseconds
 #' @export
-predict.smartfunc = function(f, ...)
+predict.smartfunc = function(object, ...)
 {
     # Wait until the model will be used to update it.
     update(f)

@@ -77,7 +77,7 @@ parallelize = function(x = NULL
 
 
 #' @export
-print.parallel_evaluator = function(x)
+print.parallel_evaluator = function(x, ...)
 {
     cat("parallel evaluator", "\n")
     cat("variable: ", attr(x, "varname"), "\n")
@@ -86,11 +86,11 @@ print.parallel_evaluator = function(x)
 
 #' Assign Variable Subset On Cluster
 #'
-#' Partition the variable into chunks and distribute each chunk to a
+#' Partition the object into chunks and distribute each chunk to a
 #' parallel worker.
 #'
 #' @param cl SNOW cluster
-#' @param manager_varname string naming variable to be exported
+#' @param x object to partition
 #' @param worker_varname string naming variable to be assigned to the
 #'      global workspace of the worker node
 #' @return indices list of partitioning indices
@@ -99,9 +99,9 @@ assign_workers = function(cl, x, worker_varname)
 
     N = if(is.data.frame(x)) nrow(x) else length(x)
 
-    splits = even_split(N, length(cl))
+    indices = even_split(N, length(cl))
 
-    chunks = split(x, splits)
+    chunks = split(x, indices)
 
     # This can be done more efficiently for a fork cluster, but that's a
     # 2nd order consideration.
@@ -111,5 +111,5 @@ assign_workers = function(cl, x, worker_varname)
         NULL
     }, worker_varname, chunks)
 
-    splits
+    indices
 }

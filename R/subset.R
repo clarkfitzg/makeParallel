@@ -11,41 +11,7 @@
 # 6. Transform the calls which subset `d` into new indices.
 
 
-#' 1. Infer that a data frame is created by a call to `read.csv()`
-#'
-#' Currently only handles top level assignment.
-#'
-#' @return symbol name of data.frame, or NULL if none found
-data_read = function(statement, assigners = c("<-", "=", "assign")
-                     , readers = c("read.csv", "read.table"))
-{
-    if(as.character(statement[[1]]) %in% assigners){
-        funcname = as.character(statement[[c(3, 1)]])
-        if(funcname %in% readers){
-            return(as.symbol(statement[[2]]))
-        } 
-    }
-    NULL
-}
-
-
-# 5. Transform the `read.csv(...)` call into `data.table::fread(..., select =
-#    usedcolumns)`
-# @xport
-to_fread = function(statement, select, remove_col.names = TRUE)
-{
-    transformed = statement
-    transformed[[1]] = quote(data.table::fread)
-    # Sometimes R just makes things too easy! So happy with this:
-    transformed[["select"]] = as.integer(select)
-    if(remove_col.names && !is.null(transformed[["col.names"]])){
-        transformed[["col.names"]] = NULL
-    }
-    transformed
-}
-
-
-# 6. Transform the calls which subset `d` into new indices.
+# Transform the calls which subset `d` into new indices.
 update_indices = function(statement, index_locs, index_map)
 {
     # for loops necessary for making incremental changes and avoiding the
@@ -84,7 +50,6 @@ readers = c("read.csv", "read.table")
 #' @param expression, for example as returned from \code{base::parse}
 #' @param varname character naming the data frame of interest
 #' @param colnames column names for the data frame of interest
-#'
 #' @return transformed code
 #' @export
 read_faster = function(expression, varname = NULL, colnames = NULL)
@@ -124,6 +89,7 @@ read_faster = function(expression, varname = NULL, colnames = NULL)
 #' c("a", "b", "c")} this returns \code{c("a", "b", "c")}. If \code{header
 #' = TRUE} it attempts to look for the file to read the column names.
 #'
+#' @inheritParams read_faster
 #' @return character vector of column names, or NULL if they can't be
 #'  determined
 infer_colnames = function(expression)
@@ -151,7 +117,7 @@ infer_colnames = function(expression)
 }
 
 
-read_faster_work = function(expression, varname, colnames, reader = "read.csv")
+read_faster_work = function(expression, varname, colnames, reader)
 {
     analyzed = lapply(expression, canon_form, varname = varname, colnames = colnames)
 

@@ -1,4 +1,6 @@
 #' @importFrom microbenchmark microbenchmark
+#' @importFrom stats lm median predict t.test update
+#' @importFrom utils head tail
 NULL
 
 
@@ -70,6 +72,8 @@ find_call = function(expr, funcname)
 #' If only literals and functions such as \code{:, c} then code can be
 #' evaluated regardless of context.  Assuming those functions haven't been
 #' redefined.
+#'
+#' @param code single R statement
 only_literals = function(code)
 {
 

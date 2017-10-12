@@ -93,7 +93,7 @@ benchmark_transform_work = function(program
 #' 
 #' @param input_file string naming a slow R script
 #' @param output_file where to save the parallelized script
-#' @param nbenchmarks number of benchmarks to run
+#' @param nbenchmarks integer number of benchmarks to run
 #' @param threshold_time seconds if serial version runs under this time then don't
 #'      even bother with a comparison to parallel
 #' @param threshold_pvalue used for t test decision to choose parallel
