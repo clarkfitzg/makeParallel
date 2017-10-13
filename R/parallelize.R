@@ -28,7 +28,7 @@
 #' do(1:3, simplify = FALSE)
 #' print(do)
 #' print.function(do)  # See parameters and attributes
-#' parallel::stopCluster(attr(do, "cluster"))
+#' stop_cluster(do)
 parallelize = function(x = NULL
                        , cl = parallel::makeCluster(spec, ...)
                        , spec = 2L, ...
@@ -81,6 +81,13 @@ print.parallel_evaluator = function(x, ...)
 {
     cat("parallel evaluator", "\n")
     cat("variable: ", attr(x, "varname"), "\n")
+}
+
+
+#' @export
+stop_cluster = function(x)
+{
+    parallel::stopCluster(attr(x, "cluster"))
 }
 
 

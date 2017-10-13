@@ -142,7 +142,7 @@ The cluster is an attribute on the evaluator.
 
 ```{r}
 
-parallel::stopCluster(attr(do, "cluster"))
+parallel::stop_cluster(attr(do, "cluster"))
 
 ```
 
@@ -259,6 +259,6 @@ worker.
 
 ```{R}
 
-parallel::stopCluster(attr(do, "cluster"))
+stop_cluster(do)
 
 ```

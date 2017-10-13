@@ -19,6 +19,9 @@ test_that("basics with default", {
     actual = do(lapply(y, head2))
 
     expect_identical(actual, lapply(y, head2))
+
+    stop_cluster(do)
+
 })
 
 
@@ -32,6 +35,7 @@ test_that("finds global variables", {
 
     expect_identical(actual, c(n, n))
 
+    stop_cluster(do)
 })
 
 
@@ -41,4 +45,5 @@ test_that("splits data frames into groups of rows", {
     dims = do(dim(iris))
 
     expect_equal(dims, c(75, 5, 75, 5))
+    stop_cluster(do)
 })
