@@ -164,3 +164,18 @@ read_faster_work = function(expression, varname, colnames, readfunc)
 
     output
 }
+
+
+# 5. Transform the `read.csv(...)` call into `data.table::fread(..., select =
+#    usedcolumns)`
+to_fread = function(statement, select, remove_col.names = TRUE)
+{
+    transformed = statement
+    transformed[[1]] = quote(data.table::fread)
+    # Sometimes R just makes things too easy! So happy with this:
+    transformed[["select"]] = as.integer(select)
+    if(remove_col.names && !is.null(transformed[["col.names"]])){
+        transformed[["col.names"]] = NULL
+    }
+    transformed
+}

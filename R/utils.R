@@ -20,6 +20,14 @@ sub_one = function(statement, env)
 }
 
 
+#' Doesn't work
+sub_one_docall = function(expr, env)
+{
+    e = substitute(expr)
+    do.call(substitute, list(e, env))
+}
+
+
 #' Substitute Expressions
 #' 
 #' Replace code with new code objects in env.

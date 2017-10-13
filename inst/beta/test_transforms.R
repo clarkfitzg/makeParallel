@@ -19,5 +19,3 @@ test_that("Basic transformation to parallel", {
     expect_null(actual)
 
 })
-
-
