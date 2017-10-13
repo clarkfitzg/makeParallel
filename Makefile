@@ -25,3 +25,8 @@ $(PKG): $(RFILES) $(TESTFILES)
 
 check: $(PKG)
 	R CMD check $(PKG)
+
+clean:
+	rm vignettes/*.html
+	rm $(PKG)
+	rm -r codedoctor.Rcheck

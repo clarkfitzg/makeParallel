@@ -1,3 +1,6 @@
+[![Travis-CI Build
+Status](https://travis-ci.org/clarkfitzg/codedoctor.svg?branch=master)](https://travis-ci.org/clarkfitzg/codedoctor)
+
 # codedoctor
 
 _experimental library to transform serial R code into parallel_
