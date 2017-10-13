@@ -54,40 +54,45 @@ do(lapply(x, head))
 There's nothing special about the use of `lapply()` above. We can evaluate
 arbitrary code.
 
+FEEDBACK: The current implementation for the parallel evaluator only looks
+for variables in the global environment, which is why I'm using `<<-`
+(because of how knitr evaluates).  I _could_ write a version that uses
+`dynGet()`, but this would be more complicated.
+
 ```{R}
 
-y = 20
-z = 30
+y <<- 20
+z <<- 30
 do(y + z, verbose = TRUE)
 
 ```
 
+`y + z` uses the variables `y` and `z`. The evaluator detects this and
+sends them over, saving the user from having to do this manually.
+
 ## Interactive
 
-This is designed for interactively building functions and analysis on large
-data sets, or data sets that take too long to run. The interactive feature
-is sending variables, including functions, from the manager's global
-workspace to the parallel workers every time they are used. This allows us
-to see the results of the improved / debugged version of the function as we
-work on them.
+The evaluator is designed for interactively building functions and analysis
+on large data sets, or data sets that take too long to run. The interactive
+feature is sending variables, including functions, from the manager's
+global workspace to the parallel workers every time they are used. This
+allows us to see the results of the improved / debugged versions of the
+functions as we work on them.
 
 ```{r}
 
 # An analysis function
-myfun = function(x) x[1:2]
+myfun <<- function(x) x[1:2]
 
 do(lapply(x, myfun))
 
 # Oops I actually need the first 4
-myfun = function(x) x[1:4]
+myfun <<- function(x) x[1:4]
 
 # Now we see the new results of myfun
 do(lapply(x, myfun))
 
 ```
-
-The user does not have to explicitly and manually send the variables over.
-
 
 ## Limitations
 
@@ -108,6 +113,9 @@ object.size(big)
 do(sum(big + x[[1]][1]))
 
 ```
+
+FEEDBACK: I could check the size of the objects before exporting them, and
+handle it if they're too large.
 
 ## Details
 
@@ -138,11 +146,10 @@ always see a list of length 2 before the results are simplified.
 
 When finished it's a good idea to shut down the cluster. This also happens
 automatically when the R session is terminated.
-The cluster is an attribute on the evaluator.
 
 ```{r}
 
-parallel::stop_cluster(attr(do, "cluster"))
+stop_cluster(do)
 
 ```
 
@@ -155,7 +162,8 @@ One can download a handful from the VA servers as follows:
 
 ```{r, echo = FALSE}
 
-datadir = "~/data/vets/vets_appeals"
+# Used on my local machine only
+datadir = "~/data/vets/appeals_sample"
 
 ```
 
@@ -187,7 +195,7 @@ The following code actually loads the data contained in the files and
 assigns the result into `appeals` on the cluster. It's efficient because
 the reads happen in parallel, rather than creating a bottleneck in the
 manager process. Furthermore, by having the workers do their own loading we
-do not have to serialize the data between processes..
+do not have to serialize the data between processes.
 
 ```{r}
 
@@ -218,7 +226,7 @@ overriding the existing one.
 
 ```{R}
 
-ten = 10
+ten <<- 10
 do(ten + 1, verbose = TRUE)
 
 ```
