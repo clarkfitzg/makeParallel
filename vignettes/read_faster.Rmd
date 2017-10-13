@@ -1,13 +1,13 @@
 ---
-title: "codedoctor-transpile"
+title: "codedoctor-read_faster"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{codedoctor-transpile}
+  %\VignetteIndexEntry{codedoctor-read_faster}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-_Transpile_ here refers to translating and changing code to make it more
+We can modify code to make it more
 efficient. Consider this simple script:
 
 ```{R, eval = FALSE}
@@ -19,12 +19,9 @@ hist(d[, 1])
 ```
 
 This script only uses the first column of `d`, which means that all the
-other columns were unnecessary. If `data.csv` is sufficiently large then
-this program will spend an excessive amount of time reading data that are
-never used.
-
-In general we'd like to do all the preprocessing as early as possible,
-saving only what we need.
+other columns were unnecessary. If `data.csv` is sufficiently large, and it
+has many columns, then this program will spend an excessive amount of time
+reading data that are never used.
 
 ```{R}
 
@@ -35,17 +32,15 @@ script = parse(text = '
     hist(d[, 2])
     ')
 
-# TODO: Infer and remove 2nd argument.
-read_faster(script, "d")
+read_faster(script)
 
 ```
-
 
 ## Static Analysis
 
 `read_faster()` uses static code analysis to infer which columns are
 required to run the complete script.  For example, we can statically
-analyze literals and evaluate simple functions such as `c()`:
+analyze literals and evaluate simple functions such as `c()`
 
 ```{R, eval = FALSE}
 mtcars[, c(1L, 3L)]
@@ -53,15 +48,7 @@ mtcars[, "mpg"]
 mtcars$mpg
 ```
 
-Through constant propagation we can also handle variables defined from
-literals:
-
-```{R, eval = FALSE}
-cols = c("cyl", disp")
-mtcars[, cols]
-```
-
-While we cannot statically analyze code where the value isn't known until
+We cannot statically analyze code where the value isn't known until
 runtime.
 
 ```{R, eval = FALSE}
@@ -94,7 +81,6 @@ Lastly, if `header = TRUE` we can try to look at the data itself to infer
 the column names. We can only try, because the location of the data may
 not be the same as the location where `read_faster()` is called.
 
-
 ## Future Work
 
 ### Necessary 
@@ -112,6 +98,9 @@ d = read.csv("data.csv")
 d[, 5] = 2
 write.csv(d, "data2.csv")  # Uses all columns of d
 ```
+
+The safe thing to do anytime we see a use of `d` which is not a subset is
+to assume that it will then require all columns.
 
 Handle variables which are redefined. This could likely be done through a
 single static assignment (SSA) preprocessing step. For example, the
@@ -131,6 +120,14 @@ print(x[[1]])
 ### Nice to Have
 
 _These tasks are less critical._
+
+Through constant propagation we can also handle variables defined from
+literals:
+
+```{R, eval = FALSE}
+cols = c("cyl", disp")
+mtcars[, cols]
+```
 
 Account for indirect use of variables. The following should infer that the
 4th column is used.
