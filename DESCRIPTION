@@ -13,12 +13,13 @@ Imports:
     parallel,
     CodeDepends,
     microbenchmark
-Suggests:
+Suggests: 
     roxygen2,
     knitr,
     rmarkdown,
     testthat,
-    data.table
+    data.table,
+    covr
 Description: This experimental package provides tools to automatically
     transform R code into a more efficient version. Typically this means
     converting serial code into a parallel version.
