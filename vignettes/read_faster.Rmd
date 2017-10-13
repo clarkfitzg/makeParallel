@@ -93,7 +93,7 @@ static analysis.
 Check if any commands imply that the whole data set must be loaded. For
 example:
 
-```{R}
+```{R, eval = FALSE}
 d = read.csv("data.csv")
 d[, 5] = 2
 write.csv(d, "data2.csv")  # Uses all columns of d
@@ -107,7 +107,7 @@ single static assignment (SSA) preprocessing step. For example, the
 following is problematic because we must restrict the code analysis and
 transformations to `x` before it is redefined:
 
-```{R}
+```{R, eval = FALSE}
 
 x = read.csv("data.csv")
 print(x[1, 1])
@@ -140,13 +140,13 @@ d2[, 4]
 
 Read subsets without corresponding variable assignments, for example:
 
-```{R}
+```{R, eval = FALSE}
 hist(read.csv("data.csv")[, 2])
 ```
 
-More complicated forms of assignment
+More complicated forms of assignment. Haven't verified which work.
 
-```{R}
+```{R, eval = FALSE}
 a = b = read.csv("data.csv")
 ```
 
@@ -180,7 +180,7 @@ The code will go through three representations then:
 
 __Original__ including mixed names and integers:
 
-```{R}
+```{R, eval = FALSE}
 
 mpg = mtcars$mpg
 cyl = mtcars[, 2]
@@ -193,7 +193,7 @@ __Name Replacement__ substitutes the names with integers, and converts all
 `data.frame` subsetting commands into single `[`. Assume that we know the
 column names.
 
-```{R}
+```{R, eval = FALSE}
 
 mpg = mtcars[, 1]
 cyl = mtcars[, 2]
@@ -211,11 +211,10 @@ smaller `data.frame`. The index map is a sorted integer vector of the
 columns that are used. This step cannot happen with the previous because
 it's necessary to first know all the columns which will be used.
 
-```{R}
+```{R, eval = FALSE}
 
 index_map = c(1, 2, 3, 5)
 
-# Suppose fread supports integers here
 .mtcars = fread(..., select = index_map)
 
 mpg = .mtcars[, 1]
@@ -278,7 +277,7 @@ together. This potentially lets R quickly process files larger than memory.
 How to get every column which is used when new copies of the data frame
 are created? For example:
 
-```{R}
+```{R, eval = FALSE}
 
 mtcars2 = mtcars[possible_subset, ]
 
@@ -303,5 +302,3 @@ info = lapply(code, CodeDepends::getInputs)
 code2 = quote(x <- rnorm(n = read.csv("data.csv")))
 
 CodeDepends::getInputs(code2)
-
-

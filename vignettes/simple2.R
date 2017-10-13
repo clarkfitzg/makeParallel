@@ -5,4 +5,4 @@ fslow = function(x) {
 }
 z = 1:10
 r1 = lapply(z, ffast)
-r2 = parallel::mclapply(z, fslow)
+r2 = lapply(z, fslow)
