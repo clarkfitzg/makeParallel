@@ -7,6 +7,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{R, eval = FALSE}
+
+library(knitr)
+opts_knit$set(eval=FALSE)
+
+```
+
 # Internal Design Documentation
 
 This document is not intended for users. It contains the following:
@@ -186,7 +193,7 @@ This seems rare to me.
 Assume that column selections can be inferred by static code analysis. For
 example, we can statically analyze the following:
 
-```{R}
+```{R, eval = FALSE}
 # Literals
 mtcars[, 1L]
 mtcars[, "mpg"]
@@ -194,12 +201,12 @@ mtcars$mpg
 
 # Variables defined from literals. This use case requires
 # constant propagation
-cols = c("cyl", disp")
+cols = c("cyl", "disp")
 mtcars[, cols]
 ```
 
 While we cannot statically analyze these:
-```{R}
+```{R, eval = FALSE}
 
 # Computed columns
 col = read.csv("something_external.csv")[1, 1]
@@ -219,7 +226,7 @@ I'm going to start off getting something common and simple to work, and
 then generalize from there. The example from the beginning is as simple as
 possible.
 
-```{R}
+```{R, eval = FALSE}
 
 d = read.csv("data.csv")
 
@@ -229,7 +236,7 @@ hist(d[, 2])
 
 This should be transformed to the following:
 
-```{R}
+```{R, eval = FALSE}
 
 d = data.table::fread("data.csv", select = 2)
 
@@ -254,7 +261,7 @@ think about these once the basics are working.
 Account for indirect use of variables. The following should infer that the
 4th column is used.
 
-```{R}
+```{R, eval = FALSE}
 d = read.csv("data.csv")
 d2 = d * 2
 d2[, 4]
@@ -266,7 +273,7 @@ static analysis.
 Check if any commands imply that the whole data set must be loaded. For
 example:
 
-```{R}
+```{R, eval = FALSE}
 d = read.csv("data.csv")
 d[, 5] = 2
 write.csv(d, "data2.csv")  # Uses all columns of d
@@ -274,13 +281,13 @@ write.csv(d, "data2.csv")  # Uses all columns of d
 
 Read subsets without corresponding variable assignments, for example:
 
-```{R}
+```{R, eval = FALSE}
 hist(read.csv("data.csv")[, 2])
 ```
 
 More complicated forms of assignment
 
-```{R}
+```{R, eval = FALSE}
 a = b = read.csv("data.csv")
 ```
 
@@ -309,7 +316,7 @@ The code will go through three representations then:
 
 __Original__ including mixed names and integers:
 
-```{R}
+```{R, eval = FALSE}
 
 mpg = mtcars$mpg
 cyl = mtcars[, 2]
@@ -322,7 +329,7 @@ __Name Replacement__ substitutes the names with integers, and converts all
 `data.frame` subsetting commands into single `[`. Assume that we know the
 column names.
 
-```{R}
+```{R, eval = FALSE}
 
 mpg = mtcars[, 1]
 cyl = mtcars[, 2]
@@ -340,7 +347,7 @@ smaller `data.frame`. The index map is a sorted integer vector of the
 columns that are used. This step cannot happen with the previous because
 it's necessary to first know all the columns which will be used.
 
-```{R}
+```{R, eval = FALSE}
 
 index_map = c(1, 2, 3, 5)
 
@@ -445,7 +452,7 @@ together. This potentially lets R quickly process files larger than memory.
 How to get every column which is used when new copies of the data frame
 are created? For example:
 
-```{R}
+```{R, eval = FALSE}
 
 mtcars2 = mtcars[possible_subset, ]
 
@@ -482,7 +489,7 @@ It's not sufficient to substitute `parallel::parLapply` in for `lapply`,
 because the workers will not load the `MASS` library or have the `start`
 variable. The following works:
 
-```{R}
+```{R, eval = FALSE}
 
 library(parallel)
 cl = makeCluster(2L)
