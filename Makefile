@@ -5,6 +5,7 @@ RFILES!= ls R/*.R
 TESTFILES!= ls tests/testthat/test*.R
 #VIGNETTES!= ls vignettes/*.Rmd
 
+PKG=codedoctor_0.0.1.tar.gz
 
 install: $(RFILES)
 	R -e "roxygen2::roxygenize()"
@@ -16,10 +17,11 @@ test: $(TESTFILES)
 
 #vignettes: $(VIGNETTES)
 
-docs:
-	R -e "tools::buildVignettes(dir = '.')"
+#docs:
+#	R -e "tools::buildVignettes(dir = '.')"
 
-# Could make this more robust to do a better CRAN check, but no need yet.
-build: $(RFILES)
+$(PKG): $(RFILES) $(TESTFILES)
 	R CMD build .
-	R CMD check 
+
+check: $(PKG)
+	R CMD check $(PKG)
