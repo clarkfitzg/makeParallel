@@ -22,6 +22,7 @@ test_that("replacing functions", {
 test_that("find_var", {
 
     expr = quote(x[1:5])
+
     expect_equal(find_var(expr, "x"), list(2))
 
     expr = quote(y[1:5])
@@ -30,7 +31,6 @@ test_that("find_var", {
     expr = quote(mean(x[1:5]))
     expect_equal(find_var(expr, "x"), list(c(2, 2)))
 
-    #TODO: Problem is the missing arg.
     expr = quote(plot(dframe[, "d"]))
     actual = find_var(expr, "dframe")
 

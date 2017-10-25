@@ -16,10 +16,20 @@ multiprocessing.
 
 ## related work
 
+Several existing packages provide a more consistent interface to parallel
+computation. These include foreach, ddR, partools, multidplyr.
+
 Bengstton's
 [futures](https://cran.r-project.org/web/packages/future/index.html)
 provides a mechanism for parallel asynchronous evaluation of R code
 across different systems.
+
+Bischl and Lang's
+[parallelMap](https://cran.r-project.org/package=parallelMap) provides a
+parallel version of `Map()` supporting different execution backends
+including local, multicore, mpi and BatchJobs. The
+[batchtools](https://cran.r-project.org/package=batchtools) package
+supports HPC systems.
 
 Böhringer's
 [parallelize.dynamic](https://cran.r-project.org/package=parallelize.dynamic)
@@ -27,7 +37,8 @@ provides the `parallelize_call()` function to dynamically parallelize a
 single function call.
 
 Wang's [valor](https://github.com/wanghc78/valor) vectorizes `lapply` calls
-into single function calls.
+into single function calls. In some sense this is the most related project,
+because the main purpose of valor is to actually transform code.
 
 ## simple example
 
