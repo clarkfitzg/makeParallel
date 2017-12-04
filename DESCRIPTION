@@ -12,7 +12,8 @@ Imports:
     methods,
     parallel,
     CodeDepends,
-    microbenchmark
+    microbenchmark,
+    whisker
 Suggests: 
     roxygen2,
     knitr,
