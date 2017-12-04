@@ -1,8 +1,8 @@
 ---
-title: "codedoctor-interactive"
+title: "autoparallel-interactive"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{codedoctor-interactive}
+  %\VignetteIndexEntry{autoparallel-interactive}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -28,7 +28,7 @@ We'll start with a basic example.
 
 ```{r}
 
-library(codedoctor)
+library(autoparallel)
 
 x = list(1:10, rnorm(10), rep(pi, 10))
 
@@ -96,7 +96,7 @@ do(lapply(x, myfun))
 
 ## Limitations
 
-`codedoctor` is not currently designed to work with multiple large
+`autoparallel` is not currently designed to work with multiple large
 objects.  Rather, it was designed for a single large object to be
 distributed to the workers when the evaluator is created.  The following
 code will be slow because it serializes a large (400 MB) object to each of

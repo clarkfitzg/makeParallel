@@ -2,6 +2,6 @@ library(testthat)
 # https://github.com/r-lib/testthat/issues/86
 Sys.setenv("R_TESTS" = "")
 
-library(codedoctor)
+library(autoparallel)
 
-test_check("codedoctor")
+test_check("autoparallel")

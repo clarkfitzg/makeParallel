@@ -2,12 +2,12 @@ library(CodeDepends)
 
 s = readScript("MapReduce.R")
 
-g = codedoctor::depend_graph(s)
+g = autoparallel::depend_graph(s)
 
 # Find if a variable assigned to a Map result is only input to a Reduce.
 # If so, then we can combine the Map and Reduce. But is this the best way?
 
-mapuse = sapply(s, codedoctor::apply_location, apply_func = "Map")
+mapuse = sapply(s, autoparallel::apply_location, apply_func = "Map")
 
 # Making assumptions on how code is written here, ie. x = Map(...)
 map_assign = which(mapuse == 3)

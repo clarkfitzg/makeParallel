@@ -1,8 +1,8 @@
 ---
-title: "codedoctor-read_faster"
+title: "autoparallel-read_faster"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{codedoctor-read_faster}
+  %\VignetteIndexEntry{autoparallel-read_faster}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -25,7 +25,7 @@ reading data that are never used.
 
 ```{R}
 
-library(codedoctor)
+library(autoparallel)
 
 script = parse(text = '
     d = read.csv("data.csv")

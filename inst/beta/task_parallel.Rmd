@@ -1,8 +1,8 @@
 ---
-title: "codedoctor-task-parallel"
+title: "autoparallel-task-parallel"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{codedoctor-task-parallel}
+  %\VignetteIndexEntry{autoparallel-task-parallel}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

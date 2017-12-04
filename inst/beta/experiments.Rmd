@@ -1,15 +1,15 @@
 ---
-title: "codedoctor-experiments"
+title: "autoparallel-experiments"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{codedoctor-interactive}
+  %\VignetteIndexEntry{autoparallel-interactive}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 # Experiments
 
-Motivation for the tools inside `codedoctor`.
+Motivation for the tools inside `autoparallel`.
 
 ## Fast Functions
 

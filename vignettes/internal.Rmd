@@ -1,8 +1,8 @@
 ---
-title: "codedoctor-internal"
+title: "autoparallel-internal"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{codedoctor-internal}
+  %\VignetteIndexEntry{autoparallel-internal}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -482,7 +482,7 @@ lapply(d, f)
 ')
 
 # Experimenting
-codedoctor:::snow_fork(code)
+autoparallel:::snow_fork(code)
 
 ```
 It's not sufficient to substitute `parallel::parLapply` in for `lapply`,

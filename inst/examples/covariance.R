@@ -1,4 +1,4 @@
-library(codedoctor)
+library(autoparallel)
 # Compute sample covariance for columns of a matrix
 
 

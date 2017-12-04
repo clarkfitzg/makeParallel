@@ -1,4 +1,4 @@
-library(codedoctor)
+library(autoparallel)
 
 test_that("replacing functions", {
 
@@ -76,7 +76,7 @@ test_that("find_call", {
 
     e0 = quote(sapply(x, f))
 
-#codedoctor:::find_call(e0, "lapply")
+#autoparallel:::find_call(e0, "lapply")
 
     expect_equal(find_call(e0, "lapply"), list())
 

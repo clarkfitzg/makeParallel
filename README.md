@@ -1,7 +1,7 @@
 [![Travis-CI Build
-Status](https://travis-ci.org/clarkfitzg/codedoctor.svg?branch=master)](https://travis-ci.org/clarkfitzg/codedoctor)
+Status](https://travis-ci.org/clarkfitzg/autoparallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/autoparallel)
 
-# codedoctor
+# autoparallel
 
 _experimental library to transform serial R code into parallel_
 

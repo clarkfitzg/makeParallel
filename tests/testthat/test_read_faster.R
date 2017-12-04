@@ -85,7 +85,7 @@ test_that("infer_colnames", {
 
     expect_equal(actual, c("a", "b"))
     
-    #fname = system.file("tests/testthat/tiny.csv", package = "codedoctor")
+    #fname = system.file("tests/testthat/tiny.csv", package = "autoparallel")
     #code = substitute(quote(read.csv(fname)))
     code = quote(read.csv("tiny.csv"))
     actual = infer_colnames(code)

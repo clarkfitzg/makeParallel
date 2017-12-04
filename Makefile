@@ -5,7 +5,7 @@ RFILES!= ls R/*.R
 TESTFILES!= ls tests/testthat/test*.R
 #VIGNETTES!= ls vignettes/*.Rmd
 
-PKG=codedoctor_0.0.1.tar.gz
+PKG=autoparallel_0.0.1.tar.gz
 
 install: $(RFILES)
 	R -e "roxygen2::roxygenize()"
@@ -29,4 +29,4 @@ check: $(PKG)
 clean:
 	rm vignettes/*.html
 	rm $(PKG)
-	rm -r codedoctor.Rcheck
+	rm -r autoparallel.Rcheck

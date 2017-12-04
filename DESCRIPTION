@@ -1,4 +1,4 @@
-Package: codedoctor
+Package: autoparallel
 Version: 0.0.1
 Date: 2017-06-12
 Title: static analysis and transformations of R code
@@ -28,7 +28,7 @@ Description: This experimental package provides tools to automatically
     analysis of large data sets, detection of task parallelism, and
     code transformations.
 License: MIT + file LICENSE
-URL: https://github.com/clarkfitzg/codedoctor
-BugReports: https://github.com/clarkfitzg/codedoctor
+URL: https://github.com/clarkfitzg/autoparallel
+BugReports: https://github.com/clarkfitzg/autoparallel
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr

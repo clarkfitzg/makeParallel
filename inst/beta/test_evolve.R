@@ -99,7 +99,7 @@ expect_equal(f(5), "fast")
 # All details subject to change
 test_that("global timings exist", {
 
-#debug(codedoctor:::startstop)
+#debug(autoparallel:::startstop)
 
 trace_timings(crossprod, metadata_func = crossprod_flops)
 
