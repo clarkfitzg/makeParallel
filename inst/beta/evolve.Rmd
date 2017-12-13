@@ -238,7 +238,12 @@ best way is to rewrite it all to use the trace implementation, since that
 is more general. Then I don't have to have two implementations.
 
 
+## Extensions
 
+I could cache the functions and the models on the user's disk for reuse in
+new sessions. Duncan has suggested that we even cache them centrally, ie.
+the user program sends in metadata, system info, and possibly
+implementations to a central server.
 
 ## Related ideas
 
