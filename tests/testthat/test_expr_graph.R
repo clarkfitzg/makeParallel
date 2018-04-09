@@ -14,14 +14,14 @@ test_that("Degenerate cases, 0 or 1 nodes", {
     s0 = readScript(txt = "
     ")
     g0 = make_empty_graph()
-    gd0 = depend_graph(s0)
+    gd0 = expr_graph(s0)
     expect_samegraph(g0, gd0)
 
     s1 = readScript(txt = "
     x = 1
     ")
     g1 = make_graph(numeric(), n = 1)
-    gd1 = depend_graph(s1)
+    gd1 = expr_graph(s1)
 
     expect_samegraph(g1, gd1)
 
@@ -36,7 +36,7 @@ test_that("User defined functions are dependencies", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = depend_graph(s)
+    actual = expr_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -51,7 +51,7 @@ test_that("Self referring node does not appear", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = depend_graph(s)
+    actual = expr_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -66,8 +66,8 @@ test_that("Assignment order respected", {
     y = 2 * x
     ")
 
-    desired = make_graph(c(1, 2, 2, 3))
-    actual = depend_graph(s)
+    desired = make_graph(c(2, 3))
+    actual = expr_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -83,7 +83,7 @@ test_that("Chains not too long", {
     ")
 
     desired = make_graph(c(1, 2, 1, 3))
-    actual = depend_graph(s)
+    actual = expr_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -99,7 +99,7 @@ test_that("Updates count as dependencies", {
     ")
 
     desired = make_graph(c(1, 2, 2, 3))
-    actual = depend_graph(s)
+    actual = expr_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -114,7 +114,7 @@ test_that("Can add source node", {
     ")
 
     desired = make_graph(c(1, 2, 1, 3))
-    actual = depend_graph(s, add_source = TRUE)
+    actual = expr_graph(s, add_source = TRUE)
 
     expect_samegraph(desired, actual)
 
@@ -129,7 +129,7 @@ test_that("$ evaluates LHS", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = depend_graph(s)
+    actual = expr_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -144,7 +144,7 @@ test_that("Precedence for user defined variables over base", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = depend_graph(s)
+    actual = expr_graph(s)
 
     expect_samegraph(desired, actual)
 

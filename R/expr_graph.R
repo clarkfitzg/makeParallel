@@ -71,7 +71,7 @@ add_source_node = function(g)
 #'
 #' @param script as returned from \code{\link[CodeDepends]{readScript}}
 #' @export
-depend_graph = function(script, add_source = FALSE)
+expr_graph = function(script, add_source = FALSE)
 {
 
     # A list of ScriptNodeInfo objects. May be useful to do more with

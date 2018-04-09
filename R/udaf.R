@@ -30,6 +30,8 @@ R_template = readLines(
 #'
 #' Alternatively I could use caps to denote SQL things, ie. CLUSTER_BY
 #'
+#' Looking back at this now 
+#'
 #'
 #' @param f function which accepts a grouped data frame and returns a
 #'  data frame

@@ -2,6 +2,7 @@
 
 S3method(print,parallel_evaluator)
 export(benchmark_transform)
+export(depend_graph)
 export(parallelize)
 export(read_faster)
 export(stop_cluster)
