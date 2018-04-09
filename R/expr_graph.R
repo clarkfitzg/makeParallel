@@ -12,20 +12,31 @@ one_edge = function(i, output)
 }
 
 
-#' Variable Use Edge Graph
+#' Where does x show up in locs
 #' 
-#' A vector of edges specifying constraints on evaluation order.
-#' Output is suitable for use with \code{\link[igraph]{make_graph}}.
+#' @param x character
+#' @param locs list of character vectors
+where_index = function(x, locs)
+{
+    which(sapply(locs, function(locs_i) x %in% locs_i))
+}
+
+
+#' Use Definition Chain
+#' 
+#' A vector of edges from the expression which defines a variable to the
+#' expressions that use that variable.
 #' 
 #' @param varname variable name
-#' @param used_vars list containing variable names used in each expression
-#' @param outputs list containing variable names defined in each expression
-vargraph = function(varname, used_vars, outputs)
+#' @param all_uses list containing variable names uses in each expression
+#' @param all_definitions list containing variable names defined in each expression
+#' @return vector suitable for use with \code{\link[igraph]{make_graph}}.
+use_def = function(varname, all_uses, all_definitions)
 {
-    used = which(sapply(used_vars, function(used) varname %in% used))
-    output = which(sapply(outputs, function(out) varname %in% out))
+    uses = where_index(varname, all_uses)
+    definitions = where_index(varname, all_definitions)
 
-    n = length(used)
+    n = length(uses)
 
     edges = integer()
 
@@ -36,7 +47,7 @@ vargraph = function(varname, used_vars, outputs)
 
     # Build edges up iteratively
     # This could be more efficient. Fix when it becomes a problem.
-    for(i in used){
+    for(i in uses){
         edges = c(edges, one_edge(i, output))
     }
 
@@ -100,19 +111,19 @@ expr_graph = function(script, add_source = FALSE)
     # Why is @functions use a named vector? And why is value NA?
     functions = lapply(info, function(x) names(x@functions))
 
-    assign_vars = mapply(c, outputs, updates, SIMPLIFY = FALSE)
-    used_vars = mapply(c, inputs, outputs, updates, functions, SIMPLIFY = FALSE)
+    definitions = mapply(c, outputs, updates, SIMPLIFY = FALSE)
+    uses = mapply(c, inputs, outputs, updates, functions, SIMPLIFY = FALSE)
+
     vars = unique(unlist(outputs))
+    edges = lapply(vars, use_def, uses, definitions)
 
-    edges = lapply(vars, vargraph, used_vars, assign_vars)
+    #badones = (sapply(edges, length) %% 2) == 1
 
-    badones = (sapply(edges, length) %% 2) == 1
-
-    # TODO: This must be odd. Haven't figured out yet why it's failing
-    if(any(badones)){
-        warning("Something broke in dependgraph(), threw out:", sum(badones))
-        edges[badones] = NULL
-    }
+    ## TODO: This must be odd. Haven't figured out yet why it's failing
+    #if(any(badones)){
+    #    warning("Something broke in dependgraph(), threw out:", sum(badones))
+    #    edges[badones] = NULL
+    #}
 
     edges = unlist(edges)
 
