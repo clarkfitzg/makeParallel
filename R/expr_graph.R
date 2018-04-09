@@ -76,9 +76,7 @@ add_source_node = function(g)
 
 #' Expression Dependency Graph
 #'
-#' Create a DAG representing a set of expression dependencies.
-#' I'm not yet trying to take the minimal set of such dependencies, because
-#' it's not clear that this is necessary.
+#' Create a DAG representing the expression dependencies implicit in code.
 #'
 #' @param script as returned from \code{\link[CodeDepends]{readScript}}
 #' @export
@@ -115,7 +113,12 @@ expr_graph = function(script, add_source = FALSE)
     uses = mapply(c, inputs, outputs, updates, functions, SIMPLIFY = FALSE)
 
     vars = unique(unlist(outputs))
-    edges = lapply(vars, use_def, uses, definitions)
+
+    use_def_chains = lapply(vars, use_def, uses, definitions)
+
+    # I'm jumping through all these hoops to make it work with igraph,
+    # better to just use a data frame of edge constraints and convert it to
+    # igraph if and when I need it.
 
     #badones = (sapply(edges, length) %% 2) == 1
 
