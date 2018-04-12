@@ -27,7 +27,7 @@ use_def = function(varname, all_uses, all_definitions)
     uses = where_index(varname, all_uses)
     defs = c(where_index(varname, all_definitions), Inf)
 
-    edges = data.frame(from = def[cut(uses, breaks = defs)]
+    edges = data.frame(from = defs[cut(uses, breaks = defs)]
                        , to = uses
                        )
     edges$type = "use-def"
@@ -89,8 +89,15 @@ expr_graph = function(script, info = lapply(script, CodeDepends::getInputs))
     # Why is @functions use a named vector? And why is value NA?
     functions = lapply(info, function(x) names(x@functions))
 
+    # Problem: getInputs(quote(x$a <- 10))
+    # has x in both inputs and updates. I want this to be considered only a
+    # definition, not a use. Here's something that should be considered
+    # both a definition and a use:
+    # x$a <- x$b + 1
+
+
     definitions = mapply(c, outputs, updates, SIMPLIFY = FALSE)
-    uses = mapply(c, inputs, outputs, updates, functions, SIMPLIFY = FALSE)
+    uses = mapply(c, inputs, updates, functions, SIMPLIFY = FALSE)
 
     vars = unique(unlist(outputs))
 

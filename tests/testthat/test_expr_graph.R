@@ -10,7 +10,7 @@ library(igraph)
 # Could define Ops to get ==, but this is sufficient
 expect_samegraph = function(g, egdf)
 {
-    eg = CodeDepends::graph_from_data_frame(egdf)
+    eg = graph_from_data_frame(egdf)
     expect_true(isomorphic(g, eg))
 }
 
