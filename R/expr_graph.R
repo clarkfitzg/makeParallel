@@ -1,15 +1,5 @@
-# Thu Feb 23 09:56:02 PST 2017
-
-#' Create a single edge from the most recent output less than i, to i
-one_edge = function(i, output)
-{
-    if(i == output[1]){
-        # Don't count the first one
-        return(integer())
-    }
-    src = tail(output[i > output], 1)
-    c(src, i)
-}
+empty_edges = data.frame(from = integer(), to = integer()
+        , type = integer(), value = integer())
 
 
 #' Where does x show up in locs
@@ -35,23 +25,13 @@ where_index = function(x, locs)
 use_def = function(varname, all_uses, all_definitions)
 {
     uses = where_index(varname, all_uses)
-    definitions = where_index(varname, all_definitions)
+    defs = c(where_index(varname, all_definitions), Inf)
 
-    n = length(uses)
-
-    edges = integer()
-
-    # No edges
-    if(n <= 1){
-        return(edges)
-    }
-
-    # Build edges up iteratively
-    # This could be more efficient. Fix when it becomes a problem.
-    for(i in uses){
-        edges = c(edges, one_edge(i, output))
-    }
-
+    edges = data.frame(from = def[cut(uses, breaks = defs)]
+                       , to = uses
+                       )
+    edges$type = "use-def"
+    edges$value = replicate(nrow(edges), list(variable = varname))
     edges
 }
 
@@ -100,8 +80,7 @@ expr_graph = function(script, info = lapply(script, CodeDepends::getInputs))
 
     # Degenerate case
     if (n <= 1){
-        return(data.frame(from = integer(), to = integer()
-                          , type = integer(), value = integer()))
+        return(empty_edges)
     }
 
     inputs = lapply(info, slot, "inputs")
