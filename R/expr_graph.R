@@ -12,23 +12,6 @@ where_index = function(x, locs)
 }
 
 
-use_def = function(x, ...) UseMethod("use_def")
-
-
-#' Handy to use for tests
-use_def.default = function(x, ...)
-{
-    use_def(getInputs(x), ...)
-}
-
-
-#'
-use_def.ScriptNodeInfo = function(x, ...)
-{
-
-}
-
-
 #' Use Definition Chain
 #' 
 #' Compute a data frame of edges with one edge connecting each use of the
@@ -39,10 +22,13 @@ use_def.ScriptNodeInfo = function(x, ...)
 #' @param all_definitions list containing variable names defined in each expression
 #' @return data frame of edges suitable for use with
 #'  \code{\link[igraph]{graph_from_data_frame}}.
-use_def.character = function(x, all_uses, all_definitions)
+use_def = function(x, all_uses, all_definitions)
 {
     varname = x
     uses = where_index(varname, all_uses)
+    if(length(uses) == 0){
+        return(empty_edges)
+    }
     defs = c(where_index(varname, all_definitions), Inf)
 
     edges = data.frame(from = defs[cut(uses, breaks = defs)]

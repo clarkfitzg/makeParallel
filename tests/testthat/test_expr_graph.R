@@ -15,23 +15,6 @@ expect_samegraph = function(g, egdf)
 }
 
 
-test_that("meaning of 'use' and 'definition' for purpose of use def chains", {
-
-    # Problem: getInputs(quote(x$a <- 10))
-    # has x in both inputs and updates. I want this to be considered only a
-    # definition, not a use. Here's something that should be considered
-    # both a definition and a use:
-    # x$a <- x$b + 1
-    actual = use_def(quote(x$a <- 10))
-
-    expected = list(used = character(), defined = "x")
-
-    expect_identical(actual, expected)
-
-})
-
-
-
 test_that("Degenerate cases, 0 or 1 nodes", {
 
     s0 = readScript(txt = "
@@ -46,6 +29,7 @@ test_that("Degenerate cases, 0 or 1 nodes", {
     g1 = make_graph(numeric(), n = 1)
     gd1 = expr_graph(s1)
 
+    skip("Not yet implemented")
     expect_samegraph(g1, gd1)
 
 })
