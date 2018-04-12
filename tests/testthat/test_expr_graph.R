@@ -15,7 +15,7 @@ expect_samegraph = function(g, egdf)
 }
 
 
-test_that("behavior of 'use' and 'definition' for purpose of use def chains", {
+test_that("meaning of 'use' and 'definition' for purpose of use def chains", {
 
     # Problem: getInputs(quote(x$a <- 10))
     # has x in both inputs and updates. I want this to be considered only a

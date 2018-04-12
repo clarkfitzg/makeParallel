@@ -15,14 +15,17 @@ where_index = function(x, locs)
 use_def = function(x, ...) UseMethod("use_def")
 
 
+#' Handy to use for tests
 use_def.default = function(x, ...)
 {
     use_def(getInputs(x), ...)
 }
 
 
+#'
 use_def.ScriptNodeInfo = function(x, ...)
 {
+
 }
 
 
