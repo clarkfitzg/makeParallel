@@ -2,10 +2,16 @@ library(CodeDepends)
 library(igraph)
 
 
+# TODO: define behavior for this script:
+# x = list(a = 1)
+# x$b = 2
+# f(x)
+
 # Could define Ops to get ==, but this is sufficient
-expect_samegraph = function(g1, g2)
+expect_samegraph = function(g, egdf)
 {
-    expect_true(isomorphic(g1, g2))
+    eg = CodeDepends::graph_from_data_frame(egdf)
+    expect_true(isomorphic(g, eg))
 }
 
 

@@ -24,13 +24,14 @@ where_index = function(x, locs)
 
 #' Use Definition Chain
 #' 
-#' A vector of edges from the expression which defines a variable to the
-#' expressions that use that variable.
+#' Compute a data frame of edges with one edge connecting each use of the
+#' variable x to the most recent definition or update of x.
 #' 
 #' @param varname variable name
 #' @param all_uses list containing variable names uses in each expression
 #' @param all_definitions list containing variable names defined in each expression
-#' @return vector suitable for use with \code{\link[igraph]{make_graph}}.
+#' @return data frame of edges suitable for use with
+#'  \code{\link[igraph]{graph_from_data_frame}}.
 use_def = function(varname, all_uses, all_definitions)
 {
     uses = where_index(varname, all_uses)
@@ -76,11 +77,16 @@ add_source_node = function(g)
 
 #' Expression Dependency Graph
 #'
-#' Create a DAG representing the expression dependencies implicit in code.
+#' Create a data frame of edges representing the expression dependencies
+#' implicit in code.
 #'
 #' @param script as returned from \code{\link[CodeDepends]{readScript}}
+#' @param info list of ScriptInfo objects from
+#'  \code{\link[CodeDepends]{getInputs}}
+#' @return data frame of edges with attribute information suitable for use
+#'  with \code{\link[igraph]{graph_from_data_frame}}.
 #' @export
-expr_graph = function(script, add_source = FALSE)
+expr_graph = function(script, info = lapply(script, CodeDepends::getInputs))
 {
 
     # A list of ScriptNodeInfo objects. May be useful to do more with
@@ -90,17 +96,12 @@ expr_graph = function(script, add_source = FALSE)
         #getInputs(x, collector = inputCollector(checkLibrarySymbols = FALSE))
     #})
 
-    info = lapply(script, getInputs)
-
     n = length(info)
 
-    # Degenerate cases
-    if (n == 0){
-        return(make_empty_graph())
-    }
-    if (n == 1){
-        # Graph with one node, no edges.
-        return(igraph::make_graph(numeric(), n = 1))
+    # Degenerate case
+    if (n <= 1){
+        return(data.frame(from = integer(), to = integer()
+                          , type = integer(), value = integer()))
     }
 
     inputs = lapply(info, slot, "inputs")
@@ -116,29 +117,7 @@ expr_graph = function(script, add_source = FALSE)
 
     use_def_chains = lapply(vars, use_def, uses, definitions)
 
-    # I'm jumping through all these hoops to make it work with igraph,
-    # better to just use a data frame of edge constraints and convert it to
-    # igraph if and when I need it.
-
-    #badones = (sapply(edges, length) %% 2) == 1
-
-    ## TODO: This must be odd. Haven't figured out yet why it's failing
-    #if(any(badones)){
-    #    warning("Something broke in dependgraph(), threw out:", sum(badones))
-    #    edges[badones] = NULL
-    #}
-
-    edges = unlist(edges)
-
-    if(add_source){
-        g = igraph::make_graph(edges + 1, n = n + 1)
-        g = add_source_node(g)
-    } else {
-        g = igraph::make_graph(edges, n = n)
-    }
-
-    # Removes multiple edges
-    igraph::simplify(g)
+    do.call(rbind, use_def_chains)
 }
 
 

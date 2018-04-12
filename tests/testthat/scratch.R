@@ -35,3 +35,12 @@ g2 = add_edges(g2, c(2, 3), type = "use-def", var = "y")
 g = union(g1, g2, byname = TRUE)
 
 edge_attr(g)
+
+
+# Thinking of a more elegant way to make the use-def chain
+
+def = c(1, 10, Inf)
+use = c(2, 3, 7, 10, 13)
+
+# Ninja level R programming here.
+def[cut(use, breaks = def)]
