@@ -12,18 +12,33 @@ where_index = function(x, locs)
 }
 
 
+use_def = function(x, ...) UseMethod("use_def")
+
+
+use_def.default = function(x, ...)
+{
+    use_def(getInputs(x), ...)
+}
+
+
+use_def.ScriptNodeInfo = function(x, ...)
+{
+}
+
+
 #' Use Definition Chain
 #' 
 #' Compute a data frame of edges with one edge connecting each use of the
 #' variable x to the most recent definition or update of x.
 #' 
-#' @param varname variable name
+#' @param x variable name
 #' @param all_uses list containing variable names uses in each expression
 #' @param all_definitions list containing variable names defined in each expression
 #' @return data frame of edges suitable for use with
 #'  \code{\link[igraph]{graph_from_data_frame}}.
-use_def = function(varname, all_uses, all_definitions)
+use_def.character = function(x, all_uses, all_definitions)
 {
+    varname = x
     uses = where_index(varname, all_uses)
     defs = c(where_index(varname, all_definitions), Inf)
 
@@ -88,12 +103,6 @@ expr_graph = function(script, info = lapply(script, CodeDepends::getInputs))
     updates = lapply(info, slot, "updates")
     # Why is @functions use a named vector? And why is value NA?
     functions = lapply(info, function(x) names(x@functions))
-
-    # Problem: getInputs(quote(x$a <- 10))
-    # has x in both inputs and updates. I want this to be considered only a
-    # definition, not a use. Here's something that should be considered
-    # both a definition and a use:
-    # x$a <- x$b + 1
 
 
     definitions = mapply(c, outputs, updates, SIMPLIFY = FALSE)
