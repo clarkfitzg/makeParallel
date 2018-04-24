@@ -44,30 +44,27 @@ Most users should interact with this software through the functions
 described in this subsection. Our goal is to make this easy to use by
 providing only a few functions that are extensible. 
 
-`clean_up()` takes R code and produces R code. It attempts to make it more
-idiomatic while preserving the semantics. It's a general purpose tool to
-improve the quality of R code. It does nothing to make the code parallel.
-We use it as a preprocessing step before parallelizing.
+Suppose you have a script `code.R` in R's current working directory.
+If you just want a quick transformation of your code into a parallel form
+then can do the following:
 
 ```{R}
-ccode = clean_up("code.R"
-    , steps = c("loops_to_apply"
-                , "move_globals_to_func_signatures"
-                , "replace_redundant_expressions"
-                )
-    , my_custom_cleaner     # Can extend by writing functions 
-    ...
-    )
+autoparallel("code.R")
 ```
 
-Parameters:
+This generates a parallel version of `code.R`.
 
-- `code` the name of a file containing an R script, a parsed expression, or
-  a function
-- `steps` character vector of built in steps to apply in which order, with
-  reasonable default
-- `...` custom code preprocessing functions, would need to specify how
-  these look
+Internally it takes the following steps:
+
+1. Parses the file `code.R`
+2. Converts R's AST into an intermediate representation (IR) that's more
+   suitable for analysis
+3. Statically analyzes the IR to detect the potential for parallelism
+4. Detects the capabilities of the system
+5. Combines the the static analysis with the system capabilities to produce
+   an execution plan
+6. Saves the generated plan into a file
+
 
 `parallelize()` takes user code and figures out an intelligent way to make
 it parallel by inferring the dependency structure of the expressions and
@@ -99,4 +96,8 @@ times to execute each statement. So we need a way for users to provide that
 information if they have it. I can think of a few hacky ways, see the
 bottom of this document below Scratch:
 
+## Future directions
 
+Things that we haven't yet implemented, but we plan to.
+
+- More code transformations
