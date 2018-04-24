@@ -7,6 +7,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+TODO: include use case
+
 # Introduction
 
 This package is meant to simplify parallel programming in R by automating
@@ -26,6 +28,7 @@ R functions typically don't have side effects. They don't modify their
 arguments; instead they produce new objects. This is what makes R
 functional and what allows us to do parallel computing.
 
+
 ## Prior Art
 
 SNOW, parallel packages now included with R as recommended packages.
@@ -33,3 +36,67 @@ SNOW, parallel packages now included with R as recommended packages.
 Bohringer's dynamic parallelization.
 
 Bengsston's futures.
+
+
+## User functions
+
+Most users should interact with this software through the functions
+described in this subsection. Our goal is to make this easy to use by
+providing only a few functions that are extensible. 
+
+`clean_up()` takes R code and produces R code. It attempts to make it more
+idiomatic while preserving the semantics. It's a general purpose tool to
+improve the quality of R code. It does nothing to make the code parallel.
+We use it as a preprocessing step before parallelizing.
+
+```{R}
+ccode = clean_up("code.R"
+    , steps = c("loops_to_apply"
+                , "move_globals_to_func_signatures"
+                , "replace_redundant_expressions"
+                )
+    , my_custom_cleaner     # Can extend by writing functions 
+    ...
+    )
+```
+
+Parameters:
+
+- `code` the name of a file containing an R script, a parsed expression, or
+  a function
+- `steps` character vector of built in steps to apply in which order, with
+  reasonable default
+- `...` custom code preprocessing functions, would need to specify how
+  these look
+
+`parallelize()` takes user code and figures out an intelligent way to make
+it parallel by inferring the dependency structure of the expressions and
+the other patterns described in this document. It produces executable R
+code that is now parallel.
+
+```{R}
+pcode = parallelize("code.R"
+    , clean_first = FALSE
+    , run_now = FALSE
+    , cluster_type = "FORK"
+    , nnodes = 4
+)
+
+# visual representation of the graph structure
+plot(pcode)
+
+# Save the parallel version of the script
+save_code(pcode, "pcode.R")
+
+# Run the whole thing interactively
+run_code(pcode)
+```
+
+TODO: I'm not satisfied with the extensibility of these high level
+functions. To tell if it's worth it to parallelize we would really like to
+know the `object.size()` of as many variables as we can, as well as the
+times to execute each statement. So we need a way for users to provide that
+information if they have it. I can think of a few hacky ways, see the
+bottom of this document below Scratch:
+
+
