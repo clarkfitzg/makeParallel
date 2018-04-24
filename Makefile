@@ -1,13 +1,18 @@
-# Not actually using these, but I may later
-# GNU specific:
-#RFILES := $(wildcard R/*.R)
-RFILES!= ls R/*.R
-TESTFILES!= ls tests/testthat/test*.R
-#VIGNETTES!= ls vignettes/*.Rmd
+# Generic Makefile that can live in the same directory as an R package.
 
-PKG=autoparallel_0.0.1.tar.gz
+PKGNAME = $(shell awk '{if(/Package:/) print $$2}' DESCRIPTION)
+VERSION = $(shell awk '{if(/Version:/) print $$2}' DESCRIPTION)
+PKG = $(PKGNAME)_$(VERSION).tar.gz
 
-install: $(RFILES)
+# Helpful for debugging:
+$(info R package is: $(PKG))
+
+RFILES = $(wildcard R/*.R)
+TESTFILES = $(wildcard tests/testthat/test*.R)
+VIGNETTES = $(wildcard vignettes/*.Rmd)
+
+# User local install
+install: $(RFILES) DESCRIPTION
 	R -e "roxygen2::roxygenize()"
 	R CMD INSTALL .
 
@@ -15,18 +20,16 @@ test: $(TESTFILES)
 	make install
 	cd tests && Rscript testthat.R && cd ..
 
-#vignettes: $(VIGNETTES)
-
-#docs:
-#	R -e "tools::buildVignettes(dir = '.')"
-
-$(PKG): $(RFILES) $(TESTFILES)
+$(PKG): $(RFILES) $(TESTFILES) $(VIGNETTES) DESCRIPTION
+	rm -f $(PKG)  # Otherwise it's included in build
 	R CMD build .
 
 check: $(PKG)
-	R CMD check $(PKG)
+	R CMD check $(PKG) --as-cran
+
+vignettes: $(VIGNETTES)
+	make install
+	R -e "tools::buildVignettes(dir = '.')"
 
 clean:
-	rm vignettes/*.html
-	rm $(PKG)
-	rm -r autoparallel.Rcheck
+	rm -rf vignettes/*.html $(PKG) *.Rcheck
