@@ -156,3 +156,20 @@ cov_loop = function(x)
     }
     output
 }
+
+
+# loop version, uses symmetry and builtin covariance
+cov_loop2 = function(x)
+{
+    p = ncol(x)
+
+    output = matrix(numeric(p*p), nrow = p)
+    for(i in 1:p){
+        for(j in i:p){
+            covij = cov(x[, i], x[, j])
+            output[i, j] = covij
+            output[j, i] = covij
+        }
+    }
+    output
+}
