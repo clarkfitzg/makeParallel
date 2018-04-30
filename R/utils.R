@@ -169,11 +169,11 @@ all_symbols = function(expr)
     symbols = character()
     walker = codetools::makeCodeWalker(leaf = function(e, w){
         if(is.symbol(e)){
-            symbols <<- c(symbols, as.character(e))
+            symbols <<- union(symbols, as.character(e))
         }
     })
     lapply(expr, codetools::walkCode, walker)
-    unique(symbols)
+    symbols
 }
 
 

@@ -9,6 +9,30 @@ vignette: >
 
 TODO: include use case
 
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    eval = FALSE
+)
+```
+
+Goal is to release on CRAN in early June 2018. 
+Include the following features:
+
+- lapply -> mclapply
+- for loop -> parallel
+- task parallel expressions
+
+These should work with Unix fork (priority) and SNOW parallel setups, which
+means properly detecting and synchronizing state.
+
+For later:
+
+- Nested subexpressions. If the top level expression graph works then
+  we can use a preprocessing step to create temporary variables and then
+  use the same task parallel stuff.
+
+I want to export as few functions as possible, probably just 1 or 2.
+
 # Introduction
 
 This package is meant to simplify parallel programming in R by automating
@@ -49,6 +73,9 @@ If you just want a quick transformation of your code into a parallel form
 then can do the following:
 
 ```{R}
+
+library(autoparallel)
+
 autoparallel("code.R")
 ```
 
