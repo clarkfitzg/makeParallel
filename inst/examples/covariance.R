@@ -101,11 +101,11 @@ cov_prechunked = function(xchunks, indices)
 
 
 cov_chunked_parallel = cov_chunked
-body(cov_chunked_parallel) = sub_expr(body(cov_chunked), list(lapply = quote(parallel::mclapply)))
+body(cov_chunked_parallel) = autoparallel:::sub_expr(body(cov_chunked), list(lapply = quote(parallel::mclapply)))
 
 
 cov_prechunked_parallel = cov_prechunked
-body(cov_prechunked_parallel) = sub_expr(body(cov_prechunked), list(lapply = quote(parallel::mclapply)))
+body(cov_prechunked_parallel) = autoparallel:::sub_expr(body(cov_prechunked), list(lapply = quote(parallel::mclapply)))
 
 
 cov_with_prechunk_parallel = function(x, nchunks = 2L)
@@ -172,4 +172,52 @@ cov_loop2 = function(x)
         }
     }
     output
+}
+
+
+# Hides nested iteration of cov_loop2 into single iteration
+#
+# This isn't any easier to analyze than the loop version, and it's a hell
+# of a lot harder for a programmer to look at it and figure out what's
+# going on.
+cov_combn = function(x)
+{
+    p = ncol(x)
+
+    output = matrix(numeric(p*p), nrow = p)
+    insert_cov = function(ij){
+        i = ij[1]
+        j = ij[2]
+        covij = cov(x[, i], x[, j])
+        output[i, j] <<- covij
+        output[j, i] <<- covij
+    }
+
+    combn(p, 2, insert_cov)
+
+    # Then we need another loop to fill in the diagonal
+    for(i in 1:p){
+        output[i, i] = var(x[, i])
+    }
+
+    output
+}
+
+
+if(TRUE){
+
+n = 300
+p = 10L
+set.seed(38290)
+x = matrix(rnorm(n * p), nrow = n)
+
+covx = cov(x)
+
+for(f in list(cov_chunked, cov_matrix, cov_Matrix_pkg, cov_loop, cov_loop2
+              , cov_combn)){
+    actual = as.matrix(f(x))
+    same = all.equal(covx, actual, check.attributes = FALSE)
+    if(!isTRUE(same)) browser()
+}
+
 }
