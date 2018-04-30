@@ -68,22 +68,21 @@ Most users should interact with this software through the functions
 described in this subsection. Our goal is to make this easy to use by
 providing only a few functions that are extensible. 
 
-Suppose you have a script `code.R` in R's current working directory.
+Suppose you have a script `my_script.R` in R's current working directory.
 If you just want a quick transformation of your code into a parallel form
 then can do the following:
 
 ```{R}
-
 library(autoparallel)
 
-autoparallel("code.R")
+autoparallel("my_script.R")
 ```
 
-This generates a parallel version of `code.R`.
+This generates a parallel version of `my_script.R`.
 
 Internally it takes the following steps:
 
-1. Parses the file `code.R`
+1. Parses the file `my_script.R`
 2. Converts R's AST into an intermediate representation (IR) that's more
    suitable for analysis
 3. Statically analyzes the IR to detect the potential for parallelism
@@ -92,6 +91,57 @@ Internally it takes the following steps:
    an execution plan
 6. Saves the generated plan into a file
 
+## Task graph
+
+For more control the user can split up these steps. The first thing is to
+create a task graph. This infers the dependency structure of the
+expressions and identifies known apply type functions or vectorized
+functions.
+
+```{r}
+
+code = parse(text = "
+             ")
+
+g = taskgraph(code)
+
+plot(g)
+```
+
+TODO: bring picture over from doc.
+
+
+
+### Annotations
+
+We can annotate the task graph with additional information to improve the
+scheduling. Knowing the object sizes and the time it takes for each
+statement to execute allows more efficient static scheduling.
+
+If you need to run this same
+script many times then it may be easier to run it once in serial and
+gather all of these object sizes and timings automatically from that run:
+
+```{r}
+g = taskgraph("my_script.R", timing_run = TRUE)
+```
+
+It's also fine to supply only partial information. 
+For example, suppose line 2 of `my_script.R` is `x =
+read.csv("x.csv")`.  Suppose we know that this line results
+in an object `x` of size 32768 bytes and it takes 0.00354 seconds to run. We can express that as follows:
+
+
+```{r}
+g = annotate(g, line = 2, size = list(x = 32768), time = 0.00354)
+```
+FEEDBACK: I may implement this with attributes. This type of user API
+me the freedom to pick that as I like
+
+
+
+
+## Scratch
 
 `parallelize()` takes user code and figures out an intelligent way to make
 it parallel by inferring the dependency structure of the expressions and
@@ -99,7 +149,8 @@ the other patterns described in this document. It produces executable R
 code that is now parallel.
 
 ```{R}
-pcode = parallelize("code.R"
+
+pcode = parallelize("my_script.R"
     , clean_first = FALSE
     , run_now = FALSE
     , cluster_type = "FORK"
@@ -110,10 +161,11 @@ pcode = parallelize("code.R"
 plot(pcode)
 
 # Save the parallel version of the script
-save_code(pcode, "pcode.R")
+save_code(pcode, "pmy_script.R")
 
 # Run the whole thing interactively
 run_code(pcode)
+
 ```
 
 TODO: I'm not satisfied with the extensibility of these high level
