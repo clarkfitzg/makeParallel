@@ -64,12 +64,12 @@ add_source_node = function(g)
 #' Create a data frame of edges representing the expression dependencies
 #' implicit in code.
 #'
+#' @export
 #' @param script as returned from \code{\link[CodeDepends]{readScript}}
 #' @param info list of ScriptInfo objects from
 #'  \code{\link[CodeDepends]{getInputs}}
 #' @return data frame of edges with attribute information suitable for use
 #'  with \code{\link[igraph]{graph_from_data_frame}}.
-#' @export
 expr_graph = function(script, info = lapply(script, CodeDepends::getInputs))
 {
 
