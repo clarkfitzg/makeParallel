@@ -23,6 +23,29 @@ opts_knit$set(eval=FALSE)
 
 ```
 
+Skimming through what is here, I realize that what I really need is a more
+systematic form of algebra rather than all these heuristics.
+
+```{R}
+library(autoparallel)
+
+autoparallel("my_script.R")
+```
+
+This generates a parallel version of `my_script.R`.
+
+Internally it takes the following steps:
+
+1. Parses the file `my_script.R`
+2. Converts R's AST into an intermediate representation (IR) that's more
+   suitable for analysis
+3. Statically analyzes the IR to detect the potential for parallelism
+4. Detects the capabilities of the system
+5. Combines the the static analysis with the system capabilities to produce
+   an execution plan
+6. Saves the generated plan into a file
+
+
 # Internal Design Documentation
 
 This document is not intended for users. It contains the following:

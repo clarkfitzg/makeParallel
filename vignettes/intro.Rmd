@@ -19,11 +19,14 @@ Goal is to release on CRAN in early June 2018.
 Include the following features:
 
 - lapply -> mclapply
-- for loop -> parallel
+- for loop -> parallel for loops
 - task parallel expressions
 
 These should work with Unix fork (priority) and SNOW parallel setups, which
 means properly detecting and synchronizing state.
+
+Not sure what kind of for loops I need to do. I'll try an experiment to see
+how the shared memory works out.
 
 For later:
 
@@ -79,17 +82,6 @@ autoparallel("my_script.R")
 ```
 
 This generates a parallel version of `my_script.R`.
-
-Internally it takes the following steps:
-
-1. Parses the file `my_script.R`
-2. Converts R's AST into an intermediate representation (IR) that's more
-   suitable for analysis
-3. Statically analyzes the IR to detect the potential for parallelism
-4. Detects the capabilities of the system
-5. Combines the the static analysis with the system capabilities to produce
-   an execution plan
-6. Saves the generated plan into a file
 
 ## Task graph
 
