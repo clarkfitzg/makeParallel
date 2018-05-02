@@ -11,6 +11,4 @@ script = parse(text = "
     xy = merge(x, y)                        # D
 ")
 
-tg = expr_graph(script)
-
-
+autoparallel(script)

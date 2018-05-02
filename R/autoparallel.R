@@ -11,7 +11,11 @@
 #' pcode = autoparallel(parse(text = "lapply(x, f)"))
 autoparallel = function(code
     , runfirst = FALSE
-    , ...)
+    , scheduler = minimize_start_time
+    , code_generator = generate_snow_code
+    )
 {
-    UseMethod("autoparallel")
+    taskgraph = expr_graph(code)
+    plan = scheduler(code, taskgraph)
+    code_generator(plan)
 }

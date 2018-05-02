@@ -1,18 +1,19 @@
 #' Minimize Node Start Time
 #'
-#' Greedy algorithm that assigns each task to the earliest possible worker
-#' node.
+#' Implementation of "list scheduling".
+#' This is a greedy algorithm that assigns each task to the earliest
+#' possible processor.
 #'
 #' See Algorithm 10 in Sinnen's book "Task Scheduling for Parallel
 #' Systems".
 #'
+#' @export
 #' @param tasks list of expressions 
 #' @param taskgraph data frame as returned from \link{\code{expr_graph}}
 #' @param nprocs integer number of processors
 #' @param task_times numeric vector of times it will take each expression to
 #'  execute
 #' @return schedule
-#' @export
 minimize_start_time = function(tasks, taskgraph, nprocs = 2L
     , task_times = rep(1, length(tasks)))
 {
@@ -22,4 +23,16 @@ minimize_start_time = function(tasks, taskgraph, nprocs = 2L
 
     communicate = list()
 
+    for(task in seq(2, length(tasks))){
+    }
+}
+
+
+#' Generate Task Parallel Code For SNOW Cluster
+#'
+#' Produces executable code.
+#' 
+#' @export
+generate_snow_code = function(schedule)
+{
 }
