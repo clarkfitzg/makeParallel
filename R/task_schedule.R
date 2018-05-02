@@ -32,6 +32,9 @@ minimize_start_time = function(tasks, taskgraph, nprocs = 2L
 #'
 #' Produces executable code.
 #' 
+#' A code generator must know: when to execute a statement
+#' 
+#' 
 #' @export
 generate_snow_code = function(schedule)
 {

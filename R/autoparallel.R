@@ -13,6 +13,9 @@ autoparallel = function(code
     , runfirst = FALSE
     , scheduler = minimize_start_time
     , code_generator = generate_snow_code
+    # TODO:
+#    , scheduler_args = list()
+#    , code_generator_args = list()
     )
 {
     taskgraph = expr_graph(code)
