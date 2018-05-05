@@ -18,9 +18,6 @@ minimize_start_time = function(ntasks, taskgraph, nprocs = 2L
     , task_times = rep(1, ntasks))
 {
 
-    # Time the processor is ready for a new computation
-    processor_ready = rep(0, nprocs)
-
     # Initialize by scheduling the first expression on the first worker.
     schedule = list(list(type = "run", expr = 1L, processor = 1L))
 
@@ -29,8 +26,15 @@ minimize_start_time = function(ntasks, taskgraph, nprocs = 2L
 }
 
 
+#' Time the processor is ready for a new computation. This means it has
+#' completed all operations in the schedule.
+processor_ready_time = function(schedule)
+{
+}
+
+
 #' Compute start time for task on a processor
-start_time = function(processor, task, schedule)
+start_time = function(processor, task, taskgraph, schedule)
 {
 }
 
