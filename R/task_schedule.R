@@ -8,23 +8,30 @@
 #' Systems".
 #'
 #' @export
-#' @param tasks list of expressions 
+#' @param ntasks number of expressions
 #' @param taskgraph data frame as returned from \link{\code{expr_graph}}
 #' @param nprocs integer number of processors
 #' @param task_times numeric vector of times it will take each expression to
 #'  execute
 #' @return schedule
-minimize_start_time = function(tasks, taskgraph, nprocs = 2L
-    , task_times = rep(1, length(tasks)))
+minimize_start_time = function(ntasks, taskgraph, nprocs = 2L
+    , task_times = rep(1, ntasks))
 {
 
-    # Initialize by scheduling the first expression.
-    execute = data.frame(expression = 1L, processor = 1L, time = 0)
+    # Time the processor is ready for a new computation
+    processor_ready = rep(0, nprocs)
 
-    communicate = list()
+    # Initialize by scheduling the first expression on the first worker.
+    schedule = list(list(type = "run", expr = 1L, processor = 1L))
 
-    for(task in seq(2, length(tasks))){
+    for(task in seq(2, ntasks)){
     }
+}
+
+
+#' Compute start time for task on a processor
+start_time = function(processor, task, schedule)
+{
 }
 
 
