@@ -8,28 +8,33 @@
 #' Systems".
 #'
 #' @export
-#' @param ntasks number of expressions
+#' @param expressions
 #' @param taskgraph data frame as returned from \link{\code{expr_graph}}
 #' @param nprocs integer number of processors
-#' @param task_times numeric vector of times it will take each expression to
+#' @param expr_times numeric vector of times it will take each expression to
 #'  execute
 #' @return schedule
-minimize_start_time = function(ntasks, taskgraph, nprocs = 2L
-    , task_times = rep(1, ntasks))
+minimize_start_time = function(expressions, taskgraph, nprocs = 2L
+    , expr_times = rep(1, length(expressions)))
 {
 
     # Initialize by scheduling the first expression on the first worker.
-    schedule = list(list(type = "run", expr = 1L, processor = 1L))
+    schedule = data.frame(processor = 1L
+            , type = "eval"
+            , start_time = 0
+            , end_time = expr_times[1]
+            , value = list(task = 1L, expr = expressions[[1]])
+            )
+
+    processors = seq(nprocs)
+    ntasks = length(expressions)
 
     for(task in seq(2, ntasks)){
+        start_times = sapply(processors, start_time
+                , task = task, taskgraph = taskgraph, schedule = schedule)
+
+        earliest_proc = which.min(start_times)
     }
-}
-
-
-#' Time the processor is ready for a new computation. This means it has
-#' completed all operations in the schedule.
-processor_ready_time = function(schedule)
-{
 }
 
 
@@ -37,6 +42,13 @@ processor_ready_time = function(schedule)
 start_time = function(processor, task, taskgraph, schedule)
 {
 }
+
+
+##' Time the processor is ready to begin a new computation, which could be
+##' an evaluation or a transfer.
+#processor_ready_time = function(schedule, task_times)
+#{
+#}
 
 
 #' Generate Task Parallel Code For SNOW Cluster

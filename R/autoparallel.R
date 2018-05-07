@@ -18,6 +18,7 @@ autoparallel = function(code
 #    , code_generator_args = list()
     )
 {
+    code = as.expression(code)
     taskgraph = expr_graph(code)
     plan = scheduler(code, taskgraph)
     code_generator(plan)

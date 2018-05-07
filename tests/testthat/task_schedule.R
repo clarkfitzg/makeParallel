@@ -12,6 +12,8 @@ script = parse(text = "
     Sys.sleep(2)
 ")
 
+eg = expr_graph(script)
+
 ap = autoparallel(script)
 
 
