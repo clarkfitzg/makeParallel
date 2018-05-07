@@ -29,17 +29,34 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
     processors = seq(nprocs)
     ntasks = length(expressions)
 
+    # It would be easier if we know every variable that every worker has
+    # after every expression and transfer. Then we could see what they
+    # need, and where they can possibly get them. SSA could help by
+    # eliminating duplicated variable names. For the moment I will assume
+    # the variable names are unique.
+
     for(task in seq(2, ntasks)){
         start_times = sapply(processors, start_time
                 , task = task, taskgraph = taskgraph, schedule = schedule)
 
         earliest_proc = which.min(start_times)
+
+        schedule = update_schedule(earliest_proc, 
+                , task = task, taskgraph = taskgraph, schedule = schedule)
     }
+    schedule
 }
 
 
 #' Compute start time for task on a processor
 start_time = function(processor, task, taskgraph, schedule)
+{
+}
+
+
+#' Assign task i to processor j as the last step in the schedule, and
+#' return the updated schedule.
+update_schedule = function(processor, task, taskgraph, schedule)
 {
 }
 
