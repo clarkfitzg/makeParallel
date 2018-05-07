@@ -48,6 +48,15 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
 }
 
 
+#' The taskgraph identifies the set of variables that can possibly be
+#' transferred. This function returns a list of character vectors, where
+#' the ith element identifies the variables available on processor i after
+#' it completes all operations in the current schedule.
+variables_available = function(taskgraph, schedule)
+{
+}
+
+
 #' Compute start time for task on a processor
 start_time = function(processor, task, taskgraph, schedule)
 {
