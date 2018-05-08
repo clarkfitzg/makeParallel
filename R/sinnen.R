@@ -33,7 +33,10 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
             , type = "eval"
             , start_time = 0
             , end_time = node_times[1]
-            , value = list(node = 1L, expr = expressions[[1]])
+            , node = 1L
+            , from = NA
+            , to = NA
+            , value = expressions[[1]]
             )
 
     procs = seq(nprocs)
@@ -67,7 +70,7 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
 data_ready_time = function(proc, node, taskgraph, schedule)
 {
     # Transfer from predecessors to current node
-    preds = predecessors(node)
+    preds = predecessors(node, taskgraph)
 
     # Not sure we need this
     # No predecessors
@@ -94,15 +97,22 @@ data_ready_time = function(proc, node, taskgraph, schedule)
 }
 
 
-#' Time to transfer data from node i to node j.
+#' Time to transfer required data between nodes
+#' Def 4.4 p. 77
+#' This is the place to include models for latency.
 transfer_cost = function(node_from, node_to, taskgraph)
 {
+    ss = (taskgraph$from == node_from) & (taskgraph$to == node_to)
+    time = taskgraph[ss, "time"]
+    if(length(time) > 1) stop("Can't handle multiple edges in task graph.")
+    time
 }
 
 
 #' Time when the processor has finished all scheduled tasks
 proc_finish_time = function(proc, schedule)
 {
+    max(schedule[schedule$processor == proc, "end_time"], 0)
 }
 
 
@@ -118,15 +128,38 @@ edge_finish_time = function(node_from, node_to, proc_from, proc_to, taskgraph, s
 }
 
 
-predecessors = function(node, schedule)
+#' The nodes which must be completed before node can be evaluated
+predecessors = function(node, taskgraph)
 {
+    taskgraph[taskgraph$to == node, "from"]
 }
 
 
-#' Account for the constraint in one edge of a task graph, and return the
+#' Account for the constraint in one edge of a task graph, and return an
 #' updated schedule
 schedule_edge = function(processor, node_from, node_to, taskgraph, schedule)
 {
+    from = schedule[(schedule$type == "eval") & schedule$node == node_from, ]
+    proc_from = from$processor
+
+    # TODO: Come back here, getting tired now.
+    send = data.frame(processor = proc_from
+            , type = "send"
+            , start_time = proc_finish_time(proc_from)
+            , end_time = 
+            , node = NA
+            , from = NA
+            , to = NA
+            , value = expressions[[1]]
+            )
+    send = data.frame(processor = 
+            , type = "eval"
+            , start_time = 0
+            , end_time = node_times[1]
+            , value = list(node = 1L, expr = expressions[[1]])
+            )
+
+    rbind(schedule, send, receive)
 }
 
 
