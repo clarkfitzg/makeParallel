@@ -46,10 +46,16 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
     # the variable names are unique.
 
     for(node in seq(2, nnodes)){
-        start_times = sapply(procs, start_time
+        allprocs = lapply(procs, data_ready_time
                 , node = node, taskgraph = taskgraph, schedule = schedule)
 
+        start_times = sapply(allprocs, `[[`, "time")
+
+        # Pick the winner, choosing lower numbers in ties
         earliest_proc = which.min(start_times)
+
+        # Update schedule with necessary transfers
+        schedule = allprocs[[earliest_proc]]$schedule
 
         schedule = schedule_node(earliest_proc, 
                 , node = node, taskgraph = taskgraph, schedule = schedule)
@@ -58,15 +64,16 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
 }
 
 
-data_ready_time = function(node, proc, taskgraph, schedule)
+data_ready_time = function(proc, node, taskgraph, schedule)
 {
     # Transfer from predecessors to current node
     preds = predecessors(node)
 
+    # Not sure we need this
     # No predecessors
-    if(length(preds) == 0L){
-        return(proc_finish_time(proc, schedule))
-    }
+    #if(length(preds) == 0L){
+    #    return(proc_finish_time(proc, schedule))
+    #}
 
     other_procs = sapply(preds, which_processor, schedule)
 
