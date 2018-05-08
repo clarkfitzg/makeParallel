@@ -52,10 +52,15 @@ generate_snow_code = function(expressions, schedule, socket_start = 33000L)
     
     out = lapply(byworker, gen_snow_worker)
 
+    # TODO: Come back here, not working yet
     comms = schedule[schedule$type %in% c("send", "receive"), c("from", "to")]
+    comms = split(comms, seq(nrow(comms)))
+    comms = lapply(comms, sort)
+    comms = unique(comms)
+    comms = Map(c, comms, seq(from = socket_start, length.out = length(comms)))
+    comms = lapply(comms, setNames, nm = c("from", "to", "socket"))
 
 
-    # TODO: Come back here.
     manager = whisker::whisker.render(snow_manager_template, data = list(
         version = version
         , 
