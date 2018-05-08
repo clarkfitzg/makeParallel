@@ -152,6 +152,12 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule)
     proc_to = processor
     proc_from = from$processor
 
+    # If both nodes are already on the same processor then the data / state
+    # is available and this function is a non op.
+    if(proc_from == proc_to){
+        return(schedule)
+    }
+
     send_start = proc_finish_time(proc_from, schedule)
     tc = transfer_cost(node_from, node_to, taskgraph)
     ss = (taskgraph$from == node_from) & (taskgraph$to == node_to)
