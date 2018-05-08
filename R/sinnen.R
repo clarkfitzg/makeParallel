@@ -51,34 +51,63 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
 
         earliest_proc = which.min(start_times)
 
-        schedule = update_schedule(earliest_proc, 
+        schedule = schedule_node(earliest_proc, 
                 , node = node, taskgraph = taskgraph, schedule = schedule)
     }
     schedule
 }
 
 
-data_ready_time = function(node, proc, schedule)
+data_ready_time = function(node, proc, taskgraph, schedule)
 {
-    finished = predecessors(node)
-    
     # Transfer from predecessors to current node
+    preds = predecessors(node)
+
+    # No predecessors
+    if(length(preds) == 0L){
+        return(proc_finish_time(proc, schedule))
+    }
+
+    other_procs = sapply(preds, which_processor, schedule)
+
+    # Let the processors that aren't busy start transferring first
+    busy_last = order(sapply(other_procs, proc_finish_time, schedule))
+    preds = preds[busy_last]
+    other_procs = other_procs[busy_last]
+
+    # Update the schedule
+    for(p in preds){
+        schedule = schedule_edge(proc, node_from = p, node_to = node
+                , taskgraph = taskgraph, schedule = schedule)
+    }
+
+    # Now the node is ready to run on proc
+    # Pass the updated schedule along so we don't need to compute it again.
+    list(time = proc_finish_time(proc, schedule), schedule = schedule)
 }
 
 
 #' Time to transfer data from node i to node j.
-transfer_cost = function(i, j, taskgraph)
+transfer_cost = function(node_from, node_to, taskgraph)
+{
+}
+
+
+#' Time when the processor has finished all scheduled tasks
+proc_finish_time = function(proc, schedule)
 {
 }
 
 
 edge_finish_time = function(node_from, node_to, proc_from, proc_to, taskgraph, schedule)
 {
-    baseline = max(processor_finish_time(proc_from),
-                     processor_finish_time(proc_to))
-    extra = if(proc_from == proc_to) 0
-        else transfer_cost(i, j, taskgraph)
-    baseline + extra
+    baseline = max(proc_finish_time(proc_from, schedule),
+                     proc_finish_time(proc_to, schedule))
+    # TODO: Later I can change this to handle cases when data has already
+    # been transferred in a previous step
+    transfer = if(proc_from == proc_to) 0
+        else transfer_cost(node_from, node_to, taskgraph)
+    baseline + transfer
 }
 
 
@@ -87,9 +116,16 @@ predecessors = function(node, schedule)
 }
 
 
-#' Assign node i to processor j as the last step in the schedule, and
+#' Account for the constraint in one edge of a task graph, and return the
+#' updated schedule
+schedule_edge = function(processor, node_from, node_to, taskgraph, schedule)
+{
+}
+
+
+#' Assign node to processor as the last step in the schedule, and
 #' return the updated schedule.
-update_schedule = function(processor, node, taskgraph, schedule)
+schedule_node = function(processor, node, taskgraph, schedule)
 {
 }
 
