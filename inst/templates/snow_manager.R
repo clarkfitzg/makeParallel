@@ -10,7 +10,8 @@ TIMEOUT = {{{timeout}}}
 
 cls = makeCluster(N, "PSOCK")
 
-# Each worker updates this to hold peer to peer socket connections
+# Each worker updates a copy of this object. On worker j workers[[i]] will
+# contain an open socket connection between workers j and i.
 workers = vector(N, mode = "list")
 
 close.NULL = function(...) NULL
