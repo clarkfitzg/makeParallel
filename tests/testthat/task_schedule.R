@@ -4,7 +4,7 @@
 
 library(autoparallel)
 
-script = parse(text = "
+oldcode = parse(text = "
     v1 = 'foo1'
     v2 = 'foo2'
     x <- paste0(v1, v1)
@@ -14,10 +14,14 @@ script = parse(text = "
 
 #times = c(1, 2, 3, 3, 3)
 
-eg = expr_graph(script)
+graph = expr_graph(oldcode)
 
-sc = minimize_start_time(script, eg)
+plan = minimize_start_time(oldcode, graph)
 #                         , node_times = times)
+
+newcode = generate_snow_code(oldcode, plan)
+
+
 
 
 ap = autoparallel(script)

@@ -207,28 +207,3 @@ schedule_node = function(processor, node, taskgraph, schedule, node_time)
             )
     rbind(schedule, task)
 }
-
-
-##' Compute start time for node on a processor
-#start_time = function(processor, node, taskgraph, schedule)
-#{
-#}
-
-##' Time the processor is ready to begin a new computation, which could be
-##' an evaluation or a transfer.
-#processor_ready_time = function(schedule, node_times)
-#{
-#}
-
-
-#' Generate Task Parallel Code For SNOW Cluster
-#'
-#' Produces executable code.
-#' 
-#' A code generator must know: when to execute a statement
-#' 
-#' 
-#' @export
-generate_snow_code = function(schedule)
-{
-}
