@@ -2,6 +2,7 @@ snow_manager_template = readLines(
     system.file("templates/snow_manager.R", package = "autoparallel")
 )
 
+
 snow_worker_template = readLines(
     system.file("templates/snow_worker.R", package = "autoparallel")
 )
@@ -39,7 +40,7 @@ gen_snow_worker = function(schedule, expressions)
 #' Produces executable code that relies on a SNOW cluster and sockets.
 #' 
 #' @param socket_start first network socket to use, can possibly use up to n * (n -
-#'  1) / 2 subsequent sockets if every worker must communicate.
+#'  1) / 2 subsequent sockets if every pair of n workers must communicate.
 #' @return code list of scripts
 #' @export
 generate_snow_code = function(expressions, schedule, socket_start = 33000L)
@@ -49,6 +50,17 @@ generate_snow_code = function(expressions, schedule, socket_start = 33000L)
 
     byworker = split(schedule, schedule$processor)
     
+    out = lapply(byworker, gen_snow_worker)
+
+    comms = schedule[schedule$type %in% c("send", "receive"), c("from", "to")]
+
+
+    # TODO: Come back here.
+    manager = whisker::whisker.render(snow_manager_template, data = list(
+        version = version
+        , 
+    ))
+
 
     udaf_dot_R = paste0(base_name, ".R")
     # Pulls variables from parent environment
