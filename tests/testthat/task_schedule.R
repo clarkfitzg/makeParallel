@@ -5,16 +5,19 @@
 library(autoparallel)
 
 script = parse(text = "
-    datadir <- '~/data'            # A
-    x <- paste0(datadir, 'x.csv')  # B
-    y <- paste0(datadir, 'y.csv')  # C
-    xy <- paste0(x, y)             # D
-    Sys.sleep(2)
+    v1 = 'foo1'
+    v2 = 'foo2'
+    x <- paste0(v1, v1)
+    y <- paste0(v2, v2)
+    xy <- paste0(x, y)
 ")
+
+#times = c(1, 2, 3, 3, 3)
 
 eg = expr_graph(script)
 
 sc = minimize_start_time(script, eg)
+#                         , node_times = times)
 
 
 ap = autoparallel(script)
