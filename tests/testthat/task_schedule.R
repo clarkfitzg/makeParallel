@@ -14,6 +14,9 @@ script = parse(text = "
 
 eg = expr_graph(script)
 
+sc = minimize_start_time(script, eg)
+
+
 ap = autoparallel(script)
 
 

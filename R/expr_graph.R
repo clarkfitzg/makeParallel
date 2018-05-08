@@ -35,7 +35,7 @@ use_def = function(x, all_uses, all_definitions)
                        , to = uses
                        )
     edges$type = "use-def"
-    edges$value = replicate(nrow(edges), list(variable = varname))
+    edges$value = replicate(nrow(edges), list(varname = varname))
     edges
 }
 

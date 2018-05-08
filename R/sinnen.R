@@ -18,7 +18,7 @@
 #' Systems".
 #'
 #' @export
-#' @param expressions
+#' @param expressions from \link{\code{as.expression}}
 #' @param taskgraph data frame as returned from \link{\code{expr_graph}}
 #' @param nprocs integer number of procs
 #' @param node_times numeric vector of times it will take each expression to
@@ -36,7 +36,7 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
             , node = 1L
             , from = NA
             , to = NA
-            , value = expressions[[1]]
+            , varname = NA
             )
 
     procs = seq(nprocs)
@@ -60,12 +60,19 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
         # Update schedule with necessary transfers
         schedule = allprocs[[earliest_proc]]$schedule
 
-        schedule = schedule_node(earliest_proc, 
+        schedule = schedule_node(earliest_proc
                 , node = node, taskgraph = taskgraph, schedule = schedule
                 , node_time = node_times[node]
-                , expr = expressions[[node]])
+                )
     }
     schedule
+}
+
+
+#' Which Processor Is Assigned to this node in the schedule?
+which_processor = function(node, schedule)
+{
+    schedule[schedule$node == node, "processor"]
 }
 
 
@@ -89,7 +96,7 @@ data_ready_time = function(proc, node, taskgraph, schedule)
 
     # Update the schedule
     for(p in preds){
-        schedule = schedule_edge(proc, node_from = p, node_to = node
+        schedule = add_send_receive(proc, node_from = p, node_to = node
                 , taskgraph = taskgraph, schedule = schedule)
     }
 
@@ -139,13 +146,13 @@ predecessors = function(node, taskgraph)
 
 #' Account for the constraint in one edge of a task graph, and return an
 #' updated schedule
-schedule_edge = function(processor, node_from, node_to, taskgraph, schedule)
+add_send_receive = function(processor, node_from, node_to, taskgraph, schedule)
 {
     from = schedule[(schedule$type == "eval") & schedule$node == node_from, ]
     proc_to = processor
     proc_from = from$processor
 
-    send_start = proc_finish_time(proc_from)
+    send_start = proc_finish_time(proc_from, schedule)
     tc = transfer_cost(node_from, node_to, taskgraph)
     ss = (taskgraph$from == node_from) & (taskgraph$to == node_to)
     varname = taskgraph[ss, "value"]
@@ -157,11 +164,11 @@ schedule_edge = function(processor, node_from, node_to, taskgraph, schedule)
             , node = NA
             , from = proc_from
             , to = proc_to
-            , value = varname
+            , varname = varname
             )
 
     # TODO: Hardcoding in 0 latency here and other places, come back and fix.
-    receive_start = max(proc_finish_time(proc_to), send_start)
+    receive_start = max(proc_finish_time(proc_to, schedule), send_start)
 
     receive = data.frame(processor = proc_to
             , type = "receive"
@@ -170,7 +177,7 @@ schedule_edge = function(processor, node_from, node_to, taskgraph, schedule)
             , node = NA
             , from = proc_from
             , to = proc_to
-            , value = varname
+            , varname = varname
             )
 
     rbind(schedule, send, receive)
@@ -180,7 +187,7 @@ schedule_edge = function(processor, node_from, node_to, taskgraph, schedule)
 #' Assign node to processor as the last step in the schedule, and
 #' return the updated schedule. All dependencies in the task graph should
 #' be satisfied at this point.
-schedule_node = function(processor, node, taskgraph, schedule, node_time, expr)
+schedule_node = function(processor, node, taskgraph, schedule, node_time)
 {
     start = proc_finish_time(processor, schedule)
     task = data.frame(processor = processor
@@ -190,11 +197,10 @@ schedule_node = function(processor, node, taskgraph, schedule, node_time, expr)
             , node = node
             , from = NA
             , to = NA
-            , value = expr
+            , varname = NA
             )
     rbind(schedule, task)
 }
-
 
 
 ##' Compute start time for node on a processor
