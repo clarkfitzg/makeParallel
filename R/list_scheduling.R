@@ -20,11 +20,11 @@
 #' @export
 #' @param expressions from \link{\code{as.expression}}
 #' @param taskgraph data frame as returned from \link{\code{task_graph}}
-#' @param nprocs integer number of procs
+#' @param maxworkers integer maximum number of procs
 #' @param node_times numeric vector of times it will take each expression to
 #'  execute
 #' @return schedule
-minimize_start_time = function(expressions, taskgraph, nprocs = 2L
+minimize_start_time = function(expressions, taskgraph, maxworkers = 2L
     , node_times = rep(1, length(expressions))
 ){
 
@@ -39,7 +39,7 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
             , varname = NA
             )
 
-    procs = seq(nprocs)
+    procs = seq(maxworkers)
     nnodes = length(expressions)
 
     # It would be easier if we know every variable that every worker has

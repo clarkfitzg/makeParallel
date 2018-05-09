@@ -5,6 +5,7 @@
 #' @export
 #' @param code file name, expression from \code{\link[base]{parse()}}
 #' @param runfirst logical, evaluate the code once to gather timings?
+#' @param maxworkers, maximum number of worker processes to use
 #' @return code that will execute in parallel if possible
 #' @examples
 #' autoparallel("my_slow_serial.R")
@@ -13,6 +14,7 @@ autoparallel = function(code
     , runfirst = FALSE
     , scheduler = minimize_start_time
     , code_generator = generate_snow_code
+    , maxworkers = 2L
     # TODO:
 #    , scheduler_args = list()
 #    , code_generator_args = list()
@@ -26,7 +28,7 @@ autoparallel = function(code
     }
 
     taskgraph = task_graph(expr)
-    plan = scheduler(expr, taskgraph)
+    plan = scheduler(expr, taskgraph, maxworkers)
     out = code_generator(expr, plan)
 
     if(is.character(code)){
