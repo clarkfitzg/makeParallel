@@ -19,7 +19,7 @@
 #'
 #' @export
 #' @param expressions from \link{\code{as.expression}}
-#' @param taskgraph data frame as returned from \link{\code{expr_graph}}
+#' @param taskgraph data frame as returned from \link{\code{task_graph}}
 #' @param nprocs integer number of procs
 #' @param node_times numeric vector of times it will take each expression to
 #'  execute

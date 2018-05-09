@@ -72,7 +72,7 @@ add_source_node = function(g)
 #'  this variable to another process
 #' @return data frame of edges with attribute information suitable for use
 #'  with \code{\link[igraph]{graph_from_data_frame}}.
-expr_graph = function(script, info = lapply(script, CodeDepends::getInputs)
+task_graph = function(script, info = lapply(script, CodeDepends::getInputs)
     , default_time = 1)
 {
 
@@ -90,9 +90,9 @@ expr_graph = function(script, info = lapply(script, CodeDepends::getInputs)
         return(empty_edges)
     }
 
-    inputs = lapply(info, slot, "inputs")
-    outputs = lapply(info, slot, "outputs")
-    updates = lapply(info, slot, "updates")
+    inputs = lapply(info, methods::slot, "inputs")
+    outputs = lapply(info, methods::slot, "outputs")
+    updates = lapply(info, methods::slot, "updates")
     # Why is @functions use a named vector? And why is value NA?
     functions = lapply(info, function(x) names(x@functions))
 

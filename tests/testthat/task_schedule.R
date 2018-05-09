@@ -14,7 +14,7 @@ oldcode = parse(text = "
 
 #times = c(1, 2, 3, 3, 3)
 
-graph = expr_graph(oldcode)
+graph = task_graph(oldcode)
 
 plan = minimize_start_time(oldcode, graph)
 #                         , node_times = times)

@@ -8,7 +8,7 @@ test_that("Components of task parallel inference.", {
         xy <- paste0(x, y)
     ")
 
-    graph = expr_graph(oldcode)
+    graph = task_graph(oldcode)
 
     plan = minimize_start_time(oldcode, graph)
 

@@ -20,14 +20,14 @@ test_that("Degenerate cases, 0 or 1 nodes", {
     s0 = readScript(txt = "
     ")
     g0 = make_empty_graph()
-    gd0 = expr_graph(s0)
+    gd0 = task_graph(s0)
     expect_samegraph(g0, gd0)
 
     s1 = readScript(txt = "
     x = 1
     ")
     g1 = make_graph(numeric(), n = 1)
-    gd1 = expr_graph(s1)
+    gd1 = task_graph(s1)
 
     skip("Not yet implemented")
     expect_samegraph(g1, gd1)
@@ -43,7 +43,7 @@ test_that("User defined functions are dependencies", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = expr_graph(s)
+    actual = task_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -58,7 +58,7 @@ test_that("Self referring node does not appear", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = expr_graph(s)
+    actual = task_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -74,7 +74,7 @@ test_that("Assignment order respected", {
     ")
 
     desired = make_graph(c(2, 3))
-    actual = expr_graph(s)
+    actual = task_graph(s)
 
     skip("Doesn't currently work because the graph doesn't know it has 3
          nodes rather than 2.")
@@ -93,7 +93,7 @@ test_that("Chains not too long", {
     ")
 
     desired = make_graph(c(1, 2, 1, 3))
-    actual = expr_graph(s)
+    actual = task_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -109,7 +109,7 @@ test_that("Updates count as dependencies", {
     ")
 
     desired = make_graph(c(1, 2, 2, 3))
-    actual = expr_graph(s)
+    actual = task_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -127,7 +127,7 @@ test_that("Can add source node", {
 
     skip("I'm not sure if it's best to add a source and sink into the data
          frame of edges.")
-    actual = expr_graph(s, add_source = TRUE)
+    actual = task_graph(s, add_source = TRUE)
 
     expect_samegraph(desired, actual)
 
@@ -142,7 +142,7 @@ test_that("$ evaluates LHS", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = expr_graph(s)
+    actual = task_graph(s)
 
     expect_samegraph(desired, actual)
 
@@ -157,7 +157,7 @@ test_that("Precedence for user defined variables over base", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = expr_graph(s)
+    actual = task_graph(s)
 
     expect_samegraph(desired, actual)
 
