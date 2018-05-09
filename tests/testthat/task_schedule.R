@@ -22,8 +22,6 @@ plan = minimize_start_time(oldcode, graph)
 newcode = generate_snow_code(oldcode, plan)
 
 
-
-
 ap = autoparallel(oldcode)
 
 

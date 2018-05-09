@@ -39,7 +39,9 @@ gen_snow_worker = function(schedule, expressions)
     # Template uses these variables
     processor = schedule[1, "processor"]
     code_body = as.character(as.expression(out))
-    whisker::whisker.render(snow_worker_template)
+    code_body = paste(code_body, collapse = "\n")
+    out = whisker::whisker.render(snow_worker_template)
+    out
 } 
 
 
@@ -62,7 +64,7 @@ generate_snow_code = function(expressions, schedule, socket_start = 33000L, min_
     
     worker_code = sapply(byworker, gen_snow_worker, expressions = expressions)
     # TODO: string escaping, this assumes only double quotes are used
-    worker_code = paste(worker_code, collapse = "', '")
+    worker_code = paste(worker_code, collapse = "', \n\n############################################################\n\n'")
     worker_code = paste0("c('", worker_code, "')")
 
     socket_map = schedule[schedule$type %in% c("send", "receive"), c("from", "to")]

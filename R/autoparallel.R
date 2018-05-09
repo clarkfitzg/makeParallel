@@ -18,8 +18,22 @@ autoparallel = function(code
 #    , code_generator_args = list()
     )
 {
-    code = as.expression(code)
-    taskgraph = expr_graph(code)
-    plan = scheduler(code, taskgraph)
-    code_generator(code, plan)
+    expr = if(is.character(code)){
+        # Assume it's a file
+        parse(code)
+    } else {
+        as.expression(code)
+    }
+
+    taskgraph = expr_graph(expr)
+    plan = scheduler(expr, taskgraph)
+    out = code_generator(expr, plan)
+
+    if(is.character(code)){
+        newcode = paste0("gen_", code)
+        writeLines(out, newcode)
+        message(sprintf("generated parallel code is in %s", newcode))
+    }
+
+    out
 }
