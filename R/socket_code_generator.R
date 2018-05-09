@@ -66,7 +66,7 @@ generate_snow_code = function(expressions, schedule, port_start = 33000L, min_ti
     worker_code = sapply(byworker, gen_snow_worker, expressions = expressions)
     # TODO: string escaping, this assumes only double quotes are used
     worker_code = paste(worker_code, collapse = "', \n\n############################################################\n\n'")
-    worker_code = paste0("c('", worker_code, "')")
+    worker_code = paste0("c(\n'", worker_code, "'\n)")
 
     socket_map = schedule[schedule$type %in% c("send", "receive"), c("from", "to")]
     socket_map$server = apply(socket_map, 1, min)

@@ -1,3 +1,4 @@
+tests/testthat/*.pdf
 scratch/*
 
 # History files

@@ -1,8 +1,6 @@
-processor = {{{processor}}}
-
-# SNOW manager sets the ID
-if(processor != ID)
-    stop("Worker is attempting to execute wrong code.")
+if({{{processor}}} != ID)
+    stop(sprintf("Worker is attempting to execute wrong code.
+This code is for {{{processor}}}, but manager assigned ID %s", ID))
 
 {{{code_body}}}
 

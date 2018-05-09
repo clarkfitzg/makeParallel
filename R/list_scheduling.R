@@ -65,6 +65,7 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
                 , node_time = node_times[node]
                 )
     }
+    class(schedule) = c("schedule", class(schedule))
     schedule
 }
 
