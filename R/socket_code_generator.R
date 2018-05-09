@@ -17,7 +17,7 @@ row_schedule_code = function(row, expressions)
         varname = as.name(row$varname)
         if(row$type == "send"){
             to = row$to
-            substitute(serialize(varname, workers[[to]]))
+            substitute(serialize(varname, workers[[to]], xdr = FALSE))
         } else if(row$type == "receive"){
             from = row$from
             substitute(varname <- unserialize(workers[[from]]))

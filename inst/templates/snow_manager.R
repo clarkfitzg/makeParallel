@@ -22,13 +22,13 @@ connect = function(server, client, port, sleep = 0.1, ...)
 {
     if(ID == server){
         con = socketConnection(port = port, server = TRUE
-                , blocking = TRUE, open = "w+", ...)
+                , blocking = TRUE, open = "a+b", ...)
         workers[[client]] <<- con
     }
     if(ID == client){
         Sys.sleep(sleep)
         con = socketConnection(port = port, server = FALSE
-                , blocking = TRUE, open = "w+", ...)
+                , blocking = TRUE, open = "a+b", ...)
         workers[[server]] <<- con
     }
     NULL
