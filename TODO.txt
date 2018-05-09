@@ -1,0 +1,10 @@
+Currently failing
+
+Rscript doesn't work, I think this may be a methods package problem.
+
+clark@DSI-CF ~/dev/autoparallel/scratch (master)
+$ Rscript try_auto.R
+Error in match.fun(FUN) : object 'slot' not found
+Calls: autoparallel -> expr_graph -> lapply -> match.fun
+recover called non-interactively; frames dumped, use debugger() to view
+clark@DSI-CF ~/dev/autoparallel/scratch (master)

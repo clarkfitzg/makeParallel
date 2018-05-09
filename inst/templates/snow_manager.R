@@ -38,7 +38,7 @@ connect = function(from, to, port, sleep = 0.1, ...)
 clusterExport(cls, c("workers", "connect", "close.NULL"))
 
 # Each worker has an ID
-clusterMap(cls, assign, "ID", seq(n)
+clusterMap(cls, assign, "ID", seq(nworkers)
         , MoreArgs = list(envir = .GlobalEnv))
 
 # Define the peer to peer connections

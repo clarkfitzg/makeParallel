@@ -73,8 +73,10 @@ generate_snow_code = function(expressions, schedule, socket_start = 33000L, min_
     socket_map = unique(socket_map[, c("server", "client")])
     socket_map$socket = seq(from = socket_start, length.out = nrow(socket_map))
 
-    socket_map_csv = textConnection("socket_map_csv", open = "w")
-    write.csv(socket_map, socket_map_csv, row.names = FALSE)
+    # Ugly code, but the resulting output isn't too difficult to read
+    con = textConnection("socket_map_csv_tmp", open = "w", local = TRUE)
+    write.csv(socket_map, con, row.names = FALSE)
+    socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")
 
     timeout = max(min_timeout, schedule$end_time)
     nworkers = length(unique(schedule$processor))
