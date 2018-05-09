@@ -138,16 +138,3 @@ make_output_table_def = function(output_cols, output_classes)
     ddl
 
 }
-
-
-#' Write Program To File
-write_program = function(program, file)
-{
-    sink(file)
-    for(expr in program){
-        print(expr)
-    }
-    sink()
-}
-
-

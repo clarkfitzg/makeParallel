@@ -195,3 +195,16 @@ eval_literal = function(code)
     # TODO: Implement me!
     eval(code)
 }
+
+
+#' Write Program To File
+write_program = function(program, file)
+{
+    sink(file)
+    for(expr in program){
+        print(expr)
+    }
+    sink()
+}
+
+

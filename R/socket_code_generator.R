@@ -27,11 +27,19 @@ row_schedule_code = function(row, expressions)
 
 
 #' Code for a single worker
+#'
+#' It's a little strange to go from parsed expressions back to text. I may
+#' rethink this.
 gen_snow_worker = function(schedule, expressions)
 {
     schedule = schedule[order(schedule$start_time), ]
     rows = split(schedule, seq(nrow(schedule)))
-    lapply(rows, row_schedule_code, expressions = expressions)
+    out = lapply(rows, row_schedule_code, expressions = expressions)
+
+    # Template uses these variables
+    processor = schedule[1, "processor"]
+    code_body = as.character(as.expression(out))
+    whisker::whisker.render(snow_worker_template)
 } 
 
 
@@ -52,7 +60,10 @@ generate_snow_code = function(expressions, schedule, socket_start = 33000L, min_
 
     byworker = split(schedule, schedule$processor)
     
-    out = lapply(byworker, gen_snow_worker, expressions = expressions)
+    worker_code = sapply(byworker, gen_snow_worker, expressions = expressions)
+    # TODO: string escaping, this assumes only double quotes are used
+    worker_code = paste(worker_code, collapse = "', '")
+    worker_code = paste0("c('", worker_code, "')")
 
     socket_map = schedule[schedule$type %in% c("send", "receive"), c("from", "to")]
     socket_map$server = apply(socket_map, 1, min)
@@ -66,7 +77,5 @@ generate_snow_code = function(expressions, schedule, socket_start = 33000L, min_
     timeout = max(min_timeout, schedule$end_time)
     nworkers = length(unique(schedule$processor))
 
-    out$manager = whisker::whisker.render(snow_manager_template)
-
-    out
+    whisker::whisker.render(snow_manager_template)
 }

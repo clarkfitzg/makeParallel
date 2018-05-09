@@ -51,10 +51,17 @@ by(socket_map, seq(nrow(socket_map)), function(x){
     clusterCall(cls, connect, x$from, x$to, x$port, timeout = timeout)
 })
 
-scripts = {{{scripts}}}
+worker_code = {{{worker_code}}}
+
+evalg = function(codestring)
+{
+    code = parse(text = codestring)
+    eval(code, .GlobalEnv)
+    NULL
+}
 
 # Action!
-parLapply(cls, scripts, source)
+parLapply(cls, worker_code, evalg)
 
 # Close peer to peer connections
 clusterEvalQ(cls, lapply(workers, close))
