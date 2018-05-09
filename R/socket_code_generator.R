@@ -31,7 +31,7 @@ gen_snow_worker = function(schedule, expressions)
 {
     schedule = schedule[order(schedule$start_time), ]
     rows = split(schedule, seq(nrow(schedule)))
-    lapply(rows, row_schedule_code)
+    lapply(rows, row_schedule_code, expressions = expressions)
 } 
 
 
@@ -52,7 +52,7 @@ generate_snow_code = function(expressions, schedule, socket_start = 33000L, min_
 
     byworker = split(schedule, schedule$processor)
     
-    out = lapply(byworker, gen_snow_worker)
+    out = lapply(byworker, gen_snow_worker, expressions = expressions)
 
     socket_map = schedule[schedule$type %in% c("send", "receive"), c("from", "to")]
     socket_map$server = apply(socket_map, 1, min)

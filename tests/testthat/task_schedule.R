@@ -24,7 +24,7 @@ newcode = generate_snow_code(oldcode, plan)
 
 
 
-ap = autoparallel(script)
+ap = autoparallel(oldcode)
 
 
 # Basically we need to do two things:
