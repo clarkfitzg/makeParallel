@@ -1,4 +1,5 @@
 #' Gantt chart of a schedule
+#' @export
 plot.schedule = function(x, main = "schedule plot", ...)
 {
 
@@ -38,13 +39,22 @@ plot.schedule = function(x, main = "schedule plot", ...)
 
     add_one = function(row){
         with(row, {
-
-        col = switch(as.character(type), eval = eval_color, send = send_color, receive = receive_color)
+        type = as.character(type)
+        col = switch(type, eval = eval_color, send = send_color, receive = receive_color)
         rect(start_time, processor - width, end_time, processor + width
             , border = "black", lwd = 2, density = NA, col = col
             )
         lab = if(is.na(varname)) node else varname
-        text((start_time + end_time) / 2, y = processor, labels = lab)
+        xcenter = (start_time + end_time) / 2
+        text(xcenter, y = processor, labels = lab)
+        if(type == "send"){
+            # Draw an arrow to the corresponding receive
+            receive = x[x$type == "receive" & x$from == from & x$varname == varname, ]
+            delta = 1.1 * width  # So it doesn't actually touch
+            if(processor < receive$processor) delta = -delta
+            arrows(xcenter, processor - delta
+                   , with(receive, (start_time + end_time) / 2), receive$processor + delta)
+        }
         })
     }
 
