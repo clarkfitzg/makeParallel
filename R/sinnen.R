@@ -72,7 +72,7 @@ minimize_start_time = function(expressions, taskgraph, nprocs = 2L
 #' Which Processor Is Assigned to this node in the schedule?
 which_processor = function(node, schedule)
 {
-    schedule[schedule$node == node, "processor"]
+    schedule[schedule$type == "eval" & schedule$node == node, "processor"]
 }
 
 
@@ -148,7 +148,7 @@ predecessors = function(node, taskgraph)
 #' updated schedule
 add_send_receive = function(processor, node_from, node_to, taskgraph, schedule)
 {
-    from = schedule[(schedule$type == "eval") & schedule$node == node_from, ]
+    from = schedule[(schedule$type == "eval") & (schedule$node == node_from), ]
     proc_to = processor
     proc_from = from$processor
 
