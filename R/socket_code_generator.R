@@ -41,9 +41,11 @@ gen_snow_worker = function(schedule, expressions)
 #' 
 #' @param socket_start first network socket to use, can possibly use up to n * (n -
 #'  1) / 2 subsequent sockets if every pair of n workers must communicate.
+#' @param min_timeout timeout for socket connection will be at least this
+#'  many seconds.
 #' @return code list of scripts
 #' @export
-generate_snow_code = function(expressions, schedule, socket_start = 33000L)
+generate_snow_code = function(expressions, schedule, socket_start = 33000L, min_timeout = 600)
 {
     gen_time = Sys.time()
     version = sessionInfo()$otherPkgs$autoparallel$Version
@@ -52,47 +54,19 @@ generate_snow_code = function(expressions, schedule, socket_start = 33000L)
     
     out = lapply(byworker, gen_snow_worker)
 
-    # TODO: Come back here, not working yet
-    comms = schedule[schedule$type %in% c("send", "receive"), c("from", "to")]
-    comms = split(comms, seq(nrow(comms)))
-    comms = lapply(comms, sort)
-    comms = unique(comms)
-    comms = Map(c, comms, seq(from = socket_start, length.out = length(comms)))
-    comms = lapply(comms, setNames, nm = c("from", "to", "socket"))
+    socket_map = schedule[schedule$type %in% c("send", "receive"), c("from", "to")]
+    socket_map$server = apply(socket_map, 1, min)
+    socket_map$client = apply(socket_map, 1, max)
+    socket_map = unique(socket_map[, c("server", "client")])
+    socket_map$socket = seq(from = socket_start, length.out = nrow(socket_map))
 
+    socket_map_csv = textConnection("socket_map_csv", open = "w")
+    write.csv(socket_map, socket_map_csv, row.names = FALSE)
 
-    manager = whisker::whisker.render(snow_manager_template, data = list(
-        version = version
-        , 
-    ))
+    timeout = max(min_timeout, schedule$end_time)
+    nworkers = length(unique(schedule$processor))
 
+    out$manager = whisker::whisker.render(snow_manager_template)
 
-    udaf_dot_R = paste0(base_name, ".R")
-    # Pulls variables from parent environment
-    sqlcode = whisker::whisker.render(sql_template)
-
-    if(!is.null(include_script)){
-        include_script = paste0(readLines(include_script), collapse = "\n")
-    }
-
-    # This just drops R code into an R script using mustache templating. An
-    # alternative way is to save all these objects into a binary file and
-    # send that file to the workers.
-    Rcode = whisker::whisker.render(R_template, data = list(include_script = include_script
-        , verbose = verbose
-        , rows_per_chunk = rows_per_chunk
-        , cluster_by = deparse(cluster_by)
-        , sep = sep
-        , input_cols = deparse(input_cols)
-        , input_classes = deparse(input_classes)
-        , try = try
-        , f = paste0(capture.output(print.function(f)), collapse = "\n")
-        , gen_time = gen_time
-        , version = version
-    ))
-
-    writeLines(sqlcode, udaf_dot_sql)
-    writeLines(Rcode, udaf_dot_R)
-
-
+    out
 }

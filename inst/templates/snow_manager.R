@@ -5,30 +5,30 @@
 
 library(parallel)
 
-N = {{{nworkers}}}
-TIMEOUT = {{{timeout}}}
+nworkers = {{{nworkers}}}
+timeout = {{{timeout}}}
 
-cls = makeCluster(N, "PSOCK")
+cls = makeCluster(nworkers, "PSOCK")
 
 # Each worker updates a copy of this object. On worker j workers[[i]] will
 # contain an open socket connection between workers j and i.
-workers = vector(N, mode = "list")
+workers = vector(nworkers, mode = "list")
 
 close.NULL = function(...) NULL
 
 
 #' Connect workers as peers
-connect = function(from, to, port, sleep = 0.1, timeout = TIMEOUT)
+connect = function(from, to, port, sleep = 0.1, ...)
 {
     if(ID == from){
         con = socketConnection(port = port, server = TRUE
-                , blocking = TRUE, open = "w+", timeout = timeout)
+                , blocking = TRUE, open = "w+", ...)
         workers[[to]] <<- con
     }
     if(ID == to){
         Sys.sleep(sleep)
         con = socketConnection(port = port, server = FALSE
-                , blocking = TRUE, open = "w+", timeout = timeout)
+                , blocking = TRUE, open = "w+", ...)
         workers[[from]] <<- con
     }
     NULL
@@ -41,15 +41,17 @@ clusterExport(cls, c("workers", "connect", "close.NULL"))
 clusterMap(cls, assign, "ID", seq(n)
         , MoreArgs = list(envir = .GlobalEnv))
 
+# Define the peer to peer connections
+socket_map = read.csv(text = '
+{{{socket_map_csv}}}
+')
 
-# Initialize all necessary connections
-conns = list({{{}}})
+# Open the connections
+by(socket_map, seq(nrow(socket_map)), function(x){
+    clusterCall(cls, connect, x$from, x$to, x$port, timeout = timeout)
+})
 
-for(x in conns){
-    clusterCall(cls, connect, x$from, x$to, x$port)
-}
-
-scripts = {{{}}}
+scripts = {{{scripts}}}
 
 # Action!
 parLapply(cls, scripts, source)
