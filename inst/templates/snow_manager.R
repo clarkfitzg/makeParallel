@@ -18,18 +18,18 @@ close.NULL = function(...) NULL
 
 
 #' Connect workers as peers
-connect = function(from, to, port, sleep = 0.1, ...)
+connect = function(server, client, port, sleep = 0.1, ...)
 {
-    if(ID == from){
+    if(ID == server){
         con = socketConnection(port = port, server = TRUE
                 , blocking = TRUE, open = "w+", ...)
-        workers[[to]] <<- con
+        workers[[client]] <<- con
     }
-    if(ID == to){
+    if(ID == client){
         Sys.sleep(sleep)
         con = socketConnection(port = port, server = FALSE
                 , blocking = TRUE, open = "w+", ...)
-        workers[[from]] <<- con
+        workers[[server]] <<- con
     }
     NULL
 }
@@ -48,7 +48,7 @@ socket_map = read.csv(text = '
 
 # Open the connections
 by(socket_map, seq(nrow(socket_map)), function(x){
-    clusterCall(cls, connect, x$from, x$to, x$port, timeout = timeout)
+    clusterCall(cls, connect, x$server, x$client, x$port, timeout = timeout)
 })
 
 worker_code = {{{worker_code}}}

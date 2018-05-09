@@ -47,15 +47,16 @@ gen_snow_worker = function(schedule, expressions)
 
 #' Generate Task Parallel Code For SNOW Cluster
 #'
-#' Produces executable code that relies on a SNOW cluster and sockets.
+#' Produces executable code that relies on a SNOW cluster on a single
+#' machine and sockets.
 #' 
-#' @param socket_start first network socket to use, can possibly use up to n * (n -
-#'  1) / 2 subsequent sockets if every pair of n workers must communicate.
+#' @param port_start first local port to use, can possibly use up to n * (n -
+#'  1) / 2 subsequent ports if every pair of n workers must communicate.
 #' @param min_timeout timeout for socket connection will be at least this
 #'  many seconds.
 #' @return code list of scripts
 #' @export
-generate_snow_code = function(expressions, schedule, socket_start = 33000L, min_timeout = 600)
+generate_snow_code = function(expressions, schedule, port_start = 33000L, min_timeout = 600)
 {
     gen_time = Sys.time()
     version = sessionInfo()$otherPkgs$autoparallel$Version
@@ -71,7 +72,7 @@ generate_snow_code = function(expressions, schedule, socket_start = 33000L, min_
     socket_map$server = apply(socket_map, 1, min)
     socket_map$client = apply(socket_map, 1, max)
     socket_map = unique(socket_map[, c("server", "client")])
-    socket_map$socket = seq(from = socket_start, length.out = nrow(socket_map))
+    socket_map$port = seq(from = port_start, length.out = nrow(socket_map))
 
     # Ugly code, but the resulting output isn't too difficult to read
     con = textConnection("socket_map_csv_tmp", open = "w", local = TRUE)
