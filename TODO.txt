@@ -1,3 +1,7 @@
+Most functions in the list scheduling use the same bunch of five components
+that get passed around, so it might make sense to package that stuff up in
+a list.
+
 The script below can really only use 2 workers, and it seems to do weird
 stuff if I pass maxworkers = 3L:
 
