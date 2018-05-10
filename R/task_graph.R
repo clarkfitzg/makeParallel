@@ -1,5 +1,5 @@
 empty_edges = data.frame(from = integer(), to = integer()
-        , type = integer(), value = integer(), time = numeric())
+        , type = integer(), value = integer(), size = numeric())
 
 
 #' Where does x show up in locs
@@ -68,12 +68,11 @@ add_source_node = function(g)
 #' @param script as returned from \code{\link[CodeDepends]{readScript}}
 #' @param info list of ScriptInfo objects from
 #'  \code{\link[CodeDepends]{getInputs}}
-#' @param default_time numeric, time in seconds that it takes to transfer
-#'  this variable to another process
+#' @param default_size numeric default size of the variables in bytes
 #' @return data frame of edges with attribute information suitable for use
 #'  with \code{\link[igraph]{graph_from_data_frame}}.
 task_graph = function(script, info = lapply(script, CodeDepends::getInputs)
-    , default_time = 1)
+    , default_size = 48)
 {
 
     # A list of ScriptNodeInfo objects. May be useful to do more with
@@ -105,7 +104,7 @@ task_graph = function(script, info = lapply(script, CodeDepends::getInputs)
     use_def_chains = lapply(vars, use_def, uses, definitions)
 
     out = do.call(rbind, use_def_chains)
-    out[, "time"] = default_time
+    out[, "size"] = default_size
     out
 }
 

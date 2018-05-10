@@ -28,14 +28,14 @@ autoparallel = function(code
     }
 
     taskgraph = task_graph(expr)
-    plan = scheduler(expr, taskgraph, maxworkers)
-    out = code_generator(expr, plan)
+    schedule = scheduler(expr, taskgraph, maxworkers)
+    newcode = code_generator(expr, schedule)
 
     if(is.character(code)){
-        newcode = paste0("gen_", code)
-        writeLines(out, newcode)
-        message(sprintf("generated parallel code is in %s", newcode))
+        newcode_file = paste0("gen_", code)
+        writeLines(newcode, newcode_file)
+        message(sprintf("generated parallel code is in %s", newcode_file))
     }
 
-    out
+    list(taskgraph = taskgraph, schedule = schedule, code = newcode)
 }

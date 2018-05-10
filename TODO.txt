@@ -1,10 +1,7 @@
-Currently failing
+The script below can really only use 2 workers, and it seems to do weird
+stuff if I pass maxworkers = 3L:
 
-Rscript doesn't work, I think this may be a methods package problem.
-
-clark@DSI-CF ~/dev/autoparallel/scratch (master)
-$ Rscript try_auto.R
-Error in match.fun(FUN) : object 'slot' not found
-Calls: autoparallel -> expr_graph -> lapply -> match.fun
-recover called non-interactively; frames dumped, use debugger() to view
-clark@DSI-CF ~/dev/autoparallel/scratch (master)
+script = parse("script4.R")
+tg = task_graph(script)
+schedule = minimize_start_time(script, tg, maxworkers = 3L)
+plot(schedule)

@@ -23,9 +23,14 @@
 #' @param maxworkers integer maximum number of procs
 #' @param node_times numeric vector of times it will take each expression to
 #'  execute
+#' @param overhead numeric seconds to send any object
+#' @param bandwidth numeric speed that the network can transfer an object
+#'  between processors in bytes per second. We don't take network
+#'  contention into account.
 #' @return schedule
 minimize_start_time = function(expressions, taskgraph, maxworkers = 2L
-    , node_times = rep(1, length(expressions))
+    , node_times = rep(10e-6, length(expressions)), overhead = 8e-6
+    , bandwidth = 1.5e9
 ){
 
     # Initialize by scheduling the first expression on the first worker.
@@ -50,7 +55,9 @@ minimize_start_time = function(expressions, taskgraph, maxworkers = 2L
 
     for(node in seq(2, nnodes)){
         allprocs = lapply(procs, data_ready_time
-                , node = node, taskgraph = taskgraph, schedule = schedule)
+                , node = node, taskgraph = taskgraph, schedule = schedule
+                , overhead = overhead, bandwidth = bandwidth
+                )
 
         start_times = sapply(allprocs, `[[`, "time")
 
@@ -77,7 +84,7 @@ which_processor = function(node, schedule)
 }
 
 
-data_ready_time = function(proc, node, taskgraph, schedule)
+data_ready_time = function(proc, node, taskgraph, schedule, overhead, bandwidth)
 {
     # Transfer from predecessors to current node
     preds = predecessors(node, taskgraph)
@@ -98,7 +105,9 @@ data_ready_time = function(proc, node, taskgraph, schedule)
     # Update the schedule
     for(p in preds){
         schedule = add_send_receive(proc, node_from = p, node_to = node
-                , taskgraph = taskgraph, schedule = schedule)
+                , taskgraph = taskgraph, schedule = schedule
+                , overhead = overhead, bandwidth = bandwidth
+                )
     }
 
     # Now the node is ready to run on proc
@@ -110,12 +119,12 @@ data_ready_time = function(proc, node, taskgraph, schedule)
 #' Time to transfer required data between nodes
 #' Def 4.4 p. 77
 #' This is the place to include models for latency.
-transfer_cost = function(node_from, node_to, taskgraph)
+transfer_cost = function(node_from, node_to, taskgraph, overhead, bandwidth)
 {
     ss = (taskgraph$from == node_from) & (taskgraph$to == node_to)
-    time = taskgraph[ss, "time"]
-    if(length(time) > 1) stop("Can't handle multiple edges in task graph.")
-    time
+    size = taskgraph[ss, "size"]
+    if(length(size) > 1) stop("Can't handle multiple edges in task graph.")
+    size / bandwidth + overhead
 }
 
 
@@ -126,14 +135,16 @@ proc_finish_time = function(proc, schedule)
 }
 
 
-edge_finish_time = function(node_from, node_to, proc_from, proc_to, taskgraph, schedule)
+# TODO: Looks like I'm not using this?
+edge_finish_time = function(node_from, node_to, proc_from, proc_to, taskgraph, schedule
+    , overhead, bandwidth)
 {
     baseline = max(proc_finish_time(proc_from, schedule),
                      proc_finish_time(proc_to, schedule))
     # TODO: Later I can change this to handle cases when data has already
     # been transferred in a previous step
     transfer = if(proc_from == proc_to) 0
-        else transfer_cost(node_from, node_to, taskgraph)
+        else transfer_cost(node_from, node_to, taskgraph, overhead, bandwidth)
     baseline + transfer
 }
 
@@ -147,7 +158,8 @@ predecessors = function(node, taskgraph)
 
 #' Account for the constraint in one edge of a task graph, and return an
 #' updated schedule
-add_send_receive = function(processor, node_from, node_to, taskgraph, schedule)
+add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
+        , overhead, bandwidth)
 {
     from = schedule[(schedule$type == "eval") & (schedule$node == node_from), ]
     proc_to = processor
@@ -160,7 +172,7 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule)
     }
 
     send_start = proc_finish_time(proc_from, schedule)
-    tc = transfer_cost(node_from, node_to, taskgraph)
+    tc = transfer_cost(node_from, node_to, taskgraph, overhead, bandwidth)
     ss = (taskgraph$from == node_from) & (taskgraph$to == node_to)
     varname = taskgraph[ss, "value"]
 
