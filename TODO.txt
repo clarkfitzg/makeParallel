@@ -1,3 +1,5 @@
+move variable names in the plot
+
 Most functions in the list scheduling use the same bunch of five components
 that get passed around, so it might make sense to package that stuff up in
 a list.
