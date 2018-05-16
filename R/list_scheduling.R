@@ -20,7 +20,7 @@
 #' Systems".
 #'
 #' @export
-#' @param tg list as returned from \link{\code{task_graph}}
+#' @param taskgraph list as returned from \link{\code{task_graph}}
 #' @param maxworkers integer maximum number of procs
 #' @param node_times numeric vector of times it will take each expression to
 #'  execute. If this is a single number it's taken to be the default for
@@ -31,16 +31,17 @@
 #'  contention into account. This will have to be extended to account for
 #'  multiple machines.
 #' @return schedule
-minimize_start_time = function(tg, maxworkers = 2L
+minimize_start_time = function(taskgraph, maxworkers = 2L
     , node_times = 10e-6, overhead = 8e-6
     , bandwidth = 1.5e9
 ){
 
     procs = seq(maxworkers)
-    nnodes = length(tg$original_code)
+    nnodes = length(taskgraph$input_code)
+    tg = taskgraph$task_graph
 
     if(length(node_times) == 1L){
-        node_times = rep(10e-6, nnodes)
+        node_times = rep(node_times, nnodes)
     }
     # TODO: Could check for size of node_times here, but I'll wait and do
     # TDD
@@ -70,7 +71,7 @@ minimize_start_time = function(tg, maxworkers = 2L
 
     for(node in seq(2, nnodes)){
         allprocs = lapply(procs, data_ready_time
-                , node = node, taskgraph = taskgraph, schedule = schedule
+                , node = node, taskgraph = tg, schedule = schedule
                 , overhead = overhead, bandwidth = bandwidth
                 )
 
@@ -83,12 +84,12 @@ minimize_start_time = function(tg, maxworkers = 2L
         schedule = allprocs[[earliest_proc]]$schedule
 
         schedule = schedule_node(earliest_proc
-                , node = node, taskgraph = taskgraph, schedule = schedule
+                , node = node, schedule = schedule
                 , node_time = node_times[node]
                 )
     }
 
-    out = c(tg, list(schedule = schedule, maxworkers = maxworkers, node_times = node_times
+    c(taskgraph, list(schedule = schedule, maxworkers = maxworkers, node_times = node_times
                      , overhead = overhead, bandwidth = bandwidth))
 }
 
@@ -187,12 +188,12 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
     varname = taskgraph[ss, "value"]
 
     # TODO: Hardcoding in 0 latency here and other places, come back and fix.
-    start_time_receive = max(proc_finish_time(proc_receive, schedule), send_start)
+    start_time_receive = max(proc_finish_time(proc_receive, schedule), start_time_send)
 
     this_transfer = data.frame(start_time_send = start_time_send
-            , start_time_receive = start_time_receive
             , end_time_send = start_time_send + tc
-            , end_time_receive = end_time_receive + tc
+            , start_time_receive = start_time_receive
+            , end_time_receive = start_time_receive + tc
             , proc_send = proc_send
             , proc_receive = proc_receive
             , varname = varname
@@ -206,7 +207,7 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
 #' Assign node to processor as the last step in the schedule, and
 #' return the updated schedule. All dependencies in the task graph should
 #' be satisfied at this point.
-schedule_node = function(processor, node, taskgraph, schedule, node_time)
+schedule_node = function(processor, node, schedule, node_time)
 {
     start_time = proc_finish_time(processor, schedule)
 
