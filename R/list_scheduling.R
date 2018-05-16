@@ -135,20 +135,6 @@ proc_finish_time = function(proc, schedule)
 }
 
 
-# TODO: Looks like I'm not using this?
-edge_finish_time = function(node_from, node_to, proc_from, proc_to, taskgraph, schedule
-    , overhead, bandwidth)
-{
-    baseline = max(proc_finish_time(proc_from, schedule),
-                     proc_finish_time(proc_to, schedule))
-    # TODO: Later I can change this to handle cases when data has already
-    # been transferred in a previous step
-    transfer = if(proc_from == proc_to) 0
-        else transfer_cost(node_from, node_to, taskgraph, overhead, bandwidth)
-    baseline + transfer
-}
-
-
 #' The nodes which must be completed before node can be evaluated
 predecessors = function(node, taskgraph)
 {
