@@ -18,16 +18,9 @@ autoparallel = function(code
 #    , code_generator_args = list()
     )
 {
-    expr = if(is.character(code)){
-        # Assume it's a file
-        parse(code)
-    } else {
-        as.expression(code)
-    }
-
-    taskgraph = task_graph(expr)
-    schedule = scheduler(expr, taskgraph, ...)
-    newcode = code_generator(expr, schedule)
+    taskgraph = task_graph(code)
+    schedule = scheduler(taskgraph, ...)
+    newcode = code_generator(schedule)
 
     if(is.character(code)){
         newcode_file = paste0("gen_", code)

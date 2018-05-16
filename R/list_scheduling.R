@@ -7,6 +7,8 @@
 # timeline starting with the beginning of the computation at 0, and 'cost'
 # means an absolute time required to do some smaller step. 
 
+# TODO: Define standard interface for a scheduler, ie. additional arguments
+# for the timings and variable sizes.
 
 #' Minimize Node Start Time
 #'
@@ -18,34 +20,51 @@
 #' Systems".
 #'
 #' @export
-#' @param expressions from \link{\code{as.expression}}
-#' @param taskgraph data frame as returned from \link{\code{task_graph}}
+#' @param tg list as returned from \link{\code{task_graph}}
 #' @param maxworkers integer maximum number of procs
 #' @param node_times numeric vector of times it will take each expression to
-#'  execute
+#'  execute. If this is a single number it's taken to be the default for
+#'  all nodes.
 #' @param overhead numeric seconds to send any object
 #' @param bandwidth numeric speed that the network can transfer an object
 #'  between processors in bytes per second. We don't take network
-#'  contention into account.
+#'  contention into account. This will have to be extended to account for
+#'  multiple machines.
 #' @return schedule
-minimize_start_time = function(expressions, taskgraph, maxworkers = 2L
-    , node_times = rep(10e-6, length(expressions)), overhead = 8e-6
+minimize_start_time = function(tg, maxworkers = 2L
+    , node_times = 10e-6, overhead = 8e-6
     , bandwidth = 1.5e9
 ){
 
+    procs = seq(maxworkers)
+    nnodes = length(tg$original_code)
+
+    if(length(node_times) == 1L){
+        node_times = rep(10e-6, nnodes)
+    }
+    # TODO: Could check for size of node_times here, but I'll wait and do
+    # TDD
+
+    schedule = c(tg, list(maxworkers = maxworkers, node_times = node_times
+                          , overhead = overhead, bandwidth = bandwidth))
+
     # Initialize by scheduling the first expression on the first worker.
-    schedule = data.frame(processor = 1L
-            , type = "eval"
+    schedule$schedule = list(
+        eval = data.frame(processor = 1L
             , start_time = 0
             , end_time = node_times[1]
             , node = 1L
-            , from = NA
-            , to = NA
-            , varname = NA
-            )
+            ),
+        transfer = data.frame(
+            , start_time_send = numeric()
+            , start_time_receive = numeric()
+            , end_time_send = numeric()
+            , end_time_receive = numeric()
+            , from = integer()
+            , to = integer()
+            , varname = character()
+        ))
 
-    procs = seq(maxworkers)
-    nnodes = length(expressions)
 
     # It would be easier if we know every variable that every worker has
     # after every expression and transfer. Then we could see what they

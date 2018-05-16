@@ -66,14 +66,20 @@ add_source_node = function(g)
 #'
 #' @export
 #' @param script as returned from \code{\link[CodeDepends]{readScript}}
-#' @param info list of ScriptInfo objects from
-#'  \code{\link[CodeDepends]{getInputs}}
 #' @param default_size numeric default size of the variables in bytes
 #' @return data frame of edges with attribute information suitable for use
 #'  with \code{\link[igraph]{graph_from_data_frame}}.
-task_graph = function(script, info = lapply(script, CodeDepends::getInputs)
+task_graph = function(script
     , default_size = 48)
 {
+    expr = if(is.character(code)){
+        # Assume it's a file
+        parse(code)
+    } else {
+        as.expression(code)
+    }
+
+    info = lapply(expr, CodeDepends::getInputs)
 
     # A list of ScriptNodeInfo objects. May be useful to do more with
     # these later, so might want to save or return this object.
@@ -103,9 +109,10 @@ task_graph = function(script, info = lapply(script, CodeDepends::getInputs)
 
     use_def_chains = lapply(vars, use_def, uses, definitions)
 
-    out = do.call(rbind, use_def_chains)
-    out[, "size"] = default_size
-    out
+    tg = do.call(rbind, use_def_chains)
+    tg[, "size"] = default_size
+
+    list(input_code = expr, task_graph = tg)
 }
 
 
