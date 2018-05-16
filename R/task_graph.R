@@ -65,11 +65,12 @@ add_source_node = function(g)
 #' implicit in code.
 #'
 #' @export
-#' @param script as returned from \code{\link[CodeDepends]{readScript}}
+#' @param code the file path to a script or an object that can be coerced
+#'  to an expression.
 #' @param default_size numeric default size of the variables in bytes
 #' @return data frame of edges with attribute information suitable for use
 #'  with \code{\link[igraph]{graph_from_data_frame}}.
-task_graph = function(script
+task_graph = function(code
     , default_size = 48)
 {
     expr = if(is.character(code)){

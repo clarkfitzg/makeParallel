@@ -45,26 +45,22 @@ minimize_start_time = function(tg, maxworkers = 2L
     # TODO: Could check for size of node_times here, but I'll wait and do
     # TDD
 
-    schedule = c(tg, list(maxworkers = maxworkers, node_times = node_times
-                          , overhead = overhead, bandwidth = bandwidth))
-
     # Initialize by scheduling the first expression on the first worker.
-    schedule$schedule = list(
+    schedule = list(
         eval = data.frame(processor = 1L
             , start_time = 0
             , end_time = node_times[1]
             , node = 1L
             ),
-        transfer = data.frame(
-            , start_time_send = numeric()
+        transfer = data.frame(start_time_send = numeric()
             , start_time_receive = numeric()
             , end_time_send = numeric()
             , end_time_receive = numeric()
-            , from = integer()
-            , to = integer()
+            , proc_send = integer()
+            , proc_receive = integer()
             , varname = character()
         ))
-
+    class(schedule) = c("schedule", class(schedule))
 
     # It would be easier if we know every variable that every worker has
     # after every expression and transfer. Then we could see what they
@@ -91,15 +87,17 @@ minimize_start_time = function(tg, maxworkers = 2L
                 , node_time = node_times[node]
                 )
     }
-    class(schedule) = c("schedule", class(schedule))
-    schedule
+
+    out = c(tg, list(schedule = schedule, maxworkers = maxworkers, node_times = node_times
+                     , overhead = overhead, bandwidth = bandwidth))
 }
 
 
 #' Which Processor Is Assigned to this node in the schedule?
 which_processor = function(node, schedule)
 {
-    schedule[schedule$type == "eval" & schedule$node == node, "processor"]
+    e = schedule$eval
+    e[e$node == node, "processor"]
 }
 
 
@@ -150,7 +148,12 @@ transfer_cost = function(node_from, node_to, taskgraph, overhead, bandwidth)
 #' Time when the processor has finished all scheduled tasks
 proc_finish_time = function(proc, schedule)
 {
-    max(schedule[schedule$processor == proc, "end_time"], 0)
+
+    t_eval = schedule$eval[schedule$eval$processor == proc, "end_time"]
+    trans = schedule$transfer
+    t_send = trans[trans$proc_send == proc, "end_time_send"]
+    t_receive = trans[trans$proc_receive == proc, "end_time_receive"]
+    max(t_eval, t_send, t_receive, 0)
 }
 
 
@@ -166,45 +169,37 @@ predecessors = function(node, taskgraph)
 add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
         , overhead, bandwidth)
 {
-    from = schedule[(schedule$type == "eval") & (schedule$node == node_from), ]
-    proc_to = processor
-    proc_from = from$processor
+    # TODO: This will probably break if we evaluate the same node multiple
+    # times, but that's a future problem.
+    from = schedule$eval[schedule$eval$node == node_from, ]
+    proc_receive = processor
+    proc_send = from$processor
 
     # If both nodes are already on the same processor then the data / state
     # is available and this function is a non op.
-    if(proc_from == proc_to){
+    if(proc_send == proc_receive){
         return(schedule)
     }
 
-    send_start = proc_finish_time(proc_from, schedule)
+    start_time_send = proc_finish_time(proc_send, schedule)
     tc = transfer_cost(node_from, node_to, taskgraph, overhead, bandwidth)
     ss = (taskgraph$from == node_from) & (taskgraph$to == node_to)
     varname = taskgraph[ss, "value"]
 
-    send = data.frame(processor = proc_from
-            , type = "send"
-            , start_time = send_start
-            , end_time = send_start + tc
-            , node = NA
-            , from = proc_from
-            , to = proc_to
-            , varname = varname
-            )
-
     # TODO: Hardcoding in 0 latency here and other places, come back and fix.
-    receive_start = max(proc_finish_time(proc_to, schedule), send_start)
+    start_time_receive = max(proc_finish_time(proc_receive, schedule), send_start)
 
-    receive = data.frame(processor = proc_to
-            , type = "receive"
-            , start_time = receive_start
-            , end_time = receive_start + tc
-            , node = NA
-            , from = proc_from
-            , to = proc_to
+    this_transfer = data.frame(start_time_send = start_time_send
+            , start_time_receive = start_time_receive
+            , end_time_send = start_time_send + tc
+            , end_time_receive = end_time_receive + tc
+            , proc_send = proc_send
+            , proc_receive = proc_receive
             , varname = varname
             )
 
-    rbind(schedule, send, receive)
+    schedule$transfer = rbind(schedule$transfer, this_transfer)
+    schedule
 }
 
 
@@ -213,15 +208,14 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
 #' be satisfied at this point.
 schedule_node = function(processor, node, taskgraph, schedule, node_time)
 {
-    start = proc_finish_time(processor, schedule)
-    task = data.frame(processor = processor
-            , type = "eval"
-            , start_time = start
-            , end_time = start + node_time
+    start_time = proc_finish_time(processor, schedule)
+
+    this_task = data.frame(processor = processor
+            , start_time = start_time
+            , end_time = start_time + node_time
             , node = node
-            , from = NA
-            , to = NA
-            , varname = NA
             )
-    rbind(schedule, task)
+
+    schedule$eval = rbind(schedule$eval, this_task)
+    schedule
 }
