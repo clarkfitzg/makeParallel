@@ -31,7 +31,7 @@
 #'  contention into account. This will have to be extended to account for
 #'  multiple machines.
 #' @return schedule
-minimize_start_time = function(taskgraph, maxworkers = 2L
+min_start_time = function(taskgraph, maxworkers = 2L
     , node_times = 10e-6, overhead = 8e-6
     , bandwidth = 1.5e9
 ){

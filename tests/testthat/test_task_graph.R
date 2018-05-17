@@ -8,10 +8,10 @@ library(igraph)
 # f(x)
 
 # Could define Ops to get ==, but this is sufficient
-expect_samegraph = function(g, egdf)
+expect_samegraph = function(g, tg)
 {
-    eg = graph_from_data_frame(egdf)
-    expect_true(isomorphic(g, eg))
+    tg2 = graph_from_data_frame(tg$task_graph)
+    expect_true(isomorphic(g, tg2))
 }
 
 

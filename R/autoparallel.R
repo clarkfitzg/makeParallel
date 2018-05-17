@@ -12,8 +12,8 @@
 #' pcode = autoparallel(parse(text = "lapply(x, f)"))
 autoparallel = function(code
     , runfirst = FALSE
-    , scheduler = minimize_start_time
-    , code_generator = generate_snow_code
+    , scheduler = min_start_time
+    , code_generator = gen_snow_code
     , ...
 #    , code_generator_args = list()
     , gen_script_prefix = "gen_"

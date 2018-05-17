@@ -10,12 +10,12 @@ test_that("Components of task parallel inference.", {
 
     graph = task_graph(oldcode)
 
-    plan = minimize_start_time(oldcode, graph)
+    plan = min_start_time(graph)
 
-    expect_s3_class(plan, "schedule")
+    expect_s3_class(plan$schedule, "schedule")
 
-    plot(plan)
+    plot(plan$schedule)
 
-    newcode = generate_snow_code(oldcode, plan)
+    newcode = gen_snow_code(oldcode, plan)
 
 })

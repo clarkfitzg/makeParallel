@@ -86,7 +86,7 @@ gen_snow_worker = function(processor, schedule)
 #' machine and sockets.
 #' 
 #' @param list as returned by scheduling algorithm such as that returned
-#'  from \link{\code{minimize_start_time}}
+#'  from \link{\code{min_start_time}}
 #' @param port_start first local port to use, can possibly use up to n * (n -
 #'  1) / 2 subsequent ports if every pair of n workers must communicate.
 #' @param min_timeout timeout for socket connection will be at least this
