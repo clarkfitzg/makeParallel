@@ -207,3 +207,10 @@ write_program = function(program, file)
     sink()
 }
 
+
+#' How long does it take for the schedule to complete?
+time_finish = function(schedule)
+{
+    # There shouldn't by any transfers after the final evaluation.
+    max(schedule$eval$end_time)
+}

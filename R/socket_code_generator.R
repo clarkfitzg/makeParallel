@@ -26,22 +26,57 @@ row_schedule_code = function(row, expressions)
 }
 
 
+#' Generate a single expression to transfer a variable
+gen_send_code = function(row)
+{
+    varname = as.name(row$varname)
+    proc_receive = row$proc_receive
+    substitute(serialize(varname, workers[[proc_receive]], xdr = FALSE))
+}
+
+
+#' Generate a single expression to transfer a variable
+gen_receive_code = function(processor, row)
+{
+    varname = as.name(row$varname)
+    proc_send = row$proc_send
+    substitute(varname <- unserialize(workers[[proc_send]]))
+}
+
+
 #' Code for a single worker
 #'
 #' It's a little strange to go from parsed expressions back to text. I may
 #' rethink this.
-gen_snow_worker = function(schedule, expressions)
+gen_snow_worker = function(processor, schedule)
 {
-    schedule = schedule[order(schedule$start_time), ]
-    rows = split(schedule, seq(nrow(schedule)))
-    out = lapply(rows, row_schedule_code, expressions = expressions)
+    work = schedule$schedule$eval
+    work = work[work$processor == processor, ]
+    work$code = as.character(schedule$input_code[work$node])
 
-    # Template uses these variables
-    processor = schedule[1, "processor"]
-    code_body = as.character(as.expression(out))
-    code_body = paste(code_body, collapse = "\n")
-    out = whisker::whisker.render(snow_worker_template)
-    out
+    trans = schedule$schedule$transfer
+
+    send = trans[trans$proc_send == processor, ]
+    send$code = as.character(by(send, seq(nrow(send)), gen_send_code))
+    send$start_time = send$start_time_send
+
+    receive = trans[trans$proc_receive == processor, ]
+    receive$code = as.character(by(receive, seq(nrow(receive)), gen_receive_code))
+    receive$start_time = receive$start_time_receive
+
+    cols = c("start_time", "code")
+    allcode = rbind(work[, cols], send[, cols], receive[, cols])
+
+    # We could do a sanity check here that the operations don't overlap. But
+    # if they do that's the fault of the scheduler. If it becomes an
+    # issue a better idea is probably to have a `verify_schedule()`
+    # function, then we can also check that it respects the task graph.
+    allcode = allcode[order(allcode$start_time), ]
+
+    whisker::whisker.render(snow_worker_template,
+        list(processor = processor
+            , code_body = paste(allcode$code, collapse = "\n")
+    ))
 } 
 
 
@@ -50,37 +85,40 @@ gen_snow_worker = function(schedule, expressions)
 #' Produces executable code that relies on a SNOW cluster on a single
 #' machine and sockets.
 #' 
+#' @param list as returned by scheduling algorithm such as that returned
+#'  from \link{\code{minimize_start_time}}
 #' @param port_start first local port to use, can possibly use up to n * (n -
 #'  1) / 2 subsequent ports if every pair of n workers must communicate.
 #' @param min_timeout timeout for socket connection will be at least this
 #'  many seconds.
 #' @return code list of scripts
 #' @export
-generate_snow_code = function(expressions, schedule, port_start = 33000L, min_timeout = 600)
+generate_snow_code = function(schedule, port_start = 33000L, min_timeout = 600)
 {
-    gen_time = Sys.time()
-    version = sessionInfo()$otherPkgs$autoparallel$Version
 
-    byworker = split(schedule, schedule$processor)
+    workers = unique(schedule$schedule$eval$processor)
     
-    worker_code = sapply(byworker, gen_snow_worker, expressions = expressions)
+    worker_code = sapply(workers, gen_snow_worker, schedule = schedule)
+
     # TODO: string escaping, this assumes only double quotes are used
     worker_code = paste(worker_code, collapse = "', \n\n############################################################\n\n'")
-    worker_code = paste0("c(\n'", worker_code, "'\n)")
 
-    socket_map = schedule[schedule$type %in% c("send", "receive"), c("from", "to")]
+    socket_map = schedule$schedule$transfer[, c("proc_send", "proc_receive")]
     socket_map$server = apply(socket_map, 1, min)
     socket_map$client = apply(socket_map, 1, max)
     socket_map = unique(socket_map[, c("server", "client")])
     socket_map$port = seq(from = port_start, length.out = nrow(socket_map))
 
-    # Ugly code, but the resulting output isn't too difficult to read
+    # Ugly code, but the generated output is easy to read
     con = textConnection("socket_map_csv_tmp", open = "w", local = TRUE)
     write.csv(socket_map, con, row.names = FALSE)
-    socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")
 
-    timeout = max(min_timeout, schedule$end_time)
-    nworkers = length(unique(schedule$processor))
-
-    whisker::whisker.render(snow_manager_template)
+    whisker::whisker.render(snow_manager_template, list(
+        gen_time = Sys.time()
+        , version = sessionInfo()$otherPkgs$autoparallel$Version
+        , nworkers = length(unique(schedule$processor))
+        , timeout = max(min_timeout, time_finish(schedule$schedule))
+        , socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")
+        , worker_code = paste0("c(\n'", worker_code, "'\n)")
+    ))
 }
