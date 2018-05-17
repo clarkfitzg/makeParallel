@@ -36,7 +36,7 @@ gen_send_code = function(row)
 
 
 #' Generate a single expression to transfer a variable
-gen_receive_code = function(processor, row)
+gen_receive_code = function(row)
 {
     varname = as.name(row$varname)
     proc_send = row$proc_send
@@ -113,12 +113,13 @@ generate_snow_code = function(schedule, port_start = 33000L, min_timeout = 600)
     con = textConnection("socket_map_csv_tmp", open = "w", local = TRUE)
     write.csv(socket_map, con, row.names = FALSE)
 
-    whisker::whisker.render(snow_manager_template, list(
+    schedule$output_code = whisker::whisker.render(snow_manager_template, list(
         gen_time = Sys.time()
         , version = sessionInfo()$otherPkgs$autoparallel$Version
-        , nworkers = length(unique(schedule$processor))
+        , nworkers = length(unique(schedule$schedule$eval$processor))
         , timeout = max(min_timeout, time_finish(schedule$schedule))
         , socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")
         , worker_code = paste0("c(\n'", worker_code, "'\n)")
     ))
+    schedule
 }

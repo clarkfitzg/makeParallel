@@ -16,17 +16,17 @@ autoparallel = function(code
     , code_generator = generate_snow_code
     , ...
 #    , code_generator_args = list()
+    , gen_script_prefix = "gen_"
     )
 {
     taskgraph = task_graph(code)
     schedule = scheduler(taskgraph, ...)
-    newcode = code_generator(schedule)
+    out = code_generator(schedule)
 
     if(is.character(code)){
-        newcode_file = paste0("gen_", code)
-        writeLines(newcode, newcode_file)
-        message(sprintf("generated parallel code is in %s", newcode_file))
+        outfile = paste0(gen_script_prefix, code)
+        writeLines(out$output_code, outfile)
+        message(sprintf("generated parallel code is in %s", outfile))
     }
-
-    list(taskgraph = taskgraph, schedule = schedule, code = newcode)
+    out
 }

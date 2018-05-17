@@ -60,6 +60,7 @@ minimize_start_time = function(taskgraph, maxworkers = 2L
             , proc_send = integer()
             , proc_receive = integer()
             , varname = character()
+            , stringsAsFactors = FALSE
         ))
     class(schedule) = c("schedule", class(schedule))
 
@@ -197,6 +198,7 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
             , proc_send = proc_send
             , proc_receive = proc_receive
             , varname = varname
+            , stringsAsFactors = FALSE
             )
 
     schedule$transfer = rbind(schedule$transfer, this_transfer)
