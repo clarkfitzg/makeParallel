@@ -19,7 +19,7 @@ graph = task_graph(oldcode)
 plan = minimize_start_time(oldcode, graph)
 #                         , node_times = times)
 
-newcode = generate_snow_code(oldcode, plan)
+newcode = gen_snow_code(oldcode, plan)
 
 
 ap = autoparallel(oldcode)

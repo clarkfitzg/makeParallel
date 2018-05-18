@@ -93,7 +93,7 @@ gen_snow_worker = function(processor, schedule)
 #'  many seconds.
 #' @return code list of scripts
 #' @export
-generate_snow_code = function(schedule, port_start = 33000L, min_timeout = 600)
+gen_snow_code = function(schedule, port_start = 33000L, min_timeout = 600)
 {
 
     workers = unique(schedule$schedule$eval$processor)

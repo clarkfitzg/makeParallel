@@ -1,56 +1,47 @@
 #' Gantt chart of a schedule
+#'
 #' @export
-plot.schedule = function(x, main = "schedule plot", ...)
+plot.schedule = function(x, blockwidth = 0.25, main = "schedule plot"
+    , eval_color = "gray", send_color = "orchid", receive_color = "slateblue"
+    , density = NA, border = "black", lwd = 2
+    , ...)
 {
 
-#    library(ggplot2)
-#
-#    # https://stackoverflow.com/questions/3550341/gantt-charts-with-r
-#    # No, doesn't show break points
-#    xm = reshape2::melt(x, measure.vars = c("start_time", "end_time"))
-#    xm$processor = as.factor(xm$processor)
-#    ggplot(xm, aes(value, processor, color = "type")) +
-#        geom_line(size = 6)
-#
+    run = x$eval
 
-#    info = list(labels = x$processor
-#                , starts = x$start_time
-#                , ends = x$end_time
-#                )
-#
-#    vg = sort(unique(c(info$starts, info$ends)))
-#
-#    plotrix::gantt.chart(info, vgridpos = vg, vgridlab = as.character(vg)
-#            , hgrid = TRUE, taskcolors = "lightgray", border.col = "black"
-#            , xlab = "time"
-#            )
-#
-#    add_label = function(row)
+    xlim = c(min(run$start_time), max(run$end_time))
+    ylim = c(min(run$processor) - 1, max(run$processor) + 1)
+    plot(xlim, ylim, type = "n", xlab = "time", ylab = "processor", main = main, ...)
 
-    xlim = c(0, max(x$end_time))
-    ylim = c(0, max(x$processor) + 1)
+    by(run, seq(nrow(run)), function(row){with(row,
+        rect(start_time, processor - blockwidth
+             , end_time, processor + blockwidth
+            , border = border, lwd = lwd, density = density, col = eval_color
+            )
+        text(x = (start_time + end_time) / 2, y = processor, labels = node)
+    )})
 
-    plot(xlim, ylim, type = "n", xlab = "time", ylab = "processor", ...)
+    delta = 1.1 * width  # So arrows doesn't actually touch
 
-    eval_color = "gray"
-    send_color = "orchid"
-    receive_color = "slateblue"
-    width = 0.25
+    by(x$transfer, seq(nrow(x$transfer)), function(row){with(row,
+        rect(start_time_send, proc_send - blockwidth
+             , end_time_send, proc_send + blockwidth
+            , border = border, lwd = lwd, density = density, col = send_color
+            )
+        rect(start_time_receive, proc_receive - blockwidth
+             , end_time_receive, proc_receive + blockwidth
+            , border = border, lwd = lwd, density = density, col = receive_color
+            )
+    )})
+
 
     add_one = function(row){
         with(row, {
         type = as.character(type)
         col = switch(type, eval = eval_color, send = send_color, receive = receive_color)
-        rect(start_time, processor - width, end_time, processor + width
-            , border = "black", lwd = 2, density = NA, col = col
-            )
-        lab = if(is.na(varname)) node else varname
-        xcenter = (start_time + end_time) / 2
-        text(xcenter, y = processor, labels = lab)
         if(type == "send"){
             # Draw an arrow to the corresponding receive
             receive = x[x$type == "receive" & x$from == from & x$varname == varname, ]
-            delta = 1.1 * width  # So it doesn't actually touch
             if(processor < receive$processor) delta = -delta
             arrows(xcenter, processor - delta
                    , with(receive, (start_time + end_time) / 2), receive$processor + delta)
