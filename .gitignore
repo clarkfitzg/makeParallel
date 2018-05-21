@@ -1,3 +1,4 @@
+*.pdf
 gen_*.R
 *.log
 tests/testthat/*.pdf

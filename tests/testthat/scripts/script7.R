@@ -12,3 +12,6 @@ a2 = 2
 b5 = a2 + 2
 b6 = a2 + b4 + b5
 writeLines(as.character(b6), "script7.R.log")
+
+# First worker
+b7 = a1 + 1
