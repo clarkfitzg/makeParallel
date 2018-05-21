@@ -1,6 +1,6 @@
 expect_generated = function(script)
 {
-    outfile = paste0(script, ".log")
+    outfile = paste0(basename(script), ".log")
     p = autoparallel(script)
 
     # Serial
@@ -17,7 +17,7 @@ expect_generated = function(script)
 
 test_that("Generated code from simple examples actually executes", {
 
-    scripts = list.files("testthat/scripts/", pattern = "script*.R")
+    scripts = Sys.glob("testthat/scripts/script*.R")
 
     lapply(scripts, expect_generated)
 

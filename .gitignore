@@ -1,3 +1,4 @@
+*.log
 tests/testthat/*.pdf
 scratch/*
 

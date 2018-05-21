@@ -24,7 +24,9 @@ autoparallel = function(code
     out = code_generator(schedule)
 
     if(is.character(code)){
-        outfile = paste0(gen_script_prefix, code)
+        # It's a file name
+        bn = paste0(gen_script_prefix, basename(code))
+        outfile = paste(dirname(code), bn, sep = "/")
         writeLines(out$output_code, outfile)
         message(sprintf("generated parallel code is in %s", outfile))
     }
