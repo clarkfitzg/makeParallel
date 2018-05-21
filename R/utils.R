@@ -214,3 +214,12 @@ time_finish = function(schedule)
     # There shouldn't by any transfers after the final evaluation.
     max(schedule$eval$end_time)
 }
+
+
+#' Handle Empty Data Frames
+by0 = function(x, ...){
+    if(nrow(x) == 0)
+        logical()
+    else
+        by(x, ...)
+}

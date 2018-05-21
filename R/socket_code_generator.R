@@ -44,14 +44,6 @@ gen_receive_code = function(row)
 }
 
 
-#' Handle Empty Data Frames
-by0 = function(x, ...){
-    if(nrow(x) == 0)
-        logical()
-    else
-        by(x, ...)
-}
-
 
 #' Code for a single worker
 #'

@@ -69,7 +69,7 @@ plot.schedule = function(x, blockwidth = 0.25, main = "schedule plot"
         , rect_aes = rect_aes
         )
 
-    by(x$transfer, seq(nrow(x$transfer)), plot_one_transfer
+    by0(x$transfer, seq(nrow(x$transfer)), plot_one_transfer
         , blockwidth = blockwidth
         , rect_aes = rect_aes
         , send_color = send_color
