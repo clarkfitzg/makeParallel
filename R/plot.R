@@ -11,7 +11,8 @@ plot_one_eval_block = function(row, blockwidth, rect_aes)
 })}
 
 
-plot_one_transfer = function(row, blockwidth, rect_aes, send_color, receive_color)
+plot_one_transfer = function(row, blockwidth, rect_aes, send_color, receive_color
+                             , text_adj = 1.2)
 {with(row, {
     send_rect_args = list(xleft = start_time_send
         , ybottom = proc_send - blockwidth
@@ -30,18 +31,19 @@ plot_one_transfer = function(row, blockwidth, rect_aes, send_color, receive_colo
     do.call(rect, c(receive_rect_args, rect_aes))
 
     delta = 1.1 * blockwidth
-    adj = c(0, 0)
+    adj = c(text_adj, text_adj)
     # Arrows can go up or down
     if(proc_receive > proc_send){
         delta = -delta
-        adj = c(0, 1)
+        adj = c(text_adj, 0)
     }
-    xa_start = (end_time_send - start_time_send) / 2
-    ya_end = proc_send - delta
-    arrows(xa_start, ya_end
-        , (end_time_receive - start_time_receive) / 2, proc_receive + delta
+    x_send = mean(c(end_time_send, start_time_send))
+    y_send = proc_send - delta
+    arrows(x0 = x_send, y0 = y_send
+        , x1 = mean(c(end_time_receive, start_time_receive))
+        , y1 = proc_receive + delta
         )
-    text(xa_start, ya_end, varname, adj = adj)
+    text(x_send, y_send, varname, adj = adj)
 })}
 
 
