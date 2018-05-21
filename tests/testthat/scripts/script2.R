@@ -12,4 +12,4 @@ c = b + y
 # don't think I've added the logic so that we know variable y is available
 # on worker 1. Thus 2 should do the following:
 output = c("got:", c*x*y, "expected:", (7 + 4 + 1 + 2) * 1 * (1 + 2))
-writeLines(output, "out2.log")
+writeLines(output, "script2.R.log")

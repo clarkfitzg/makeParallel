@@ -8,7 +8,10 @@ expect_generated = function(script, expected_output)
 
 
 test_that("Generated code from simple examples actually executes", {
-    scripts = list.files("testthat/scripts/script*.R")
+
+    scripts = list.files("testthat/scripts/", pattern )
     expected_logs = list.files("testthat/scripts/expect*.log")
+
     Map(expect_generated, scripts, expected_logs)
+
 })

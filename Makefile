@@ -11,12 +11,19 @@ RFILES = $(wildcard R/*.R)
 TESTFILES = $(wildcard tests/testthat/test*.R)
 VIGNETTES = $(wildcard vignettes/*.Rmd)
 
+GEN_SCRIPT_OUTPUT = $(addsuffix .log, $(wildcard tests/testthat/scripts/script*.R))
+
+
+# Log files that go with each test
+%.R.log: %.R
+	Rscript $<
+
 # User local install
 install: $(RFILES) DESCRIPTION
 	R -e "roxygen2::roxygenize()"
 	R CMD INSTALL .
 
-test: $(TESTFILES)
+test: $(TESTFILES) $(GEN_SCRIPT_OUTPUT)
 	make install
 	cd tests && Rscript testthat.R && cd ..
 

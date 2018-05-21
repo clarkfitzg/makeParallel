@@ -15,5 +15,4 @@ b4 = b2 + b3 + a3
 a5 = a3 + a4 + b4
 b5 = b3 + b4 + a4
 
-writeLines(as.character(a5), "out4a.log")
-writeLines(as.character(b5), "out4b.log")
+writeLines(as.character(b5), "script4.R.log")

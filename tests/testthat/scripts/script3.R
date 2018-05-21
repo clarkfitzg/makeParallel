@@ -10,3 +10,4 @@ b4 = b3 + 1
 a3 = a2 + 1
 a4 = a3 + 1
 c3 = c2 + 1
+writeLines(as.character(c3), "script3.R.log")

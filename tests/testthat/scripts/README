@@ -1,0 +1,2 @@
+Each script should write results to a file following the current naming
+convention. For example, script1.R writes output to script1.R.log.

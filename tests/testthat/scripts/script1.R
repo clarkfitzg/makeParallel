@@ -3,4 +3,4 @@ v2 = "foo2"
 x <- paste0(v1, v1)
 y <- paste0(v2, v2)
 xy <- paste0(x, y)
-writeLines(xy, "script1.log")
+writeLines(xy, "script1.R.log")
