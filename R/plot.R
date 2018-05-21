@@ -1,21 +1,34 @@
-plot_one_eval_block = function(row){with(row, {
-    rect(start_time, processor - blockwidth
-         , end_time, processor + blockwidth
-        , border = border, lwd = lwd, density = density, col = eval_color
+plot_one_eval_block = function(row, blockwidth, rect_aes)
+{with(row, {
+    rect_args = list(xleft = start_time
+        , ybottom = processor - blockwidth
+        , xright = end_time
+        , ytop = processor + blockwidth
         )
+    do.call(rect, c(rect_args, rect_aes))
+
     text(x = (start_time + end_time) / 2, y = processor, labels = node)
 })}
 
 
-plot_one_transfer = function(row, blockwidth){with(row, {
-    rect(start_time_send, proc_send - blockwidth
-         , end_time_send, proc_send + blockwidth
-        , border = border, lwd = lwd, density = density, col = send_color
+plot_one_transfer = function(row, blockwidth, rect_aes, send_color, receive_color)
+{with(row, {
+    send_rect_args = list(xleft = start_time_send
+        , ybottom = proc_send - blockwidth
+        , xright = end_time_send
+        , ytop = proc_send + blockwidth
         )
-    rect(start_time_receive, proc_receive - blockwidth
-        , end_time_receive, proc_receive + blockwidth
-        , border = border, lwd = lwd, density = density, col = receive_color
+    rect_aes[["col"]] = send_color
+    do.call(rect, c(send_rect_args, rect_aes))
+
+    receive_rect_args = list(xleft = start_time_receive
+        , ybottom = proc_receive - blockwidth
+        , xright = end_time_receive
+        , ytop = proc_receive + blockwidth
         )
+    rect_aes[["col"]] = receive_color
+    do.call(rect, c(receive_rect_args, rect_aes))
+
     delta = 1.1 * blockwidth
     adj = c(0, 0)
     # Arrows can go up or down
@@ -35,9 +48,11 @@ plot_one_transfer = function(row, blockwidth){with(row, {
 #' Gantt chart of a schedule
 #'
 #' @export
+#' @param rect_aes list of additional arguments for \code{rect}.
+#' @param ... additional arguments to \code{plot}
 plot.schedule = function(x, blockwidth = 0.25, main = "schedule plot"
     , eval_color = "gray", send_color = "orchid", receive_color = "slateblue"
-    , density = NA, border = "black", lwd = 2
+    , rect_aes = list(density = NA, border = "black", lwd = 2)
     , ...)
 {
     run = x$eval
@@ -46,9 +61,18 @@ plot.schedule = function(x, blockwidth = 0.25, main = "schedule plot"
     ylim = c(min(run$processor) - 1, max(run$processor) + 1)
     plot(xlim, ylim, type = "n", xlab = "time", ylab = "processor", main = main, ...)
 
-    by(run, seq(nrow(run)), plot_one_eval_block)
+    rect_aes[["col"]] = eval_color
+    by(run, seq(nrow(run)), plot_one_eval_block
+        , blockwidth = blockwidth
+        , rect_aes = rect_aes
+        )
 
-    by(x$transfer, seq(nrow(x$transfer)), plot_one_transfer, blockwidth = blockwidth)
+    by(x$transfer, seq(nrow(x$transfer)), plot_one_transfer
+        , blockwidth = blockwidth
+        , rect_aes = rect_aes
+        , send_color = send_color
+        , receive_color = receive_color
+        )
 
     NULL
 }
