@@ -1,3 +1,4 @@
+gen_*.R
 *.log
 tests/testthat/*.pdf
 scratch/*

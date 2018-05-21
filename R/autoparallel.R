@@ -25,10 +25,10 @@ autoparallel = function(code
 
     if(is.character(code)){
         # It's a file name
-        bn = paste0(gen_script_prefix, basename(code))
-        outfile = paste(dirname(code), bn, sep = "/")
-        writeLines(out$output_code, outfile)
-        message(sprintf("generated parallel code is in %s", outfile))
+        gen_file_name = file.path(dirname(code), paste0(gen_script_prefix, basename(code)))
+        writeLines(out$output_code, gen_file_name)
+        message(sprintf("generated parallel code is in %s", gen_file_name))
+        out[["gen_file_name"]] = gen_file_name
     }
     out
 }
