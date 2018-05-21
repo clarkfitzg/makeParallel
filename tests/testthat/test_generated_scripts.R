@@ -1,17 +1,24 @@
-expect_generated = function(script, expected_output)
+expect_generated = function(script)
 {
+    outfile = paste0(script, ".log")
     p = autoparallel(script)
-    eval(p$code)
-    expect_equal(readLines(paste0(script, ".log")
-        , readLines(expected_output)))
+
+    # Serial
+    eval(p$input_code)
+    expected = readLines(outfile)
+
+    # Parallel
+    eval(parse(text = p$output_code))
+    actual = readLines(outfile)
+    
+    expect_equal(actual, expected)
 }
 
 
 test_that("Generated code from simple examples actually executes", {
 
-    scripts = list.files("testthat/scripts/", pattern )
-    expected_logs = list.files("testthat/scripts/expect*.log")
+    scripts = list.files("testthat/scripts/", pattern = "script*.R")
 
-    Map(expect_generated, scripts, expected_logs)
+    lapply(scripts, expect_generated)
 
 })
