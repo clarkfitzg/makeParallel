@@ -44,6 +44,15 @@ gen_receive_code = function(row)
 }
 
 
+#' Handle Empty Data Frames
+by0 = function(x, ...){
+    if(nrow(x) == 0)
+        logical()
+    else
+        by(x, ...)
+}
+
+
 #' Code for a single worker
 #'
 #' It's a little strange to go from parsed expressions back to text. I may
@@ -57,11 +66,11 @@ gen_snow_worker = function(processor, schedule)
     trans = schedule$schedule$transfer
 
     send = trans[trans$proc_send == processor, ]
-    send$code = as.character(by(send, seq(nrow(send)), gen_send_code))
+    send$code = as.character(by0(send, seq(nrow(send)), gen_send_code))
     send$start_time = send$start_time_send
 
     receive = trans[trans$proc_receive == processor, ]
-    receive$code = as.character(by(receive, seq(nrow(receive)), gen_receive_code))
+    receive$code = as.character(by0(receive, seq(nrow(receive)), gen_receive_code))
     receive$start_time = receive$start_time_receive
 
     cols = c("start_time", "code")
