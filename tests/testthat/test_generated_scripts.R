@@ -13,7 +13,8 @@ expect_generated = function(script, ...)
 
     # Serial
     #eval(p$input_code)
-    system2("Rscript", script)
+    #e = system2("Rscript", c(script, "--vanilla"))
+    e = source(script)
     file.rename(outfile, serfile)
     expected = readLines(serfile)
 
@@ -33,7 +34,6 @@ test_that("Generated code from simple examples actually executes", {
     # First do all of them with defaults
     lapply(scripts, expect_generated)
 
-    # Then pass in some extra arguments
     expect_generated("testthat/scripts/script3.R")
 
     # Then pass in some extra arguments
