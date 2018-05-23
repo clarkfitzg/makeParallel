@@ -1,3 +1,6 @@
+Change the whole testing strategy. It's not working. Try to use shell
+redirection.
+
 Create example where transfer is initiated earlier than it's received.
 
 move variable names in the plot

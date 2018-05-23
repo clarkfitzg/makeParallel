@@ -3,6 +3,10 @@ snow_manager_template = readLines(
 )
 
 
+snow_notransfer_template = readLines(
+    system.file("templates/snow_notransfer.R", package = "autoparallel")
+)
+
 snow_worker_template = readLines(
     system.file("templates/snow_worker.R", package = "autoparallel")
 )
@@ -96,7 +100,38 @@ gen_snow_worker = function(processor, schedule)
 #' @export
 gen_snow_code = function(schedule, port_start = 33000L, min_timeout = 600)
 {
+    if(nrow(schedule$schedule$transfer) == 0){
+        gen_snow_code_no_comm(schedule)
+    } else {
+        gen_snow_code_comm(schedule, port_start, min_timeout)
+    }
+}
 
+
+gen_snow_code_no_comm = function(schedule)
+{
+    workers = unique(schedule$schedule$eval$processor)
+    
+    worker_code = sapply(workers, gen_snow_worker, schedule = schedule)
+
+    # TODO: string escaping, this assumes only double quotes are used
+    worker_code = paste(worker_code, collapse = "', \n\n############################################################\n\n'")
+
+    # TODO Fix all this.
+    schedule$output_code = whisker::whisker.render(snow_manager_template, list(
+        gen_time = Sys.time()
+        , version = sessionInfo()$otherPkgs$autoparallel$Version
+        , nworkers = length(unique(schedule$schedule$eval$processor))
+        , timeout = max(min_timeout, time_finish(schedule$schedule))
+        , socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")
+        , worker_code = paste0("c(\n'", worker_code, "'\n)")
+    ))
+    schedule
+}
+
+
+gen_snow_code_comm = function(schedule, port_start, min_timeout)
+{
     workers = unique(schedule$schedule$eval$processor)
     
     worker_code = sapply(workers, gen_snow_worker, schedule = schedule)
