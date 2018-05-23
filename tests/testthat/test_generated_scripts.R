@@ -34,6 +34,9 @@ test_that("Generated code from simple examples actually executes", {
     lapply(scripts, expect_generated)
 
     # Then pass in some extra arguments
+    expect_generated("testthat/scripts/script3.R")
+
+    # Then pass in some extra arguments
     expect_generated("testthat/scripts/script3.R", maxworkers = 3)
 
 })

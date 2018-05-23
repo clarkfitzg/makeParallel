@@ -6,4 +6,4 @@ z = 3
 a = x + y
 b = y + z
 out = a + b + x
-write.table(out, "script3.R.log")
+write.table(out, "script5.R.log")
