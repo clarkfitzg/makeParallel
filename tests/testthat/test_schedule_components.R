@@ -26,6 +26,6 @@ test_that("run_and_measure", {
 
     graph = run_and_measure(task_graph(oldcode))
 
-    expect_equal(graph$task_graph$size[1], object.size("foo1"))
+    expect_equal(graph$task_graph$size[1], as.numeric(object.size("foo1")))
 
 })

@@ -31,8 +31,8 @@ run_and_measure = function(taskgraph, envir = globalenv(), timer = Sys.time)
         from_rows = tg$type == "use-def" & tg$from == i
         vars_to_measure = tg[from_rows, "value"]
         for(v in vars_to_measure){
-            size = object.size(get(v, envir))
-            tg[from_rows & tg$value == "v", "size"] = size
+            size = as.numeric(object.size(get(v, envir)))
+            tg[from_rows & tg$value == v, "size"] = size
         }
     }
     taskgraph$task_graph = tg
