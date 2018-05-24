@@ -10,10 +10,10 @@
 # TODO: Define standard interface for a scheduler, ie. additional arguments
 # for the timings and variable sizes.
 
-#' Minimize Node Start Time
+#' Minimize expression Start Time
 #'
 #' Implementation of "list scheduling".
-#' This is a greedy algorithm that assigns each node to the earliest
+#' This is a greedy algorithm that assigns each expression to the earliest
 #' possible processor.
 #'
 #' See Algorithm 10 in Sinnen's book "Task Scheduling for Parallel
@@ -22,9 +22,9 @@
 #' @export
 #' @param taskgraph list as returned from \link{\code{task_graph}}
 #' @param maxworkers integer maximum number of procs
-#' @param node_times numeric vector of times it will take each expression to
-#'  execute. If this is a single number it's taken to be the default for
-#'  all nodes.
+#' @param default_node_time numeric time in seconds to execute a single
+#' expression This will only be used if taskgraph does not have an element named
+#' \code{expr_times}.
 #' @param overhead numeric seconds to send any object
 #' @param bandwidth numeric speed that the network can transfer an object
 #'  between processors in bytes per second. We don't take network
@@ -32,7 +32,7 @@
 #'  multiple machines.
 #' @return schedule
 min_start_time = function(taskgraph, maxworkers = 2L
-    , node_times = 10e-6, overhead = 8e-6
+    , default_expr_times = 10e-6, overhead = 8e-6
     , bandwidth = 1.5e9
 ){
 
@@ -40,17 +40,16 @@ min_start_time = function(taskgraph, maxworkers = 2L
     nnodes = length(taskgraph$input_code)
     tg = taskgraph$task_graph
 
-    if(length(node_times) == 1L){
-        node_times = rep(node_times, nnodes)
+    expr_times = taskgraph$expr_times
+    if(is.null(expr_times)){
+        expr_times = rep(default_expr_times, nnodes)
     }
-    # TODO: Could check for size of node_times here, but I'll wait and do
-    # TDD
 
     # Initialize by scheduling the first expression on the first worker.
     schedule = list(
         eval = data.frame(processor = 1L
             , start_time = 0
-            , end_time = node_times[1]
+            , end_time = expr_times[1]
             , node = 1L
             ),
         transfer = data.frame(start_time_send = numeric()
@@ -86,11 +85,11 @@ min_start_time = function(taskgraph, maxworkers = 2L
 
         schedule = schedule_node(earliest_proc
                 , node = node, schedule = schedule
-                , node_time = node_times[node]
+                , node_time = expr_times[node]
                 )
     }
 
-    c(taskgraph, list(schedule = schedule, maxworkers = maxworkers, node_times = node_times
+    c(taskgraph, list(schedule = schedule, maxworkers = maxworkers, expr_times = expr_times
                      , overhead = overhead, bandwidth = bandwidth))
 }
 

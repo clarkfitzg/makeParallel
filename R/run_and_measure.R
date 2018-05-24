@@ -36,6 +36,6 @@ run_and_measure = function(taskgraph, envir = globalenv(), timer = Sys.time)
         }
     }
     taskgraph$task_graph = tg
-    taskgraph$times = as.numeric(times)
+    taskgraph$expr_times = as.numeric(times)
     taskgraph
 }
