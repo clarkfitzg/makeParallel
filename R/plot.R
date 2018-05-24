@@ -19,7 +19,7 @@ plot_one_transfer = function(row, blockwidth, rect_aes, send_color, receive_colo
         , xright = end_time_send
         , ytop = proc_send + blockwidth
         )
-    rect_aes[["col"]] = send_color
+    rect_aes[["col"]] = rect_aes[["border"]] = send_color
     do.call(rect, c(send_rect_args, rect_aes))
 
     receive_rect_args = list(xleft = start_time_receive
@@ -27,7 +27,7 @@ plot_one_transfer = function(row, blockwidth, rect_aes, send_color, receive_colo
         , xright = end_time_receive
         , ytop = proc_receive + blockwidth
         )
-    rect_aes[["col"]] = receive_color
+    rect_aes[["col"]] = rect_aes[["border"]] = receive_color
     do.call(rect, c(receive_rect_args, rect_aes))
 
     delta = 1.1 * blockwidth

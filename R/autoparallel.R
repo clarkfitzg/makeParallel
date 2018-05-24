@@ -20,6 +20,7 @@ autoparallel = function(code
     )
 {
     taskgraph = task_graph(code)
+    if(runfirst) taskgraph = run_and_measure(taskgraph)
     schedule = scheduler(taskgraph, ...)
     out = code_generator(schedule)
 

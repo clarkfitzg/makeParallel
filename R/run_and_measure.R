@@ -5,8 +5,9 @@
 #' possibly be transferred.
 #'
 #' @export
-#' @param timer function that returns a timestamp, try using
-#'  microbenchmark::get_nanotime here for more precision.
+#' @param timer function that returns a timestamp. Milliseconds are a
+#'  sufficient timing resolution, because this is intended to apply to code
+#'  that takes at least say 10 seconds to run completely.
 #' @param envir environment to evaluate the code in.
 run_and_measure = function(taskgraph, envir = globalenv(), timer = Sys.time)
 {

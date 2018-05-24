@@ -22,9 +22,9 @@
 #' @export
 #' @param taskgraph list as returned from \link{\code{task_graph}}
 #' @param maxworkers integer maximum number of procs
-#' @param default_node_time numeric time in seconds to execute a single
-#' expression This will only be used if taskgraph does not have an element named
-#' \code{expr_times}.
+#' @param expr_times time in seconds to execute each expression
+#' @param default_expr_time numeric time in seconds to execute a single
+#'  expression. This will only be used if \code{expr_times} is NULL.
 #' @param overhead numeric seconds to send any object
 #' @param bandwidth numeric speed that the network can transfer an object
 #'  between processors in bytes per second. We don't take network
@@ -32,7 +32,8 @@
 #'  multiple machines.
 #' @return schedule
 min_start_time = function(taskgraph, maxworkers = 2L
-    , default_expr_times = 10e-6, overhead = 8e-6
+    , expr_times = taskgraph$expr_times
+    , default_expr_time = 10e-6, overhead = 8e-6
     , bandwidth = 1.5e9
 ){
 
@@ -40,9 +41,8 @@ min_start_time = function(taskgraph, maxworkers = 2L
     nnodes = length(taskgraph$input_code)
     tg = taskgraph$task_graph
 
-    expr_times = taskgraph$expr_times
     if(is.null(expr_times)){
-        expr_times = rep(default_expr_times, nnodes)
+        expr_times = rep(default_expr_time, nnodes)
     }
 
     # Initialize by scheduling the first expression on the first worker.
