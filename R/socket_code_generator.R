@@ -117,13 +117,10 @@ gen_snow_code_no_comm = function(schedule)
     # TODO: string escaping, this assumes only double quotes are used
     worker_code = paste(worker_code, collapse = "', \n\n############################################################\n\n'")
 
-    # TODO Fix all this.
-    schedule$output_code = whisker::whisker.render(snow_manager_template, list(
+    schedule$output_code = whisker::whisker.render(snow_notransfer_template, list(
         gen_time = Sys.time()
         , version = sessionInfo()$otherPkgs$autoparallel$Version
         , nworkers = length(unique(schedule$schedule$eval$processor))
-        , timeout = max(min_timeout, time_finish(schedule$schedule))
-        , socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")
         , worker_code = paste0("c(\n'", worker_code, "'\n)")
     ))
     schedule

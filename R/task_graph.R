@@ -111,7 +111,7 @@ task_graph = function(code
     use_def_chains = lapply(vars, use_def, uses, definitions)
 
     tg = do.call(rbind, use_def_chains)
-    tg[, "size"] = default_size
+    tg[, "size"] = if(nrow(tg) == 0) numeric() else default_size
 
     list(input_code = expr, task_graph = tg)
 }

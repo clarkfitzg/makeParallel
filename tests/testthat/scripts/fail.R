@@ -1,4 +1,2 @@
-options(error = {geterrmessage()
-        quit(status = 10)})
-"a" + "b"
-print(1 + 2)
+ab = "a" + "b"
+print("If this line prints then execution proceeded after the error. Fix it.")

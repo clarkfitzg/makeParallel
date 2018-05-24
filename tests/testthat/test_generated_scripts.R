@@ -12,19 +12,28 @@ expect_generated = function(script, ...)
     dev.off()
 
     # Serial
-    #eval(p$input_code)
-    #e = system2("Rscript", c(script, "--vanilla"))
-    e = source(script)
+    source(script)
     file.rename(outfile, serfile)
     expected = readLines(serfile)
 
     # Parallel
-    #eval(parse(text = p$output_code))
-    system2("Rscript", p$gen_file_name)
+    # Generated scripts have a cluster `cls`. It needs to go away if
+    # something fails midway through.
+    on.exit(try(parallel::stopCluster(cls), silent = TRUE))
+    source(p$gen_file_name)
     actual = readLines(outfile)
     
     expect_equal(actual, expected)
 }
+
+
+test_that("expect_generated fails when it should fail.", {
+    # That's right, this is a test of the tests :)
+
+    expect_error(expect_generated("testthat/scripts/fail.R")
+        , regexp = "non-numeric argument to binary operator")
+
+})
 
 
 test_that("Generated code from simple examples actually executes", {
@@ -33,8 +42,6 @@ test_that("Generated code from simple examples actually executes", {
 
     # First do all of them with defaults
     lapply(scripts, expect_generated)
-
-    expect_generated("testthat/scripts/script3.R")
 
     # Then pass in some extra arguments
     expect_generated("testthat/scripts/script3.R", maxworkers = 3)
