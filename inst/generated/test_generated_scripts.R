@@ -1,5 +1,11 @@
+library(testthat)
+library(autoparallel)
+
+
 expect_generated = function(script, ...)
 {
+    cat(sprintf("Testing %s\n", script))
+
     # Check that the output of the file is the same for the serial script
     # and the generated script.
 
@@ -17,20 +23,22 @@ expect_generated = function(script, ...)
     expected = readLines(serfile)
 
     # Parallel
-    # Generated scripts have a cluster `cls`. It needs to go away if
+    # Generated scripts have a cluster `cls`. It needs to be cleaned up if
     # something fails midway through.
     on.exit(try(parallel::stopCluster(cls), silent = TRUE))
     source(p$gen_file_name)
     actual = readLines(outfile)
     
     expect_equal(actual, expected)
+
+    cat(sprintf("Pass %s\n\n", script))
 }
 
 
 test_that("expect_generated fails when it should fail.", {
     # That's right, this is a test of the tests :)
 
-    expect_error(expect_generated("testthat/scripts/fail.R")
+    expect_error(expect_generated("fail.R")
         , regexp = "non-numeric argument to binary operator")
 
 })
@@ -38,12 +46,15 @@ test_that("expect_generated fails when it should fail.", {
 
 test_that("Generated code from simple examples actually executes", {
 
-    scripts = Sys.glob("testthat/scripts/script*.R")
+    #pkg_root = system.file(package = "autoparallel")
+    scripts = Sys.glob("script*.R")
+
+    #scripts = system.file("inst", "generated", package = "autoparallel")
 
     # First do all of them with defaults
     lapply(scripts, expect_generated)
 
     # Then pass in some extra arguments
-    expect_generated("testthat/scripts/script3.R", maxworkers = 3)
+    expect_generated("script3.R", maxworkers = 3)
 
 })
