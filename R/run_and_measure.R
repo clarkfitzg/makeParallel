@@ -1,7 +1,10 @@
+#' Run and Measure Code
+#'
 #' Run the code in the task graph and measure how long each expression
 #' takes to run as well as the object sizes of each variable that can
 #' possibly be transferred.
 #'
+#' @export
 #' @param timer function that returns a timestamp, try using
 #'  microbenchmark::get_nanotime here for more precision.
 #' @param envir environment to evaluate the code in.
