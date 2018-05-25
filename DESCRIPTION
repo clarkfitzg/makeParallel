@@ -1,7 +1,7 @@
 Package: autoparallel
 Version: 0.0.1
 Date: 2017-06-12
-Title: static analysis and transformations of R code
+Title: transform serial R code into parallel R code
 Authors@R: person("Clark", "Fitzgerald", role = c("aut", "cre"),
                      email = "clarkfitzg@gmail.com")
 Author: Clark Fitzgerald [aut, cre]
@@ -12,9 +12,9 @@ Imports:
     methods,
     parallel,
     CodeDepends,
-    microbenchmark,
     whisker
 Suggests: 
+    microbenchmark,
     roxygen2,
     knitr,
     rmarkdown,
@@ -22,8 +22,7 @@ Suggests:
     data.table,
     covr
 Description: This experimental package provides tools to automatically
-    transform R code into a more efficient version. Typically this means
-    converting serial code into a parallel version.
+    transform serial R code into more efficient parallel versions.
     The primary intended use case is an R script that takes too
     long (at least more than a second!) Other use cases include interactive
     analysis of large data sets, detection of task parallelism, and

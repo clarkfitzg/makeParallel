@@ -99,7 +99,6 @@ benchmark_transform_work = function(program
 #' @param threshold_pvalue used for t test decision to choose parallel
 #'      over serial.
 #' @return transformed program
-#' @export
 benchmark_transform = function(input_file, output_file = NULL
         , nbenchmarks = 5L, threshold_time = 0.001
         , threshold_pvalue = 0.01)

@@ -1,3 +1,7 @@
+#' @importFrom parallel stopCluster
+NULL
+
+
 #' Parallelized Data Evaluator
 #'
 #' Distributes data over a cluster and returns a closure capable of
@@ -17,7 +21,7 @@
 #' @param cl SNOW cluster
 #' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
 #' @param ... additional arguments to \code{\link[parallel]{makeCluster}}
-#' @return parallel evaluator resembling \code{\link[base]{eval}}
+#' @return function with class parallel_evaluator resembling \code{\link[base]{eval}}
 #' @examples
 #' x = list(1:10, 21:30)
 #' do = parallelize(x)
@@ -28,17 +32,16 @@
 #' do(1:3, simplify = FALSE)
 #' print(do)
 #' print.function(do)  # See parameters and attributes
-#' stop_cluster(do)
+#' stopCluster(do)
 parallelize = function(x = NULL
-                       , cl = parallel::makeCluster(spec, ...)
-                       , spec = 2L, ...
-                       )
-{
+    , cl = parallel::makeCluster(spec, ...)
+    , spec = 2L, ...
+){
 
     varname = deparse(substitute(x))
     splits = assign_workers(cl, x, varname)
 
-    evaluator = function(expr, simplify = c, verbose = FALSE)
+    evaluator = function(expr, simplify = c, verbose = TRUE)
     {
         # Recover the expression as an object to manipulate
         code = substitute(expr)
@@ -52,14 +55,14 @@ parallelize = function(x = NULL
         used = used[used != varname]
         exports = intersect(ls(globalenv()), used)
 
-        if(verbose){
-            message("Sending these variables to the cluster:\n"
-                    , paste(exports, collapse = ", "))
+        if(length(exports) > 0){
+            parallel::clusterExport(cl, exports, env = globalenv())
+            if(verbose){
+                message("Sending these variables to the cluster:\n"
+                        , paste(exports, collapse = ", "))
+            }
         }
-        parallel::clusterExport(cl, exports, env = globalenv())
 
-        # TODO: Is there any difference between using .GlobalEnv and
-        # globalenv()? Probably should read up on this.
         evaluated = parallel::clusterCall(cl, eval, code, env = globalenv())
 
         if(is.function(simplify)){
@@ -81,13 +84,14 @@ print.parallel_evaluator = function(x, ...)
 {
     cat("parallel evaluator", "\n")
     cat("variable: ", attr(x, "varname"), "\n")
+    cat(head(x, 1), "\n")
 }
 
 
 #' @export
-stop_cluster = function(x)
+stopCluster.parallel_evaluator = function(cl)
 {
-    parallel::stopCluster(attr(x, "cluster"))
+    parallel::stopCluster(attr(cl, "cluster"))
 }
 
 

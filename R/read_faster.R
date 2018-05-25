@@ -53,7 +53,6 @@ readfuncs = c("read.csv", "read.table")
 #' @param readfunc character (optional) name of function originally used to
 #'  read the data.
 #' @return transformed code
-#' @export
 read_faster = function(expression, varname = NULL, colnames = NULL, readfunc = NULL)
 {
 

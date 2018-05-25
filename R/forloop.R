@@ -12,7 +12,6 @@
 #' Code in the body of the loop is truly iterative. Functions update global
 #' state in any way other than direct assignment.
 #' 
-#' @export
 forloop_to_mclapply = function(forloop)
 {
 
