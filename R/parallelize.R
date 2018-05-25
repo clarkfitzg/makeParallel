@@ -1,7 +1,3 @@
-#' @importFrom parallel stopCluster
-NULL
-
-
 #' Parallelized Data Evaluator
 #'
 #' Distributes data over a cluster and returns a closure capable of
@@ -32,7 +28,7 @@ NULL
 #' do(1:3, simplify = FALSE)
 #' print(do)
 #' print.function(do)  # See parameters and attributes
-#' stopCluster(do)
+#' stop_cluster(do)
 parallelize = function(x = NULL
     , cl = parallel::makeCluster(spec, ...)
     , spec = 2L, ...
@@ -89,9 +85,9 @@ print.parallel_evaluator = function(x, ...)
 
 
 #' @export
-stopCluster.parallel_evaluator = function(cl)
+stop_cluster = function(x)
 {
-    parallel::stopCluster(attr(cl, "cluster"))
+    parallel::stopCluster(attr(x, "cluster"))
 }
 
 
