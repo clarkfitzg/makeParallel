@@ -1,6 +1,6 @@
 #' Convert Code Into Parallel
 #'
-#' Transforms code into a parallel form.
+#' Detects task parallelism in code and rewrites code to use it.
 #'
 #' @export
 #' @param code file name, expression from \code{\link[base]{parse()}}
