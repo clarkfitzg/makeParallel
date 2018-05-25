@@ -8,7 +8,7 @@ test_that("for loop to mclapply", {
 
     expected = quote(parallel::mclapply(x, function(i = NULL){f(i)}))
 
-    expect_equal(actual, expected)
+    expect_true(same_expr(actual, expected))
 
     # Can't be parallelized
     loop2 = quote(for(i in x){

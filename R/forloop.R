@@ -20,7 +20,7 @@ forloop_to_mclapply = function(forloop)
 
     deps = CodeDepends::getInputs(forloop$body)
 
-    if(c(deps@outputs, deps@updates) > 0){
+    if(length(c(deps@outputs, deps@updates)) > 0){
         return(forloop)
     }
 
