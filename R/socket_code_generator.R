@@ -12,7 +12,7 @@ snow_worker_template = readLines(
 )
 
 
-#' Code for a single row in a schedule
+# Code for a single row in a schedule
 row_schedule_code = function(row, expressions)
 {
     if(row$type == "eval"){
@@ -30,7 +30,7 @@ row_schedule_code = function(row, expressions)
 }
 
 
-#' Generate a single expression to transfer a variable
+# Generate a single expression to transfer a variable
 gen_send_code = function(row)
 {
     varname = as.name(row$varname)
@@ -39,7 +39,7 @@ gen_send_code = function(row)
 }
 
 
-#' Generate a single expression to transfer a variable
+# Generate a single expression to transfer a variable
 gen_receive_code = function(row)
 {
     varname = as.name(row$varname)
@@ -49,10 +49,10 @@ gen_receive_code = function(row)
 
 
 
-#' Code for a single worker
-#'
-#' It's a little strange to go from parsed expressions back to text. I may
-#' rethink this.
+# Code for a single worker
+#
+# It's a little strange to go from parsed expressions back to text. I may
+# rethink this.
 gen_snow_worker = function(processor, schedule)
 {
     work = schedule$schedule$eval
@@ -91,7 +91,7 @@ gen_snow_worker = function(processor, schedule)
 #' machine and sockets.
 #' 
 #' @param list as returned by scheduling algorithm such as that returned
-#'  from \link{\code{min_start_time}}
+#'  from \code{\link{min_start_time}}
 #' @param port_start first local port to use, can possibly use up to n * (n -
 #'  1) / 2 subsequent ports if every pair of n workers must communicate.
 #' @param min_timeout timeout for socket connection will be at least this

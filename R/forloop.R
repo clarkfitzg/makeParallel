@@ -1,5 +1,7 @@
+#' Transfrom For Loop To Lapply
+#'
 #' Determine if a for loop can be parallelized, and if so transform it into
-#' a call to mclapply. This first version will parallelize loops if and
+#' a call to \code{parallel::mclapply}. This first version will parallelize loops if and
 #' only if the body of the loop does not do any assignments at all.
 #' 
 #' Recommended use case:
@@ -12,6 +14,9 @@
 #' Code in the body of the loop is truly iterative. Functions update global
 #' state in any way other than direct assignment.
 #' 
+#' @param forloop R language object with class \code{for}.
+#' @return call R call to \code{parallel::mclapply} if successful,
+#'  otherwise the original forloop.
 forloop_to_mclapply = function(forloop)
 {
 

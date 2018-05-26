@@ -1,7 +1,7 @@
 Package: autoparallel
 Version: 0.0.1
 Date: 2017-06-12
-Title: transform serial R code into parallel R code
+Title: Transform Serial R Code into Parallel R Code
 Authors@R: person("Clark", "Fitzgerald", role = c("aut", "cre"),
                      email = "clarkfitzg@gmail.com")
 Author: Clark Fitzgerald [aut, cre]
@@ -14,7 +14,6 @@ Imports:
     CodeDepends,
     whisker
 Suggests: 
-    microbenchmark,
     roxygen2,
     knitr,
     rmarkdown,

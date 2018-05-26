@@ -1,5 +1,4 @@
-#' Apply preprocessing steps to code
-#' @export
+# Apply preprocessing steps to code
 preprocess = function(code)
 {
     for(i in seq_along(code)){

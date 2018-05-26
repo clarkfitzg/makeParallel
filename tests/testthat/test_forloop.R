@@ -8,9 +8,6 @@ test_that("for loop to mclapply", {
 
     expected = quote(parallel::mclapply(x, function(i = NULL){f(i)}))
 
-    # TODO: Update same_expr to actually test expression 
-    expect_true(same_expr(actual, expected))
-
     # Can't be parallelized
     loop2 = quote(for(i in x){
         y = f(y)
@@ -18,4 +15,6 @@ test_that("for loop to mclapply", {
 
     expect_equal(forloop_to_mclapply(loop2), loop2)
 
+    skip("TODO: Update same_expr to actually test expression equality.")
+    expect_true(same_expr(actual, expected))
 })

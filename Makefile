@@ -27,6 +27,7 @@ test: $(TESTFILES) $(GEN_SCRIPT_OUTPUT)
 
 $(PKG): $(RFILES) $(TESTFILES) $(VIGNETTES) DESCRIPTION
 	rm -f $(PKG)  # Otherwise it's included in build
+	make install
 	R CMD build .
 
 check: $(PKG)

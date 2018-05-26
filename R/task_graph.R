@@ -2,10 +2,10 @@ empty_edges = data.frame(from = integer(), to = integer()
         , type = integer(), value = integer(), size = numeric())
 
 
-#' Where does x show up in locs
-#' 
-#' @param x character
-#' @param locs list of character vectors
+# Where does x show up in locs
+# 
+# @param x character
+# @param locs list of character vectors
 where_index = function(x, locs)
 {
     which(sapply(locs, function(locs_i) x %in% locs_i))
@@ -40,16 +40,16 @@ use_def = function(x, all_uses, all_definitions)
 }
 
 
-#' Shuffle vectors x and y together, ie. (x[1], y[1], x[2], y[2], ...)
+# Shuffle vectors x and y together, ie. (x[1], y[1], x[2], y[2], ...)
 shuffle = function(x, y)
 {
     as.vector(rbind(x, y))
 }
 
 
-#' Add Source Node To Graph
-#'
-#' Add a source node with index 0 for each node without parents, return resulting graph.
+# Add Source Node To Graph
+#
+# Add a source node with index 0 for each node without parents, return resulting graph.
 add_source_node = function(g)
 {
     incoming = as_adj_list(g, "in")
@@ -59,9 +59,9 @@ add_source_node = function(g)
 }
 
 
-#' Expression Dependency Graph
+#' Task Dependency Graph
 #'
-#' Create a data frame of edges representing the expression dependencies
+#' Create a data frame of edges representing the expression (task) dependencies
 #' implicit in code.
 #'
 #' @export
@@ -117,7 +117,7 @@ task_graph = function(code
 }
 
 
-#' Count Number Of Nodes In Longest Path For DAG
+# Count Number Of Nodes In Longest Path For DAG
 longest_path = function(dag)
 {
 

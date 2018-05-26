@@ -8,7 +8,9 @@
 #' @param ..., additional arguments to scheduler
 #' @return list of output from each step
 #' @examples
+#' \dontrun{
 #' autoparallel("my_slow_serial.R")
+#' }
 #' pcode = autoparallel(parse(text = "lapply(x, f)"))
 autoparallel = function(code
     , runfirst = FALSE

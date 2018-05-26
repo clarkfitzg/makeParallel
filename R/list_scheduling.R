@@ -94,7 +94,7 @@ min_start_time = function(taskgraph, maxworkers = 2L
 }
 
 
-#' Which Processor Is Assigned to this node in the schedule?
+# Which Processor Is Assigned to this node in the schedule?
 which_processor = function(node, schedule)
 {
     e = schedule$eval
@@ -134,9 +134,9 @@ data_ready_time = function(proc, node, taskgraph, schedule, overhead, bandwidth)
 }
 
 
-#' Time to transfer required data between nodes
-#' Def 4.4 p. 77
-#' This is the place to include models for latency.
+# Time to transfer required data between nodes
+# Def 4.4 p. 77
+# This is the place to include models for latency.
 transfer_cost = function(node_from, node_to, taskgraph, overhead, bandwidth)
 {
     ss = (taskgraph$from == node_from) & (taskgraph$to == node_to)
@@ -146,7 +146,7 @@ transfer_cost = function(node_from, node_to, taskgraph, overhead, bandwidth)
 }
 
 
-#' Time when the processor has finished all scheduled tasks
+# Time when the processor has finished all scheduled tasks
 proc_finish_time = function(proc, schedule)
 {
 
@@ -158,15 +158,15 @@ proc_finish_time = function(proc, schedule)
 }
 
 
-#' The nodes which must be completed before node can be evaluated
+# The nodes which must be completed before node can be evaluated
 predecessors = function(node, taskgraph)
 {
     taskgraph[taskgraph$to == node, "from"]
 }
 
 
-#' Account for the constraint in one edge of a task graph, and return an
-#' updated schedule
+# Account for the constraint in one edge of a task graph, and return an
+# updated schedule
 add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
         , overhead, bandwidth)
 {
@@ -205,9 +205,9 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
 }
 
 
-#' Assign node to processor as the last step in the schedule, and
-#' return the updated schedule. All dependencies in the task graph should
-#' be satisfied at this point.
+# Assign node to processor as the last step in the schedule, and
+# return the updated schedule. All dependencies in the task graph should
+# be satisfied at this point.
 schedule_node = function(processor, node, schedule, node_time)
 {
     start_time = proc_finish_time(processor, schedule)

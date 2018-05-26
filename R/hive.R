@@ -70,7 +70,7 @@ R_template = readLines(
 #' @examples
 #' #write_udaf_scripts(...)
 #' @export
-write_udaf_scripts = function(f
+write_hive_scripts = function(f
     , cluster_by
     , input_table
     , input_cols
