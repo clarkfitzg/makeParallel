@@ -20,7 +20,7 @@
 #' Systems".
 #'
 #' @export
-#' @param taskgraph list as returned from \link{\code{task_graph}}
+#' @param taskgraph list as returned from \code{\link{task_graph}}
 #' @param maxworkers integer maximum number of procs
 #' @param expr_times time in seconds to execute each expression
 #' @param default_expr_time numeric time in seconds to execute a single

@@ -11,7 +11,9 @@
 #' \dontrun{
 #' autoparallel("my_slow_serial.R")
 #' }
-#' pcode = autoparallel(parse(text = "lapply(x, f)"))
+#' pcode = autoparallel(parse(text = "x = 1:100
+#' y = rep(1, 100)
+#' z = x + y"))
 autoparallel = function(code
     , runfirst = FALSE
     , scheduler = min_start_time
