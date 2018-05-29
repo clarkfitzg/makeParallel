@@ -17,7 +17,7 @@
 autoparallel = function(code
     , runfirst = FALSE
     , scheduler = min_start_time
-    , code_generator = gen_snow_code
+    , code_generator = gen_socket_code
     , ...
 #    , code_generator_args = list()
     , gen_script_prefix = "gen_"

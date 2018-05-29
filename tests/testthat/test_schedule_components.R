@@ -17,7 +17,7 @@ test_that("Components of task parallel inference.", {
 
     plot(plan$schedule)
 
-    newcode = gen_snow_code(plan)
+    newcode = gen_socket_code(plan)
 
 })
 

@@ -83,7 +83,6 @@ print.distributed_evaluator = function(x, ...)
 }
 
 
-#' @export
 stop_cluster = function(x)
 {
     parallel::stopCluster(attr(x, "cluster"))

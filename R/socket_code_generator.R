@@ -98,17 +98,17 @@ gen_snow_worker = function(processor, schedule)
 #'  many seconds.
 #' @return code list of scripts
 #' @export
-gen_snow_code = function(schedule, port_start = 33000L, min_timeout = 600)
+gen_socket_code = function(schedule, port_start = 33000L, min_timeout = 600)
 {
     if(nrow(schedule$schedule$transfer) == 0){
-        gen_snow_code_no_comm(schedule)
+        gen_socket_code_no_comm(schedule)
     } else {
-        gen_snow_code_comm(schedule, port_start, min_timeout)
+        gen_socket_code_comm(schedule, port_start, min_timeout)
     }
 }
 
 
-gen_snow_code_no_comm = function(schedule)
+gen_socket_code_no_comm = function(schedule)
 {
     workers = unique(schedule$schedule$eval$processor)
     
@@ -127,7 +127,7 @@ gen_snow_code_no_comm = function(schedule)
 }
 
 
-gen_snow_code_comm = function(schedule, port_start, min_timeout)
+gen_socket_code_comm = function(schedule, port_start, min_timeout)
 {
     workers = unique(schedule$schedule$eval$processor)
     
