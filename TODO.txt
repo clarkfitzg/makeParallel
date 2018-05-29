@@ -1,3 +1,5 @@
+Measure CPU utilization during timings to see what's parallel / threaded.
+
 Change the whole testing strategy. It's not working. Try to use shell
 redirection.
 

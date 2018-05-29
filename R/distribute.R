@@ -1,4 +1,4 @@
-#' Parallelized Data Evaluator
+#' Distributed Data Evaluator
 #'
 #' Distributes data over a cluster and returns a closure capable of
 #' evaluating code in parallel. Designed for interactive use.
@@ -10,14 +10,13 @@
 #' created with; this is assumed to be large, so it will only be exported
 #' to the cluster once when the evaluator is created. 
 #'
-#' @export
 #' @param x An object to split and run parallel code on. Typically a large
 #' data frame or list. Data frames are split into groups of rows, lists on
 #' elements.
 #' @param cl SNOW cluster
 #' @param spec number of workers, see \code{\link[parallel]{makeCluster}}
 #' @param ... additional arguments to \code{\link[parallel]{makeCluster}}
-#' @return function with class parallel_evaluator resembling \code{\link[base]{eval}}
+#' @return function with class distributed_evaluator resembling \code{\link[base]{eval}}
 #' @examples
 #' x = list(1:10, 21:30)
 #' do = parallelize(x)
@@ -29,7 +28,7 @@
 #' print(do)
 #' print.function(do)  # See parameters and attributes
 #' stop_cluster(do)
-parallelize = function(x = NULL
+distribute = function(x = NULL
     , cl = parallel::makeCluster(spec, ...)
     , spec = 2L, ...
 ){
@@ -70,15 +69,15 @@ parallelize = function(x = NULL
     attr(evaluator, "cluster") = cl
     attr(evaluator, "splits") = splits
     attr(evaluator, "varname") = varname
-    class(evaluator) = c("parallel_evaluator", class(evaluator))
+    class(evaluator) = c("distributed_evaluator", class(evaluator))
     evaluator
 }
 
 
 #' @export
-print.parallel_evaluator = function(x, ...)
+print.distributed_evaluator = function(x, ...)
 {
-    cat("parallel evaluator", "\n")
+    cat("distributed evaluator", "\n")
     cat("variable: ", attr(x, "varname"), "\n")
     cat(head(x, 1), "\n")
 }

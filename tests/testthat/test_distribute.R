@@ -1,13 +1,13 @@
-context("parallelize")
+context("distribute")
 
-# parallelize works off variables in the global environment
+# distribute works off variables in the global environment
 # testthat does some other things here.
 assign("y", list(letters, LETTERS, 1:10), envir = .GlobalEnv)
 
 
 test_that("basics with default", {
 
-    do = parallelize(y)
+    do = distribute(y)
 
     actual = do(lapply(y, head))
 
@@ -27,7 +27,7 @@ test_that("basics with default", {
 
 test_that("finds global variables", {
 
-    do = parallelize(y, spec = 2L)
+    do = distribute(y, spec = 2L)
     # assigning n must happen after cluster creation, otherwise forking
     # will send n
     assign("n", 10, envir = .GlobalEnv)
@@ -41,7 +41,7 @@ test_that("finds global variables", {
 
 test_that("splits data frames into groups of rows", {
 
-    do = parallelize(iris)
+    do = distribute(iris)
     dims = do(dim(iris))
 
     expect_equal(dims, c(75, 5, 75, 5))
