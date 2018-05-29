@@ -22,7 +22,7 @@ plan = minimize_start_time(oldcode, graph)
 newcode = gen_socket_code(oldcode, plan)
 
 
-ap = autoparallel(oldcode)
+ap = task_parallel(oldcode)
 
 
 # Basically we need to do two things:

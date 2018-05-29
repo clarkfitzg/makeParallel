@@ -1,20 +1,27 @@
-#' Convert Code Into Parallel
+#' Create Code That Uses Task Parallelism
 #'
-#' Detects task parallelism in code and rewrites code to use it.
+#' This function is experimental and unstable. If you're trying to actually
+#' speed up your code through parallelism then consider
+#' \code{\link{data_parallel}}.
+#'
+#' This function detects task parallelism in code and rewrites code to use it.
+#' Task parallelism means two or more processors run different R
+#' expressions simultaneously.
 #'
 #' @export
-#' @param code file name, expression from \code{\link[base]{parse()}}
+#' @param code file name, expression from \code{\link[base]{parse}}
 #' @param runfirst logical, evaluate the code once to gather timings?
 #' @param ..., additional arguments to scheduler
+#' @param gen_script_prefix character added to front of file name
 #' @return list of output from each step
 #' @examples
 #' \dontrun{
-#' autoparallel("my_slow_serial.R")
+#' task_parallel("my_slow_serial.R")
 #' }
-#' pcode = autoparallel(parse(text = "x = 1:100
+#' pcode = task_parallel(parse(text = "x = 1:100
 #' y = rep(1, 100)
 #' z = x + y"))
-autoparallel = function(code
+task_parallel = function(code
     , runfirst = FALSE
     , scheduler = min_start_time
     , code_generator = gen_socket_code
@@ -36,4 +43,63 @@ autoparallel = function(code
         out[["gen_file_name"]] = gen_file_name
     }
     out
+}
+
+
+#' Create Code That Uses Data Parallelism
+#'
+#' This function transforms R code from serial into parallel.
+#' It detects parallelism through the use of top level calls to R's
+#' apply family of functions and through analysis of \code{for} loops.
+#' Currently supported apply style functions include
+#' \code{\link[base]{lapply}} and \code{\link[base]{mapply}}. It doesn't
+#' parallelize all for loops that can be parallelized, but it does do the
+#' common ones listed in the example.
+#'
+#' Consider using this if: 
+#'
+#' \itemize{
+#'  \item \code{code} is slow
+#'  \item \code{code} uses for loops or one of the apply functions mentioned above
+#'  \item You're unfamiliar with parallel programming in R
+#' }
+#'
+#' @export
+#' @param code file name, expression from \code{\link[base]{parse}}
+#' @param gen_script_prefix character added to front of file name
+#' @examples
+#' \dontrun{
+#' data_parallel("my_slow_serial.R")
+#' }
+#'
+#' # Each iteration of the for loop writes to a different file- good!
+#' # If they write to the same file this will break.
+#' data_parallel(parse(text = "
+#'      fnames = paste0(1:10, ".txt")
+#'      for(f in fname){
+#'          writeLines("testing...", f)
+#'      }"))
+#'
+#' # A couple examples in one script
+#' serial_code = parse(text = "
+#'      x1 = lapply(1:10, exp)
+#'      x2 = 1:10
+#'      for(i in x2) x2[i] = exp(x2[i])
+#' ")
+#'
+#' parallel_code = data_parallel(serial_code)
+#'
+#' eval(serial_code)
+#' x1
+#' x2
+#' rm(x1, x2)
+#' 
+#' # x1 and x2 should now be back and the same as they were for serial
+#' eval(parallel_code)
+#' x1
+#' x2
+data_parallel = function(code
+    , gen_script_prefix = "gen_"
+    )
+{
 }

@@ -18,3 +18,8 @@ script = parse("script4.R")
 tg = task_graph(script)
 schedule = minimize_start_time(script, tg, maxworkers = 3L)
 plot(schedule)
+
+How do other packages express parallelism?
+
+- parallel substitutes lapply with mclapply
+- foreach defines its own looping construct: `x <- foreach(i=1:3) %dopar% sqrt(i)`
