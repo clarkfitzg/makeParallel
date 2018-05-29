@@ -1,6 +1,3 @@
-#' @importFrom stats lm median predict t.test update
-#' @importFrom utils head tail
-NULL
 
 
 # Test Expressions For Equality

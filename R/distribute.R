@@ -74,7 +74,6 @@ distribute = function(x = NULL
 }
 
 
-#' @export
 print.distributed_evaluator = function(x, ...)
 {
     cat("distributed evaluator", "\n")
