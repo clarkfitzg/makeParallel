@@ -7,7 +7,6 @@ R_template = readLines(
 )
 
 
-
 #' Writes User Defined Aggregation Function
 #'
 #' Generates R and SQL scripts to call as user defined aggregation

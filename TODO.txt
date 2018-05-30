@@ -1,25 +1,15 @@
-Measure CPU utilization during timings to see what's parallel / threaded.
+# TODO
 
-Change the whole testing strategy. It's not working. Try to use shell
-redirection.
+Before release on CRAN:
 
-Create example where transfer is initiated earlier than it's received.
+- Vignettes.
+- Show a realistic script as an example that actually benefits from task parallelism.
+- Write the `data_parallel()` function, including modification of for loops
+  into parallel code.
+- Simplify `write_hive_scripts()` to do less. The burden should be on the
+  users to write the SQL.
 
-move variable names in the plot
+Less urgent:
 
-Most functions in the list scheduling use the same bunch of five components
-that get passed around, so it might make sense to package that stuff up in
-a list.
-
-The script below can really only use 2 workers, and it seems to do weird
-stuff if I pass maxworkers = 3L:
-
-script = parse("script4.R")
-tg = task_graph(script)
-schedule = minimize_start_time(script, tg, maxworkers = 3L)
-plot(schedule)
-
-How do other packages express parallelism?
-
-- parallel substitutes lapply with mclapply
-- foreach defines its own looping construct: `x <- foreach(i=1:3) %dopar% sqrt(i)`
+- Alternative scheduling algorithm and code generator based on fork / join.
+- Measure CPU utilization during timings to see what's parallel / threaded.
