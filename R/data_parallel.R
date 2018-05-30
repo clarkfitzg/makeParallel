@@ -1,6 +1,6 @@
 equivalent_apply = data.frame(serial = c("mapply", "lapply", "Map")
                          , stringsAsFactors = FALSE)
-equivalent_apply[, "parallel"] = paste0("parallel::mc", equivalent_functions[, "serial"])
+equivalent_apply[, "parallel"] = paste0("parallel::mc", equivalent_apply[, "serial"])
 
 
 dont_change_in = c("for", "while", "repeat")
@@ -11,9 +11,12 @@ dont_change_in = c("for", "while", "repeat")
 # This transforms a single expression to a parallel version by directly
 # substituting the variable names. It also prevents nested parallelism.
 #
-# @param expr 
+# @param expr language object
+# @param map data frame with corresponding serial and parallel columns
+# @value new_expr language object modified to parallel
 ser_apply_to_parallel = function(expr, map = equivalent_apply)
 {
+    # I could be doing this with a breadth first traversal of the AST.
 }
 
 
