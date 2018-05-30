@@ -183,17 +183,19 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
 
     # One expression can define multiple variables simultaneously, ie. 
     # a = b = 5
-    tg_from_to = tg[(taskgraph$from == node_from) & (taskgraph$to == node_to), ]
+    tg_from_to = taskgraph[(taskgraph$from == node_from) & (taskgraph$to == node_to), ]
     for(i in seq(nrow(tg_from_to))){
-        schedule = add_single_send_receive(tg_from_to[i, ], schedule)
+        schedule = add_single_send_receive(tg_from_to[i, ], schedule
+            , proc_send, proc_receive
+            , overhead, bandwidth)
     }
     schedule
 }
 
 
-add_single_send_receive = function(tg_from_to, schedule, proc_send, proc_receive
-    , overhead, bandwidth
-    )
+add_single_send_receive = function(tg_from_to, schedule
+    , proc_send, proc_receive
+    , overhead, bandwidth)
 {
     start_time_send = proc_finish_time(proc_send, schedule)
     tc = transfer_cost(tg_from_to, overhead, bandwidth)
@@ -207,7 +209,7 @@ add_single_send_receive = function(tg_from_to, schedule, proc_send, proc_receive
             , end_time_receive = start_time_receive + tc
             , proc_send = proc_send
             , proc_receive = proc_receive
-            , varname = tg_from_to[, "varname"]
+            , varname = tg_from_to[, "value"]
             , stringsAsFactors = FALSE
             )
 

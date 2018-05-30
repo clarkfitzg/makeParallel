@@ -35,9 +35,12 @@ test_that("Multiple assignment in single expression", {
 
     code = parse(text = "
         x = y = z = 1
-        f(x)
+        a = b = c = 2
+        f(x, y, z, a, b, c)
     ")
 
-    out = autoparallel(code)
+    out = task_parallel(code)
+
+    expect_equal(3, nrow(out$schedule$transfer))
 
 })
