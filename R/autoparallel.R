@@ -64,6 +64,16 @@ task_parallel = function(code
 #'  \item You're unfamiliar with parallel programming in R
 #' }
 #'
+#' Don't use this if:
+#'
+#' \itemize{
+#'  \item \code{code} is fast enough for your application
+#'  \item \code{code} is already parallel, either explicitly with a package
+#'      such as parallel, or implicitly, say through a multi threaded BLAS
+#'  \item You need maximum performance at all costs. In this case you need
+#'      to carefully profile and interface appropriately with compiled code.
+#' }
+#'
 #' @export
 #' @param code file name, expression from \code{\link[base]{parse}}
 #' @param gen_script_prefix character added to front of file name
@@ -75,7 +85,7 @@ task_parallel = function(code
 #' # Each iteration of the for loop writes to a different file- good!
 #' # If they write to the same file this will break.
 #' data_parallel(parse(text = "
-#'      fnames = paste0(1:10, ".txt")
+#'      fnames = paste0(1:10, '.txt')
 #'      for(f in fname){
 #'          writeLines("testing...", f)
 #'      }"))

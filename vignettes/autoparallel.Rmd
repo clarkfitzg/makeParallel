@@ -1,0 +1,24 @@
+---
+title: "autoparallel"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autoparallel}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+# autoparallel
+
+```{r}
+library(autoparallel)
+```
+
+At the simplest level we can swap out serial R functions with equivalent
+parallel ones.
+
+```{r}
+code = parse(text = "x = 1:10
+    sinx = lapply(x, sin)")
+pcode = data_parallel(code)
+pcode
+```
