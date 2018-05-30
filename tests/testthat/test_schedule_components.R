@@ -41,6 +41,9 @@ test_that("Multiple assignment in single expression", {
 
     out = task_parallel(code)
 
+    # The first two lines will be assigned to different processors, so
+    # three transfers should happen regardless of which processor evaluates
+    # the last line.
     expect_equal(3, nrow(out$schedule$transfer))
 
 })

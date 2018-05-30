@@ -160,7 +160,7 @@ proc_finish_time = function(proc, schedule)
 # The nodes which must be completed before node can be evaluated
 predecessors = function(node, taskgraph)
 {
-    taskgraph[taskgraph$to == node, "from"]
+    unique(taskgraph[taskgraph$to == node, "from"])
 }
 
 
