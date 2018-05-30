@@ -3,6 +3,7 @@
 Before release on CRAN:
 
 - Vignettes.
+- Robust test for expression equality
 - Show a realistic script as an example that actually benefits from task parallelism.
 - Write the `data_parallel()` function, including modification of for loops
   into parallel code.

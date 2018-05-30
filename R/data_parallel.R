@@ -1,48 +1,45 @@
-#' Create Code That Uses Task Parallelism
-#'
-#' This function is experimental and unstable. If you're trying to actually
-#' speed up your code through parallelism then consider
-#' \code{\link{data_parallel}}.
-#'
-#' This function detects task parallelism in code and rewrites code to use it.
-#' Task parallelism means two or more processors run different R
-#' expressions simultaneously.
-#'
-#' @export
-#' @param code file name, expression from \code{\link[base]{parse}}
-#' @param runfirst logical, evaluate the code once to gather timings?
-#' @param ..., additional arguments to scheduler
-#' @param gen_script_prefix character added to front of file name
-#' @return list of output from each step
-#' @examples
-#' \dontrun{
-#' task_parallel("my_slow_serial.R")
-#' }
-#' pcode = task_parallel(parse(text = "x = 1:100
-#' y = rep(1, 100)
-#' z = x + y"))
-task_parallel = function(code
-    , runfirst = FALSE
-    , scheduler = min_start_time
-    , code_generator = gen_socket_code
-    , ...
-#    , code_generator_args = list()
-    , gen_script_prefix = "gen_"
-    )
-{
-    taskgraph = task_graph(code)
-    if(runfirst) taskgraph = run_and_measure(taskgraph)
-    schedule = scheduler(taskgraph, ...)
-    out = code_generator(schedule)
+equivalent_apply = data.frame(serial = c("mapply", "lapply", "Map")
+                         , stringsAsFactors = FALSE)
+equivalent_apply[, "parallel"] = paste0("parallel::mc", equivalent_functions[, "serial"])
 
-    if(is.character(code)){
-        # It's a file name
-        gen_file_name = file.path(dirname(code), paste0(gen_script_prefix, basename(code)))
-        writeLines(out$output_code, gen_file_name)
-        message(sprintf("generated parallel code is in %s", gen_file_name))
-        out[["gen_file_name"]] = gen_file_name
+
+dont_change_in = c("for", "while", "repeat")
+
+
+# Transform Expression To Parallel
+#
+# This transforms a single expression to a parallel version by directly
+# substituting the variable names. It also prevents nested parallelism.
+#
+# @param expr 
+ser_apply_to_parallel = function(expr, map = equivalent_apply)
+{
+}
+
+
+#' Find and parallelize the first use of an apply function
+parallelize_first_apply = function(expr
+    , ser_funcs = apply_funcs[, "serial"]
+    , par_funcs = apply_funcs[, "parallel"]
+){
+    finds = sapply(ser_funcs, function(fname){
+        find_call(expr, fname)
+    })
+
+    # list with 0 or 1 elements
+    first = lapply(finds, head, 1)
+    first = head(do.call(c, first), 1)
+
+    if(length(first) == 0){
+        NULL
+    } else {
+        index = first[[1]]
+        parexpr = expr
+        pcode = par_funcs[ser_funcs == names(first)]
+        pcode = parse(text = pcode)[[1]]
+        parexpr[[index]] = pcode
+        parexpr
     }
-    out
 }
 
 
@@ -108,8 +105,6 @@ task_parallel = function(code
 #' eval(parallel_code)
 #' x1
 #' x2
-data_parallel = function(code
-    , gen_script_prefix = "gen_"
-    )
+data_parallel = function(code, gen_script_prefix = "gen_")
 {
 }
