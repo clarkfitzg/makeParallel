@@ -137,12 +137,11 @@ data_ready_time = function(proc, node, taskgraph, schedule, overhead, bandwidth)
 # Time to transfer required data between nodes
 # Def 4.4 p. 77
 # This is the place to include models for latency.
-transfer_cost = function(node_from, node_to, taskgraph, overhead, bandwidth)
+# @param tg_row is a single row from a task graph
+transfer_cost = function(tg_row, overhead, bandwidth)
 {
-    ss = (taskgraph$from == node_from) & (taskgraph$to == node_to)
-    size = taskgraph[ss, "size"]
-    if(length(size) > 1) stop("Can't handle multiple edges in task graph.")
-    size / bandwidth + overhead
+    if(nrow(tg_row) > 1) stop("Did not expect multiple transfers here.")
+    tg_row[, "size"] / bandwidth + overhead
 }
 
 
@@ -165,8 +164,8 @@ predecessors = function(node, taskgraph)
 }
 
 
-# Account for the constraint in one edge of a task graph, and return an
-# updated schedule
+# Account for the constraint from one node to another, and return an
+# updated schedule.
 add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
         , overhead, bandwidth)
 {
@@ -182,10 +181,22 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
         return(schedule)
     }
 
+    # One expression can define multiple variables simultaneously, ie. 
+    # a = b = 5
+    tg_from_to = tg[(taskgraph$from == node_from) & (taskgraph$to == node_to), ]
+    for(i in seq(nrow(tg_from_to))){
+        schedule = add_single_send_receive(tg_from_to[i, ], schedule)
+    }
+    schedule
+}
+
+
+add_single_send_receive = function(tg_from_to, schedule, proc_send, proc_receive
+    , overhead, bandwidth
+    )
+{
     start_time_send = proc_finish_time(proc_send, schedule)
-    tc = transfer_cost(node_from, node_to, taskgraph, overhead, bandwidth)
-    ss = (taskgraph$from == node_from) & (taskgraph$to == node_to)
-    varname = taskgraph[ss, "value"]
+    tc = transfer_cost(tg_from_to, overhead, bandwidth)
 
     # TODO: Hardcoding in 0 latency here and other places, come back and fix.
     start_time_receive = max(proc_finish_time(proc_receive, schedule), start_time_send)
@@ -196,7 +207,7 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
             , end_time_receive = start_time_receive + tc
             , proc_send = proc_send
             , proc_receive = proc_receive
-            , varname = varname
+            , varname = tg_from_to[, "varname"]
             , stringsAsFactors = FALSE
             )
 

@@ -29,3 +29,15 @@ test_that("run_and_measure", {
     expect_equal(graph$task_graph$size[1], as.numeric(object.size("foo1")))
 
 })
+
+
+test_that("Multiple assignment in single expression", {
+
+    code = parse(text = "
+        x = y = z = 1
+        f(x)
+    ")
+
+    out = autoparallel(code)
+
+})
