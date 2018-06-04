@@ -7,6 +7,7 @@ Before release on CRAN:
 - Show a realistic script as an example that actually benefits from task parallelism.
 - Write the `data_parallel()` function, including modification of for loops
   into parallel code.
+- Handle assignment inside of a for loop of the form `x[[i]] = ...`
 - Simplify `write_hive_scripts()` to do less. The burden should be on the
   users to write the SQL.
 

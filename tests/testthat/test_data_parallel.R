@@ -13,7 +13,7 @@ test_that("Basic transformation to parallel", {
     expect_equal(actual, target)
 
     expr = quote(f(a, b))
-    actual = parallelize_first_apply(expr)
+    actual = ser_apply_to_parallel(expr)
     expect_equal(expr, actual)
 
 })
@@ -23,7 +23,7 @@ test_that("Nested transformation", {
 
     expr = quote(lapply(lapply(x, f), g))
     target = quote(parallel::mclapply(lapply(x, f), g))
-    actual = parallelize_first_apply(expr)
+    actual = ser_apply_to_parallel(expr)
     expect_equal(actual, target)
 
 })

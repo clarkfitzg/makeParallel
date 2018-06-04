@@ -3,7 +3,20 @@ equivalent_apply = data.frame(serial = c("mapply", "lapply", "Map")
 equivalent_apply[, "parallel"] = paste0("parallel::mc", equivalent_apply[, "serial"])
 
 
-dont_change_in = c("for", "while", "repeat")
+# For playing around with
+expr = quote(f(for(i in x) g, lapply(x, f), 10, c(1, 2)))
+
+
+# Apply preprocessing steps to code
+preprocess = function(code)
+{
+    for(i in seq_along(code)){
+        if(class(code[[i]]) == "for"){
+            code[[i]] = forloop_to_mclapply(code[[i]]) 
+        }
+    }
+    code
+}
 
 
 # Transform Expression To Parallel
@@ -16,7 +29,20 @@ dont_change_in = c("for", "while", "repeat")
 # @value new_expr language object modified to parallel
 ser_apply_to_parallel = function(expr, map = equivalent_apply)
 {
-    # I could be doing this with a breadth first traversal of the AST.
+    # An alternative implementation could mutate the AST in place during a
+    # traversal
+
+    pcode = lapply(program, parallelize_first_apply)
+
+    func_finder = function(fname) find_call(expr, fname)
+
+    ser_func_names = c("for", map$serial)
+
+    # All the function calls in the whole expression
+    ser_func_locs = sapply(ser_func_names, func_finder)
+
+    #loop_locs = sapply(c("while", "repeat"), 
+
 }
 
 

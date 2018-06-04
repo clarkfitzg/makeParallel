@@ -1,7 +1,7 @@
 #' Transfrom For Loop To Lapply
 #'
 #' Determine if a for loop can be parallelized, and if so transform it into
-#' a call to \code{parallel::mclapply}. This first version will parallelize loops if and
+#' a call to \code{lapply}. This first version will modify loops if and
 #' only if the body of the loop does not do any assignments at all.
 #' 
 #' Recommended use case:
@@ -17,7 +17,7 @@
 #' @param forloop R language object with class \code{for}.
 #' @return call R call to \code{parallel::mclapply} if successful,
 #'  otherwise the original forloop.
-forloop_to_mclapply = function(forloop)
+forloop_to_lapply = function(forloop)
 {
 
     names(forloop) = c("for", "ivar", "iterator", "body")
@@ -36,7 +36,7 @@ forloop_to_mclapply = function(forloop)
     formals(f) = args
     body(f) = forloop$body
 
-    out = substitute(parallel::mclapply(iterator, f)
+    out = substitute(lapply(iterator, f)
         , list(iterator = forloop$iterator, f = get("f"))
         )
 

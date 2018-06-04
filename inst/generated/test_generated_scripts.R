@@ -1,3 +1,5 @@
+#!/usr/bin/env Rscript
+
 library(testthat)
 library(autoparallel)
 
@@ -11,7 +13,7 @@ expect_generated = function(script, ...)
 
     outfile = paste0(basename(script), ".log")
     serfile = paste0("expected_", outfile)
-    p = autoparallel(script, ...)
+    p = task_parallel(script, ...)
 
     pdf(paste0(script, ".pdf"))
     plot(p$schedule)
