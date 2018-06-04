@@ -3,10 +3,6 @@ equivalent_apply = data.frame(serial = c("mapply", "lapply", "Map")
 equivalent_apply[, "parallel"] = paste0("parallel::mc", equivalent_apply[, "serial"])
 
 
-# For playing around with
-expr = quote(f(for(i in x) g, lapply(x, f), 10, c(1, 2)))
-
-
 # Apply preprocessing steps to code
 preprocess = function(code)
 {
@@ -25,31 +21,18 @@ preprocess = function(code)
 # substituting the variable names. It also prevents nested parallelism.
 #
 # @param expr language object
-# @param map data frame with corresponding serial and parallel columns
 # @value new_expr language object modified to parallel
 ser_apply_to_parallel = function(expr, map = equivalent_apply)
 {
     # An alternative implementation could mutate the AST in place during a
     # traversal
-
-    pcode = lapply(program, parallelize_first_apply)
-
-    func_finder = function(fname) find_call(expr, fname)
-
-    ser_func_names = c("for", map$serial)
-
-    # All the function calls in the whole expression
-    ser_func_locs = sapply(ser_func_names, func_finder)
-
-    #loop_locs = sapply(c("while", "repeat"), 
-
 }
 
 
 #' Find and parallelize the first use of an apply function
 parallelize_first_apply = function(expr
-    , ser_funcs = apply_funcs[, "serial"]
-    , par_funcs = apply_funcs[, "parallel"]
+    , ser_funcs = equivalent_apply[, "serial"]
+    , par_funcs = equivalent_apply[, "parallel"]
 ){
     finds = sapply(ser_funcs, function(fname){
         find_call(expr, fname)
@@ -60,7 +43,7 @@ parallelize_first_apply = function(expr
     first = head(do.call(c, first), 1)
 
     if(length(first) == 0){
-        NULL
+        expr
     } else {
         index = first[[1]]
         parexpr = expr
@@ -87,6 +70,9 @@ parallelize_first_apply = function(expr
 #' \itemize{
 #'  \item \code{code} is slow
 #'  \item \code{code} uses for loops or one of the apply functions mentioned above
+#'  \item You have access to machine with multiple cores that supports
+#'      \code{\link[parallel]{makeForkCluster}} (Any UNIX variant should work,
+#'      ie. Mac)
 #'  \item You're unfamiliar with parallel programming in R
 #' }
 #'
@@ -97,11 +83,20 @@ parallelize_first_apply = function(expr
 #'  \item \code{code} is already parallel, either explicitly with a package
 #'      such as parallel, or implicitly, say through a multi threaded BLAS
 #'  \item You need maximum performance at all costs. In this case you need
-#'      to carefully profile and interface appropriately with compiled code.
+#'      to carefully profile and interface appropriately with a high
+#'      performance library.
+#' }
+#'
+#' Road map of features to implement:
+#'
+#' \itemize{
+#'  \item Prevent from parallelizing calls that are themselves in the body
+#'  of a loop.
 #' }
 #'
 #' @export
 #' @param code file name, expression from \code{\link[base]{parse}}
+#' @param map data frame with corresponding serial and parallel columns
 #' @param gen_script_prefix character added to front of file name
 #' @examples
 #' \dontrun{
@@ -134,6 +129,10 @@ parallelize_first_apply = function(expr
 #' eval(parallel_code)
 #' x1
 #' x2
-data_parallel = function(code, gen_script_prefix = "gen_")
+data_parallel = function(code, map = equivalent_apply, gen_script_prefix = "gen_")
 {
+    expr = as.expression(code)
+    pp_expr = preprocess(expr)
+    pcode = lapply(pp_expr, parallelize_first_apply)
+    list(output_code = as.expression(pcode))
 }

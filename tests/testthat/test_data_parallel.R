@@ -2,28 +2,28 @@ context("transforms")
 
 test_that("Basic transformation to parallel", {
 
-    expr = quote(lapply(f, x))
-    target = quote(parallel::mclapply(f, x)) 
-    actual = ser_apply_to_parallel(expr)
+    expr = parse(text = "lapply(f, x)")
+    target = parse(text = "parallel::mclapply(f, x)")
+    actual = data_parallel(expr)$output_code
     expect_equal(actual, target)
 
-    expr = quote(y <- lapply(f, x))
-    target = quote(y <- parallel::mclapply(f, x)) 
-    actual = ser_apply_to_parallel(expr)
+    expr = parse(text = "y <- lapply(f, x)")
+    target = parse(text = "y <- parallel::mclapply(f, x)")
+    actual = data_parallel(expr)$output_code
     expect_equal(actual, target)
 
-    expr = quote(f(a, b))
-    actual = ser_apply_to_parallel(expr)
-    expect_equal(expr, actual)
+    expr = parse(text = "f(a, b)")
+    actual = data_parallel(expr)$output_code
+    expect_equal(actual, expr)
 
 })
 
 
 test_that("Nested transformation", {
 
-    expr = quote(lapply(lapply(x, f), g))
-    target = quote(parallel::mclapply(lapply(x, f), g))
-    actual = ser_apply_to_parallel(expr)
+    expr = parse(text = "lapply(lapply(x, f), g)")
+    target = parse(text = "parallel::mclapply(lapply(x, f), g)")
+    actual = data_parallel(expr)$output_code
     expect_equal(actual, target)
 
 })
