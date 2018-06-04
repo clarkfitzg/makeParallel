@@ -17,7 +17,10 @@ multiprocessing.
 ## related work
 
 Several existing packages provide a more consistent interface to parallel
-computation. These include foreach, ddR, partools, multidplyr.
+computation.
+
+Landau's [drake](https://ropensci.github.io/drake/) provides task
+parallelism similar to GNU make.
 
 Bengstton's
 [futures](https://cran.r-project.org/web/packages/future/index.html)
