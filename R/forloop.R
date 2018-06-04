@@ -28,16 +28,11 @@ forloop_to_lapply = function(forloop)
         return(forloop)
     }
 
-    # Build the function
-    f = function(ivar) NULL
-    args = list(NULL)
-    names(args) = as.character(forloop$ivar)
-
-    formals(f) = args
-    body(f) = forloop$body
-
-    out = substitute(lapply(iterator, f)
-        , list(iterator = forloop$iterator, f = get("f"))
+    out = substitute(lapply(iterator, function(ivar) body)
+        , as.list(forloop)
         )
+    # The names of the function arguments are special.
+    names(out[[c(3, 2)]]) = as.character(forloop$ivar)
 
+    out
 }

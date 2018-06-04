@@ -3,4 +3,7 @@ library(testthat)
 Sys.setenv("R_TESTS" = "")
 library(autoparallel)
 
+# Allows parse() to check equality between expressions
+#options(keep.source = FALSE)
+
 test_check("autoparallel")

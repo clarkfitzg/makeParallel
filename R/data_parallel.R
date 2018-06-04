@@ -118,7 +118,7 @@ parallelize_first_apply = function(expr
 #'      for(i in x2) x2[i] = exp(x2[i])
 #' ")
 #'
-#' parallel_code = data_parallel(serial_code)
+#' p = data_parallel(serial_code)
 #'
 #' eval(serial_code)
 #' x1
@@ -126,7 +126,7 @@ parallelize_first_apply = function(expr
 #' rm(x1, x2)
 #' 
 #' # x1 and x2 should now be back and the same as they were for serial
-#' eval(parallel_code)
+#' eval(p$output_code)
 #' x1
 #' x2
 data_parallel = function(code, map = equivalent_apply, gen_script_prefix = "gen_")
