@@ -38,6 +38,16 @@ code = parse(text = "
     ")
 
 pcode = data_parallel(code)
+```
+
+Usually we call `data_parallel()` on the name of a file containing an R
+script. But we can also call it directly on the code as we do here, which
+makes for a self contained example. The resulting object has replaced
+`lapply` with `parallel::mclapply`.
+
+```{r}
+code
+
 pcode
 
 eval(pcode$output_code)
@@ -46,18 +56,21 @@ eval(pcode$output_code)
 m
 ```
 
-`data_parallel` looks for uses of R's apply family of functions and
-specific types of `for` loops and replaces these with parallel versions.
+Besides changing R's apply style functions, `data_parallel` also replaces
+specific types of `for` loops with parallel versions.
 
 
 ## high level
 
-The main idea is to transform serial R programs written in base R into
-parallel programs. This automatic program tranformation differs from
-current parallel technologies which require the user to explicitly write
-code for a given parallel programming model.
-The broader goal is to incorporate more intelligence into the system,
-freeing the user to write higher level code that also performs better.
+The main idea of this package is to transform serial R programs written in
+base R into parallel programs. In this sense it acts as a
+[transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler). This
+automatic program tranformation differs from current parallel technologies
+which require the user to explicitly write code for a specified parallel
+programming model. The broader goal is to bring in more information on the
+system and the data to compute on. In this way we build more intelligence
+into the system, freeing the user to write higher level code that also
+performs better.
 
 ## task parallelism
 
@@ -68,7 +81,8 @@ parallelism executes multiple different pieces of code simultaneously.
 The only way to get a speedup from task parallelism is if two or more long
 running parts of the program can run simultaneously. This could happen when
 reading two large files, for example. If we happen to know how long
-each of the statements will take we can pass this in also.
+each of the expressions will take to run we can pass these times in as an
+argument.
 
 ```{r echo=FALSE, results='hide',message=FALSE}
 
@@ -82,7 +96,7 @@ each of the statements will take we can pass this in also.
 
 ```
 
-```{r}
+```{r, fig.width = 6, fig.height = 6}
 code = parse(text = "
     x = read.csv(xfile)
     y = read.csv(yfile)
@@ -92,6 +106,22 @@ code = parse(text = "
 pcode = task_parallel(code, expr_times = c(1.25, 1.24, 0.2))
 
 plot(pcode$schedule)
+```
+
+This plot illustrates the schedule returned from the scheduling algorithm.
+The completion time of the script is the last time a processor is busy on
+the graph. Efficient schedules complete earlier. This plot is a useful
+diagnostic- if all cores are mostly busy that's a good sign. If only one
+core does almost all the work then either 1) the code can't be improved
+through task parallelism, or 2) the default scheduling algorithm chose a
+poor schedule. In general task scheduling problem is NP hard, but we leave
+hooks in for users to supply their own scheduling algorithm.
+
+The generated code is this disgusting thing that no sane person would ever
+write by hand:
+
+```{r}
+pcode$output_code
 ```
 
 
@@ -105,7 +135,8 @@ task_parallel("some_script.R")
 runs all of the steps, and by default writes the newly generated code to
 `gen_some_script.R`.
 
-This is the basic mental model for the steps that autoparallel takes:
+This is the basic computational model for the steps in inferring task
+parallelism.
 
 ![basic model](basic_model.png)
 
