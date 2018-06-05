@@ -67,8 +67,8 @@ parallelism executes multiple different pieces of code simultaneously.
 
 The only way to get a speedup from task parallelism is if two or more long
 running parts of the program can run simultaneously. This could happen when
-reading two large files, for example. If we happen to know how long the
-each of the statements take we can pass this in also.
+reading two large files, for example. If we happen to know how long
+each of the statements will take we can pass this in also.
 
 ```{r echo=FALSE, results='hide',message=FALSE}
 
@@ -105,146 +105,19 @@ task_parallel("some_script.R")
 runs all of the steps, and by default writes the newly generated code to
 `gen_some_script.R`.
 
-This is the essential mental model for the steps that autoparallel takes:
+This is the basic mental model for the steps that autoparallel takes:
 
 ![basic model](basic_model.png)
 
-
-## Passing Arguments Through
-
-The scheduler happens to be the most complex step in the process, and we
-would like to provide a way for users to easily control these parameters.
-R's ellipses `...` provide a mechanism for this.
-Note that it really only makes sense to use this with a single function.
-
-```{r}
-task_parallel = function(code, ...)
-{
-    tg = task_graph(code)
-    sc = scheduler(tg, ...)
-    code_generator(sc)
-}
-```
-
-Now if a user wants to specify another argument to the scheduling step, say
-`maxworkers = 3L` to create a schedule with three workers they can easily
-do this:
-
-```{r}
-newcode = task_parallel(code, maxworkers = 3L)
-```
-
-![dots model](dots_model.png)
-
-We could take this further and pass in further arguments in the form of a
-list from `task_parallel` in to the other steps `task_graph` and
-`code_generator`. We are not doing this at the moment for two reasons. First,
-we don't currently see a need for specifying many arguments for these two
-functions. Second, it's easy to add later without breaking anything.
-
-## Customizability
-
-In the original computational model the scheduling algorithm and the code
-generation are meant to be modular. Users can customize the
-system by supplying their own functions that implement scheduling or code
-generation.
-
-![modular model](modular_model.png)
-
-The code becomes:
-
-```{r}
-task_parallel = function(code, scheduler = default_scheduler, ...
-    code_generator = default_code_generator)
-{
-    tg = task_graph(code)
-    sc = scheduler(tg, ...)
-    code_generator(sc)
-}
-```
-
-Now users can define and use their own scheduling algorithms, for example
-`genetic_scheduler` that uses a genetic algorithm.
-
-```{r}
-newcode = task_parallel(code, genetic_scheduler)
-```
-
-Suppose the user wants to modify some part of the pipeline. If the user has
-a schedule in hand then they can directly call the code generator, and
-there's no need to use `task_parallel`. But they may want to modify the
-task graph and pass this directly in. R evaluates arguments lazily, so we
-can allow users to pass in a task graph by lifting the first line in the
-body of the function into a default parameter:
-
-```{r}
-task_parallel = function(code, taskgraph = task_graph(code), scheduler = default_scheduler,
-    ..., code_generator = default_code_generator)
-{
-    sc = scheduler(taskgraph, ...)
-    code_generator(sc)
-}
-```
-
-We could even lift several lines into default parameters, provided that we
-avoid circular references.
-
 ## Extensibility
 
-Some schedulers must be tied to their code generators. We want the runtime
-to figure out what the most appropriate code generator is and use that.
-This is where the extensibility through object oriented programming comes
-in. We change the __package code__ as follows:
+Some schedulers must be tied to their code generators.
+`task_graph, schedule`, and `generate_code` are all generic functions, so
+we can extend the system through object oriented programming. For
+example, one could define a scheduling algorithm `fork_join_schedule` that returns a more
+specialized schedule as well as an associated code generator.
 
-```{r}
-generate_code = function(schedule, ...)
-{
-    UseMethod("generate_code")
-}
-
-generate_code.default = function(schedule, ...)
-{
-    # ... more code here ...
-}
-```
-
-At this point two of the three steps in the model use methods. We may as
-well be consistent and make the scheduling step a method, even though we
-don't expect to dispatch on many different classes of task graphs.
-
-```{r}
-schedule = function(taskgraph, maxworkers = 2L, ...)
-{
-    UseMethod("schedule")
-}
-
-schedule.default = function(taskgraph, maxworkers, ...)
-{
-    # ... more code here ...
-    class(result) = "Schedule"
-    result
-}
-```
-
-The primary function becomes:
-
-```{r}
-task_parallel = function(code, taskgraph = task_graph(code),
-    scheduler = schedule, ..., code_generator = generate_code)
-{
-    sc = scheduler(tg, ...)
-    code_generator(sc)
-}
-```
-
-Now we can extend the system through object oriented programming. For
-example, `fork_join_schedule` is a scheduling algorithm that returns a more
-specialized schedule that supports a particular type of code generator.
-Then we don't want to use the `default_code_generator`. By using a generic
-function the _user_ __OR__ the package author can define a scheduling
-algorithm with an associated implementation as follows:
-
-```{r}
+```{r, eval = FALSE}
 fork_join_schedule = function(taskgraph, maxworkers = 2L, ...)
 {
     # ... more code here ...
@@ -260,26 +133,18 @@ generate_code.ForkJoinSchedule = function(schedule, ...)
 
 We can call this new code as follows:
 
-```{r}
+```{r, eval = FALSE}
 task_parallel(code, scheduler = fork_join_schedule)
 ```
 
-`fork_join_schedule` creates an object of class `ForkJoinSchedule`, and
-`generate_code` will dispatch to the specialized method. These objects
-become implicitly tied together which is what we wanted.
+Users can specify the scheduling and code generation steps by passing
+functions or defining methods. Here's an associated mental model.
 
-![extensible](extensible.png)
+![extensible model](extensible.png)
 
-## Summary
+In summary, `task_parallel` can be used in the following ways:
 
-We started with a function `task_parallel` that could only be called in one
-simple way:
-
-- `task_parallel(code)`.
-
-We preserved this desirable simple behavior and extended it so that users can do any
-of the following:
-
+- `task_parallel(code)` simple, common use case
 - `task_parallel("some_script.R")` methods for different classes of
   the first argument.
 - `task_parallel(taskgraph = tg)` skips the setup part of the function in
@@ -291,110 +156,3 @@ of the following:
 - `task_parallel(code, schedule = fork_join_schedule)` dispatches on the
   class allowing users to extend the system through defining their own
   classes.
-
-This style of code accommodates three increasingly sophisticated classes of
-users:
-
-1. Users who just want to treat it as a black box
-2. Users who understand the model and would like to experiment by passing
-   in new functions
-3. Users who would like to extend and build upon the system by writing
-   methods and using object oriented programming techniques
-
-The final version of the code supports all of these use cases
-simultaneously. Further, we don't force users to do it in any particular
-way. This is nice as each usage style has its merits.
-
-## Appendix - Final code
-
-```{r}
-# Different inputs
-#------------------------------------------------------------
-
-task_graph = function(code, ...)
-{
-    UseMethod("task_graph")
-}
-
-task_graph.character = function(code, ...)
-{
-    # ... Disambiguate file names from a character vector
-    task_graph(parse(filename))
-}
-    
-task_graph.expression = function(code, ...)
-{
-    # The actual work of building a task graph
-}
-
-
-# Allows extension through intermediate objects
-#------------------------------------------------------------
-
-generate_code = function(schedule, ...)
-{
-    UseMethod("generate_code")
-}
-
-generate_code.default = function(schedule, ...)
-{
-    # ... more code here ...
-}
-
-schedule = function(taskgraph, maxworkers = 2L, ...)
-{
-    UseMethod("schedule")
-}
-
-schedule.default = function(taskgraph, maxworkers, ...)
-{
-    # ... more code here ...
-    class(result) = "Schedule"
-    result
-}
-
-
-# Final user facing function
-#------------------------------------------------------------
-
-task_parallel = function(code, taskgraph = task_graph(code),
-    scheduler = schedule, ..., code_generator = generate_code)
-{
-    sc = scheduler(tg, ...)
-    code_generator(sc)
-}
-```
-
-## related work
-
-Several existing packages provide a more consistent interface to parallel
-computation.
-
-Bengstton's
-[futures](https://cran.r-project.org/web/packages/future/index.html)
-provides a mechanism for parallel asynchronous evaluation of R code.
-It supports multiple different systems. It is similar to this package
-because it statically analyzes code to identify global variables necessary
-to execute blocks of code.
-
-Landau's [drake](https://ropensci.github.io/drake/) facilitates
-reproducible computations by allowing one to directly specify rules and
-targets. This model is similar to GNU make.
-
-Bischl and Lang's
-[parallelMap](https://cran.r-project.org/package=parallelMap) provides a
-parallel version of `Map()` supporting different execution backends
-including local, multicore, mpi and BatchJobs. The
-[batchtools](https://cran.r-project.org/package=batchtools) package
-supports HPC systems.
-
-Böhringer's
-[parallelize.dynamic](https://cran.r-project.org/package=parallelize.dynamic)
-provides the `parallelize_call()` function to dynamically parallelize a
-single function call.
-
-Wang's [valor](https://github.com/wanghc78/valor) vectorizes `lapply` calls
-into single function calls. In some sense this is the most related project,
-because the main purpose of valor is to actually transform code.
-
-

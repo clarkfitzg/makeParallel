@@ -1,0 +1,38 @@
+digraph G {
+rankdir = LR;
+//rankdir = TB;
+
+//edge [fontname = "courier"];
+
+labeljust=right;
+
+node [shape = "rectangle"];
+input [label = "Input\nCode", fontname = "courier"];
+taskgraph [label = "Task\nGraph"];
+schedule [label = "Schedule"];
+fork_join_schedule [label = "ForkJoin\nSchedule", fontname = "courier"];
+output [label = "Output\nCode", fontname = "courier"];
+
+node [shape = "oval"];
+dependency [label = "Dependency\nAnalysis"];
+schedule_algo1 [label = "fork join\nscheduler"];
+schedule_algo2 [label = "Scheduler 2"];
+schedule_algo3 [label = "Scheduler 3"];
+code_generator1 [label = "fork join\ncode gen"];
+code_generator2 [label = "Code Gen 2"];
+
+input -> dependency;
+dependency -> taskgraph;
+taskgraph -> schedule_algo1;
+taskgraph -> schedule_algo2;
+taskgraph -> schedule_algo3;
+schedule_algo2 -> schedule;
+schedule_algo3 -> schedule;
+schedule -> code_generator2;
+code_generator1 -> output;
+code_generator2 -> output;
+
+// Bypass
+schedule_algo1 -> fork_join_schedule [style = "dotted"];
+fork_join_schedule -> code_generator1 [style = "dotted"];
+}
