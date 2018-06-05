@@ -39,3 +39,7 @@ vignettes: $(VIGNETTES)
 
 clean:
 	rm -rf vignettes/*.html $(PKG) *.Rcheck
+
+# Graphviz images
+%.png: %.dot
+	dot -Tpng $< -o $@
