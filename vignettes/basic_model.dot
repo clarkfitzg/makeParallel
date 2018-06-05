@@ -1,0 +1,30 @@
+digraph G {
+rankdir = LR;
+//rankdir = TB;
+
+//edge [fontname = "courier"];
+
+label = "Rectangles represent data structures
+Ovals represent functions
+";
+labeljust=right;
+
+node [shape = "rectangle"];
+input [label = "Input\nCode", fontname = "courier"];
+taskgraph [label = "Task\nGraph"];
+schedule [label = "Schedule"];
+output [label = "Output\nCode", fontname = "courier"];
+
+node [shape = "oval"];
+dependency [label = "Dependency\nAnalysis"];
+schedule_algo [label = "Static\nScheduling\nAlgorithm"];
+code_generator [label = "Code Generator"];
+
+input -> dependency;
+dependency -> taskgraph;
+taskgraph -> schedule_algo;
+schedule_algo -> schedule;
+schedule -> code_generator;
+code_generator -> output;
+
+}

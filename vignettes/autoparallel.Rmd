@@ -7,23 +7,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# autoparallel
-
-```{r}
-library(autoparallel)
-```
-
-At the simplest level we can swap out serial R functions with equivalent
-parallel ones.
-
-```{r}
-code = parse(text = "x = 1:10
-    sinx = lapply(x, sin)")
-pcode = data_parallel(code)
-pcode
-```
-
-
 [![Travis-CI Build
 Status](https://travis-ci.org/clarkfitzg/autoparallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/autoparallel)
 
@@ -35,23 +18,366 @@ If you would like to write parallel R today then you should start with a
 well established package. The CRAN Task View: [High-Performance and
 Parallel Computing with
 R](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
-provides a comprehensive review of available software.
-[parallel](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf),
-included with R since R 2.14, provides the core functionality to do
+provides a comprehensive review of available software. The [parallel
+package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf),
+included as a recommended package with R since R 2.14, provides the core functionality to do
 multiprocessing.
+
+## quick start
+
+The simplest thing we can do with this package is directly replace serial
+code with parallel versions. The following example comes from the documentation for 
+`lapply`:
+
+```{r}
+library(autoparallel)
+
+code = parse(text = "
+    x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
+    m <- lapply(x, mean)
+    ")
+
+pcode = data_parallel(code)
+pcode
+
+eval(pcode$output_code)
+
+# same result as evaluating the serial code
+m
+```
+
+`data_parallel` looks for uses of R's apply family of functions and
+specific types of `for` loops and replaces these with parallel versions.
+
+
+## high level
+
+The main idea is to transform serial R programs written in base R into
+parallel programs. This automatic program tranformation differs from
+current parallel technologies which require the user to explicitly write
+code for a given parallel programming model.
+The broader goal is to incorporate more intelligence into the system,
+freeing the user to write higher level code that also performs better.
+
+## task parallelism
+
+Data parallelism executes the same code on different data. R's vectorized
+computational model is amenable to data parallelism. In contrast, task
+parallelism executes multiple different pieces of code simultaneously. 
+
+The only way to get a speedup from task parallelism is if two or more long
+running parts of the program can run simultaneously. This could happen when
+reading two large files, for example.
+
+```{r echo=FALSE, results='hide',message=FALSE}
+
+```
+
+
+
+```{r}
+code = parse(text = "
+    file1 = tempfile()
+    write.table(rnorm(1e6), file1)
+
+    d1 = 
+    x = solve(matrix(rnorm(nx * nx), nrow = nx))
+    ny = 2018
+    y = solve(matrix(rnorm(ny * ny), nrow = ny))
+    ")
+
+pcode = data_parallel(code)
+pcode
+
+
+```
+
+
+At the simplest level users write:
+
+```{r, eval = FALSE}
+task_parallel("some_script.R")
+```
+
+`task_parallel` determines that `some_script.R` is a file on your computer,
+runs all of the steps, and by default writes the newly generated code to
+`gen_some_script.R`.
+
+This is the essential mental model for the steps that autoparallel takes:
+
+![basic model](basic_model.png)
+
+
+## Passing Arguments Through
+
+The scheduler happens to be the most complex step in the process, and we
+would like to provide a way for users to easily control these parameters.
+R's ellipses `...` provide a mechanism for this.
+Note that it really only makes sense to use this with a single function.
+
+```{r}
+task_parallel = function(code, ...)
+{
+    tg = task_graph(code)
+    sc = scheduler(tg, ...)
+    code_generator(sc)
+}
+```
+
+Now if a user wants to specify another argument to the scheduling step, say
+`maxworkers = 3L` to create a schedule with three workers they can easily
+do this:
+
+```{r}
+newcode = task_parallel(code, maxworkers = 3L)
+```
+
+![dots model](dots_model.png)
+
+We could take this further and pass in further arguments in the form of a
+list from `task_parallel` in to the other steps `task_graph` and
+`code_generator`. We are not doing this at the moment for two reasons. First,
+we don't currently see a need for specifying many arguments for these two
+functions. Second, it's easy to add later without breaking anything.
+
+## Customizability
+
+In the original computational model the scheduling algorithm and the code
+generation are meant to be modular. Users can customize the
+system by supplying their own functions that implement scheduling or code
+generation.
+
+![modular model](modular_model.png)
+
+The code becomes:
+
+```{r}
+task_parallel = function(code, scheduler = default_scheduler, ...
+    code_generator = default_code_generator)
+{
+    tg = task_graph(code)
+    sc = scheduler(tg, ...)
+    code_generator(sc)
+}
+```
+
+Now users can define and use their own scheduling algorithms, for example
+`genetic_scheduler` that uses a genetic algorithm.
+
+```{r}
+newcode = task_parallel(code, genetic_scheduler)
+```
+
+Suppose the user wants to modify some part of the pipeline. If the user has
+a schedule in hand then they can directly call the code generator, and
+there's no need to use `task_parallel`. But they may want to modify the
+task graph and pass this directly in. R evaluates arguments lazily, so we
+can allow users to pass in a task graph by lifting the first line in the
+body of the function into a default parameter:
+
+```{r}
+task_parallel = function(code, taskgraph = task_graph(code), scheduler = default_scheduler,
+    ..., code_generator = default_code_generator)
+{
+    sc = scheduler(taskgraph, ...)
+    code_generator(sc)
+}
+```
+
+We could even lift several lines into default parameters, provided that we
+avoid circular references.
+
+## Extensibility
+
+Some schedulers must be tied to their code generators. We want the runtime
+to figure out what the most appropriate code generator is and use that.
+This is where the extensibility through object oriented programming comes
+in. We change the __package code__ as follows:
+
+```{r}
+generate_code = function(schedule, ...)
+{
+    UseMethod("generate_code")
+}
+
+generate_code.default = function(schedule, ...)
+{
+    # ... more code here ...
+}
+```
+
+At this point two of the three steps in the model use methods. We may as
+well be consistent and make the scheduling step a method, even though we
+don't expect to dispatch on many different classes of task graphs.
+
+```{r}
+schedule = function(taskgraph, maxworkers = 2L, ...)
+{
+    UseMethod("schedule")
+}
+
+schedule.default = function(taskgraph, maxworkers, ...)
+{
+    # ... more code here ...
+    class(result) = "Schedule"
+    result
+}
+```
+
+The primary function becomes:
+
+```{r}
+task_parallel = function(code, taskgraph = task_graph(code),
+    scheduler = schedule, ..., code_generator = generate_code)
+{
+    sc = scheduler(tg, ...)
+    code_generator(sc)
+}
+```
+
+Now we can extend the system through object oriented programming. For
+example, `fork_join_schedule` is a scheduling algorithm that returns a more
+specialized schedule that supports a particular type of code generator.
+Then we don't want to use the `default_code_generator`. By using a generic
+function the _user_ __OR__ the package author can define a scheduling
+algorithm with an associated implementation as follows:
+
+```{r}
+fork_join_schedule = function(taskgraph, maxworkers = 2L, ...)
+{
+    # ... more code here ...
+    class(result) = c("ForkJoinSchedule", "Schedule")
+    result
+}
+
+generate_code.ForkJoinSchedule = function(schedule, ...)
+{
+    # ... more code here ...
+}
+```
+
+We can call this new code as follows:
+
+```{r}
+task_parallel(code, scheduler = fork_join_schedule)
+```
+
+`fork_join_schedule` creates an object of class `ForkJoinSchedule`, and
+`generate_code` will dispatch to the specialized method. These objects
+become implicitly tied together which is what we wanted.
+
+![extensible](extensible.png)
+
+## Summary
+
+We started with a function `task_parallel` that could only be called in one
+simple way:
+
+- `task_parallel(code)`.
+
+We preserved this desirable simple behavior and extended it so that users can do any
+of the following:
+
+- `task_parallel("some_script.R")` methods for different classes of
+  the first argument.
+- `task_parallel(taskgraph = tg)` skips the setup part of the function in
+  case the user has already done that or they have a special task graph to
+  use.
+- `task_parallel(code, schedule = my_scheduler, code_generator =
+  my_code_generator)` allows users to customize the steps in the process
+    by passing in their own functions to perform them.
+- `task_parallel(code, schedule = fork_join_schedule)` dispatches on the
+  class allowing users to extend the system through defining their own
+  classes.
+
+This style of code accommodates three increasingly sophisticated classes of
+users:
+
+1. Users who just want to treat it as a black box
+2. Users who understand the model and would like to experiment by passing
+   in new functions
+3. Users who would like to extend and build upon the system by writing
+   methods and using object oriented programming techniques
+
+The final version of the code supports all of these use cases
+simultaneously. Further, we don't force users to do it in any particular
+way. This is nice as each usage style has its merits.
+
+## Appendix - Final code
+
+```{r}
+# Different inputs
+#------------------------------------------------------------
+
+task_graph = function(code, ...)
+{
+    UseMethod("task_graph")
+}
+
+task_graph.character = function(code, ...)
+{
+    # ... Disambiguate file names from a character vector
+    task_graph(parse(filename))
+}
+    
+task_graph.expression = function(code, ...)
+{
+    # The actual work of building a task graph
+}
+
+
+# Allows extension through intermediate objects
+#------------------------------------------------------------
+
+generate_code = function(schedule, ...)
+{
+    UseMethod("generate_code")
+}
+
+generate_code.default = function(schedule, ...)
+{
+    # ... more code here ...
+}
+
+schedule = function(taskgraph, maxworkers = 2L, ...)
+{
+    UseMethod("schedule")
+}
+
+schedule.default = function(taskgraph, maxworkers, ...)
+{
+    # ... more code here ...
+    class(result) = "Schedule"
+    result
+}
+
+
+# Final user facing function
+#------------------------------------------------------------
+
+task_parallel = function(code, taskgraph = task_graph(code),
+    scheduler = schedule, ..., code_generator = generate_code)
+{
+    sc = scheduler(tg, ...)
+    code_generator(sc)
+}
+```
 
 ## related work
 
 Several existing packages provide a more consistent interface to parallel
 computation.
 
-Landau's [drake](https://ropensci.github.io/drake/) provides task
-parallelism similar to GNU make.
-
 Bengstton's
 [futures](https://cran.r-project.org/web/packages/future/index.html)
-provides a mechanism for parallel asynchronous evaluation of R code
-across different systems.
+provides a mechanism for parallel asynchronous evaluation of R code.
+It supports multiple different systems. It is similar to this package
+because it statically analyzes code to identify global variables necessary
+to execute blocks of code.
+
+Landau's [drake](https://ropensci.github.io/drake/) facilitates
+reproducible computations by allowing one to directly specify rules and
+targets. This model is similar to GNU make.
 
 Bischl and Lang's
 [parallelMap](https://cran.r-project.org/package=parallelMap) provides a
@@ -69,42 +395,4 @@ Wang's [valor](https://github.com/wanghc78/valor) vectorizes `lapply` calls
 into single function calls. In some sense this is the most related project,
 because the main purpose of valor is to actually transform code.
 
-## simple example
 
-The following base R code can execute in parallel because each call
-to `mean(X[[i]])` is independent:
-
-```{R}
-lapply(mean, X)
-```
-
-But because of the overhead in parallelism we don't know ahead of time if
-a parallel version will be faster.
-
-## high level
-
-The main idea is to transform serial R programs written in base R into
-parallel programs. This automatic program tranformation differs from
-current parallel technologies which require the user to explicitly write
-code for a given parallel programming model.
-
-Opportunities for parallelism are found through analysis of base R's apply
-family of functions using the [CodeDepends
-package](https://cran.r-project.org/web/packages/CodeDepends/index.html).
-The apply family includes `lapply, apply, sapply, tapply, by,
-mapply, Map, vapply, outer, by, replicate`. These are all variants of the
-map reduce computational model which has been successful for implementing
-large scale parallel systems.
-
-Performance profiling measures how long the program spends executing each
-part of the code. The profiling together with estimates of the overhead on
-the particular machine allow us to determine if it's actually worth it to
-parallelize a given R expression.  If the parallel version is slower then
-the expression should be left in serial form.
-
-The broader goal is to incorporate more intelligence into the system,
-freeing the user to write higher level code that also performs better.
-
-## examples
-
-See the vignettes in this package, or look in `inst/examples`.
