@@ -14,24 +14,4 @@ test_that("for loop to mclapply", {
     })
 
     expect_equal(forloop_to_lapply(loop2), loop2)
-
-    #skip("TODO: Update same_expr to actually test expression equality.")
-    #expect_true(same_expr(actual, expected))
 })
-
-
-if(FALSE){
-
-# Try to reproduce a minimal example
-
-    loop = quote(for(i in 1:10){i + 5})
-
-    goal = quote(lapply(x, function(i = NULL){i + 5}))
-    actual = goal
-
-    body(goal[[3]])
-
-    # Issue is that I need to go from an actual function to an expression
-    # containing a function. Crazy.
-
-}
