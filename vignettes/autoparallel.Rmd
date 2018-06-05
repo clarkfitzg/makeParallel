@@ -67,29 +67,31 @@ parallelism executes multiple different pieces of code simultaneously.
 
 The only way to get a speedup from task parallelism is if two or more long
 running parts of the program can run simultaneously. This could happen when
-reading two large files, for example.
+reading two large files, for example. If we happen to know how long the
+each of the statements take we can pass this in also.
 
 ```{r echo=FALSE, results='hide',message=FALSE}
 
+    n = 1e6
+
+    xfile = tempfile()
+    write.csv(data.frame(x = rnorm(n)), xfile, row.names = FALSE)
+
+    yfile = tempfile()
+    write.csv(data.frame(y = rnorm(n)), yfile, row.names = FALSE)
+
 ```
-
-
 
 ```{r}
 code = parse(text = "
-    file1 = tempfile()
-    write.table(rnorm(1e6), file1)
-
-    d1 = 
-    x = solve(matrix(rnorm(nx * nx), nrow = nx))
-    ny = 2018
-    y = solve(matrix(rnorm(ny * ny), nrow = ny))
+    x = read.csv(xfile)
+    y = read.csv(yfile)
+    xy = sort(c(x[, 1], y[, 1]))
     ")
 
-pcode = data_parallel(code)
-pcode
+pcode = task_parallel(code, expr_times = c(1.25, 1.24, 0.2))
 
-
+plot(pcode$schedule)
 ```
 
 
