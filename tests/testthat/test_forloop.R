@@ -130,4 +130,10 @@ if(FALSE){
     # Unless we can reliably differentiate vectors and lists based on
     # static analysis I think we should just default to a list. The use of
     # `[[` usually means it's a list, even though it works with vectors.
+
+    # Just thought of another perversion. What if the user redefines the
+    # iterator variable inside the loop?
+    # for(i in 1:n){
+    #   i = ...
+    # Ack!
 }

@@ -64,8 +64,9 @@ forloop_with_updates = function(forloop, changed)
     # for(i in ...){
     #   x[i] = ...
     #   y[i] = ...
-    # We can do some tings with this, but it isn't a priority, so just
+    # We can potentially work with this, but it isn't a priority, so just
     # give up and return the for loop.
+
     if(length(g_assign) > 1){
         return(forloop)
     }
@@ -79,17 +80,33 @@ forloop_with_updates = function(forloop, changed)
 
     ivar = as.character(forloop$ivar)
 
-    if(!check_usage(expr, g_assign, ivar)){
+    if(!right_kind_of_usage(expr, g_assign, ivar)){
         return(forloop)
     }
 
     lastline = forloop$body[[length(forloop$body)]]
-    if(!check_assign(lastline, g_assign, ivar)){
+    if(!right_kind_of_assign(lastline, g_assign, ivar)){
         return(forloop)
     }
 
     # All the checks have passed, we can make the change.
 
+    # Transform the for loop body into the function body
+    body = forloop$body
+    ll = length(body)
+    rhs_of_lastline = body[[c(ll, 3)]]
+    body[[ll]] = rhs_of_lastline
+
+    out = substitute(output[iterator] <- lapply(iterator, function(ivar) body)
+        , list(output = as.symbol(g_assign)
+               , iterator = forloop$iterator
+               , ivar = forloop$ivar
+               , body = body
+        ))
+    # The names of the function arguments are special.
+    names(out[[c(3, 2)]]) = as.character(forloop$ivar)
+
+    out
 }
 
 
@@ -97,23 +114,42 @@ forloop_with_updates = function(forloop, changed)
 # avar[[ivar]]
 # @param avar character assignment variable
 # @param ivar character index variable
-check_usage = function(expr, avar, ivar, subset_fun = "[[")
+right_kind_of_usage = function(expr, avar, ivar)
 {
+    locs = find_var(expr, avar)
+
+    for(loc in locs){
+        lo = loc[-length(loc)]
+        if(!is_index(expr[[lo]], avar, ivar)){
+            return(FALSE)
+        }
+    }
+    TRUE
+}
+
+
+# Verify that expr has the form
+# avar[[ivar]]
+is_index = function(expr, avar, ivar, subset_fun = "[[")
+{
+    if((length(expr) == 3)
+        && (expr[[1]] == subset_fun)
+        && (expr[[2]] == avar)
+        && (expr[[3]] == ivar)
+    ) TRUE else FALSE
 }
 
 
 # Verify that expr has the form
 # avar[[ivar]] = ...
-check_assign = function(expr, avar, ivar
-    , assign_funs = c("=", "<-"), subset_fun = "[[")
+right_kind_of_assign = function(expr, avar, ivar
+    , assign_funs = c("=", "<-"))
 {
-    expr_i = function(i) as.character(expr[[i]])
+    f = as.character(expr[[1]])
+    if(!(f %in% assign_funs)){
+        return(FALSE)
+    }
 
-    # Relying on short circuit behavior to avoid subscript out of bounds
-    # errors.
-    if( (expr_i(1) %in% assign_funs)
-        && (expr_i(c(2, 1)) == subset_fun)
-        && (expr_i(c(2, 2)) == avar)
-        && (expr_i(c(2, 3)) == ivar)
-    ) TRUE else FALSE
+    lhs = expr[[2]]
+    is_index(lhs, avar, ivar)
 }
