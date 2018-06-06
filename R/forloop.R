@@ -50,4 +50,17 @@ forloop_no_updates = function(forloop)
 # Harder case: loop does change things
 forloop_with_updates = function(forloop, changed)
 {
+    # TODO: Experiment with 'method' argument here for more or less
+    # aggressive detection schemes.
+    globals = globals::globalsOf(forloop, mustExist=FALSE)
+    globals_changed = intersect(changed, names(globals))
+
+    # The code doesn't update global variables, so it can be parallelized.
+    if(length(globals_changed) == 0){
+        return(forloop_no_updates(forloop))
+    }
+
+
+    # If the all of the last line of the loop body is
+    # x[[i]] = ...
 }
