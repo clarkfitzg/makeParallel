@@ -19,28 +19,27 @@ test_that("for loop to mclapply", {
 
 test_that("assignment inside for loop", {
 
-    loop = parse(text = "
+    loop = quote(
     for (i in 1:500){
         tmp = g() 
         output[[i]] = tmp
-    }")
+    })
 
-    expected = parse(text = "
-    output[1:500] = lapply(1:500, function(i) {
+    expected = quote(
+    output[1:500] <- lapply(1:500, function(i) {
         tmp = g() 
         tmp
-    })
-    ")
+    }))
 
     actual = forloop_to_lapply(loop)
 
     expect_equal(actual, expected)
 
-    dependent_loop = parse(text = "
+    dependent_loop = quote(
     for (i in 1:500){
         tmp = g(tmp) 
         output[[i]] = tmp
-    }")
+    })
 
     actual = forloop_to_lapply(dependent_loop)
 
