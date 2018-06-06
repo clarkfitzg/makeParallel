@@ -1,8 +1,5 @@
 test_that("for loop to lapply", {
 
-# For testing interactively
-forloop_to_lapply = autoparallel:::forloop_to_lapply
-
     loop1 = quote(for(i in x){f(i)})
     actual = forloop_to_lapply(loop1)
     expected = quote(lapply(x, function(i){f(i)}))
@@ -30,6 +27,9 @@ forloop_to_lapply = autoparallel:::forloop_to_lapply
 
 })
 
+
+# For testing interactively
+forloop_to_lapply = autoparallel:::forloop_to_lapply
 
 test_that("assignment inside for loop", {
 

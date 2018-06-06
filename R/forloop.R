@@ -79,8 +79,9 @@ forloop_with_updates = function(forloop, changed)
     # If it does then we turn it into an lapply, otherwise give up.
 
     ivar = as.character(forloop$ivar)
+    body = forloop$body
 
-    if(!right_kind_of_usage(expr, g_assign, ivar)){
+    if(!right_kind_of_usage(body, g_assign, ivar)){
         return(forloop)
     }
 
@@ -92,7 +93,6 @@ forloop_with_updates = function(forloop, changed)
     # All the checks have passed, we can make the change.
 
     # Transform the for loop body into the function body
-    body = forloop$body
     ll = length(body)
     rhs_of_lastline = body[[c(ll, 3)]]
     body[[ll]] = rhs_of_lastline
