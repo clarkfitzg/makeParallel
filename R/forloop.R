@@ -51,16 +51,69 @@ forloop_no_updates = function(forloop)
 forloop_with_updates = function(forloop, changed)
 {
     # TODO: Experiment with 'method' argument here for more or less
-    # aggressive detection schemes.
+    # aggressive global detection schemes.
     globals = globals::globalsOf(forloop, mustExist=FALSE)
-    globals_changed = intersect(changed, names(globals))
+    g_assign = intersect(changed, names(globals))
 
     # The code doesn't update global variables, so it can be parallelized.
-    if(length(globals_changed) == 0){
+    if(length(g_assign) == 0){
         return(forloop_no_updates(forloop))
     }
 
+    # Case of loop such as: 
+    # for(i in ...){
+    #   x[i] = ...
+    #   y[i] = ...
+    # We can do some tings with this, but it isn't a priority, so just
+    # give up and return the for loop.
+    if(length(g_assign) > 1){
+        return(forloop)
+    }
 
-    # If the all of the last line of the loop body is
-    # x[[i]] = ...
+    # Verify loop has the form:
+    # for(i in ...){
+    #   ... g(x[i]) # optionally
+    #   x[i] = ...
+    # }
+    # If it does then we turn it into an lapply, otherwise give up.
+
+    ivar = as.character(forloop$ivar)
+
+    if(!check_usage(expr, g_assign, ivar)){
+        return(forloop)
+    }
+
+    lastline = forloop$body[[length(forloop$body)]]
+    if(!check_assign(lastline, g_assign, ivar)){
+        return(forloop)
+    }
+
+    # All the checks have passed, we can make the change.
+
+}
+
+
+# Verify that the only usage of avar in expr is of the form
+# avar[[ivar]]
+# @param avar character assignment variable
+# @param ivar character index variable
+check_usage = function(expr, avar, ivar, subset_fun = "[[")
+{
+}
+
+
+# Verify that expr has the form
+# avar[[ivar]] = ...
+check_assign = function(expr, avar, ivar
+    , assign_funs = c("=", "<-"), subset_fun = "[[")
+{
+    expr_i = function(i) as.character(expr[[i]])
+
+    # Relying on short circuit behavior to avoid subscript out of bounds
+    # errors.
+    if( (expr_i(1) %in% assign_funs)
+        && (expr_i(c(2, 1)) == subset_fun)
+        && (expr_i(c(2, 2)) == avar)
+        && (expr_i(c(2, 3)) == ivar)
+    ) TRUE else FALSE
 }

@@ -33,7 +33,7 @@ forloop_to_lapply = autoparallel:::forloop_to_lapply
 
 test_that("assignment inside for loop", {
 
-    loop = quote(
+    loop1 = quote(
     for (i in 1:500){
         tmp = g() 
         output[[i]] = tmp
@@ -45,19 +45,30 @@ test_that("assignment inside for loop", {
         tmp
     }))
 
-    actual = forloop_to_lapply(loop)
+    actual = forloop_to_lapply(loop1)
 
     expect_equal(actual, expected)
 
-    dependent_loop = quote(
+    # True dependence, can't parallelize
+    loop2 = quote(
     for (i in 1:500){
         tmp = g(tmp) 
-        output[[i]] = tmp
+        x[[i]] = tmp
     })
 
-    actual = forloop_to_lapply(dependent_loop)
+    actual = forloop_to_lapply(loop2)
 
-    expect_equal(actual, dependent_loop)
+    expect_equal(actual, loop2)
+
+    # True dependence, can't parallelize
+    loop3 = quote(
+    for (i in 2:500){
+        x[[i]] = g(x[[i - 1]])
+    })
+
+    actual = forloop_to_lapply(loop3)
+
+    expect_equal(actual, loop3)
 
 })
 
