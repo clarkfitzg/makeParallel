@@ -187,3 +187,45 @@ In summary, `task_parallel` can be used in the following ways:
 - `task_parallel(code, schedule = fork_join_schedule)` dispatches on the
   class allowing users to extend the system through defining their own
   classes.
+
+
+## Next Steps
+
+This package needs several more features before it can be used on general
+types of code.
+
+1. Add constraints for processes, ie. code that performs plotting must
+   happen in one process
+2. More efficient scheduling algorithms and code generation
+3. Detection of objects with reference semantics to throw appropriate
+   errors
+
+
+## Related Work
+
+Several existing packages provide a more consistent interface to parallel
+computation.
+
+Landau's [drake](https://ropensci.github.io/drake/) provides task
+parallelism similar to GNU make.
+
+Bengstton's
+[futures](https://cran.r-project.org/web/packages/future/index.html)
+provides a mechanism for parallel asynchronous evaluation of R code
+across different systems.
+
+Bischl and Lang's
+[parallelMap](https://cran.r-project.org/package=parallelMap) provides a
+parallel version of `Map()` supporting different execution backends
+including local, multicore, mpi and BatchJobs. The
+[batchtools](https://cran.r-project.org/package=batchtools) package
+supports HPC systems.
+
+Böhringer's
+[parallelize.dynamic](https://cran.r-project.org/package=parallelize.dynamic)
+provides the `parallelize_call()` function to dynamically parallelize a
+single function call.
+
+Wang's [valor](https://github.com/wanghc78/valor) vectorizes `lapply` calls
+into single function calls. In some sense this is the most related project,
+because the main purpose of valor is to actually transform code.

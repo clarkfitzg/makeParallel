@@ -19,18 +19,35 @@ test_that("for loop to mclapply", {
 
 test_that("assignment inside for loop", {
 
-    loop = quote(for(i in seq_along(x)){
-        x[[i]] = f(x[[i]])
-    })
+    loop = parse(text = "
+    for (i in 1:500){
+        tmp = g() 
+        output[[i]] = tmp
+    }")
 
     expected = parse(text = "
-    x[seq_along(x)] = lapply(seq_along(x), f)
+    output[1:500] = lapply(1:500, function(i) {
+        tmp = g() 
+        tmp
+    })
     ")
+
     actual = forloop_to_lapply(loop)
 
     expect_equal(actual, expected)
 
+    dependent_loop = parse(text = "
+    for (i in 1:500){
+        tmp = g(tmp) 
+        output[[i]] = tmp
+    }")
+
+    actual = forloop_to_lapply(dependent_loop)
+
+    expect_equal(actual, dependent_loop)
+
 })
+
 
 if(FALSE){
     # Here's the actual use case I want to capture. 
@@ -86,4 +103,7 @@ if(FALSE){
     # NOT be a simple sequence, and they should still match the result of
     # the for loop. I think I'll go with this way.
 
+    # Unless we can reliably differentiate vectors and lists based on
+    # static analysis I think we should just default to a list. The use of
+    # `[[` usually means it's a list, even though it works with vectors.
 }
