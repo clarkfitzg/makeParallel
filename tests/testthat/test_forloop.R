@@ -1,9 +1,7 @@
-test_that("for loop to mclapply", {
+test_that("for loop to lapply", {
 
     loop1 = quote(for(i in x){f(i)})
-
     actual = forloop_to_lapply(loop1)
-
     expected = quote(lapply(x, function(i){f(i)}))
 
     expect_equal(actual, expected)
@@ -14,6 +12,19 @@ test_that("for loop to mclapply", {
     })
 
     expect_equal(forloop_to_lapply(loop2), loop2)
+
+    loop3 = quote(for(i in x){
+        tmp = foo()
+        f(tmp, i)
+    })
+    actual = forloop_to_lapply(loop3)
+    expected = quote(lapply(x, function(i){
+        tmp = foo()
+        f(tmp, i)
+    }))
+
+    expect_equal(actual, expected)
+
 })
 
 

@@ -24,10 +24,19 @@ forloop_to_lapply = function(forloop)
 
     deps = CodeDepends::getInputs(forloop$body)
 
-    if(length(c(deps@outputs, deps@updates)) > 0){
-        return(forloop)
-    }
+    changed = c(deps@outputs, deps@updates)
 
+    if(length(changed) > 0){
+        forloop_with_updates(forloop, changed)
+    } else {
+        forloop_no_updates(forloop)
+    }
+}
+
+
+# Easy case: loop doesn't change anything
+forloop_no_updates = function(forloop)
+{
     out = substitute(lapply(iterator, function(ivar) body)
         , as.list(forloop)
         )
@@ -35,4 +44,10 @@ forloop_to_lapply = function(forloop)
     names(out[[c(3, 2)]]) = as.character(forloop$ivar)
 
     out
+}
+
+
+# Harder case: loop does change things
+forloop_with_updates = function(forloop, changed)
+{
 }
