@@ -52,8 +52,8 @@ forloop_with_updates = function(forloop, changed)
 {
     # TODO: Experiment with 'method' argument here for more or less
     # aggressive global detection schemes.
-    globals = globals::globalsOf(forloop, mustExist=FALSE)
-    g_assign = intersect(changed, names(globals))
+    g = globals::globalsOf(forloop, mustExist = FALSE, method = "liberal")
+    g_assign = intersect(changed, names(g))
 
     # The code doesn't update global variables, so it can be parallelized.
     if(length(g_assign) == 0){
@@ -73,10 +73,9 @@ forloop_with_updates = function(forloop, changed)
 
     # Verify loop has the form:
     # for(i in ...){
-    #   ... g(x[i]) # optionally
+    #   ... g(x[i]) # It's ok if this kind of thing happens
     #   x[i] = ...
     # }
-    # If it does then we turn it into an lapply, otherwise give up.
 
     ivar = as.character(forloop$ivar)
     body = forloop$body
