@@ -58,6 +58,17 @@ add_source_node = function(g)
     add_edges(g, edges)
 }
 
+task_graph.character = function(code, ...)
+{
+    # ... Disambiguate file names from a character vector
+    task_graph(parse(filename))
+}
+    
+task_graph.expression = function(code, ...)
+{
+    # The actual work of building a task graph
+}
+
 
 #' Task Dependency Graph
 #'
@@ -67,19 +78,39 @@ add_source_node = function(g)
 #' @export
 #' @param code the file path to a script or an object that can be coerced
 #'  to an expression.
-#' @param default_size numeric default size of the variables in bytes
 #' @return data frame of edges with attribute information suitable for use
 #'  with \code{\link[igraph]{graph_from_data_frame}}.
-task_graph = function(code
-    , default_size = 48)
+task_graph = function(code, ...)
 {
-    expr = if(is.character(code)){
-        # Assume it's a file
-        parse(code)
-    } else {
-        as.expression(code)
-    }
+    UseMethod("task_graph")
+}
 
+
+#' @rdname task_graph
+#' @export
+task_graph.character = function(code, ...)
+{
+    # Assume it's a file
+    expr = parse(code)
+    task_graph(expr, ...)
+}
+
+
+#' @rdname task_graph
+#' @export
+task_graph.default = function(code, ...)
+{
+    expr = as.expression(code)
+    task_graph(expr, ...)
+}
+
+
+#' @rdname task_graph
+#' @param default_size numeric default size of the variables in bytes
+#' @export
+task_graph.expression = function(code, default_size = 48, ...)
+{
+    expr = code
     info = lapply(expr, CodeDepends::getInputs)
 
     # A list of ScriptNodeInfo objects. May be useful to do more with

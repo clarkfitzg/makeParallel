@@ -97,6 +97,7 @@ parallelize_first_apply = function(expr
 #'   ... 
 #'   x[i] <- ...
 #' }
+#' }
 #'
 #' If the last line doesn't update the variable then it's not clear that
 #' the loop can be parallelized.
