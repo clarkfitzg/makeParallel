@@ -29,8 +29,8 @@ test_that("for loop to lapply", {
 
 
 # For testing interactively
-forloop_to_lapply = autoparallel:::forloop_to_lapply
-debug(autoparallel:::forloop_with_updates)
+#forloop_to_lapply = autoparallel:::forloop_to_lapply
+#debug(autoparallel:::forloop_with_updates)
 
 test_that("assignment inside for loop", {
 

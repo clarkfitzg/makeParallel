@@ -27,7 +27,7 @@ forloop_to_lapply = function(forloop)
     changed = c(deps@outputs, deps@updates)
 
     if(length(changed) > 0){
-        forloop_with_updates(forloop, changed)
+        forloop_with_updates(forloop, deps)
     } else {
         forloop_no_updates(forloop)
     }
@@ -48,15 +48,17 @@ forloop_no_updates = function(forloop)
 
 
 # Harder case: loop does change things
-forloop_with_updates = function(forloop, changed)
+forloop_with_updates = function(forloop, deps)
 {
-    # TODO: Experiment with 'method' argument here for more or less
-    # aggressive global detection schemes.
-    g = globals::globalsOf(forloop, mustExist = FALSE, method = "liberal")
-    g_assign = intersect(changed, names(g))
+    # read after write (RAW) loop dependency
+    if(length(intersect(deps@inputs, deps@outputs) > 0)){
+        return(forloop)
+    }
+
+    global_update = deps@updates
 
     # The code doesn't update global variables, so it can be parallelized.
-    if(length(g_assign) == 0){
+    if(length(global_update) == 0){
         return(forloop_no_updates(forloop))
     }
 
@@ -67,7 +69,7 @@ forloop_with_updates = function(forloop, changed)
     # We can potentially work with this, but it isn't a priority, so just
     # give up and return the for loop.
 
-    if(length(g_assign) > 1){
+    if(length(global_update) > 1){
         return(forloop)
     }
 
@@ -80,12 +82,12 @@ forloop_with_updates = function(forloop, changed)
     ivar = as.character(forloop$ivar)
     body = forloop$body
 
-    if(!right_kind_of_usage(body, g_assign, ivar)){
+    if(!right_kind_of_usage(body, global_update, ivar)){
         return(forloop)
     }
 
     lastline = forloop$body[[length(forloop$body)]]
-    if(!right_kind_of_assign(lastline, g_assign, ivar)){
+    if(!right_kind_of_assign(lastline, global_update, ivar)){
         return(forloop)
     }
 
@@ -97,7 +99,7 @@ forloop_with_updates = function(forloop, changed)
     body[[ll]] = rhs_of_lastline
 
     out = substitute(output[iterator] <- lapply(iterator, function(ivar) body)
-        , list(output = as.symbol(g_assign)
+        , list(output = as.symbol(global_update)
                , iterator = forloop$iterator
                , ivar = forloop$ivar
                , body = body
