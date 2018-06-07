@@ -88,9 +88,10 @@ parallelize_first_apply = function(expr
 #'      performance library.
 #' }
 #'
-#' Currently this function support \code{for} loops that update 0 or 1 global variables. For
-#' those that update a single variable the update must be on the last line
-#' of the loop body, so the for loop should have the following form:
+#' Currently this function support \code{for} loops that update 0 or 1
+#' global variables. For those that update a single variable the update
+#' must be on the last line of the loop body, so the for loop should have
+#' the following form:
 #'
 #' \code{
 #' for(i in ...){
@@ -147,8 +148,8 @@ parallelize_first_apply = function(expr
 #' x2
 data_parallel = function(code, map = equivalent_apply, gen_script_prefix = "gen_")
 {
-    expr = as.expression(code)
-    pp_expr = preprocess(expr)
+    tg = task_graph(code)
+    pp_expr = preprocess(tg$input_code)
     pcode = lapply(pp_expr, parallelize_first_apply)
     list(output_code = as.expression(pcode))
 }

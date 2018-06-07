@@ -124,25 +124,25 @@ task_graph.expression = function(code, default_size = 48, ...)
 
     # Degenerate case
     if (n <= 1){
-        return(empty_edges)
+        tg = empty_edges
+    } else {
+        inputs = lapply(info, methods::slot, "inputs")
+        outputs = lapply(info, methods::slot, "outputs")
+        updates = lapply(info, methods::slot, "updates")
+        # Why is @functions use a named vector? And why is value NA?
+        functions = lapply(info, function(x) names(x@functions))
+
+
+        definitions = mapply(c, outputs, updates, SIMPLIFY = FALSE)
+        uses = mapply(c, inputs, updates, functions, SIMPLIFY = FALSE)
+
+        vars = unique(unlist(outputs))
+
+        use_def_chains = lapply(vars, use_def, uses, definitions)
+
+        tg = do.call(rbind, use_def_chains)
+        tg[, "size"] = if(nrow(tg) == 0) numeric() else default_size
     }
-
-    inputs = lapply(info, methods::slot, "inputs")
-    outputs = lapply(info, methods::slot, "outputs")
-    updates = lapply(info, methods::slot, "updates")
-    # Why is @functions use a named vector? And why is value NA?
-    functions = lapply(info, function(x) names(x@functions))
-
-
-    definitions = mapply(c, outputs, updates, SIMPLIFY = FALSE)
-    uses = mapply(c, inputs, updates, functions, SIMPLIFY = FALSE)
-
-    vars = unique(unlist(outputs))
-
-    use_def_chains = lapply(vars, use_def, uses, definitions)
-
-    tg = do.call(rbind, use_def_chains)
-    tg[, "size"] = if(nrow(tg) == 0) numeric() else default_size
 
     list(input_code = expr, task_graph = tg)
 }
