@@ -105,7 +105,7 @@ forloop_with_updates = function(forloop, deps)
                , body = body
         ))
     # The names of the function arguments are special.
-    names(out[[c(3, 2)]]) = as.character(forloop$ivar)
+    names(out[[c(3, 3, 2)]]) = as.character(forloop$ivar)
 
     out
 }
