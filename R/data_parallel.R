@@ -4,11 +4,12 @@ equivalent_apply[, "parallel"] = paste0("parallel::mc", equivalent_apply[, "seri
 
 
 # Apply preprocessing steps to code
+# I'll likely come back and generalize this
 preprocess = function(code)
 {
     for(i in seq_along(code)){
         if(class(code[[i]]) == "for"){
-            code[[i]] = forloop_to_mclapply(code[[i]]) 
+            code[[i]] = forloop_to_lapply(code[[i]]) 
         }
     }
     code
@@ -87,6 +88,19 @@ parallelize_first_apply = function(expr
 #'      performance library.
 #' }
 #'
+#' Currently this function support \code{for} loops that update 0 or 1 global variables. For
+#' those that update a single variable the update must be on the last line
+#' of the loop body, so the for loop should have the following form:
+#'
+#' \code{
+#' for(i in ...){
+#'   ... 
+#'   x[i] <- ...
+#' }
+#'
+#' If the last line doesn't update the variable then it's not clear that
+#' the loop can be parallelized.
+#'
 #' Road map of features to implement:
 #'
 #' \itemize{
@@ -114,8 +128,9 @@ parallelize_first_apply = function(expr
 #' # A couple examples in one script
 #' serial_code = parse(text = "
 #'      x1 = lapply(1:10, exp)
-#'      x2 = 1:10
-#'      for(i in x2) x2[i] = exp(x2[i])
+#'      n = 10
+#'      x2 = rep(NA, n)
+#'      for(i in seq(n)) x2[[i]] = exp(i + 1)
 #' ")
 #'
 #' p = data_parallel(serial_code)
