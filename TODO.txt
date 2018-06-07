@@ -3,6 +3,7 @@
 Before release on CRAN:
 
 - OO methods as discussed in code review
+- Read templates when necessary.
 - Simplify `write_hive_scripts()` to do less. The burden should be on the
   users to write the SQL.
 
