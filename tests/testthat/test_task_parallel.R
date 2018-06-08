@@ -47,3 +47,25 @@ test_that("Multiple assignment in single expression", {
     expect_equal(3, nrow(out$schedule$transfer))
 
 })
+
+
+test_that("whole workflow on files", {
+
+    task_parallel("example.R")
+    expect_true(file.exists("gen_example.R"))
+
+    expect_error(task_parallel("example.R"), "exists")
+
+    task_parallel("example.R", overwrite = TRUE)
+
+    rm("gen_example.R")
+
+    task_parallel("example.R", output_file = "ex.R")
+    expect_true(file.exists("ex.R"))
+    rm("ex.R")
+
+    task_parallel("example.R", gen_script_prefix = "GEN")
+    expect_true(file.exists("GENexample.R"))
+    rm("GENexample.R")
+
+})

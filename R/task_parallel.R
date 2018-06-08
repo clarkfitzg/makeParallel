@@ -14,8 +14,11 @@
 #' @param runfirst logical, evaluate the code once to gather timings?
 #' @param ..., additional arguments to scheduler
 #' @param gen_script_prefix character added to front of file name
-#' @param output_file where to write the generated script, or NULL to not
-#'  write it.
+#' @param output_file character where to write the generated script,
+#'  or FALSE to not write anything. If missing and code is a file then use
+#'  \code{gen_script_prefix} to make a new name and write a script if
+#'  code was a file name.
+#' @param overwrite logical write over existing out
 #' @return list of output from each step
 #' @examples
 #' \dontrun{
@@ -32,19 +35,20 @@ task_parallel = function(code
     , ...
 #    , code_generator_args = list()
     , gen_script_prefix = "gen_"
-    , output_file = NULL
+    , output_file
+    , overwrite = FALSE
     )
 {
     if(runfirst) taskgraph = run_and_measure(taskgraph)
     schedule = scheduler(taskgraph, ...)
     out = code_generator(schedule)
-    finish_code_pipeline(out, output_file)
+    finish_code_pipeline(out, gen_script_prefix, output_file)
     out
 }
 
 finish_code_pipeline = function(generated, output_file)
 {
-    if(!is.null(output_file) || !is.null(generated$input_file))
+    if(is.null(output_file))
         # TODO: Come back to this point
     if(is.character(code)){
         # It's a file name
