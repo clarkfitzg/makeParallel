@@ -39,7 +39,8 @@ task_parallel = function(code
     , overwrite = FALSE
     )
 {
-    if(runfirst) taskgraph = run_and_measure(taskgraph)
+    if(runfirst)
+        taskgraph = run_and_measure(taskgraph)
     schedule = scheduler(taskgraph, ...)
     out = code_generator(schedule)
     finish_code_pipeline(out, gen_script_prefix, output_file)

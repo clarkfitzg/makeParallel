@@ -5,6 +5,7 @@ test_that("Basic transformation to parallel", {
     expr = parse(text = "lapply(f, x)")
     target = parse(text = "parallel::mclapply(f, x)")
     actual = data_parallel(expr)$output_code
+
     expect_equal(actual, target)
 
     expr = parse(text = "y <- lapply(f, x)")
