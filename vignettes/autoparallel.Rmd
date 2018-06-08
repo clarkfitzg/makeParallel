@@ -37,10 +37,10 @@ code = parse(text = "
     m <- lapply(x, mean)
     ")
 
-pcode = data_parallel(code)
+pcode = autoparallel(code)
 ```
 
-Usually we call `data_parallel()` on the name of a file containing an R
+Usually we call `autoparallel()` on the name of a file containing an R
 script. But we can also call it directly on the code as we do here, which
 makes for a self contained example. The resulting object has replaced
 `lapply` with `parallel::mclapply`.
@@ -74,6 +74,16 @@ performs better.
 
 ## task parallelism
 
+Choosing a scheduler. The default scheduler is `data_scheduler`, which
+uses the more common data parallelism found in R. The alternative is
+`task_scheduler`, which uses task parallelism to generate a schedule.
+`data_scheduler` and `task_scheduler` are generic functions. _Why? They
+don't dispatch on any args. Ah, but they could do different things
+depending on the system. Hmm, could I fit the Hive code generation into
+this model? Maybe possible. It would be nice to design it in such a way
+that I'm not limited from extending it later, if possible._
+
+
 Data parallelism executes the same code on different data. R's vectorized
 computational model is amenable to data parallelism. In contrast, task
 parallelism executes multiple different pieces of code simultaneously. 
@@ -103,7 +113,8 @@ code = parse(text = "
     xy = sort(c(x[, 1], y[, 1]))
     ")
 
-pcode = task_parallel(code, expr_times = c(1.25, 1.24, 0.2))
+pcode = autoparallel(code, scheduler = task_scheduler
+    , expr_times = c(1.25, 1.24, 0.2))
 
 plot(pcode$schedule)
 ```
@@ -128,10 +139,10 @@ pcode$output_code
 At the simplest level users write:
 
 ```{r, eval = FALSE}
-task_parallel("some_script.R")
+autoparallel("some_script.R")
 ```
 
-`task_parallel` determines that `some_script.R` is a file on your computer,
+`autoparallel` determines that `some_script.R` is a file on your computer,
 runs all of the steps, and by default writes the newly generated code to
 `gen_some_script.R`.
 
@@ -165,7 +176,7 @@ generate_code.ForkJoinSchedule = function(schedule, ...)
 We can call this new code as follows:
 
 ```{r, eval = FALSE}
-task_parallel(code, scheduler = fork_join_schedule)
+autoparallel(code, scheduler = fork_join_schedule)
 ```
 
 Users can specify the scheduling and code generation steps by passing
@@ -173,18 +184,18 @@ functions or defining methods. Here's an associated mental model.
 
 ![extensible model](extensible.png)
 
-In summary, `task_parallel` can be used in the following ways:
+In summary, `autoparallel` can be used in the following ways:
 
-- `task_parallel(code)` simple, common use case
-- `task_parallel("some_script.R")` methods for different classes of
+- `autoparallel(code)` simple, common use case
+- `autoparallel("some_script.R")` methods for different classes of
   the first argument.
-- `task_parallel(taskgraph = tg)` skips the setup part of the function in
+- `autoparallel(taskgraph = tg)` skips the setup part of the function in
   case the user has already done that or they have a special task graph to
   use.
-- `task_parallel(code, schedule = my_scheduler, code_generator =
+- `autoparallel(code, schedule = my_scheduler, code_generator =
   my_code_generator)` allows users to customize the steps in the process
     by passing in their own functions to perform them.
-- `task_parallel(code, schedule = fork_join_schedule)` dispatches on the
+- `autoparallel(code, schedule = fork_join_schedule)` dispatches on the
   class allowing users to extend the system through defining their own
   classes.
 
