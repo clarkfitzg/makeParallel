@@ -1,3 +1,35 @@
+Fri Jun  8 12:00:36 PDT 2018
+
+Talking with Duncan has gotten me to think more deeply about what kind of
+object oriented system I want to use. S3 is simpler while S4 is more
+complex. But I don't understand either of them, because this passing
+default arguments has got me confused. Do any R S3 methods use default
+arguments?
+
+Conceptually there are 3 important objects: TaskGraph, Schedule,
+GeneratedCode
+
+I would like to share more of the implementation between `data_parallel`
+and `task_parallel` functions, and probably merge them together. Actually I
+can probably merge them now by defaulting to data parallelism in the
+scheduler.
+
+I would like to have these features right now:
+
+- methods to create a TaskGraph from different inputs
+- plotting methods for TaskGraph and Schedule
+- Allow user to define their own code_generator function to dispatch on
+  Schedule and return object of GeneratedCode
+
+In the future I might like to have these features:
+
+- summary methods
+- ways to describe data and systems so that these feed into the scheduling
+- object validation for Schedule objects, because one can
+create schedules that aren't valid (which implies problems with the
+schedule generator)
+
+
 # TODO
 
 Before release on CRAN:

@@ -89,7 +89,7 @@ task_graph = function(code, default_size = object.size(1L), ...)
 
 #' @rdname task_graph
 #' @export
-task_graph.character = function(code, default_size, ...)
+task_graph.character = function(code, default_size = object.size(1L), ...)
 {
     # Assume it's a file
     expr = parse(code)
@@ -99,7 +99,7 @@ task_graph.character = function(code, default_size, ...)
 
 #' @rdname task_graph
 #' @export
-task_graph.default = function(code, default_size, ...)
+task_graph.default = function(code, default_size = object.size(1L), ...)
 {
     expr = as.expression(code)
     task_graph(expr, default_size, ...)
@@ -108,7 +108,7 @@ task_graph.default = function(code, default_size, ...)
 
 #' @rdname task_graph
 #' @export
-task_graph.expression = function(code, default_size, ...)
+task_graph.expression = function(code, default_size = object.size(1L), ...)
 {
     expr = code
     info = lapply(expr, CodeDepends::getInputs)

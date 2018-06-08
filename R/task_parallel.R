@@ -47,7 +47,7 @@ task_parallel = function(code
     out
 }
 
-finish_code_pipeline = function(generated, output_file)
+finish_code_pipeline = function(generated, gen_script_prefix, output_file)
 {
     if(is.null(output_file))
         # TODO: Come back to this point
