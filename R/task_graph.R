@@ -78,9 +78,10 @@ task_graph.expression = function(code, ...)
 #' @export
 #' @param code the file path to a script or an object that can be coerced
 #'  to an expression.
+#' @param default_size numeric default size of the variables in bytes
 #' @return data frame of edges with attribute information suitable for use
 #'  with \code{\link[igraph]{graph_from_data_frame}}.
-task_graph = function(code, ...)
+task_graph = function(code, default_size = object.size(1L), ...)
 {
     UseMethod("task_graph")
 }
@@ -88,27 +89,26 @@ task_graph = function(code, ...)
 
 #' @rdname task_graph
 #' @export
-task_graph.character = function(code, ...)
+task_graph.character = function(code, default_size, ...)
 {
     # Assume it's a file
     expr = parse(code)
-    task_graph(expr, ...)
+    task_graph(expr, default_size, ...)
 }
 
 
 #' @rdname task_graph
 #' @export
-task_graph.default = function(code, ...)
+task_graph.default = function(code, default_size, ...)
 {
     expr = as.expression(code)
-    task_graph(expr, ...)
+    task_graph(expr, default_size, ...)
 }
 
 
 #' @rdname task_graph
-#' @param default_size numeric default size of the variables in bytes
 #' @export
-task_graph.expression = function(code, default_size = 48, ...)
+task_graph.expression = function(code, default_size, ...)
 {
     expr = code
     info = lapply(expr, CodeDepends::getInputs)
