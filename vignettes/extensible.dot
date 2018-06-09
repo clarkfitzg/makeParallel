@@ -1,38 +1,72 @@
 digraph G {
 rankdir = LR;
-//rankdir = TB;
-
-//edge [fontname = "courier"];
 
 labeljust=right;
 
-node [shape = "rectangle"];
-input [label = "Input\nCode", fontname = "courier"];
-taskgraph [label = "Task\nGraph"];
-schedule [label = "Schedule"];
-fork_join_schedule [label = "ForkJoin\nSchedule", fontname = "courier"];
-output [label = "Output\nCode", fontname = "courier"];
+node [shape = "rectangle", fontname = "arial"];
+//------------------------------------------------------------
+file_name [label = "file\nname"];
+parsed_expression [label = "parsed\nexpression"];
 
-node [shape = "oval"];
-dependency [label = "Dependency\nAnalysis"];
-schedule_algo1 [label = "fork join\nscheduler"];
-schedule_algo2 [label = "Scheduler 2"];
-schedule_algo3 [label = "Scheduler 3"];
-code_generator1 [label = "fork join\ncode gen"];
-code_generator2 [label = "Code Gen 2"];
+node [shape = "rectangle", fontname = "courier"];
+//------------------------------------------------------------
+DependGraph;
+TaskSchedule;
+MapSchedule;
+SerialSchedule;
+GeneratedCode;
 
-input -> dependency;
-dependency -> taskgraph;
-taskgraph -> schedule_algo1;
-taskgraph -> schedule_algo2;
-taskgraph -> schedule_algo3;
-schedule_algo2 -> schedule;
-schedule_algo3 -> schedule;
-schedule -> code_generator2;
-code_generator1 -> output;
-code_generator2 -> output;
+node [shape = "oval", fontname = "arial"];
+//------------------------------------------------------------
+socket_code_generator [label = "socket code\ngenerator"];
+parallel_package_code_generator [label = "parallel package\ncode generator"];
+
+node [shape = "oval", fontname = "courier"];
+//------------------------------------------------------------
+depend_graph;
+serial_scheduler;
+task_scheduler;
+map_scheduler;
+serial_scheduler;
+
+node [style = "filled", shape = "oval", fontname = "courier"];
+//------------------------------------------------------------
+forkjoin_scheduler;
+ForkJoinSchedule [shape = "rectangle"];
+
+node [fontname = "arial"];
+hive_code_generator [label = "Apache Hive\ncode generator"];
+future_code_generator [label = "R future package\ncode generator"];
+mcparallel_code_generator [label = "parallel::mcparallel\ncode generator"];
+
+
+file_name -> depend_graph;
+parsed_expression -> depend_graph;
+depend_graph -> DependGraph;
+DependGraph -> task_scheduler;
+DependGraph -> map_scheduler;
+DependGraph -> serial_scheduler;
+DependGraph -> forkjoin_scheduler;
+task_scheduler -> TaskSchedule;
+serial_scheduler -> SerialSchedule;
+map_scheduler -> MapSchedule;
+SerialSchedule -> GeneratedCode [label = "non op"];
+TaskSchedule -> socket_code_generator;
+MapSchedule -> parallel_package_code_generator;
+MapSchedule -> hive_code_generator;
+hive_code_generator -> GeneratedCode;
+socket_code_generator -> GeneratedCode;
+parallel_package_code_generator -> GeneratedCode;
+forkjoin_scheduler -> ForkJoinSchedule;
+ForkJoinSchedule -> future_code_generator;
+ForkJoinSchedule -> mcparallel_code_generator;
+future_code_generator -> GeneratedCode;
+mcparallel_code_generator -> GeneratedCode;
 
 // Bypass
-schedule_algo1 -> fork_join_schedule [style = "dotted"];
-fork_join_schedule -> code_generator1 [style = "dotted"];
+edge [style = "dotted"];
+//------------------------------------------------------------
+task_scheduler -> SerialSchedule;
+map_scheduler -> SerialSchedule;
+forkjoin_scheduler -> SerialSchedule;
 }

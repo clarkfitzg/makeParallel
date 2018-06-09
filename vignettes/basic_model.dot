@@ -9,22 +9,24 @@ Ovals represent functions
 ";
 labeljust=right;
 
-node [shape = "rectangle"];
-input [label = "Input\nCode", fontname = "courier"];
-taskgraph [label = "Task\nGraph"];
-schedule [label = "Schedule"];
-output [label = "Output\nCode", fontname = "courier"];
+node [shape = "rectangle", fontname = "courier"];
+//------------------------------------------------------------
+Code [label = "Code"];
+TaskGraph [label = "TaskGraph"];
+Schedule [label = "Schedule"];
+GeneratedCode [label = "GeneratedCode"];
 
 node [shape = "oval"];
-dependency [label = "Dependency\nAnalysis"];
-schedule_algo [label = "Static\nScheduling\nAlgorithm"];
-code_generator [label = "Code Generator"];
+//------------------------------------------------------------
+task_graph [label = "task_graph"];
+scheduler [label = "scheduler"];
+code_generator [label = "code_generator"];
 
-input -> dependency;
-dependency -> taskgraph;
-taskgraph -> schedule_algo;
-schedule_algo -> schedule;
-schedule -> code_generator;
-code_generator -> output;
+Code -> task_graph;
+task_graph -> TaskGraph;
+TaskGraph -> scheduler;
+scheduler -> Schedule;
+Schedule -> code_generator;
+code_generator -> GeneratedCode;
 
 }

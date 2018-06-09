@@ -146,7 +146,7 @@ parallelize_first_apply = function(expr
 #' eval(p$output_code)
 #' x1
 #' x2
-data_parallel = function(code, map = equivalent_apply, gen_script_prefix = "gen_")
+data_parallel_scheduler = function(TaskGraph, map = equivalent_apply)
 {
     tg = task_graph(code)
     pp_expr = preprocess(tg$input_code)
