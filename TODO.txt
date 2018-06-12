@@ -9,21 +9,17 @@ arguments?
 Conceptually there are 3 important objects: TaskGraph, Schedule,
 GeneratedCode
 
-I would like to share more of the implementation between `data_parallel`
-and `task_parallel` functions, and probably merge them together. Actually I
-can probably merge them now by defaulting to data parallelism in the
-scheduler.
-
 I would like to have these features right now:
 
 - methods to create a TaskGraph from different inputs
-- plotting methods for TaskGraph and Schedule
+- plot methods for TaskGraph
 - Allow user to define their own code_generator function to dispatch on
   Schedule and return object of GeneratedCode
+- The flexibility to add arbitrary elements to classes
 
 In the future I might like to have these features:
 
-- summary methods
+- summary, print, and more plot methods
 - ways to describe data and systems so that these feed into the scheduling
 - object validation for Schedule objects, because one can
 create schedules that aren't valid (which implies problems with the
