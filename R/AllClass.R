@@ -1,3 +1,14 @@
+# This design "nests" the objects together, so Graph is a slot in Schedule
+# and Schedule is a slot in GeneratedCode. 
+#
+# If I wanted "flatter" objects I could make each class inherit from
+# another. But this has disadvantages:
+#   1. They're conceptually quite different objects
+#   2. When I define a new class extending the first class (DependGraph)
+#       then how do I propagate the new slots through to the subclasses?
+#   3. How can I easily call say the `plot()` method for the first class,
+#       if all the others have plot methods?
+
 # Not necessary, comes from methods package?
 # setOldClass("expression")
 
@@ -9,11 +20,14 @@
 # - transfers of objects between processors
 #
 # Should I specify them formally as subclasses of data frame?
+# Probably best to wait until it seems necessary
 
+
+# Graphs
+############################################################
 
 DependGraph = setClass("DependGraph",
     slots = c(code = "expression", graph = "data.frame"))
-
 
 MeasuredDependGraph = setClass("MeasuredDependGraph",
     slots = c(time = "numeric"),
@@ -21,11 +35,25 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
     contains = "DependGraph")
 
 
-# Maybe have this be a virtual class?
-Schedule = setClass("Schedule", 
-    slots = c(evaluation = "data.frame", transfer = "data.frame"))
+# Schedules
+############################################################
 
+Schedule = setClass("Schedule", 
+    slots = c(graph = "DependGraph"
+        , evaluation = "data.frame"
+        ))
 
 SerialSchedule = setClass("SerialSchedule", contains = "Schedule")
-TaskSchedule = setClass("TaskSchedule", contains = "Schedule")
+
+TaskSchedule = setClass("TaskSchedule",
+    slots = c(transfer = "data.frame"),
+    contains = "Schedule")
+
 MapSchedule = setClass("MapSchedule", contains = "Schedule")
+
+
+# Generated Code
+############################################################
+
+GeneratedCode = setClass("GeneratedCode",
+    slots = c(
