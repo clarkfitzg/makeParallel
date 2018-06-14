@@ -10,8 +10,10 @@
 #'
 #' @export
 #' @param code file name, expression from \code{\link[base]{parse}}
-#' @param taskgraph result of \code{\link{task_graph}}
-#' @param runfirst logical, evaluate the code once to gather timings?
+#' @param dependGraph object of class \code{\link{DependGraph}}
+#' @param runFirst logical, evaluate the code once to gather timings?
+#' @param scheduler, function to produce a \code{\link{Schedule}}
+#'  from a \code{\link{DependGraph}}.
 #' @param ..., additional arguments to scheduler
 #' @param gen_script_prefix character added to front of file name
 #' @param output_file character where to write the generated script,
@@ -27,11 +29,11 @@
 #' pcode = task_parallel(parse(text = "x = 1:100
 #' y = rep(1, 100)
 #' z = x + y"))
-task_parallel = function(code
-    , taskgraph = task_graph(code)
-    , runfirst = FALSE
-    , scheduler = min_start_time
-    , code_generator = gen_socket_code
+autoparallel = function(code
+    , dependGraph = DependGraph(code)
+    , runFirst = FALSE
+    , scheduler = MapSchedule
+    , code_generator = NULL
     , ...
 #    , code_generator_args = list()
     , gen_script_prefix = "gen_"
@@ -39,9 +41,9 @@ task_parallel = function(code
     , overwrite = FALSE
     )
 {
-    if(runfirst)
-        taskgraph = run_and_measure(taskgraph)
-    schedule = scheduler(taskgraph, ...)
+    if(runFirst)
+        dependGraph = run_and_measure(dependGraph)
+    schedule = scheduler(dependGraph, ...)
     out = code_generator(schedule)
     finish_code_pipeline(out, gen_script_prefix, output_file)
     out
@@ -59,3 +61,4 @@ finish_code_pipeline = function(generated, gen_script_prefix, output_file)
         out[["gen_file_name"]] = gen_file_name
     }
 }
+

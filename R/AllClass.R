@@ -3,11 +3,13 @@
 #
 # If I wanted "flatter" objects I could make each class inherit from
 # another. But this has disadvantages:
+#
 #   1. They're conceptually quite different objects
 #   2. When I define a new class extending the first class (DependGraph)
 #       then how do I propagate the new slots through to the subclasses?
 #   3. How can I easily call say the `plot()` method for the first class,
-#       if all the others have plot methods?
+#       if all the others have plot methods? I would actually like to do
+#       this.
 
 # Not necessary, comes from methods package?
 # setOldClass("expression")
@@ -56,4 +58,4 @@ MapSchedule = setClass("MapSchedule", contains = "Schedule")
 ############################################################
 
 GeneratedCode = setClass("GeneratedCode",
-    slots = c(
+    slots = c(schedule = "Schedule", code = "expression"))
