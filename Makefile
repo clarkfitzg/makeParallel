@@ -18,7 +18,7 @@ VIGNETTES = $(wildcard vignettes/*.Rmd)
 
 # User local install
 install: $(RFILES) DESCRIPTION
-	R -e "roxygen2::roxygenize()"
+	R -e "devtools::document()"
 	R CMD INSTALL .
 
 test: $(TESTFILES) $(GEN_SCRIPT_OUTPUT)

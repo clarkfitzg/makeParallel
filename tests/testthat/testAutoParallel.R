@@ -9,15 +9,18 @@ oldcode = parse(text = "
 
 test_that("Components of task parallel inference.", {
 
-    graph = task_graph(oldcode)
+    g = dependGraph(oldcode)
+    s = schedule(g)
+    newcode = generateCode(plan)
 
-    plan = min_start_time(graph)
+    expect_s4_class(g, "DependGraph")
+    expect_s4_class(s, "Schedule")
+    expect_s4_class(newcode, "GeneratedCode")
 
-    expect_s3_class(plan$schedule, "schedule")
+    plot(s)
 
-    plot(plan$schedule)
-
-    newcode = gen_socket_code(plan)
+    write(newcode, "ex.R")
+    expect_true(file.exists("ex.R"))
 
 })
 

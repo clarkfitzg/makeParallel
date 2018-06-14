@@ -7,6 +7,7 @@
 # timeline starting with the beginning of the computation at 0, and 'cost'
 # means an absolute time required to do some smaller step. 
 
+
 # TODO: Define standard interface for a scheduler, ie. additional arguments
 # for the timings and variable sizes.
 
