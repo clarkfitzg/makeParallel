@@ -31,4 +31,5 @@ setGeneric("generate", function(sched, ...)
 
 
 #' @export
-setGeneric("code", function(x, ...) x@code)
+setGeneric("writeCode", function(x, file, ...) 
+           standardGeneric("writeCode"))

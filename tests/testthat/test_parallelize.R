@@ -20,8 +20,10 @@ test_that("Defaults for generics used in parallelize.", {
     # TODO: test for task parallel
     #plot(s)
 
-    writeLines(code(newcode), "ex.R")
+    writeCode(newcode, "ex.R")
     expect_true(file.exists("ex.R"))
+
+    unlink("ex.R")
 
 })
 
@@ -61,15 +63,14 @@ test_that("whole workflow on files", {
     expect_error(task_parallel("example.R"), "exists")
 
     task_parallel("example.R", overwrite = TRUE)
-
-    rm("gen_example.R")
+    unlink("gen_example.R")
 
     task_parallel("example.R", output_file = "ex.R")
     expect_true(file.exists("ex.R"))
-    rm("ex.R")
+    unlink("ex.R")
 
     task_parallel("example.R", gen_script_prefix = "GEN")
     expect_true(file.exists("GENexample.R"))
-    rm("GENexample.R")
+    unlink("GENexample.R")
 
 })
