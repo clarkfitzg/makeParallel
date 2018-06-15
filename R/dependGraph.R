@@ -58,59 +58,25 @@ add_source_node = function(g)
     add_edges(g, edges)
 }
 
-task_graph.character = function(code, ...)
-{
-    # ... Disambiguate file names from a character vector
-    task_graph(parse(filename))
-}
-    
-task_graph.expression = function(code, ...)
-{
-    # The actual work of building a task graph
-}
 
-
-#' Task Dependency Graph
-#'
-#' Create a data frame of edges representing the expression (task) dependencies
-#' implicit in code.
-#'
-#' @export
-#' @param code the file path to a script or an object that can be coerced
-#'  to an expression.
-#' @param default_size numeric default size of the variables in bytes
-#' @return data frame of edges with attribute information suitable for use
-#'  with \code{\link[igraph]{graph_from_data_frame}}.
-setGeneric("dependGraph", function(code, default_size = object.size(1L), ...)
+setMethod("dependGraph", "character", function(code, ...)
 {
-    UseMethod("task_graph")
+    #if(length(code) > 1) stop("pass a single R file name or a language object")
+    expr = parse(code)
+    callGeneric(expr, ...)
 })
 
 
-
-
-#' @rdname task_graph
-#' @export
-task_graph.character = function(code, default_size = object.size(1L), ...)
-{
-    # Assume it's a file
-    expr = parse(code)
-    task_graph(expr, default_size, ...)
-}
-
-
-#' @rdname task_graph
-#' @export
-task_graph.default = function(code, default_size = object.size(1L), ...)
+setMethod("dependGraph", "language", function(code, ...)
 {
     expr = as.expression(code)
-    task_graph(expr, default_size, ...)
-}
+    callGeneric(expr, ...)
+})
 
 
 #' @rdname task_graph
 #' @export
-task_graph.expression = function(code, default_size = object.size(1L), ...)
+setMethod("dependGraph", "expression", function(code, ...)
 {
     expr = code
     info = lapply(expr, CodeDepends::getInputs)
@@ -146,8 +112,8 @@ task_graph.expression = function(code, default_size = object.size(1L), ...)
         tg[, "size"] = if(nrow(tg) == 0) numeric() else default_size
     }
 
-    list(input_code = expr, task_graph = tg)
-}
+    new("DependGraph", code = expr, graph = tg)
+})
 
 
 # Count Number Of Nodes In Longest Path For DAG
