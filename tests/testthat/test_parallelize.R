@@ -11,7 +11,7 @@ test_that("Components of task parallel inference.", {
 
     g = dependGraph(oldcode)
     s = schedule(g)
-    newcode = generateCode(plan)
+    newcode = generate(s)
 
     expect_s4_class(g, "DependGraph")
     expect_s4_class(s, "Schedule")

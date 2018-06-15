@@ -1,7 +1,7 @@
 test_that("for loop to lapply", {
 
     loop1 = quote(for(i in x){f(i)})
-    actual = forloop_to_lapply(loop1)
+    actual = forLoopToLapply(loop1)
     expected = quote(lapply(x, function(i){f(i)}))
 
     expect_equal(actual, expected)
@@ -11,13 +11,13 @@ test_that("for loop to lapply", {
         y = f(y)
     })
 
-    expect_equal(forloop_to_lapply(loop2), loop2)
+    expect_equal(forLoopToLapply(loop2), loop2)
 
     loop3 = quote(for(i in x){
         tmp = foo()
         f(tmp, i)
     })
-    actual = forloop_to_lapply(loop3)
+    actual = forLoopToLapply(loop3)
     expected = quote(lapply(x, function(i){
         tmp = foo()
         f(tmp, i)
@@ -29,7 +29,7 @@ test_that("for loop to lapply", {
 
 
 # For testing interactively
-#forloop_to_lapply = autoparallel:::forloop_to_lapply
+#forLoopToLapply = autoparallel:::forLoopToLapply
 #debug(autoparallel:::forloop_with_updates)
 
 test_that("assignment inside for loop", {
@@ -46,7 +46,7 @@ test_that("assignment inside for loop", {
         tmp
     }))
 
-    actual = forloop_to_lapply(loop1)
+    actual = forLoopToLapply(loop1)
 
     expect_equal(actual, expected)
 
@@ -57,7 +57,7 @@ test_that("assignment inside for loop", {
         x[[i]] = tmp
     })
 
-    actual = forloop_to_lapply(loop2)
+    actual = forLoopToLapply(loop2)
 
     expect_equal(actual, loop2)
 
@@ -67,7 +67,7 @@ test_that("assignment inside for loop", {
         x[[i]] = g(x[[i - 1]])
     })
 
-    actual = forloop_to_lapply(loop3)
+    actual = forLoopToLapply(loop3)
 
     expect_equal(actual, loop3)
 

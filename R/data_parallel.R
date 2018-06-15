@@ -1,6 +1,5 @@
-equivalent_apply = data.frame(serial = c("mapply", "lapply", "Map")
-                         , stringsAsFactors = FALSE)
-equivalent_apply[, "parallel"] = paste0("parallel::mc", equivalent_apply[, "serial"])
+equivalent_apply = c("mapply", "lapply", "Map")
+names(equivalent_apply) = paste0("parallel::mc", equivalent_apply)
 
 
 # Apply preprocessing steps to code
@@ -9,7 +8,7 @@ preprocess = function(code)
 {
     for(i in seq_along(code)){
         if(class(code[[i]]) == "for"){
-            code[[i]] = forloop_to_lapply(code[[i]]) 
+            code[[i]] = forLoopToLapply(code[[i]]) 
         }
     }
     code

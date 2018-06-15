@@ -81,10 +81,12 @@ task_graph.expression = function(code, ...)
 #' @param default_size numeric default size of the variables in bytes
 #' @return data frame of edges with attribute information suitable for use
 #'  with \code{\link[igraph]{graph_from_data_frame}}.
-task_graph = function(code, default_size = object.size(1L), ...)
+setGeneric("dependGraph", function(code, default_size = object.size(1L), ...)
 {
     UseMethod("task_graph")
-}
+})
+
+
 
 
 #' @rdname task_graph

@@ -1,3 +1,4 @@
+
 Fri Jun  8 12:00:36 PDT 2018
 
 Talking with Duncan has gotten me to think more deeply about what kind of
@@ -37,6 +38,7 @@ Before release on CRAN:
 
 Less urgent:
 
+- preprocessing step
 - Alternative scheduling algorithm and code generator based on fork / join.
 - Measure CPU utilization during timings to see what's parallel / threaded.
 

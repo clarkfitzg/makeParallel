@@ -1,3 +1,8 @@
+# DO NOT WRITE MORE HERE. I copied the code over to the CodeAnalysis
+# package, which is where it belongs.
+# Thu Jun 14 18:05:43 PDT 2018
+
+
 #' Transfrom For Loop To Lapply
 #'
 #' Determine if a for loop can be parallelized, and if so transform it into
@@ -17,7 +22,7 @@
 #' @param forloop R language object with class \code{for}.
 #' @return call R call to \code{parallel::mclapply} if successful,
 #'  otherwise the original forloop.
-forloop_to_lapply = function(forloop)
+forLoopToLapply = function(forloop)
 {
 
     names(forloop) = c("for", "ivar", "iterator", "body")
@@ -27,15 +32,15 @@ forloop_to_lapply = function(forloop)
     changed = c(deps@outputs, deps@updates)
 
     if(length(changed) > 0){
-        forloop_with_updates(forloop, deps)
+        forLoopWithUpdates(forloop, deps)
     } else {
-        forloop_no_updates(forloop)
+        forLoopNoUpdates(forloop)
     }
 }
 
 
 # Easy case: loop doesn't change anything
-forloop_no_updates = function(forloop)
+forLoopNoUpdates = function(forloop)
 {
     out = substitute(lapply(iterator, function(ivar) body)
         , as.list(forloop)
@@ -48,7 +53,7 @@ forloop_no_updates = function(forloop)
 
 
 # Harder case: loop does change things
-forloop_with_updates = function(forloop, deps)
+forLoopWithUpdates = function(forloop, deps)
 {
     # read after write (RAW) loop dependency
     if(length(intersect(deps@inputs, deps@outputs) > 0)){
@@ -59,7 +64,7 @@ forloop_with_updates = function(forloop, deps)
 
     # The code doesn't update global variables, so it can be parallelized.
     if(length(global_update) == 0){
-        return(forloop_no_updates(forloop))
+        return(forLoopNoUpdates(forloop))
     }
 
     # Case of loop such as: 
@@ -82,12 +87,12 @@ forloop_with_updates = function(forloop, deps)
     ivar = as.character(forloop$ivar)
     body = forloop$body
 
-    if(!right_kind_of_usage(body, global_update, ivar)){
+    if(!onlyUseSimpleIndex(body, global_update, ivar)){
         return(forloop)
     }
 
     lastline = forloop$body[[length(forloop$body)]]
-    if(!right_kind_of_assign(lastline, global_update, ivar)){
+    if(!isSimpleIndexAssign(lastline, global_update, ivar)){
         return(forloop)
     }
 
@@ -115,13 +120,13 @@ forloop_with_updates = function(forloop, deps)
 # avar[[ivar]]
 # @param avar character assignment variable
 # @param ivar character index variable
-right_kind_of_usage = function(expr, avar, ivar)
+onlyUseSimpleIndex = function(expr, avar, ivar)
 {
     locs = find_var(expr, avar)
 
     for(loc in locs){
         lo = loc[-length(loc)]
-        if(!is_index(expr[[lo]], avar, ivar)){
+        if(!isSimpleIndex(expr[[lo]], avar, ivar)){
             return(FALSE)
         }
     }
@@ -131,7 +136,7 @@ right_kind_of_usage = function(expr, avar, ivar)
 
 # Verify that expr has the form
 # avar[[ivar]]
-is_index = function(expr, avar, ivar, subset_fun = "[[")
+isSimpleIndex = function(expr, avar, ivar, subset_fun = "[[")
 {
     if((length(expr) == 3)
         && (expr[[1]] == subset_fun)
@@ -143,7 +148,7 @@ is_index = function(expr, avar, ivar, subset_fun = "[[")
 
 # Verify that expr has the form
 # avar[[ivar]] = ...
-right_kind_of_assign = function(expr, avar, ivar
+isSimpleIndexAssign = function(expr, avar, ivar
     , assign_funs = c("=", "<-"))
 {
     f = as.character(expr[[1]])
@@ -152,5 +157,5 @@ right_kind_of_assign = function(expr, avar, ivar
     }
 
     lhs = expr[[2]]
-    is_index(lhs, avar, ivar)
+    isSimpleIndex(lhs, avar, ivar)
 }
