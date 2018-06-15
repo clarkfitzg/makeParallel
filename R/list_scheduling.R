@@ -21,7 +21,7 @@
 #' Systems".
 #'
 #' @export
-#' @param taskgraph list as returned from \code{\link{task_graph}}
+#' @param taskgraph list as returned from \code{\link{dependGraph}}
 #' @param maxworkers integer maximum number of procs
 #' @param expr_times time in seconds to execute each expression
 #' @param default_expr_time numeric time in seconds to execute a single
@@ -40,7 +40,7 @@ min_start_time = function(taskgraph, maxworkers = 2L
 
     procs = seq(maxworkers)
     nnodes = length(taskgraph$input_code)
-    tg = taskgraph$task_graph
+    tg = taskgraph$dependGraph
 
     if(is.null(expr_times)){
         expr_times = rep(default_expr_time, nnodes)

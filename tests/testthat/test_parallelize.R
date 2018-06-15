@@ -27,9 +27,9 @@ test_that("Components of task parallel inference.", {
 
 test_that("run_and_measure", {
 
-    graph = run_and_measure(task_graph(oldcode))
+    graph = run_and_measure(dependGraph(oldcode))
 
-    expect_equal(graph$task_graph$size[1], as.numeric(object.size("foo1")))
+    expect_equal(graph$dependGraph$size[1], as.numeric(object.size("foo1")))
 
 })
 

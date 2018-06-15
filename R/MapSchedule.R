@@ -173,7 +173,7 @@ empty_eval_frame = function() data.frame(processor = 1L
 
 data_parallel_scheduler = function(TaskGraph, map = equivalent_apply)
 {
-    tg = task_graph(code)
+    tg = dependGraph(code)
     pp_expr = preprocess(tg$input_code)
     pcode = lapply(pp_expr, parallelize_first_apply)
     list(output_code = as.expression(pcode))

@@ -5,14 +5,14 @@
 #' possibly be transferred.
 #'
 #' @export
-#' @param taskgraph as returned by \code{\link{task_graph}}
+#' @param taskgraph as returned by \code{\link{dependGraph}}
 #' @param envir environment to evaluate the code in
 #' @param timer function that returns a timestamp. Milliseconds are a
 #'  sufficient timing resolution, because this is intended to apply to code
 #'  that takes at least several seconds to run completely.
 run_and_measure = function(taskgraph, envir = globalenv(), timer = Sys.time)
 {
-    tg = taskgraph$task_graph
+    tg = taskgraph$dependGraph
     code = taskgraph$input_code
     n = length(code)
     times = numeric(n)
@@ -37,7 +37,7 @@ run_and_measure = function(taskgraph, envir = globalenv(), timer = Sys.time)
             tg[from_rows & tg$value == v, "size"] = size
         }
     }
-    taskgraph$task_graph = tg
+    taskgraph$dependGraph = tg
     taskgraph$expr_times = as.numeric(times)
     taskgraph
 }

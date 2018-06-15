@@ -74,7 +74,6 @@ setMethod("dependGraph", "language", function(code, ...)
 })
 
 
-#' @rdname task_graph
 #' @export
 setMethod("dependGraph", "expression", function(code, ...)
 {
@@ -109,7 +108,6 @@ setMethod("dependGraph", "expression", function(code, ...)
         use_def_chains = lapply(vars, use_def, uses, definitions)
 
         tg = do.call(rbind, use_def_chains)
-        tg[, "size"] = if(nrow(tg) == 0) numeric() else default_size
     }
 
     new("DependGraph", code = expr, graph = tg)
