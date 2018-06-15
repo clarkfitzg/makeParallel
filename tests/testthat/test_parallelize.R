@@ -7,7 +7,7 @@ oldcode = parse(text = "
 ")
 
 
-test_that("Components of task parallel inference.", {
+test_that("Defaults for generics used in parallelize.", {
 
     g = dependGraph(oldcode)
     s = schedule(g)
@@ -17,9 +17,10 @@ test_that("Components of task parallel inference.", {
     expect_s4_class(s, "Schedule")
     expect_s4_class(newcode, "GeneratedCode")
 
-    plot(s)
+    # TODO: test for task parallel
+    #plot(s)
 
-    write(newcode, "ex.R")
+    writeLines(code(newcode), "ex.R")
     expect_true(file.exists("ex.R"))
 
 })

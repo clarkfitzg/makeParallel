@@ -31,8 +31,8 @@ ser_apply_to_parallel = function(expr, map = equivalent_apply)
 
 #' Find and parallelize the first use of an apply function
 parallelize_first_apply = function(expr
-    , ser_funcs = equivalent_apply[, "serial"]
-    , par_funcs = equivalent_apply[, "parallel"]
+    , ser_funcs = equivalent_apply
+    , par_funcs = names(equivalent_apply)
 ){
     finds = sapply(ser_funcs, function(fname){
         find_call(expr, fname)
@@ -145,11 +145,12 @@ parallelize_first_apply = function(expr
 #' eval(p$output_code)
 #' x1
 #' x2
-setMethod("schedule", "DependGraph", function(graph, maxworkers, ...)
+#setMethod("schedule", "DependGraph", function(graph, maxWorkers, epsilonTime, ...)
+setMethod("schedule", "DependGraph", function(graph, ...)
 {
 
-    # TODO: Use maxworkers argument
-    new("MapSchedule", graph = graph, evaluation = empty_eval_frame())
+    # TODO: Use maxworkers argument, actually put evaluation schedule in here.
+    new("MapSchedule", graph = graph, evaluation = data.frame())
 })
 
 
@@ -157,6 +158,7 @@ setMethod("generate", "MapSchedule", function(sched, ...)
 {
     pp_expr = preprocess(sched@graph@code)
     pcode = lapply(pp_expr, parallelize_first_apply)
+    pcode = as.expression(pcode)
     new("GeneratedCode", schedule = sched, code = pcode)
 })
 
@@ -164,17 +166,8 @@ setMethod("generate", "MapSchedule", function(sched, ...)
 # We could put some OO structure on these, but I'll wait until I have a
 # compelling reason. For this one I also need to add a column saying if the
 # expression can be parallelized.
-empty_eval_frame = function() data.frame(processor = 1L
+firstEvaluation = function(endTime) data.frame(processor = 1L
     , start_time = 0
-    , end_time = expr_times[1]
+    , end_time = endTime
     , node = 1L
     )
-
-
-data_parallel_scheduler = function(TaskGraph, map = equivalent_apply)
-{
-    tg = dependGraph(code)
-    pp_expr = preprocess(tg$input_code)
-    pcode = lapply(pp_expr, parallelize_first_apply)
-    list(output_code = as.expression(pcode))
-}

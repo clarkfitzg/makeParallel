@@ -20,13 +20,15 @@ setGeneric("dependGraph", function(code, ...)
 #' @param default_size numeric default size of the variables in bytes
 # default_size = object.size(1L), 
 
-setGeneric("schedule", function(graph, maxworkers = 2L, ...)
+#' @export
+setGeneric("schedule", function(graph, maxWorkers = 2L, epsilonTime = 1e-6, ...)
            standardGeneric("schedule"))
 
 
+#' @export
 setGeneric("generate", function(sched, ...)
            standardGeneric("generate"))
 
 
-# Do I need this if I want to define a method for write()?
-#setGeneric("write")
+#' @export
+setGeneric("code", function(x, ...) x@code)

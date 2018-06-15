@@ -62,3 +62,8 @@ finish_code_pipeline = function(generated, gen_script_prefix, output_file)
     }
 }
 
+
+#setMethod("writeCode", c("GeneratedCode", "character"), function(x, file, ...)
+#{
+#    writeLines(x@code, file)
+#})
