@@ -145,6 +145,32 @@ parallelize_first_apply = function(expr
 #' eval(p$output_code)
 #' x1
 #' x2
+setMethod("schedule", "DependGraph", function(graph, maxworkers, ...)
+{
+
+    # TODO: Use maxworkers argument
+    new("MapSchedule", graph = graph, evaluation = empty_eval_frame())
+})
+
+
+setMethod("generate", "MapSchedule", function(sched, ...)
+{
+    pp_expr = preprocess(sched@graph@code)
+    pcode = lapply(pp_expr, parallelize_first_apply)
+    new("GeneratedCode", schedule = sched, code = pcode)
+})
+
+
+# We could put some OO structure on these, but I'll wait until I have a
+# compelling reason. For this one I also need to add a column saying if the
+# expression can be parallelized.
+empty_eval_frame = function() data.frame(processor = 1L
+    , start_time = 0
+    , end_time = expr_times[1]
+    , node = 1L
+    )
+
+
 data_parallel_scheduler = function(TaskGraph, map = equivalent_apply)
 {
     tg = task_graph(code)

@@ -1,4 +1,4 @@
-#' Create Code That Uses Task Parallelism
+#' Create Parallel Code From Serial
 #'
 #' This function is experimental and unstable. If you're trying to actually
 #' speed up your code through parallelism then consider
@@ -10,7 +10,7 @@
 #'
 #' @export
 #' @param code file name, expression from \code{\link[base]{parse}}
-#' @param dependGraph object of class \code{\link{DependGraph}}
+#' @param graph object of class \code{\link{DependGraph}}
 #' @param runFirst logical, evaluate the code once to gather timings?
 #' @param scheduler, function to produce a \code{\link{Schedule}}
 #'  from a \code{\link{DependGraph}}.
@@ -29,11 +29,11 @@
 #' pcode = task_parallel(parse(text = "x = 1:100
 #' y = rep(1, 100)
 #' z = x + y"))
-autoparallel = function(code
-    , dependGraph = DependGraph(code)
+parallelize = function(code
+    , graph = DependGraph(code)
     , runFirst = FALSE
-    , scheduler = MapSchedule
-    , code_generator = NULL
+    , scheduler = schedule
+    , codeGenerator = generate
     , ...
 #    , code_generator_args = list()
     , gen_script_prefix = "gen_"
@@ -42,9 +42,9 @@ autoparallel = function(code
     )
 {
     if(runFirst)
-        dependGraph = run_and_measure(dependGraph)
-    schedule = scheduler(dependGraph, ...)
-    out = code_generator(schedule)
+        graph = run_and_measure(graph)
+    schedule = scheduler(graph, ...)
+    out = codeGenerator(schedule)
     finish_code_pipeline(out, gen_script_prefix, output_file)
     out
 }

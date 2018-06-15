@@ -1,6 +1,6 @@
 # DO NOT WRITE MORE HERE. I copied the code over to the CodeAnalysis
-# package, which is where it belongs.
-# Thu Jun 14 18:05:43 PDT 2018
+# package, which is where it belongs. Once CodeAnalysis makes it to CRAN
+# I'll delete this and import CodeAnalysis.
 
 
 #' Transfrom For Loop To Lapply

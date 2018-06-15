@@ -20,11 +20,11 @@ setGeneric("dependGraph", function(code, ...)
 #' @param default_size numeric default size of the variables in bytes
 # default_size = object.size(1L), 
 
-setGeneric("schedule", function(dg, maxworkers = 2L, ...)
+setGeneric("schedule", function(graph, maxworkers = 2L, ...)
            standardGeneric("schedule"))
 
 
-setGeneric("generate", function(sc, ...)
+setGeneric("generate", function(sched, ...)
            standardGeneric("generate"))
 
 
