@@ -20,7 +20,7 @@
 #'  or FALSE to not write anything. If missing and code is a file then use
 #'  \code{gen_script_prefix} to make a new name and write a script if
 #'  code was a file name.
-#' @param overwrite logical write over existing out
+#' @param overWrite logical write over existing out
 #' @return list of output from each step
 #' @examples
 #' \dontrun{
@@ -38,7 +38,7 @@ parallelize = function(code
 #    , code_generator_args = list()
     , gen_script_prefix = "gen_"
     , output_file
-    , overwrite = FALSE
+    , overWrite = FALSE
     )
 {
     if(runFirst)

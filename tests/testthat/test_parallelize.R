@@ -45,31 +45,33 @@ test_that("Multiple assignment in single expression", {
         f(x, y, z, a, b, c)
     ")
 
-    out = task_parallel(code)
+    out = parallelize(code, scheduler = taskSchedule)
 
     # The first two lines will be assigned to different processors, so
     # three transfers should happen regardless of which processor evaluates
     # the last line.
-    expect_equal(3, nrow(out$schedule$transfer))
+    trans = schedule(out)@transfer
+    expect_equal(3, nrow(trans))
 
 })
 
 
 test_that("whole workflow on files", {
 
-    task_parallel("example.R")
+    parallelize("example.R", scheduler = taskSchedule)
     expect_true(file.exists("gen_example.R"))
 
-    expect_error(task_parallel("example.R"), "exists")
+    expect_error(parallelize("example.R"), "exists")
 
-    task_parallel("example.R", overwrite = TRUE)
+    parallelize("example.R", overWrite = TRUE)
     unlink("gen_example.R")
 
-    task_parallel("example.R", output_file = "ex.R")
-    expect_true(file.exists("ex.R"))
-    unlink("ex.R")
+    fname = "some_file_created_in_test.R"
+    parallelize("example.R", scheduler = taskSchedule, output_file = fname)
+    expect_true(file.exists(fname))
+    unlink(fname)
 
-    task_parallel("example.R", gen_script_prefix = "GEN")
+    parallelize("example.R", scheduler = taskSchedule, prefix = "GEN")
     expect_true(file.exists("GENexample.R"))
     unlink("GENexample.R")
 
