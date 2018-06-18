@@ -149,7 +149,11 @@ parallelize_first_apply = function(expr
 setMethod("schedule", "DependGraph", function(graph, ...)
 {
 
-    # TODO: Use maxworkers argument, actually put evaluation schedule in here.
+    # TODO: 
+    # - Use maxworkers argument
+    # - actually put evaluation schedule in here.
+    # - Allow users to choose fork or SNOW clusters, and default to
+    #   whatever their current system is.
     new("MapSchedule", graph = graph, evaluation = data.frame())
 })
 

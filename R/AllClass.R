@@ -48,8 +48,12 @@ Schedule = setClass("Schedule",
 SerialSchedule = setClass("SerialSchedule", contains = "Schedule")
 
 TaskSchedule = setClass("TaskSchedule",
-    slots = c(transfer = "data.frame"),
-    contains = "Schedule")
+    slots = c(transfer = "data.frame"
+              , maxWorker = "integer"
+              , exprTime = "numeric"
+              , overhead = "numeric"
+              , bandwidth = "numeric"
+    ), contains = "Schedule")
 
 MapSchedule = setClass("MapSchedule", contains = "Schedule")
 

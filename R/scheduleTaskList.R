@@ -21,36 +21,36 @@
 #' Systems".
 #'
 #' @export
-#' @param taskgraph list as returned from \code{\link{dependGraph}}
-#' @param maxworkers integer maximum number of procs
-#' @param expr_times time in seconds to execute each expression
-#' @param default_expr_time numeric time in seconds to execute a single
-#'  expression. This will only be used if \code{expr_times} is NULL.
+#' @param graph object of class \code{DependGraph} as returned from \code{\link{dependGraph}}
+#' @param maxWorkers integer maximum number of procs
+#' @param exprTimes time in seconds to execute each expression
+#' @param exprTimeDefault numeric time in seconds to execute a single
+#'  expression. This will only be used if \code{exprTimes} is NULL.
 #' @param overhead numeric seconds to send any object
 #' @param bandwidth numeric speed that the network can transfer an object
 #'  between processors in bytes per second. We don't take network
 #'  contention into account. This will have to be extended to account for
 #'  multiple machines.
-#' @return schedule
-min_start_time = function(taskgraph, maxworkers = 2L
-    , expr_times = taskgraph$expr_times
-    , default_expr_time = 10e-6, overhead = 8e-6
+#' @return schedule object of class \code{TaskSchedule}
+scheduleTaskList = function(graph, maxWorkers = 2L
+    , exprTimes = NULL
+    , exprTimeDefault = 10e-6, overhead = 8e-6
     , bandwidth = 1.5e9
 ){
 
-    procs = seq(maxworkers)
-    nnodes = length(taskgraph$input_code)
-    tg = taskgraph$dependGraph
+    procs = seq(maxWorkers)
+    nnodes = length(graph$input_code)
+    tg = graph$dependGraph
 
-    if(is.null(expr_times)){
-        expr_times = rep(default_expr_time, nnodes)
+    if(is.null(exprTimes)){
+        exprTimes = rep(exprTimeDefault, nnodes)
     }
 
     # Initialize by scheduling the first expression on the first worker.
     schedule = list(
         eval = data.frame(processor = 1L
             , start_time = 0
-            , end_time = expr_times[1]
+            , end_time = exprTimes[1]
             , node = 1L
             ),
         transfer = data.frame(start_time_send = numeric()
@@ -62,7 +62,6 @@ min_start_time = function(taskgraph, maxworkers = 2L
             , varname = character()
             , stringsAsFactors = FALSE
         ))
-    class(schedule) = c("schedule", class(schedule))
 
     # It would be easier if we know every variable that every worker has
     # after every expression and transfer. Then we could see what they
@@ -72,7 +71,7 @@ min_start_time = function(taskgraph, maxworkers = 2L
 
     for(node in seq(2, nnodes)){
         allprocs = lapply(procs, data_ready_time
-                , node = node, taskgraph = tg, schedule = schedule
+                , node = node, graph = tg, schedule = schedule
                 , overhead = overhead, bandwidth = bandwidth
                 )
 
@@ -86,12 +85,18 @@ min_start_time = function(taskgraph, maxworkers = 2L
 
         schedule = schedule_node(earliest_proc
                 , node = node, schedule = schedule
-                , node_time = expr_times[node]
+                , node_time = exprTimes[node]
                 )
     }
 
-    c(taskgraph, list(schedule = schedule, maxworkers = maxworkers, expr_times = expr_times
-                     , overhead = overhead, bandwidth = bandwidth))
+    new("TaskSchedule", graph = graph
+        , evaluation = schedule$eval
+        , transfer = schedule$transfer
+        , maxWorkers = maxWorkers
+        , exprTimes = exprTimes
+        , overhead = overhead
+        , bandwidth = bandwidth
+        )
 }
 
 
@@ -103,10 +108,10 @@ which_processor = function(node, schedule)
 }
 
 
-data_ready_time = function(proc, node, taskgraph, schedule, overhead, bandwidth)
+data_ready_time = function(proc, node, graph, schedule, overhead, bandwidth)
 {
     # Transfer from predecessors to current node
-    preds = predecessors(node, taskgraph)
+    preds = predecessors(node, graph)
 
     # Not sure we need this
     # No predecessors
@@ -124,7 +129,7 @@ data_ready_time = function(proc, node, taskgraph, schedule, overhead, bandwidth)
     # Update the schedule
     for(p in preds){
         schedule = add_send_receive(proc, node_from = p, node_to = node
-                , taskgraph = taskgraph, schedule = schedule
+                , graph = graph, schedule = schedule
                 , overhead = overhead, bandwidth = bandwidth
                 )
     }
@@ -159,15 +164,15 @@ proc_finish_time = function(proc, schedule)
 
 
 # The nodes which must be completed before node can be evaluated
-predecessors = function(node, taskgraph)
+predecessors = function(node, graph)
 {
-    unique(taskgraph[taskgraph$to == node, "from"])
+    unique(graph[graph$to == node, "from"])
 }
 
 
 # Account for the constraint from one node to another, and return an
 # updated schedule.
-add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
+add_send_receive = function(processor, node_from, node_to, graph, schedule
         , overhead, bandwidth)
 {
     # TODO: This will probably break if we evaluate the same node multiple
@@ -184,7 +189,7 @@ add_send_receive = function(processor, node_from, node_to, taskgraph, schedule
 
     # One expression can define multiple variables simultaneously, ie. 
     # a = b = 5
-    tg_from_to = taskgraph[(taskgraph$from == node_from) & (taskgraph$to == node_to), ]
+    tg_from_to = graph[(graph$from == node_from) & (graph$to == node_to), ]
     for(i in seq(nrow(tg_from_to))){
         schedule = add_single_send_receive(tg_from_to[i, ], schedule
             , proc_send, proc_receive
