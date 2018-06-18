@@ -23,12 +23,12 @@ test_that("Degenerate cases, 0 or 1 nodes", {
     x = 1
     ")
     g1 = make_graph(numeric(), n = 1)
-    gd1 = dependGraph(s1)
+    gd1 = inferGraph(s1)
 
     s0 = parse(text = "
     ")
     g0 = make_empty_graph()
-    gd0 = dependGraph(s0)
+    gd0 = inferGraph(s0)
     expect_samegraph(g0, gd0)
 
     expect_samegraph(g1, gd1)
@@ -44,7 +44,7 @@ test_that("User defined functions are dependencies", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = dependGraph(s)
+    actual = inferGraph(s)
 
     expect_samegraph(desired, actual)
 
@@ -59,7 +59,7 @@ test_that("Self referring node does not appear", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = dependGraph(s)
+    actual = inferGraph(s)
 
     expect_samegraph(desired, actual)
 
@@ -75,7 +75,7 @@ test_that("Assignment order respected", {
     ")
 
     desired = make_graph(c(2, 3))
-    actual = dependGraph(s)
+    actual = inferGraph(s)
 
     skip("Doesn't currently work because the graph doesn't know it has 3
          nodes rather than 2.")
@@ -94,7 +94,7 @@ test_that("Chains not too long", {
     ")
 
     desired = make_graph(c(1, 2, 1, 3))
-    actual = dependGraph(s)
+    actual = inferGraph(s)
 
     expect_samegraph(desired, actual)
 
@@ -110,7 +110,7 @@ test_that("Updates count as dependencies", {
     ")
 
     desired = make_graph(c(1, 2, 2, 3))
-    actual = dependGraph(s)
+    actual = inferGraph(s)
 
     expect_samegraph(desired, actual)
 
@@ -128,7 +128,7 @@ test_that("Can add source node", {
 
     skip("I'm not sure if it's best to add a source and sink into the data
          frame of edges.")
-    actual = dependGraph(s, add_source = TRUE)
+    actual = inferGraph(s, add_source = TRUE)
 
     expect_samegraph(desired, actual)
 
@@ -143,7 +143,7 @@ test_that("$ evaluates LHS", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = dependGraph(s)
+    actual = inferGraph(s)
 
     expect_samegraph(desired, actual)
 
@@ -158,7 +158,7 @@ test_that("Precedence for user defined variables over base", {
     ")
 
     desired = make_graph(c(1, 2))
-    actual = dependGraph(s)
+    actual = inferGraph(s)
 
     expect_samegraph(desired, actual)
 

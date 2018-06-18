@@ -9,7 +9,7 @@ oldcode = parse(text = "
 
 test_that("Defaults for generics used in parallelize.", {
 
-    g = dependGraph(oldcode)
+    g = inferGraph(oldcode)
     s = schedule(g)
     newcode = generate(s)
 
@@ -30,9 +30,9 @@ test_that("Defaults for generics used in parallelize.", {
 
 test_that("run_and_measure", {
 
-    graph = run_and_measure(dependGraph(oldcode))
+    graph = run_and_measure(inferGraph(oldcode))
 
-    expect_equal(graph$dependGraph$size[1], as.numeric(object.size("foo1")))
+    expect_equal(graph$inferGraph$size[1], as.numeric(object.size("foo1")))
 
 })
 

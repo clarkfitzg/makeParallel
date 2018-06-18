@@ -59,7 +59,7 @@ add_source_node = function(g)
 }
 
 
-setMethod("dependGraph", "character", function(code, ...)
+setMethod("inferGraph", "character", function(code, ...)
 {
     #if(length(code) > 1) stop("pass a single R file name or a language object")
     expr = parse(code)
@@ -67,7 +67,7 @@ setMethod("dependGraph", "character", function(code, ...)
 })
 
 
-setMethod("dependGraph", "language", function(code, ...)
+setMethod("inferGraph", "language", function(code, ...)
 {
     expr = as.expression(code)
     callGeneric(expr, ...)
@@ -75,7 +75,7 @@ setMethod("dependGraph", "language", function(code, ...)
 
 
 #' @export
-setMethod("dependGraph", "expression", function(code, ...)
+setMethod("inferGraph", "expression", function(code, ...)
 {
     expr = code
     info = lapply(expr, CodeDepends::getInputs)

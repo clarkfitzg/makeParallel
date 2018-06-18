@@ -30,7 +30,7 @@
 #' y = rep(1, 100)
 #' z = x + y"))
 parallelize = function(code
-    , graph = DependGraph(code)
+    , graph = inferGraph(code)
     , runFirst = FALSE
     , scheduler = schedule
     , codeGenerator = generate
@@ -43,8 +43,8 @@ parallelize = function(code
 {
     if(runFirst)
         graph = run_and_measure(graph)
-    schedule = scheduler(graph, ...)
-    out = codeGenerator(schedule)
+    sc = scheduler(graph, ...)
+    out = codeGenerator(sc)
     finish_code_pipeline(out, gen_script_prefix, output_file)
     out
 }

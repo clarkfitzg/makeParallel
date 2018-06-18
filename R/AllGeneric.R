@@ -1,5 +1,5 @@
 # I'd like to have some way of allowing user defined code preprocessors
-# before we do the dependGraph.
+# before we do the inferGraph.
 
 
 #' Task Dependency Graph
@@ -12,8 +12,8 @@
 #'  to an expression.
 #' @return data frame of edges with attribute information suitable for use
 #'  with \code{\link[igraph]{graph_from_data_frame}}.
-setGeneric("dependGraph", function(code, ...)
-           standardGeneric("dependGraph"))
+setGeneric("inferGraph", function(code, ...)
+           standardGeneric("inferGraph"))
 
 
 # Where to put this parameter?

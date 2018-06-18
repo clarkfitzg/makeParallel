@@ -21,7 +21,7 @@
 #' Systems".
 #'
 #' @export
-#' @param graph object of class \code{DependGraph} as returned from \code{\link{dependGraph}}
+#' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
 #' @param maxWorkers integer maximum number of procs
 #' @param exprTimes time in seconds to execute each expression
 #' @param exprTimeDefault numeric time in seconds to execute a single
@@ -40,7 +40,7 @@ scheduleTaskList = function(graph, maxWorkers = 2L
 
     procs = seq(maxWorkers)
     nnodes = length(graph$input_code)
-    tg = graph$dependGraph
+    tg = graph$inferGraph
 
     if(is.null(exprTimes)){
         exprTimes = rep(exprTimeDefault, nnodes)
