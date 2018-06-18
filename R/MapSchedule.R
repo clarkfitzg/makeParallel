@@ -31,14 +31,19 @@ ser_apply_to_parallel = function(expr, map = equivalent_apply)
 
 #' Find and parallelize the first use of an apply function
 parallelize_first_apply = function(expr
-    , ser_funcs = equivalent_apply
+    , ser_funcs = unname(equivalent_apply)
     , par_funcs = names(equivalent_apply)
 ){
-    finds = sapply(ser_funcs, function(fname){
+    finds = lapply(ser_funcs, function(fname){
         find_call(expr, fname)
     })
 
-    # list with 0 or 1 elements
+    # TODO: Wow, there is a subtle bug here. Current version doesn't necessarily
+    # parallelize the outermost apply. For this I'll need an appropriate
+    # traversal of the AST.
+
+    # There are potentially a bunch of locations, but we want this to be a
+    # list with 0 or 1 elements.
     first = lapply(finds, head, 1)
     first = head(do.call(c, first), 1)
 
@@ -46,10 +51,11 @@ parallelize_first_apply = function(expr
         expr
     } else {
         index = first[[1]]
+        # Build the parallel expression based on the original one
         parexpr = expr
-        pcode = par_funcs[ser_funcs == names(first)]
-        pcode = parse(text = pcode)[[1]]
-        parexpr[[index]] = pcode
+        parallel_apply_fun_char = par_funcs[ser_funcs == names(first)]  # <- TODO: come back and fix this one!
+        parallel_apply_fun = parse(text = parallel_apply_fun_char)[[1]]
+        parexpr[[index]] = parallel_apply_fun
         parexpr
     }
 }
