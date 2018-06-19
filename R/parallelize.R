@@ -15,13 +15,13 @@
 #' @param scheduler, function to produce a \code{\link{Schedule}}
 #'  from a \code{\link{DependGraph}}.
 #' @param ..., additional arguments to scheduler
-#' @param gen_script_prefix character added to front of file name
-#' @param output_file character where to write the generated script,
+#' @param prefix character added to front of file name
+#' @param file character where to write the generated script,
 #'  or FALSE to not write anything. If missing and code is a file then use
 #'  \code{gen_script_prefix} to make a new name and write a script if
 #'  code was a file name.
-#' @param overWrite logical write over existing out
-#' @return list of output from each step
+#' @param overWrite logical write over existing script
+#' @return code object of class \code{\link{GeneratedCode}}
 #' @examples
 #' \dontrun{
 #' task_parallel("my_slow_serial.R")
@@ -36,8 +36,8 @@ parallelize = function(code
     , codeGenerator = generate
     , ...
 #    , code_generator_args = list()
-    , gen_script_prefix = "gen_"
-    , output_file
+    , prefix = "gen_"
+    , file
     , overWrite = FALSE
     )
 {
@@ -45,24 +45,7 @@ parallelize = function(code
         graph = runMeasure(graph)
     sc = scheduler(graph, ...)
     out = codeGenerator(sc)
-    # TODO: Automatically fill in file name.
-    if(!missing(output_file)){
-        writeCode(out, output_file)
-    }
+    writeCode(out, file, overWrite = overWrite, prefix = prefix)
     out
 }
 
-
-# Old function, I'm keeping it around to pull parts out of it as I fix up
-# the above.
-finish_code_pipeline = function(generated, gen_script_prefix, output_file)
-{
-    if(is.null(output_file))
-    if(is.character(code)){
-        # It's a file name
-        gen_file_name = file.path(dirname(code), paste0(gen_script_prefix, basename(code)))
-        writeLines(out$output_code, gen_file_name)
-        message(sprintf("generated parallel code is in %s", gen_file_name))
-        out[["gen_file_name"]] = gen_file_name
-    }
-}

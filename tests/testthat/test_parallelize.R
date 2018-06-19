@@ -59,6 +59,7 @@ test_that("Multiple assignment in single expression", {
 test_that("whole workflow on files", {
 
     parallelize("example.R", scheduler = scheduleTaskList)
+
     expect_true(file.exists("gen_example.R"))
 
     expect_error(parallelize("example.R"), "exists")
