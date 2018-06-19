@@ -16,10 +16,9 @@
 #'  from a \code{\link{DependGraph}}.
 #' @param ..., additional arguments to scheduler
 #' @param prefix character added to front of file name
-#' @param file character where to write the generated script,
-#'  or FALSE to not write anything. If missing and code is a file then use
-#'  \code{gen_script_prefix} to make a new name and write a script if
-#'  code was a file name.
+#' @param file character where to write the generated script. If NULL and
+#'  code is a file then use \code{prefix} to make a new name and write a
+#'  script if code was a file name.
 #' @param overWrite logical write over existing script
 #' @return code object of class \code{\link{GeneratedCode}}
 #' @examples
@@ -37,7 +36,7 @@ parallelize = function(code
     , ...
 #    , code_generator_args = list()
     , prefix = "gen_"
-    , file
+    , file = NULL
     , overWrite = FALSE
     )
 {

@@ -1,5 +1,5 @@
 #' @export
-setMethod("writeCode", c("GeneratedCode", "missing"), 
+setMethod("writeCode", c("GeneratedCode", "NULL"), 
           function(x, file, overWrite = FALSE, prefix = "gen_", ...)
 {
     srcfile = attr(x@schedule@graph@code, "srcfile")
