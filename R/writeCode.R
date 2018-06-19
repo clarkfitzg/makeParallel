@@ -4,7 +4,8 @@ setMethod("writeCode", c("GeneratedCode", "NULL"),
 {
     srcfile = attr(x@schedule@graph@code, "srcfile")
     if(!is.null(srcfile)){
-        file = prefixFileName(srcfile, prefix)
+        file = srcfile$filename
+        file = prefixFileName(file, prefix)
         writeHelper(x, file, overWrite = overWrite)
     }
 })

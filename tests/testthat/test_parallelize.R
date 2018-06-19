@@ -68,7 +68,7 @@ test_that("whole workflow on files", {
     unlink("gen_example.R")
 
     fname = "some_file_created_in_test.R"
-    parallelize("example.R", scheduler = scheduleTaskList, output_file = fname)
+    parallelize("example.R", scheduler = scheduleTaskList, file = fname)
     expect_true(file.exists(fname))
     unlink(fname)
 
