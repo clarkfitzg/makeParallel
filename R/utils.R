@@ -9,6 +9,11 @@ removeDescendants = function(nodes)
     # data structures.
 
     N = length(nodes)
+
+    if(N == 0){
+        return(nodes)
+    }
+
     strings = sapply(nodes, paste0, collapse = ",")
 
     ancestors = rep(TRUE, N)
