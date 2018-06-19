@@ -1,31 +1,32 @@
-# Only keep the ancestor nodes
-# @param nodes list of position vectors in an AST
-# @return nodes with descendants removed
-removeDescendants = function(nodes)
+# Identify those nodes that have ancestors within the set of nodes
+#
+# This algorithm is quadratic in length(nodes). I'll fix it if it
+# becomes a problem. This is another example where using a proper graph
+# data structure might be better.
+#
+# @param locs list of integer vectors corresponding to an AST
+# @return vector of positions 
+hasAncestors = function(locs)
 {
-    # This algorithm is quadratic in length(nodes). I'll fix it if it
-    # becomes a problem. It's also an example of something algorithmic
-    # that's difficult in R, and easy in other languages with richer
-    # data structures.
-
-    N = length(nodes)
+    N = length(locs)
 
     if(N == 0){
-        return(nodes)
+        return(locs)
     }
 
-    strings = sapply(nodes, paste0, collapse = ",")
+    # This is safe because they're integers
+    strings = sapply(locs, paste0, collapse = ",")
 
-    ancestors = rep(TRUE, N)
+    anc = rep(FALSE, N)
     for(i in seq(N)){
         child = strings[i]
         matches = startsWith(child, strings)
         # Always matches itself, so we need more than 1
         if(sum(matches) > 1){
-            ancestors[i] = FALSE
+            anc[i] = TRUE
         }
     }
-    nodes[ancestors]
+    anc
 }
  
 

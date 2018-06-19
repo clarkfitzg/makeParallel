@@ -15,6 +15,18 @@ preprocess = function(code)
 }
 
 
+# Use index position to remove calls that are nested underneath others.
+removeNested = function(locs)
+{
+    # Function calls always end in a 1. Chopping off the 1 and adding zeros
+    # to the front allows us to more easily detect the nested structure.
+    parentloc = function(loc, frontpad = 0) c(frontpad, loc[-length(loc)])
+    locs2 = lapply(locs, parentloc)
+    nested = hasAncestors(locs2)
+    locs[!nested]
+}
+
+
 # Transform Expression To Parallel
 #
 # This transforms a single expression to a parallel version by directly
@@ -31,8 +43,7 @@ replaceApply = function(expr, map = mclapplyNames)
         find_call(expr, fname)
     })
     finds = do.call(c, finds)
-    # Handles nesting
-    finds = removeDescendants(finds)
+    finds = removeNested(finds)
 
     # Build the parallel expression based on the original one. Here we only
     # directly swap functions, so we're not changing the actual structure
@@ -48,6 +59,16 @@ replaceApply = function(expr, map = mclapplyNames)
 
     parexpr
 }
+
+# Try to use codetools to do this by traversing the AST and updating in
+# place. This would be a nice blog post- how to use codetools!
+replaceApply2 = function(expr, map = mclapplyNames)
+{
+
+    walker = codetools::makeCodeWalker()
+
+}
+
 
 
 #' Create Code That Uses Data Parallelism
