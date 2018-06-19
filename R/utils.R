@@ -1,4 +1,28 @@
+# Only keep the ancestor nodes
+# @param nodes list of position vectors in an AST
+# @return nodes with descendants removed
+removeDescendants = function(nodes)
+{
+    # This algorithm is quadratic in length(nodes). I'll fix it if it
+    # becomes a problem. It's also an example of something algorithmic
+    # that's difficult in R, and easy in other languages with richer
+    # data structures.
 
+    N = length(nodes)
+    strings = sapply(nodes, paste0, collapse = ",")
+    ancestors = rep(TRUE, N)
+    for(i in strings){
+        # TODO: Vectorize with startsWith
+        child = strings[i]
+        for(anc in strings){
+            if(startsWith(child, anc) && child != anc){
+                ancestors[child] = FALSE
+            }
+        }
+    }
+    nodes[ancestors]
+}
+ 
 
 # Test Expressions For Equality
 same_expr = function(e1, e2)

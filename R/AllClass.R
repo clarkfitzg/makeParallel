@@ -10,6 +10,10 @@
 #   3. How can I easily call say the `plot()` method for the first class,
 #       if all the others have plot methods? I would actually like to do
 #       this.
+#
+# If the nesting bothers me, I could define methods for the `[` so it goes
+# away.
+
 
 # Not necessary, comes from methods package?
 # setOldClass("expression")

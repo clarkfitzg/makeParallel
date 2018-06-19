@@ -1,5 +1,17 @@
 library(autoparallel)
 
+
+test_that("descendant removal", {
+
+    nodes = list(c(1, 2), c(1, 2, 4))
+
+    actual = removeDescendants(nodes)
+
+    expect_equal(list(c(1, 2)), actual)
+
+})
+
+
 test_that("replacing functions", {
 
     expr = parse(text = "

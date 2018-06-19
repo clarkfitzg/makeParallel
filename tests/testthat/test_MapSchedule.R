@@ -19,7 +19,15 @@ test_that("Basic transformation to parallel", {
     generated_code_matches(f(a, b)
         , f(a, b))
 
+})
+
+
+test_that("Nested parallelism", {
+
     generated_code_matches(lapply(lapply(x, f), g)
         , parallel::mclapply(lapply(x, f), g))
+
+    generated_code_matches(foo(lapply(x, f), lapply(y, f))
+        , foo(parallel::mclapply(x, f), parallel::mclapply(y, f)))
 
 })
