@@ -1,7 +1,14 @@
-- Rename package to parallelize. Main end user function is
+To discuss for code review:
+
+- Could rename package to parallelize. Then main end user function is
   parallelize::parallelize(). So users only have to remember one thing.
   Otherwise it could be autoParallel::autoParallel, but I don't want a
   package name in CamelCase.
+- Should I use an `eval()` generic? I need something to do the "run and
+  measure".
+
+TODO list:
+
 - Return expression objects rather than text
 
 

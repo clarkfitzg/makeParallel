@@ -1,8 +1,8 @@
 # Identify those nodes that have ancestors within the set of nodes
 #
 # This algorithm is quadratic in length(nodes). I'll fix it if it
-# becomes a problem. This is another example where using a proper graph
-# data structure might be better.
+# becomes a problem. This is another example where using a proper tree
+# data structure might provide better ways to do this.
 #
 # @param locs list of integer vectors corresponding to an AST
 # @return vector of positions 

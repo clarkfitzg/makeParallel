@@ -28,11 +28,11 @@ test_that("Defaults for generics used in parallelize.", {
 })
 
 
-test_that("run_and_measure", {
+test_that("runMeasure", {
 
-    graph = run_and_measure(inferGraph(oldcode))
+    g = runMeasure(oldcode)
 
-    expect_equal(graph$inferGraph$size[1], as.numeric(object.size("foo1")))
+    expect_s4_class(g, "MeasuredDependGraph")
 
 })
 

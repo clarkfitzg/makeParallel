@@ -39,8 +39,8 @@ scheduleTaskList = function(graph, maxWorkers = 2L
 ){
 
     procs = seq(maxWorkers)
-    nnodes = length(graph$input_code)
-    tg = graph$inferGraph
+    nnodes = length(graph@code)
+    tg = graph@graph
 
     if(is.null(exprTimes)){
         exprTimes = rep(exprTimeDefault, nnodes)

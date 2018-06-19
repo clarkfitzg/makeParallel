@@ -5,9 +5,9 @@ test_that("descendant removal", {
 
     nodes = list(c(1, 2), c(1, 2, 4))
 
-    actual = removeDescendants(nodes)
+    actual = hasAncestors(nodes)
 
-    expect_equal(list(c(1, 2)), actual)
+    expect_equal(c(FALSE, TRUE), actual)
 
 })
 

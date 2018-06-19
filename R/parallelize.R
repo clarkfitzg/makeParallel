@@ -11,7 +11,7 @@
 #' @export
 #' @param code file name, expression from \code{\link[base]{parse}}
 #' @param graph object of class \code{\link{DependGraph}}
-#' @param runFirst logical, evaluate the code once to gather timings?
+#' @param run logical, evaluate the code once to gather timings?
 #' @param scheduler, function to produce a \code{\link{Schedule}}
 #'  from a \code{\link{DependGraph}}.
 #' @param ..., additional arguments to scheduler
@@ -31,7 +31,7 @@
 #' z = x + y"))
 parallelize = function(code
     , graph = inferGraph(code)
-    , runFirst = FALSE
+    , run = FALSE
     , scheduler = schedule
     , codeGenerator = generate
     , ...
@@ -41,8 +41,8 @@ parallelize = function(code
     , overWrite = FALSE
     )
 {
-    if(runFirst)
-        graph = run_and_measure(graph)
+    if(run)
+        graph = runMeasure(graph)
     sc = scheduler(graph, ...)
     out = codeGenerator(sc)
     # TODO: Automatically fill in file name.
