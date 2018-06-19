@@ -17,40 +17,50 @@
 #' This is a greedy algorithm that assigns each expression to the earliest
 #' possible processor.
 #'
+#' I plan to keep this function basically as is so that I can compare it as
+#' a baseline to others.
+#'
 #' See Algorithm 10 in Sinnen's book "Task Scheduling for Parallel
 #' Systems".
 #'
 #' @export
 #' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
-#' @param maxWorkers integer maximum number of procs
-#' @param exprTimes time in seconds to execute each expression
+#' @param maxWorker integer maximum number of procs
+#' @param exprTime time in seconds to execute each expression
 #' @param exprTimeDefault numeric time in seconds to execute a single
-#'  expression. This will only be used if \code{exprTimes} is NULL.
+#'  expression. This will only be used if \code{exprTime} is NULL.
 #' @param overhead numeric seconds to send any object
 #' @param bandwidth numeric speed that the network can transfer an object
 #'  between processors in bytes per second. We don't take network
 #'  contention into account. This will have to be extended to account for
 #'  multiple machines.
 #' @return schedule object of class \code{TaskSchedule}
-scheduleTaskList = function(graph, maxWorkers = 2L
-    , exprTimes = NULL
-    , exprTimeDefault = 10e-6, overhead = 8e-6
+scheduleTaskList = function(graph, maxWorker = 2L
+    , exprTime = NULL
+    , exprTimeDefault = 10e-6
+    , sizeDefault = object.size(1L)
+    , overhead = 8e-6
     , bandwidth = 1.5e9
 ){
 
-    procs = seq(maxWorkers)
+    procs = seq(maxWorker)
     nnodes = length(graph@code)
     tg = graph@graph
 
-    if(is.null(exprTimes)){
-        exprTimes = rep(exprTimeDefault, nnodes)
+    # TODO:*  use expression times from MeasuredDependGraph
+    if(is.null(exprTime)){
+        exprTime = rep(exprTimeDefault, nnodes)
+    }
+
+    if(!("size" %in% colnames(tg))){
+        tg[, "size"] = sizeDefault
     }
 
     # Initialize by scheduling the first expression on the first worker.
     schedule = list(
         eval = data.frame(processor = 1L
             , start_time = 0
-            , end_time = exprTimes[1]
+            , end_time = exprTime[1]
             , node = 1L
             ),
         transfer = data.frame(start_time_send = numeric()
@@ -85,15 +95,15 @@ scheduleTaskList = function(graph, maxWorkers = 2L
 
         schedule = schedule_node(earliest_proc
                 , node = node, schedule = schedule
-                , node_time = exprTimes[node]
+                , node_time = exprTime[node]
                 )
     }
 
     new("TaskSchedule", graph = graph
         , evaluation = schedule$eval
         , transfer = schedule$transfer
-        , maxWorkers = maxWorkers
-        , exprTimes = exprTimes
+        , maxWorker = maxWorker
+        , exprTime = exprTime
         , overhead = overhead
         , bandwidth = bandwidth
         )

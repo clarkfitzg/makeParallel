@@ -9,8 +9,12 @@ To discuss for code review:
 
 TODO list:
 
-- Return expression objects rather than text
+- All items in code marked `TODO:*`
+- Make sure documentation can be accessed.
 
+Done:
+
+- Return expression objects rather than text
 
 Fri Jun  8 12:00:36 PDT 2018
 

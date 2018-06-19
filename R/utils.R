@@ -224,10 +224,10 @@ eval_literal = function(code)
 
 
 # How long does it take for the schedule to complete?
-time_finish = function(schedule)
+timeFinish = function(schedule)
 {
-    # There shouldn't by any transfers after the final evaluation.
-    max(schedule$eval$end_time)
+    # There shouldn't be any transfers after the final evaluation.
+    max(schedule@evaluation$end_time)
 }
 
 

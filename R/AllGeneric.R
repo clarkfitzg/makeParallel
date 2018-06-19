@@ -26,7 +26,7 @@ setGeneric("schedule", function(graph, maxWorkers = 2L, epsilonTime = 1e-6, ...)
 
 
 #' @export
-setGeneric("generate", function(sched, ...)
+setGeneric("generate", function(schedule, ...)
            standardGeneric("generate"))
 
 

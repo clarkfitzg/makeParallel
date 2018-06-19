@@ -50,16 +50,14 @@ gen_receive_code = function(row)
 
 
 # Code for a single worker
-#
-# It's a little strange to go from parsed expressions back to text. I may
-# rethink this.
 gen_snow_worker = function(processor, schedule)
 {
-    work = schedule$schedule$eval
+    work = schedule@evaluation
     work = work[work$processor == processor, ]
-    work$code = as.character(schedule$input_code[work$node])
+    # The original code
+    work$code = as.character(schedule@graph@code[work$node])
 
-    trans = schedule$schedule$transfer
+    trans = schedule@transfer
 
     send = trans[trans$proc_send == processor, ]
     send$code = as.character(by0(send, seq(nrow(send)), gen_send_code))
@@ -98,45 +96,46 @@ gen_snow_worker = function(processor, schedule)
 #'  many seconds.
 #' @return code list of scripts
 #' @export
-gen_socket_code = function(schedule, port_start = 33000L, min_timeout = 600)
+setMethod("generate", "TaskSchedule", function(schedule, port_start = 33000L, min_timeout = 600)
 {
-    if(nrow(schedule$schedule$transfer) == 0){
+    if(nrow(schedule@transfer) == 0){
         gen_socket_code_no_comm(schedule)
     } else {
         gen_socket_code_comm(schedule, port_start, min_timeout)
     }
-}
+})
 
 
 gen_socket_code_no_comm = function(schedule)
 {
-    workers = unique(schedule$schedule$eval$processor)
+    workers = unique(schedule@evaluation$processor)
     
     worker_code = sapply(workers, gen_snow_worker, schedule = schedule)
 
     # TODO: string escaping, this assumes only double quotes are used
     worker_code = paste(worker_code, collapse = "', \n\n############################################################\n\n'")
 
-    schedule$output_code = whisker::whisker.render(snow_notransfer_template, list(
+    output_code = whisker::whisker.render(snow_notransfer_template, list(
         gen_time = Sys.time()
         , version = sessionInfo()$otherPkgs$autoparallel$Version
-        , nworkers = length(unique(schedule$schedule$eval$processor))
+        , nworkers = length(unique(schedule@evaluation$processor))
         , worker_code = paste0("c(\n'", worker_code, "'\n)")
     ))
-    schedule
+
+    new("GeneratedCode", schedule = schedule, code = parse(text = output_code))
 }
 
 
 gen_socket_code_comm = function(schedule, port_start, min_timeout)
 {
-    workers = unique(schedule$schedule$eval$processor)
+    workers = unique(schedule@evaluation$processor)
     
     worker_code = sapply(workers, gen_snow_worker, schedule = schedule)
 
     # TODO: string escaping, this assumes only double quotes are used
     worker_code = paste(worker_code, collapse = "', \n\n############################################################\n\n'")
 
-    socket_map = schedule$schedule$transfer[, c("proc_send", "proc_receive")]
+    socket_map = schedule@transfer[, c("proc_send", "proc_receive")]
     socket_map$server = apply(socket_map, 1, min)
     socket_map$client = apply(socket_map, 1, max)
     socket_map = unique(socket_map[, c("server", "client")])
@@ -146,13 +145,14 @@ gen_socket_code_comm = function(schedule, port_start, min_timeout)
     con = textConnection("socket_map_csv_tmp", open = "w", local = TRUE)
     write.csv(socket_map, con, row.names = FALSE)
 
-    schedule$output_code = whisker::whisker.render(snow_manager_template, list(
+    output_code = whisker::whisker.render(snow_manager_template, list(
         gen_time = Sys.time()
         , version = sessionInfo()$otherPkgs$autoparallel$Version
-        , nworkers = length(unique(schedule$schedule$eval$processor))
-        , timeout = max(min_timeout, time_finish(schedule$schedule))
+        , nworkers = length(unique(schedule@evaluation$processor))
+        , timeout = max(min_timeout, timeFinish(schedule))
         , socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")
         , worker_code = paste0("c(\n'", worker_code, "'\n)")
     ))
-    schedule
+
+    new("GeneratedCode", schedule = schedule, code = parse(text = output_code))
 }

@@ -174,12 +174,12 @@ setMethod("schedule", "DependGraph", function(graph, ...)
 })
 
 
-setMethod("generate", "MapSchedule", function(sched, ...)
+setMethod("generate", "MapSchedule", function(schedule, ...)
 {
-    pp_expr = preprocess(sched@graph@code)
+    pp_expr = preprocess(schedule@graph@code)
     pcode = lapply(pp_expr, replaceApply)
     pcode = as.expression(pcode)
-    new("GeneratedCode", schedule = sched, code = pcode)
+    new("GeneratedCode", schedule = schedule, code = pcode)
 })
 
 
