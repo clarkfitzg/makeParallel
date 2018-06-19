@@ -1,5 +1,5 @@
-equivalent_apply = c("mapply", "lapply", "Map")
-names(equivalent_apply) = paste0("parallel::mc", equivalent_apply)
+mclapplyNames = c("mapply", "lapply", "Map")
+names(mclapplyNames) = paste0("parallel::mc", mclapplyNames)
 
 
 # Apply preprocessing steps to code
@@ -21,43 +21,32 @@ preprocess = function(code)
 # substituting the variable names. It also prevents nested parallelism.
 #
 # @param expr language object
+# @param map named character vector where values are serial apply
+#  functions and the corresponding names are the equivalent parallel apply
+#  functions.
 # @value new_expr language object modified to parallel
-ser_apply_to_parallel = function(expr, map = equivalent_apply)
+replaceApply = function(expr, map = mclapplyNames)
 {
-    # An alternative implementation could mutate the AST in place during a
-    # traversal
-}
-
-
-#' Find and parallelize the first use of an apply function
-parallelize_first_apply = function(expr
-    , ser_funcs = unname(equivalent_apply)
-    , par_funcs = names(equivalent_apply)
-){
-    finds = lapply(ser_funcs, function(fname){
+    finds = lapply(map, function(fname){
         find_call(expr, fname)
     })
+    finds = do.call(c, finds)
+    # Handles nesting
+    finds = removeDescendants(finds)
 
-    # TODO: Wow, there is a subtle bug here. Current version doesn't necessarily
-    # parallelize the outermost apply. For this I'll need an appropriate
-    # traversal of the AST.
-
-    # There are potentially a bunch of locations, but we want this to be a
-    # list with 0 or 1 elements.
-    first = lapply(finds, head, 1)
-    first = head(do.call(c, first), 1)
-
-    if(length(first) == 0){
-        expr
-    } else {
-        index = first[[1]]
-        # Build the parallel expression based on the original one
-        parexpr = expr
-        parallel_apply_fun_char = par_funcs[ser_funcs == names(first)]  # <- TODO: come back and fix this one!
-        parallel_apply_fun = parse(text = parallel_apply_fun_char)[[1]]
-        parexpr[[index]] = parallel_apply_fun
-        parexpr
+    # Build the parallel expression based on the original one. Here we only
+    # directly swap functions, so we're not changing the actual structure
+    # of the tree. If we did we would have to be more careful that the
+    # locations don't change as we update.
+    parexpr = expr
+    for(loc in finds){
+        basefunc = as.character(parexpr[[loc]])
+        parfunc = names(map[map == basefunc])
+        parfunc = parse(text = parfunc)[[1]]
+        parexpr[[loc]] = parfunc
     }
+
+    parexpr
 }
 
 
@@ -167,7 +156,7 @@ setMethod("schedule", "DependGraph", function(graph, ...)
 setMethod("generate", "MapSchedule", function(sched, ...)
 {
     pp_expr = preprocess(sched@graph@code)
-    pcode = lapply(pp_expr, parallelize_first_apply)
+    pcode = lapply(pp_expr, replaceApply)
     pcode = as.expression(pcode)
     new("GeneratedCode", schedule = sched, code = pcode)
 })
