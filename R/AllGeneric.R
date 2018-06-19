@@ -26,6 +26,13 @@ setGeneric("schedule", function(graph, maxWorkers = 2L, epsilonTime = 1e-6, ...)
 
 
 #' @export
+setMethod("schedule", "GeneratedCode", function(graph, ...)
+{
+    graph@schedule
+})
+
+
+#' @export
 setGeneric("generate", function(schedule, ...)
            standardGeneric("generate"))
 
