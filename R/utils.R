@@ -10,14 +10,14 @@ removeDescendants = function(nodes)
 
     N = length(nodes)
     strings = sapply(nodes, paste0, collapse = ",")
+
     ancestors = rep(TRUE, N)
-    for(i in strings){
-        # TODO: Vectorize with startsWith
+    for(i in seq(N)){
         child = strings[i]
-        for(anc in strings){
-            if(startsWith(child, anc) && child != anc){
-                ancestors[child] = FALSE
-            }
+        matches = startsWith(child, strings)
+        # Always matches itself, so we need more than 1
+        if(sum(matches) > 1){
+            ancestors[i] = FALSE
         }
     }
     nodes[ancestors]
