@@ -45,14 +45,19 @@ parallelize = function(code
         graph = run_and_measure(graph)
     sc = scheduler(graph, ...)
     out = codeGenerator(sc)
-    finish_code_pipeline(out, gen_script_prefix, output_file)
+    # TODO: Automatically fill in file name.
+    if(!missing(output_file)){
+        writeCode(out, output_file)
+    }
     out
 }
 
+
+# Old function, I'm keeping it around to pull parts out of it as I fix up
+# the above.
 finish_code_pipeline = function(generated, gen_script_prefix, output_file)
 {
     if(is.null(output_file))
-        # TODO: Come back to this point
     if(is.character(code)){
         # It's a file name
         gen_file_name = file.path(dirname(code), paste0(gen_script_prefix, basename(code)))
@@ -61,4 +66,3 @@ finish_code_pipeline = function(generated, gen_script_prefix, output_file)
         out[["gen_file_name"]] = gen_file_name
     }
 }
-

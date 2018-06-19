@@ -1,3 +1,8 @@
+- Rename package to parallelize. Main end user function is
+  parallelize::parallelize(). So users only have to remember one thing.
+  Otherwise it could be autoParallel::autoParallel, but I don't want a
+  package name in CamelCase.
+
 
 Fri Jun  8 12:00:36 PDT 2018
 
