@@ -9,11 +9,13 @@ To discuss for code review:
 
 TODO list:
 
+- Import methods
 - All items in code marked `TODO:*`
-- Make sure documentation can be accessed.
+- Make sure documentation can be accessed
 
 Done:
 
+- Read templates when necessary
 - Return expression objects rather than text
 
 Fri Jun  8 12:00:36 PDT 2018
@@ -49,7 +51,6 @@ schedule generator)
 Before release on CRAN:
 
 - OO methods as discussed in code review
-- Read templates when necessary.
 - Simplify `write_hive_scripts()` to do less. The burden should be on the
   users to write the SQL.
 

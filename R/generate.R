@@ -1,17 +1,3 @@
-snow_manager_template = readLines(
-    system.file("templates/snow_manager.R", package = "autoparallel")
-)
-
-
-snow_notransfer_template = readLines(
-    system.file("templates/snow_notransfer.R", package = "autoparallel")
-)
-
-snow_worker_template = readLines(
-    system.file("templates/snow_worker.R", package = "autoparallel")
-)
-
-
 # Code for a single row in a schedule
 row_schedule_code = function(row, expressions)
 {
@@ -76,7 +62,10 @@ gen_snow_worker = function(processor, schedule)
     # function, then we can also check that it respects the task graph.
     allcode = allcode[order(allcode$start_time), ]
 
-    whisker::whisker.render(snow_worker_template,
+    template = readLines(
+        system.file("templates/snow_worker.R", package = "autoparallel"))
+
+    whisker::whisker.render(template,
         list(processor = processor
             , code_body = paste(allcode$code, collapse = "\n")
     ))
@@ -115,7 +104,10 @@ gen_socket_code_no_comm = function(schedule)
     # TODO: string escaping, this assumes only double quotes are used
     worker_code = paste(worker_code, collapse = "', \n\n############################################################\n\n'")
 
-    output_code = whisker::whisker.render(snow_notransfer_template, list(
+    template = readLines(
+        system.file("templates/snow_notransfer.R", package = "autoparallel"))
+
+    output_code = whisker::whisker.render(template, list(
         gen_time = Sys.time()
         , version = sessionInfo()$otherPkgs$autoparallel$Version
         , nworkers = length(unique(schedule@evaluation$processor))
@@ -145,7 +137,10 @@ gen_socket_code_comm = function(schedule, port_start, min_timeout)
     con = textConnection("socket_map_csv_tmp", open = "w", local = TRUE)
     write.csv(socket_map, con, row.names = FALSE)
 
-    output_code = whisker::whisker.render(snow_manager_template, list(
+    template = readLines(
+        system.file("templates/snow_manager.R", package = "autoparallel"))
+
+    output_code = whisker::whisker.render(template, list(
         gen_time = Sys.time()
         , version = sessionInfo()$otherPkgs$autoparallel$Version
         , nworkers = length(unique(schedule@evaluation$processor))
