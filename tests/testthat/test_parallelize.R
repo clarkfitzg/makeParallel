@@ -17,9 +17,6 @@ test_that("Defaults for generics used in parallelize.", {
     expect_s4_class(s, "Schedule")
     expect_s4_class(newcode, "GeneratedCode")
 
-    # TODO: test for task parallel
-    #plot(s)
-
     writeCode(newcode, "ex.R")
     expect_true(file.exists("ex.R"))
 
@@ -65,6 +62,10 @@ test_that("whole workflow on files", {
     out = parallelize(exfile, scheduler = scheduleTaskList)
 
     expect_s4_class(out, "GeneratedCode")
+
+    # TODO: test for task parallel
+    plot(out)
+    plot(schedule(out))
 
     expect_true(file.exists(genfile))
 
