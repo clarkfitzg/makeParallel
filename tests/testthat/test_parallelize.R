@@ -58,17 +58,34 @@ test_that("Multiple assignment in single expression", {
 
 test_that("whole workflow on files", {
 
-    parallelize("example.R", scheduler = scheduleTaskList)
+    exfile = "example.R"
+    genfile = "gen_example.R"
+    try(unlink(genfile))
 
-    expect_true(file.exists("gen_example.R"))
+    out = parallelize(exfile, scheduler = scheduleTaskList)
 
-    expect_error(parallelize("example.R"), "exists")
+    expect_s4_class(out, "GeneratedCode")
 
-    parallelize("example.R", overWrite = TRUE)
-    unlink("gen_example.R")
+    # Test below passes if I do this.
+    #writeLines("hey", "gen_example.R")
+
+    # Works if I pass an explicit file name
+    #parallelize("example.R", scheduler = scheduleTaskList, file = "gen_example.R")
+
+    # Test also passes if I run it interactively.
+
+    # So it's like something with how I'm accessing the srcref for the
+    # parsed file.
+
+    expect_true(file.exists(genfile))
+
+    expect_error(parallelize(exfile, "exists")
+
+    parallelize(exfile, overWrite = TRUE)
+    unlink(genfile)
 
     fname = "some_file_created_in_test.R"
-    parallelize("example.R", scheduler = scheduleTaskList, file = fname)
+    parallelize(exfile, scheduler = scheduleTaskList, file = fname)
     expect_true(file.exists(fname))
     unlink(fname)
 
