@@ -1,3 +1,7 @@
+#' @import methods
+NULL
+
+
 # I'd like to have some way of allowing user defined code preprocessors
 # before we do the inferGraph.
 

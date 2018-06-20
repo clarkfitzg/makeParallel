@@ -9,7 +9,7 @@ To discuss for code review:
 
 TODO list:
 
-- Import methods
+- Import methods for plot
 - All items in code marked `TODO:*`
 - Make sure documentation can be accessed
 

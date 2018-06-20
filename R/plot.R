@@ -52,12 +52,12 @@ plot_one_transfer = function(row, blockwidth, rect_aes, send_color, receive_colo
 #' @export
 #' @param rect_aes list of additional arguments for \code{rect}.
 #' @param ... additional arguments to \code{plot}
-plot.schedule = function(x, blockwidth = 0.25, main = "schedule plot"
+setMethod(plot, "TaskSchedule", function(x, blockwidth = 0.25, main = "schedule plot"
     , eval_color = "gray", send_color = "orchid", receive_color = "slateblue"
     , rect_aes = list(density = NA, border = "black", lwd = 2)
     , ...)
 {
-    run = x$eval
+    run = x@evaluation
 
     xlim = c(min(run$start_time), max(run$end_time))
     ylim = c(min(run$processor) - 1, max(run$processor) + 1)
@@ -77,4 +77,4 @@ plot.schedule = function(x, blockwidth = 0.25, main = "schedule plot"
         )
 
     NULL
-}
+})

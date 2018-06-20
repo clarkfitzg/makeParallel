@@ -64,7 +64,6 @@ test_that("whole workflow on files", {
     expect_s4_class(out, "GeneratedCode")
 
     # TODO: test for task parallel
-    plot(out)
     plot(schedule(out))
 
     expect_true(file.exists(genfile))
