@@ -66,20 +66,9 @@ test_that("whole workflow on files", {
 
     expect_s4_class(out, "GeneratedCode")
 
-    # Test below passes if I do this.
-    #writeLines("hey", "gen_example.R")
-
-    # Works if I pass an explicit file name
-    #parallelize("example.R", scheduler = scheduleTaskList, file = "gen_example.R")
-
-    # Test also passes if I run it interactively.
-
-    # So it's like something with how I'm accessing the srcref for the
-    # parsed file.
-
     expect_true(file.exists(genfile))
 
-    expect_error(parallelize(exfile, "exists")
+    expect_error(parallelize(exfile), "exists")
 
     parallelize(exfile, overWrite = TRUE)
     unlink(genfile)
@@ -94,3 +83,4 @@ test_that("whole workflow on files", {
     unlink("GENexample.R")
 
 })
+

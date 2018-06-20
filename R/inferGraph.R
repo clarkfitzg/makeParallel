@@ -62,7 +62,7 @@ add_source_node = function(g)
 setMethod("inferGraph", "character", function(code, ...)
 {
     #if(length(code) > 1) stop("pass a single R file name or a language object")
-    expr = parse(code)
+    expr = parse(code, keep.source = TRUE)
     callGeneric(expr, ...)
 })
 
