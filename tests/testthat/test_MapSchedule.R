@@ -1,6 +1,3 @@
-context("transforms")
-
-
 # Use NSE to make the tests more readable.
 generated_code_matches = function(input, expected)
 {
@@ -27,7 +24,6 @@ test_that("Nested parallelism", {
     generated_code_matches(lapply(lapply(x, f), g)
         , parallel::mclapply(lapply(x, f), g))
 
-    #skip("Will implement this once it becomes necessary.")
     generated_code_matches(foo(lapply(x, f), lapply(y, f))
         , foo(parallel::mclapply(x, f), parallel::mclapply(y, f)))
 

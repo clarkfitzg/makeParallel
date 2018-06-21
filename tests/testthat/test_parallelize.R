@@ -86,4 +86,3 @@ test_that("whole workflow on files", {
     unlink("GENexample.R")
 
 })
-
