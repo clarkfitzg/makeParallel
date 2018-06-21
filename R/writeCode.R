@@ -27,6 +27,7 @@ writeHelper = function(x, file, overWrite)
     content = as.character(x@code)
     writeLines(content, file)
     message(sprintf("generated parallel code is in %s", file))
+    file
 }
 
 

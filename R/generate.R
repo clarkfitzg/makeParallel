@@ -18,12 +18,6 @@ setMethod("file", "GeneratedCode", function(description)
 })
 
 
-GeneratedCode = function(schedule, code)
-{
-    new("GeneratedCode", schedule = schedule, code = code, file = file(schedule))
-}
-
-
 # Code for a single row in a schedule
 row_schedule_code = function(row, expressions)
 {

@@ -44,7 +44,8 @@ parallelize = function(code
         graph = runMeasure(graph)
     sc = scheduler(graph, ...)
     out = codeGenerator(sc)
-    writeCode(out, file, overWrite = overWrite, prefix = prefix)
+    fname = writeCode(out, file, overWrite = overWrite, prefix = prefix)
+    if(is.character(fname))
+        out@outfile = fname
     out
 }
-

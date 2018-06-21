@@ -49,4 +49,14 @@ MapSchedule = setClass("MapSchedule", contains = "Schedule")
 ############################################################
 
 setClass("GeneratedCode",
-    slots = c(schedule = "Schedule", code = "expression", file = "character"))
+    slots = c(schedule = "Schedule"
+              , code = "expression"
+              , outfile = "character"
+))
+
+
+GeneratedCode = function(schedule, code)
+{
+    new("GeneratedCode", schedule = schedule, code = code
+        , outfile = as.character(NA))
+}
