@@ -4,7 +4,7 @@ library(testthat)
 library(autoparallel)
 
 
-expect_generated = function(script, ...)
+expect_generated = function(script, scheduler = scheduleTaskList, plot = FALSE, ...)
 {
     cat(sprintf("Testing %s\n", script))
 
@@ -13,11 +13,13 @@ expect_generated = function(script, ...)
 
     outfile = paste0(basename(script), ".log")
     serfile = paste0("expected_", outfile)
-    p = task_parallel(script, ...)
+    p = parallelize(script, scheduler = scheduler, overWrite = TRUE, ...)
 
-    pdf(paste0(script, ".pdf"))
-    plot(p$schedule)
-    dev.off()
+    if(plot){
+        pdf(paste0(script, ".pdf"))
+        plot(schedule(p))
+        dev.off()
+    }
 
     # Serial
     source(script)
@@ -28,6 +30,7 @@ expect_generated = function(script, ...)
     # Generated scripts have a cluster `cls`. It needs to be cleaned up if
     # something fails midway through.
     on.exit(try(parallel::stopCluster(cls), silent = TRUE))
+    # TODO:*
     source(p$gen_file_name)
     actual = readLines(outfile)
     

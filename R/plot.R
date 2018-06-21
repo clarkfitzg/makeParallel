@@ -1,3 +1,8 @@
+#' @importFrom graphics plot
+NULL
+setGeneric("plot")
+
+
 plot_one_eval_block = function(row, blockwidth, rect_aes)
 {with(row, {
     rect_args = list(xleft = start_time
@@ -69,7 +74,7 @@ setMethod(plot, "TaskSchedule", function(x, blockwidth = 0.25, main = "schedule 
         , rect_aes = rect_aes
         )
 
-    by0(x$transfer, seq(nrow(x$transfer)), plot_one_transfer
+    by0(x@transfer, seq(nrow(x@transfer)), plot_one_transfer
         , blockwidth = blockwidth
         , rect_aes = rect_aes
         , send_color = send_color

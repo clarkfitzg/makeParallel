@@ -28,8 +28,8 @@ Other considerations:
 
 TODO list:
 
+- Pass R CMD check
 - Run tests on generated code
-- Import methods for plot
 - Drop all the functions and objects that I don't use
 - All items in code marked `TODO:*`
 - Make sure documentation can be accessed
