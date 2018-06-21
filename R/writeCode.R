@@ -34,5 +34,7 @@ writeHelper = function(x, file, overWrite)
 # Put the prefix in front of filename
 prefixFileName = function(file, prefix)
 {
-        file.path(dirname(file), paste0(prefix, basename(file)))
+    newname = paste0(prefix, basename(file))
+    dir = dirname(file)
+    if(dir == ".") newname else file.path(dir, newname)
 }
