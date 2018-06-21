@@ -179,7 +179,7 @@ setMethod("generate", "MapSchedule", function(schedule, ...)
     pp_expr = preprocess(schedule@graph@code)
     pcode = lapply(pp_expr, replaceApply)
     pcode = as.expression(pcode)
-    new("GeneratedCode", schedule = schedule, code = pcode)
+    GeneratedCode(schedule = schedule, code = pcode)
 })
 
 

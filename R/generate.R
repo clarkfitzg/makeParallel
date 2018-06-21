@@ -1,3 +1,23 @@
+setMethod("file", "Schedule", function(description)
+{
+    srcfile = attr(description@graph@code, "srcfile")
+    out = if(is.null(srcfile)) NA else srcfile$filename
+    as.character(out)
+})
+
+
+setMethod("file", "GeneratedCode", function(description)
+{
+    description@file
+})
+
+
+GeneratedCode = function(schedule, code)
+{
+    new("GeneratedCode", schedule = schedule, code = code, file = file(schedule))
+}
+
+
 # Code for a single row in a schedule
 row_schedule_code = function(row, expressions)
 {
@@ -114,7 +134,7 @@ gen_socket_code_no_comm = function(schedule)
         , worker_code = paste0("c(\n'", worker_code, "'\n)")
     ))
 
-    new("GeneratedCode", schedule = schedule, code = parse(text = output_code))
+    GeneratedCode(schedule = schedule, code = parse(text = output_code))
 }
 
 
@@ -149,5 +169,5 @@ gen_socket_code_comm = function(schedule, port_start, min_timeout)
         , worker_code = paste0("c(\n'", worker_code, "'\n)")
     ))
 
-    new("GeneratedCode", schedule = schedule, code = parse(text = output_code))
+    GeneratedCode(schedule = schedule, code = parse(text = output_code))
 }

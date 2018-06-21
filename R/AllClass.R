@@ -48,5 +48,5 @@ MapSchedule = setClass("MapSchedule", contains = "Schedule")
 # Generated Code
 ############################################################
 
-GeneratedCode = setClass("GeneratedCode",
-    slots = c(schedule = "Schedule", code = "expression"))
+setClass("GeneratedCode",
+    slots = c(schedule = "Schedule", code = "expression", file = "character"))

@@ -2,8 +2,9 @@
 setMethod("writeCode", c("GeneratedCode", "NULL"), 
           function(x, file, overWrite = FALSE, prefix = "gen_", ...)
 {
-    srcfile = attr(x@schedule@graph@code, "srcfile")
-    if(!is.null(srcfile)){
+    #srcfile = attr(x@schedule@graph@code, "srcfile")
+    srcfile = file(x@schedule)
+    if(!is.na(srcfile)){
         file = srcfile$filename
         file = prefixFileName(file, prefix)
         writeHelper(x, file, overWrite = overWrite)
