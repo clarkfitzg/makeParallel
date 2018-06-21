@@ -25,6 +25,9 @@ Other considerations:
 - Should I use an `eval()` generic? I currently have a function called
   `runMeasure` that measures how long every statement takes and the size of
   all the objects that could be transferred.
+- What's the best way to keep the arguments to schedule() consistent? I could
+  put them in the generic, but it's not clear that I want to dispatch on
+  them. Right now they're in scheduleTaskList.
 
 TODO list:
 

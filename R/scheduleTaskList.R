@@ -99,7 +99,7 @@ scheduleTaskList = function(graph, maxWorker = 2L
     new("TaskSchedule", graph = graph
         , evaluation = schedule$eval
         , transfer = schedule$transfer
-        , maxWorker = maxWorker
+        , maxWorker = as.integer(maxWorker)
         , exprTime = exprTime
         , overhead = overhead
         , bandwidth = bandwidth

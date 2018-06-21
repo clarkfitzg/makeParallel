@@ -60,7 +60,7 @@ test_that("whole workflow on files", {
     genfile = "gen_example.R"
     try(unlink(genfile))
 
-    out = parallelize(exfile, scheduler = scheduleTaskList)
+    out = parallelize(exfile, scheduler = scheduleTaskList, maxWorker = 3)
 
     expect_s4_class(out, "GeneratedCode")
 

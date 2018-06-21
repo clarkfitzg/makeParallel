@@ -31,7 +31,7 @@ expect_generated = function(script, scheduler = scheduleTaskList, plot = FALSE, 
     # something fails midway through.
     on.exit(try(parallel::stopCluster(cls), silent = TRUE))
     # TODO:*
-    source(p$gen_file_name)
+    source(p@outfile)
     actual = readLines(outfile)
     
     expect_equal(actual, expected)
@@ -60,6 +60,6 @@ test_that("Generated code from simple examples actually executes", {
     lapply(scripts, expect_generated)
 
     # Then pass in some extra arguments
-    expect_generated("script3.R", maxworkers = 3)
+    expect_generated("script3.R", maxWorker = 3)
 
 })
