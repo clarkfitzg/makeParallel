@@ -8,9 +8,6 @@
 # means an absolute time required to do some smaller step. 
 
 
-# TODO: Define standard interface for a scheduler, ie. additional arguments
-# for the timings and variable sizes.
-
 #' Minimize expression Start Time
 #'
 #' Implementation of "list scheduling".
@@ -216,7 +213,8 @@ add_single_send_receive = function(tg_from_to, schedule
     start_time_send = proc_finish_time(proc_send, schedule)
     tc = transfer_cost(tg_from_to, overhead, bandwidth)
 
-    # TODO: Hardcoding in 0 latency here and other places, come back and fix.
+    # TODO: Hardcoding in 0 latency here and other places. Will need to fix
+    # this when running on actual distributed machines.
     start_time_receive = max(proc_finish_time(proc_receive, schedule), start_time_send)
 
     this_transfer = data.frame(start_time_send = start_time_send

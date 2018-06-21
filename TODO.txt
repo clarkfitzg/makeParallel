@@ -1,20 +1,47 @@
 To discuss for code review:
 
+The current design "nests" the objects together, so Graph is a slot in Schedule
+and Schedule is a slot in GeneratedCode. 
+
+If I wanted "flatter" objects I could make each class inherit from
+another. But this has disadvantages:
+
+1. They're conceptually quite different objects
+2. When I define a new class extending the first class (DependGraph)
+   then how do I propagate the new slots through to the subclasses?
+3. How can I easily call say the `plot()` method for the first class,
+   if all the others have plot methods? I would actually like to do
+   this.
+
+If the nesting bothers me, I could define methods for the `[` so it goes
+away.
+
+Other considerations:
+
 - Could rename package to parallelize. Then main end user function is
   parallelize::parallelize(). So users only have to remember one thing.
-  Otherwise it could be autoParallel::autoParallel, but I don't want a
-  package name in CamelCase.
-- Should I use an `eval()` generic? I need something to do the "run and
-  measure".
+  Otherwise it could be autoParallel::autoParallel, but I don't want the
+  package name to be CamelCase.
+- Should I use an `eval()` generic? I currently have a function called
+  `runMeasure` that measures how long every statement takes and the size of
+  all the objects that could be transferred.
 
 TODO list:
 
+- Run tests on generated code
 - Import methods for plot
+- Drop all the functions and objects that I don't use
 - All items in code marked `TODO:*`
 - Make sure documentation can be accessed
+- Revisit Apache hive code generation function
+- Make sure object naming convention and argument names are consistent for
+  all exported objects.
+
 
 Done:
 
+- Unit tests passing
+- Switch to S4
 - Read templates when necessary
 - Return expression objects rather than text
 
@@ -48,11 +75,6 @@ schedule generator)
 
 # TODO
 
-Before release on CRAN:
-
-- OO methods as discussed in code review
-- Simplify `write_hive_scripts()` to do less. The burden should be on the
-  users to write the SQL.
 
 Less urgent:
 
