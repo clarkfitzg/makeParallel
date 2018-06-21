@@ -32,7 +32,6 @@ Other considerations:
 TODO list:
 
 - Pass R CMD check
-- Run tests on generated code
 - Drop all the functions and objects that I don't use
 - All items in code marked `TODO:*`
 - Make sure documentation can be accessed
@@ -44,9 +43,11 @@ TODO list:
 Done:
 
 - Unit tests passing
+- Run tests on generated code
 - Switch to S4
 - Read templates when necessary
 - Return expression objects rather than text
+
 
 Fri Jun  8 12:00:36 PDT 2018
 
@@ -81,6 +82,7 @@ schedule generator)
 
 Less urgent:
 
+- Conversion to igraph objects
 - preprocessing step
 - Alternative scheduling algorithm and code generator based on fork / join.
 - Measure CPU utilization during timings to see what's parallel / threaded.
