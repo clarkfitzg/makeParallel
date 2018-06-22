@@ -5,16 +5,16 @@
 #' possibly be transferred.
 #'
 #' This does naive and biased timing since it doesn't account for the
-#' overhead in evaluating a single expression. However, this is fine in
+#' overhead in evaluating a single expression. However, this is fine for
 #' this application since the focus is on measuring statements that take at
-#' least 1 second to run. 
+#' least on the order of 1 second to run. 
 #'
 #' @export
 #' @param code to be passed into \code{\link{inferGraph}}
 #' @param graph object of class \code{DependGraph}
 #' @param envir environment to evaluate the code in
 #' @param timer function that returns a timestamp.
-#' @return 
+#' @return graph object of class \code{MeasuredDependGraph}
 runMeasure = function(code, graph = inferGraph(code), envir = globalenv(), timer = Sys.time)
 {
     expr = graph@code

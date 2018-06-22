@@ -32,13 +32,19 @@ Other considerations:
 TODO list:
 
 - Pass R CMD check
+- Add error classes to messages
+- Only write to tmp directories
 - Drop all the functions and objects that I don't use
 - All items in code marked `TODO:*`
 - Make sure documentation can be accessed
 - Revisit Apache hive code generation function
 - Make sure object naming convention and argument names are consistent for
   all exported objects.
+- Move some simple cases from tests to the function examples
 
+Can defer:
+
+- Global option for overwriting files
 
 Done:
 
