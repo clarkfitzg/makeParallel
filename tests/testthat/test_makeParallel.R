@@ -70,7 +70,8 @@ test_that("whole workflow on files", {
 
     expect_true(file.exists(genfile))
 
-    expect_error(makeParallel(exfile), "exists")
+    e = tryCatch(makeParallel(exfile), error = identity)
+    expect_true(is(e, "FileExistsError"))
 
     makeParallel(exfile, overWrite = TRUE)
     unlink(genfile)

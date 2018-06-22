@@ -22,7 +22,9 @@ setMethod("writeCode", c("GeneratedCode", "character"),
 writeHelper = function(x, file, overWrite)
 {
     if(file.exists(file) && !overWrite){
-        stop(sprintf("The file %s already exists. Pass overWrite = TRUE to replace %s with a new version.", file, file))
+        e = simpleError(sprintf("The file %s already exists. Pass overWrite = TRUE to replace %s with a new version.", file, file))
+        class(e) = c("FileExistsError", class(e))
+        stop(e)
     }
     content = as.character(x@code)
     writeLines(content, file)
