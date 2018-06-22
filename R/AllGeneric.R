@@ -23,9 +23,25 @@ setGeneric("inferGraph", function(code, ...)
 # Where to put this parameter?
 #' @param default_size numeric default size of the variables in bytes
 # default_size = object.size(1L), 
+#' @param epsilonTime numeric small positive number used to avoid
+#'  difficulties which would arise 
 
+
+#' Schedule Dependency Graph
+#'
+#' Creates the schedule for a dependency graph. The schedule is the
+#' assignment of the expressions to different processors at different
+#' times. There are many possible scheduling algorithms. The default is a
+#' simple map reduce using R's apply family of functions.
+#'
+#' @references See \emph{Task Scheduling for Parallel Systems}, Sinnen, O
+#' for a thorough treatment of what it means to have a valid schedule.
+#' 
+#' @param graph object of class \code{\link{DependGraph}}.
+#' @param maxWorkers integer maximum number of parallel workers
+#' 
 #' @export
-setGeneric("schedule", function(graph, maxWorkers = 2L, epsilonTime = 1e-6, ...)
+setGeneric("schedule", function(graph, maxWorkers = 2L, ...)
            standardGeneric("schedule"))
 
 

@@ -1,7 +1,8 @@
 TODO list:
 
+- Properly cite references
+- Make sure that links work using 
 - Pass R CMD check
-- Add error classes to messages
 - Only write to tmp directories
 - Drop all the functions and objects that I don't use
 - All items in code marked `TODO:*`
@@ -17,6 +18,7 @@ Can defer:
 
 Done:
 
+- Add error classes to messages
 - Unit tests passing
 - Run tests on generated code
 - Switch to S4

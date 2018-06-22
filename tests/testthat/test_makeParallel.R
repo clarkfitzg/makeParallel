@@ -70,6 +70,7 @@ test_that("whole workflow on files", {
 
     expect_true(file.exists(genfile))
 
+    # 'Catching different types of errors' - This would make a nice blog post.
     e = tryCatch(makeParallel(exfile), error = identity)
     expect_true(is(e, "FileExistsError"))
 

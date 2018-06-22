@@ -8,21 +8,18 @@
 # means an absolute time required to do some smaller step. 
 
 
-#' Minimize expression Start Time
+#' Minimize Expression Start Time
 #'
 #' Implementation of "list scheduling".
 #' This is a greedy algorithm that assigns each expression to the earliest
 #' possible processor.
 #'
-#' I plan to keep this function basically as is so that I can compare it as
-#' a baseline to others.
-#'
-#' See Algorithm 10 in Sinnen's book "Task Scheduling for Parallel
-#' Systems".
+#' @references Algorithm 10 in \emph{Task Scheduling for Parallel
+#' Systems}, Sinnen, O.
 #'
 #' @export
 #' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
-#' @param maxWorker integer maximum number of procs
+#' @param maxWorker integer maximum number of processors
 #' @param exprTime time in seconds to execute each expression
 #' @param exprTimeDefault numeric time in seconds to execute a single
 #'  expression. This will only be used if \code{exprTime} is NULL.
@@ -32,6 +29,14 @@
 #'  contention into account. This will have to be extended to account for
 #'  multiple machines.
 #' @return schedule object of class \code{TaskSchedule}
+#' @examples
+#' code <- parse(text = "a <- 100
+#'      b <- 200
+#'      c <- a + b")
+#'
+#' g <- inferGraph(code)
+#' s <- scheduleTaskList(g)
+#' plot(s)
 scheduleTaskList = function(graph, maxWorker = 2L
     , exprTime = NULL
     , exprTimeDefault = 10e-6
