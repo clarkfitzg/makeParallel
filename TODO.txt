@@ -1,34 +1,3 @@
-To discuss for code review:
-
-The current design "nests" the objects together, so Graph is a slot in Schedule
-and Schedule is a slot in GeneratedCode. 
-
-If I wanted "flatter" objects I could make each class inherit from
-another. But this has disadvantages:
-
-1. They're conceptually quite different objects
-2. When I define a new class extending the first class (DependGraph)
-   then how do I propagate the new slots through to the subclasses?
-3. How can I easily call say the `plot()` method for the first class,
-   if all the others have plot methods? I would actually like to do
-   this.
-
-If the nesting bothers me, I could define methods for the `[` so it goes
-away.
-
-Other considerations:
-
-- Could rename package to parallelize. Then main end user function is
-  parallelize::makeParallel(). So users only have to remember one thing.
-  Otherwise it could be autoParallel::autoParallel, but I don't want the
-  package name to be CamelCase.
-- Should I use an `eval()` generic? I currently have a function called
-  `runMeasure` that measures how long every statement takes and the size of
-  all the objects that could be transferred.
-- What's the best way to keep the arguments to schedule() consistent? I could
-  put them in the generic, but it's not clear that I want to dispatch on
-  them. Right now they're in scheduleTaskList.
-
 TODO list:
 
 - Pass R CMD check
@@ -53,6 +22,15 @@ Done:
 - Switch to S4
 - Read templates when necessary
 - Return expression objects rather than text
+
+
+
+- What's the best way to keep the arguments to schedule() consistent? I could
+  put them in the generic, but it's not clear that I want to dispatch on
+  them. Right now they're in scheduleTaskList.
+
+Duncan's answer: Put the arguments in the generic if and only if every
+method should use and respect this same set of arguments.
 
 
 Fri Jun  8 12:00:36 PDT 2018
