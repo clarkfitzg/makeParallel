@@ -135,14 +135,14 @@ me the freedom to pick that as I like
 
 ## Scratch
 
-`parallelize()` takes user code and figures out an intelligent way to make
+`makeParallel()` takes user code and figures out an intelligent way to make
 it parallel by inferring the dependency structure of the expressions and
 the other patterns described in this document. It produces executable R
 code that is now parallel.
 
 ```{R}
 
-pcode = parallelize("my_script.R"
+pcode = makeParallel("my_script.R"
     , clean_first = FALSE
     , run_now = FALSE
     , cluster_type = "FORK"

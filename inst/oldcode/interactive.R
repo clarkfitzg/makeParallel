@@ -4,7 +4,7 @@ library(autoparallel)
 
 x = list(1:10, rnorm(10), rep(pi, 10))
 
-do = parallelize(x)
+do = makeParallel(x)
 do
 
 
@@ -84,7 +84,7 @@ datadir = "~/data/vets/appeals_sample"
 filenames = list.files(datadir, full.names = TRUE)
 length(filenames)
 
-do = parallelize(filenames)
+do = makeParallel(filenames)
 
 
 ## ------------------------------------------------------------------------

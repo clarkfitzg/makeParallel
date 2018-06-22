@@ -43,7 +43,7 @@ test_that("Multiple assignment in single expression", {
         f(x, y, z, a, b, c)
     ")
 
-    out = parallelize(code, scheduler = scheduleTaskList)
+    out = makeParallel(code, scheduler = scheduleTaskList)
 
     # The first two lines will be assigned to different processors, so
     # three transfers should happen regardless of which processor evaluates
@@ -60,7 +60,7 @@ test_that("whole workflow on files", {
     genfile = "gen_example.R"
     try(unlink(genfile))
 
-    out = parallelize(exfile, scheduler = scheduleTaskList, maxWorker = 3)
+    out = makeParallel(exfile, scheduler = scheduleTaskList, maxWorker = 3)
 
     expect_s4_class(out, "GeneratedCode")
 
@@ -70,18 +70,18 @@ test_that("whole workflow on files", {
 
     expect_true(file.exists(genfile))
 
-    expect_error(parallelize(exfile), "exists")
+    expect_error(makeParallel(exfile), "exists")
 
-    parallelize(exfile, overWrite = TRUE)
+    makeParallel(exfile, overWrite = TRUE)
     unlink(genfile)
 
     fname = "some_file_created_in_test.R"
-    out = parallelize(exfile, scheduler = scheduleTaskList, file = fname)
+    out = makeParallel(exfile, scheduler = scheduleTaskList, file = fname)
     expect_true(file.exists(fname))
     expect_equal(fname, out@outfile)
     unlink(fname)
 
-    parallelize("example.R", scheduler = scheduleTaskList, prefix = "GEN")
+    makeParallel("example.R", scheduler = scheduleTaskList, prefix = "GEN")
     expect_true(file.exists("GENexample.R"))
     unlink("GENexample.R")
 

@@ -19,7 +19,7 @@
 #' @return function with class distributed_evaluator resembling \code{\link[base]{eval}}
 #' @examples
 #' x = list(1:10, 21:30)
-#' do = parallelize(x)
+#' do = makeParallel(x)
 #' do(lapply(x, head))
 #' y = 20
 #' do(x[[1]][1] + y, verbose = TRUE)

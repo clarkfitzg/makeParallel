@@ -19,7 +19,7 @@ away.
 Other considerations:
 
 - Could rename package to parallelize. Then main end user function is
-  parallelize::parallelize(). So users only have to remember one thing.
+  parallelize::makeParallel(). So users only have to remember one thing.
   Otherwise it could be autoParallel::autoParallel, but I don't want the
   package name to be CamelCase.
 - Should I use an `eval()` generic? I currently have a function called

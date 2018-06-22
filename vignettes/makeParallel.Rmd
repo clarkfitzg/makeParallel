@@ -1,16 +1,16 @@
 ---
-title: "autoparallel"
+title: "makeParallel"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{autoparallel}
+  %\VignetteIndexEntry{makeParallel}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 [![Travis-CI Build
-Status](https://travis-ci.org/clarkfitzg/autoparallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/autoparallel)
+Status](https://travis-ci.org/clarkfitzg/makeParallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/makeParallel)
 
-# autoparallel
+# makeParallel
 
 _experimental library to transform serial R code into parallel_
 
@@ -30,17 +30,17 @@ code with parallel versions. The following example comes from the documentation 
 `lapply`:
 
 ```{r}
-library(autoparallel)
+library(makeParallel)
 
 code = parse(text = "
     x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
     m <- lapply(x, mean)
     ")
 
-pcode = autoparallel(code)
+pcode = makeParallel(code)
 ```
 
-Usually we call `autoparallel()` on the name of a file containing an R
+Usually we call `makeParallel()` on the name of a file containing an R
 script. But we can also call it directly on the code as we do here, which
 makes for a self contained example. The resulting object has replaced
 `lapply` with `parallel::mclapply`.
@@ -113,7 +113,7 @@ code = parse(text = "
     xy = sort(c(x[, 1], y[, 1]))
     ")
 
-pcode = autoparallel(code, scheduler = task_scheduler
+pcode = makeParallel(code, scheduler = task_scheduler
     , expr_times = c(1.25, 1.24, 0.2))
 
 plot(pcode$schedule)
@@ -139,10 +139,10 @@ pcode$output_code
 At the simplest level users write:
 
 ```{r, eval = FALSE}
-autoparallel("some_script.R")
+makeParallel("some_script.R")
 ```
 
-`autoparallel` determines that `some_script.R` is a file on your computer,
+`makeParallel` determines that `some_script.R` is a file on your computer,
 runs all of the steps, and by default writes the newly generated code to
 `gen_some_script.R`.
 
@@ -176,7 +176,7 @@ generate_code.ForkJoinSchedule = function(schedule, ...)
 We can call this new code as follows:
 
 ```{r, eval = FALSE}
-autoparallel(code, scheduler = fork_join_schedule)
+makeParallel(code, scheduler = fork_join_schedule)
 ```
 
 Users can specify the scheduling and code generation steps by passing
@@ -184,18 +184,18 @@ functions or defining methods. Here's an associated mental model.
 
 ![extensible model](extensible.png)
 
-In summary, `autoparallel` can be used in the following ways:
+In summary, `makeParallel` can be used in the following ways:
 
-- `autoparallel(code)` simple, common use case
-- `autoparallel("some_script.R")` methods for different classes of
+- `makeParallel(code)` simple, common use case
+- `makeParallel("some_script.R")` methods for different classes of
   the first argument.
-- `autoparallel(taskgraph = tg)` skips the setup part of the function in
+- `makeParallel(taskgraph = tg)` skips the setup part of the function in
   case the user has already done that or they have a special task graph to
   use.
-- `autoparallel(code, scheduler = my_scheduler, code_generator =
+- `makeParallel(code, scheduler = my_scheduler, code_generator =
   my_code_generator)` allows users to both customize the steps in the process
     by passing in their own functions to perform them.
-- `autoparallel(code, scheduler = fork_join_schedule)` dispatches on the
+- `makeParallel(code, scheduler = fork_join_schedule)` dispatches on the
   class allowing users to extend the system through defining their own
   classes.
 

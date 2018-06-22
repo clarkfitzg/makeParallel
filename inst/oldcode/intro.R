@@ -10,7 +10,7 @@ knitr::opts_chunk$set(
 #  autoparallel("code.R")
 
 ## ------------------------------------------------------------------------
-#  pcode = parallelize("code.R"
+#  pcode = makeParallel("code.R"
 #      , clean_first = FALSE
 #      , run_now = FALSE
 #      , cluster_type = "FORK"

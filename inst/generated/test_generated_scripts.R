@@ -13,7 +13,7 @@ expect_generated = function(script, scheduler = scheduleTaskList, plot = FALSE, 
 
     outfile = paste0(basename(script), ".log")
     serfile = paste0("expected_", outfile)
-    p = parallelize(script, scheduler = scheduler, overWrite = TRUE, ...)
+    p = makeParallel(script, scheduler = scheduler, overWrite = TRUE, ...)
 
     if(plot){
         pdf(paste0(script, ".pdf"))
