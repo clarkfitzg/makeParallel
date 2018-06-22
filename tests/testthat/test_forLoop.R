@@ -30,10 +30,6 @@ test_that("for loop to lapply", {
 })
 
 
-# For testing interactively
-#forLoopToLapply = autoparallel:::forLoopToLapply
-#debug(autoparallel:::forloop_with_updates)
-
 test_that("assignment inside for loop", {
 
     loop1 = quote(

@@ -28,7 +28,7 @@
 #' pcode = task_parallel(parse(text = "x = 1:100
 #' y = rep(1, 100)
 #' z = x + y"))
-parallelize = function(code
+makeParallel = function(code
     , graph = inferGraph(code)
     , run = FALSE
     , scheduler = schedule

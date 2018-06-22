@@ -2,7 +2,7 @@
 
 export(generate)
 export(inferGraph)
-export(parallelize)
+export(makeParallel)
 export(runMeasure)
 export(schedule)
 export(scheduleTaskList)

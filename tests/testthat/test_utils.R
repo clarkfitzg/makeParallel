@@ -1,4 +1,4 @@
-library(autoparallel)
+library(makeParallel)
 
 
 test_that("descendant removal", {

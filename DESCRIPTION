@@ -1,4 +1,4 @@
-Package: autoparallel
+Package: makeParallel
 Version: 0.0.1
 Date: 2017-06-12
 Title: Transform Serial R Code into Parallel R Code
@@ -20,14 +20,13 @@ Suggests:
     knitr,
     rmarkdown,
     testthat,
-    data.table,
-    covr
+    data.table
 Description: This experimental package provides tools to automatically
     transform serial R code into more efficient parallel versions.
     The primary intended use case is a R script that takes too
     long, ie. at least more than one second.
 License: MIT + file LICENSE
-URL: https://github.com/clarkfitzg/autoparallel
-BugReports: https://github.com/clarkfitzg/autoparallel
+URL: https://github.com/clarkfitzg/makeParallel
+BugReports: https://github.com/clarkfitzg/makeParallel
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
