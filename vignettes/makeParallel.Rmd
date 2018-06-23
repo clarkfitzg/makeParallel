@@ -12,7 +12,7 @@ Status](https://travis-ci.org/clarkfitzg/makeParallel.svg?branch=master)](https:
 
 # makeParallel
 
-_experimental library to transform serial R code into parallel_
+_experimental package to transform serial R code into parallel_
 
 If you would like to write parallel R today then you should start with a
 well established package. The CRAN Task View: [High-Performance and
@@ -22,6 +22,12 @@ provides a comprehensive review of available software. The [parallel
 package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf),
 included as a recommended package with R since R 2.14, provides the core functionality to do
 multiprocessing.
+
+Have vignette be different from README, README can be more like plans for
+where we're going with this.
+
+TODO: Call out what I'm using, CodeDepends, rstatic
+TODO: Start out with where this could go, breadth
 
 ## quick start
 
