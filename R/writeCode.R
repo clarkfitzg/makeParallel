@@ -1,6 +1,6 @@
 #' @export
 setMethod("writeCode", c("GeneratedCode", "NULL"), 
-          function(x, file, overWrite = FALSE, prefix = "gen_", ...)
+    function(x, file, overWrite = FALSE, prefix = "gen_", ...)
 {
     #srcfile = attr(x@schedule@graph@code, "srcfile")
     srcfile = file(x)
@@ -8,14 +8,23 @@ setMethod("writeCode", c("GeneratedCode", "NULL"),
         fname = prefixFileName(srcfile, prefix)
         writeHelper(x, fname, overWrite = overWrite)
     }
+    x@code
+})
+
+
+#' @export
+setMethod("writeCode", c("GeneratedCode", "missing"), function(x, file, ...)
+{
+    callGeneric(x, file = NULL, ...)
 })
 
 
 #' @export
 setMethod("writeCode", c("GeneratedCode", "character"),
-        function(x, file, overWrite = FALSE, ...)
+    function(x, file, overWrite = FALSE, ...)
 {
     writeHelper(x, file, overWrite = overWrite)
+    x@code
 })
 
 

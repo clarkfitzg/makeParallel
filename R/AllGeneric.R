@@ -34,13 +34,13 @@ setGeneric("inferGraph", function(code, ...)
 #' times. There are many possible scheduling algorithms. The default is a
 #' simple map reduce using R's apply family of functions.
 #'
-#' @references See \emph{Task Scheduling for Parallel Systems}, Sinnen, O
+#' @references See \emph{Task Scheduling for Parallel Systems}, Sinnen, O.
 #' for a thorough treatment of what it means to have a valid schedule.
 #' 
-#' @param graph object of class \code{\link{DependGraph}}.
+#' @export
+#' @param graph object of class \linkS4class{DependGraph}
 #' @param maxWorkers integer maximum number of parallel workers
 #' 
-#' @export
 setGeneric("schedule", function(graph, maxWorkers = 2L, ...)
            standardGeneric("schedule"))
 
@@ -57,6 +57,16 @@ setGeneric("generate", function(schedule, ...)
            standardGeneric("generate"))
 
 
+#' Write Generated Code
+#'
+#' This writes the 
+#'
+#' @param x object of class \linkS4class{GeneratedCode}
+#' @param file character name of a file to write the code. missing or NULL
+#'  arguments here will return an R expression object with the generated
+#'  code.
+#' @return expression R language object, ie. the same thing returned from
+#'  \link{\code{parse}}.
 #' @export
 setGeneric("writeCode", function(x, file, ...) 
            standardGeneric("writeCode"))

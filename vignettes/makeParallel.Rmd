@@ -7,66 +7,14 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<!--
 [![Travis-CI Build
 Status](https://travis-ci.org/clarkfitzg/makeParallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/makeParallel)
+-->
 
 # makeParallel
 
 _experimental package to transform serial R code into parallel_
-
-If you would like to write parallel R today then you should start with a
-well established package. The CRAN Task View: [High-Performance and
-Parallel Computing with
-R](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
-provides a comprehensive review of available software. The [parallel
-package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf),
-included as a recommended package with R since R 2.14, provides the core functionality to do
-multiprocessing.
-
-Have vignette be different from README, README can be more like plans for
-where we're going with this.
-
-TODO: Call out what I'm using, CodeDepends, rstatic
-TODO: Start out with where this could go, breadth
-
-## quick start
-
-The simplest thing we can do with this package is directly replace serial
-code with parallel versions. The following example comes from the documentation for 
-`lapply`:
-
-```{r}
-library(makeParallel)
-
-code = parse(text = "
-    x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
-    m <- lapply(x, mean)
-    ")
-
-pcode = makeParallel(code)
-```
-
-Usually we call `makeParallel()` on the name of a file containing an R
-script. But we can also call it directly on the code as we do here, which
-makes for a self contained example. The resulting object has replaced
-`lapply` with `parallel::mclapply`.
-
-```{r}
-code
-
-pcode
-
-eval(pcode$output_code)
-
-# same result as evaluating the serial code
-m
-```
-
-Besides changing R's apply style functions, `data_parallel` also replaces
-specific types of `for` loops with parallel versions.
-
-
-## high level
 
 The main idea of this package is to transform serial R programs written in
 base R into parallel programs. In this sense it acts as a
@@ -77,6 +25,60 @@ programming model. The broader goal is to bring in more information on the
 system and the data to compute on. In this way we build more intelligence
 into the system, freeing the user to write higher level code that also
 performs better.
+
+If you would like to write parallel R today then you should start with a
+well established package. The CRAN Task View: [High-Performance and
+Parallel Computing with
+R](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
+provides a comprehensive review of available software. The [parallel
+package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf),
+included as a recommended package with R since R 2.14, provides the core
+functionality to do multiprocessing.
+
+
+## quick start
+
+`makeParallel` can directly replace serial code with parallel versions. The
+following example comes from the documentation for `lapply`:
+
+```{r}
+library(makeParallel)
+
+input <- parse(text = "
+    x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
+    m1 <- lapply(x, mean)
+    m2 <- list()
+    for(i in seq_along(x)) {
+        m2[[i]] = mean(x[[i]])
+    }
+    ")
+
+transformed <- makeParallel(input)
+```
+
+Usually we call `makeParallel()` on the name of a file containing an R
+script. But we can also call it directly on the code as we do here, which
+makes for a self contained example.
+
+The resulting object has transformed
+both the `for` loop and the `lapply` to `parallel::mclapply`. This will
+not run in parallel on a Windows system- keep reading to see how to do
+this.
+
+```{r}
+input
+
+newcode <- writeCode(transformed)
+
+newcode
+
+eval(newcode)
+
+# same result as evaluating the serial code
+m1
+m2
+```
+
 
 ## task parallelism
 
@@ -119,10 +121,10 @@ code = parse(text = "
     xy = sort(c(x[, 1], y[, 1]))
     ")
 
-pcode = makeParallel(code, scheduler = task_scheduler
-    , expr_times = c(1.25, 1.24, 0.2))
+pcode = makeParallel(code, scheduler = taskScheduleList
+    , exprTimes = c(1.25, 1.24, 0.2))
 
-plot(pcode$schedule)
+plot(schedule(pcode))
 ```
 
 This plot illustrates the schedule returned from the scheduling algorithm.
@@ -138,7 +140,7 @@ The generated code is this disgusting thing that no sane person would ever
 write by hand:
 
 ```{r}
-pcode$output_code
+writeCode(pcode)
 ```
 
 
@@ -159,17 +161,19 @@ parallelism.
 
 ## Extensibility
 
-Some schedulers must be tied to their code generators.
-`task_graph, schedule`, and `generate_code` are all generic functions, so
-we can extend the system through object oriented programming. For
-example, one could define a scheduling algorithm `fork_join_schedule` that returns a more
-specialized schedule as well as an associated code generator.
+Some schedulers must be tied to their code generators. `inferGraph,
+schedule`, and `generate` are all generic functions, so we can allow user
+defined types to extend the system through R's S4 object oriented
+programming system. For example, one could define a scheduling algorithm
+that explicitly sets the number of workers by extending `MapSchedule`.
 
-```{r, eval = FALSE}
-fork_join_schedule = function(taskgraph, maxworkers = 2L, ...)
+```{r}
+setClass("WorkerMapSchedule", c(maxWorker = "integer"), contains = "MapSchedule")
+
+# TODO: Come back to this point
+workerMapSchedule = function(graph, maxWorker = 2L, ...)
 {
-    # ... more code here ...
-    class(result) = c("ForkJoinSchedule", "Schedule")
+    message("Scheduling.")
     result
 }
 
@@ -181,7 +185,7 @@ generate_code.ForkJoinSchedule = function(schedule, ...)
 
 We can call this new code as follows:
 
-```{r, eval = FALSE}
+```{r}
 makeParallel(code, scheduler = fork_join_schedule)
 ```
 

@@ -131,12 +131,12 @@ replaceApply2 = function(expr, map = mclapplyNames)
 #' @param gen_script_prefix character added to front of file name
 #' @examples
 #' \dontrun{
-#' data_parallel("my_slow_serial.R")
+#' makeParallel("my_slow_serial.R")
 #' }
 #'
 #' # Each iteration of the for loop writes to a different file- good!
 #' # If they write to the same file this will break.
-#' data_parallel(parse(text = "
+#' makeParallel(parse(text = "
 #'      fnames = paste0(1:10, '.txt')
 #'      for(f in fname){
 #'          writeLines("testing...", f)
@@ -150,7 +150,7 @@ replaceApply2 = function(expr, map = mclapplyNames)
 #'      for(i in seq(n)) x2[[i]] = exp(i + 1)
 #' ")
 #'
-#' p = data_parallel(serial_code)
+#' p = makeParallel(serial_code)
 #'
 #' eval(serial_code)
 #' x1
@@ -158,7 +158,7 @@ replaceApply2 = function(expr, map = mclapplyNames)
 #' rm(x1, x2)
 #' 
 #' # x1 and x2 should now be back and the same as they were for serial
-#' eval(p$output_code)
+#' eval(writeCode(p))
 #' x1
 #' x2
 #setMethod("schedule", "DependGraph", function(graph, maxWorkers, epsilonTime, ...)

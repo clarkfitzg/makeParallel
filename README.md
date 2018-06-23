@@ -33,7 +33,9 @@ analyis we've been putting them in the [CodeAnalysis
 package](https://github.com/duncantl/CodeAnalysis) which this package will
 eventually come to depend on.
 
-## Future
+## Plans
+
+__Use information on data__
 
 We're currently working on extending makeParallel to take into account the
 size and nature of the data to be analyzed. For example, if the data won't
