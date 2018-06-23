@@ -28,6 +28,8 @@ setMethod("writeCode", c("GeneratedCode", "character"),
 })
 
 
+# TODO:* Define and use a file method here.
+
 writeHelper = function(x, file, overWrite)
 {
     if(file.exists(file) && !overWrite){

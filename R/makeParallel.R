@@ -44,6 +44,7 @@ makeParallel = function(code
         graph = runMeasure(graph)
     sc = scheduler(graph, ...)
     out = codeGenerator(sc)
+    # TODO:* Use a file method here.
     fname = writeCode(out, file, overWrite = overWrite, prefix = prefix)
     if(is.character(fname))
         out@outfile = fname
