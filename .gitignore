@@ -2,6 +2,7 @@
 gen_*.R
 *.log
 tests/testthat/*.pdf
+tests/testthat/ex.R
 scratch/*
 
 # History files

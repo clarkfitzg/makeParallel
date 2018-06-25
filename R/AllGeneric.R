@@ -70,3 +70,9 @@ setGeneric("generate", function(schedule, ...)
 #' @export
 setGeneric("writeCode", function(x, file, ...) 
            standardGeneric("writeCode"))
+
+
+# Match parameter names with base::file. I don't know if there's a better
+# way.
+setGeneric("file<-", function(description, value)
+           standardGeneric("file<-"))

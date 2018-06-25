@@ -1,12 +1,12 @@
 # Methods and functions associated with writing files.
 
 #' @export
-setMethod("writeCode", c("GeneratedCode", "NULL"), 
+setMethod("writeCode", c("GeneratedCode", "logical"), 
     function(x, file, overWrite = FALSE, prefix = "gen_", ...)
 {
     #srcfile = attr(x@schedule@graph@code, "srcfile")
-    srcfile = file(x)
-    if(!is.na(srcfile)){
+    srcfile = file(schedule(x))
+    if(file && !is.na(srcfile)){
         fname = prefixFileName(srcfile, prefix)
         writeHelper(x, fname, overWrite = overWrite)
     }
@@ -17,7 +17,7 @@ setMethod("writeCode", c("GeneratedCode", "NULL"),
 #' @export
 setMethod("writeCode", c("GeneratedCode", "missing"), function(x, file, ...)
 {
-    callGeneric(x, file = NULL, ...)
+    callGeneric(x, file = TRUE, ...)
 })
 
 
@@ -71,5 +71,12 @@ setMethod("file", "Schedule", function(description)
 
 setMethod("file", "GeneratedCode", function(description)
 {
-    description@outfile
+    description@file
+})
+
+
+setMethod("file<-", c("GeneratedCode", "LogicalOrCharacter"), function(description, value)
+{
+    description@file = value
+    description
 })
