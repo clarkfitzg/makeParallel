@@ -17,8 +17,8 @@ test_that("Defaults for generics used in parallelize.", {
     expect_s4_class(s, "Schedule")
     expect_s4_class(newcode, "GeneratedCode")
 
-    out = writeCode(newcode, "ex.R")
-    expect_equal(out, "ex.R")
+    writeCode(newcode, "ex.R")
+    expect_equal(file(out), "ex.R")
     expect_true(file.exists("ex.R"))
 
     unlink("ex.R")
@@ -66,7 +66,7 @@ test_that("whole workflow on files", {
 
     plot(schedule(out))
 
-    expect_equal(genfile, out@outfile)
+    expect_equal(genfile, file(out))
 
     expect_true(file.exists(genfile))
 
@@ -80,11 +80,13 @@ test_that("whole workflow on files", {
     fname = "some_file_created_in_test.R"
     out = makeParallel(exfile, scheduler = scheduleTaskList, file = fname)
     expect_true(file.exists(fname))
-    expect_equal(fname, out@outfile)
+    expect_equal(fname, file(out))
     unlink(fname)
 
-    makeParallel("example.R", scheduler = scheduleTaskList, prefix = "GEN")
-    expect_true(file.exists("GENexample.R"))
-    unlink("GENexample.R")
+    out = makeParallel("example.R", scheduler = scheduleTaskList, prefix = "GEN")
+    fn = "GENexample.R"
+    expect_true(file.exists(fn))
+    expect_equal(fn, file(out))
+    unlink(fn)
 
 })
