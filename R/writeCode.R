@@ -28,31 +28,30 @@ setMethod("writeCode", c("GeneratedCode", "character"),
 })
 
 
-# TODO:* Define and use a file method here.
-
-writeHelper = function(x, file, overWrite)
+writeHelper = function(x, fname, overWrite)
 {
-    if(file.exists(file) && !overWrite){
-        e = simpleError(sprintf("The file %s already exists. Pass overWrite = TRUE to replace %s with a new version.", file, file))
+    if(file.exists(fname) && !overWrite){
+        e = simpleError(sprintf("The file %s already exists. Pass overWrite = TRUE to replace %s with a new version.", fname, fname))
         class(e) = c("FileExistsError", class(e))
         stop(e)
     }
     content = as.character(x@code)
-    writeLines(content, file)
-    message(sprintf("generated parallel code is in %s", file))
-    file
+    writeLines(content, fname)
+    message(sprintf("generated parallel code is in %s", fname))
+    fname
 }
 
 
 # Extract the original file name from the schedule and prefix it.
 prefixFileName = function(schedule, prefix)
 {
-    srcfile = file(schedule)
-    if(!is.null(srcfile)){
-        newname = paste0(prefix, basename(file))
-        dir = dirname(file)
+    oldname = file(schedule)
+    if(!is.null(oldname)){
+        newname = paste0(prefix, basename(oldname))
+        dir = dirname(oldname)
         if(dir == ".") newname else file.path(dir, newname)
-    } else as.character(NA)
+    #} else as.character(NA)
+    } else NA
 }
 
 

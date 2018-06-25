@@ -47,10 +47,10 @@ makeParallel = function(code
     out = codeGenerator(sc)
 
     if(is.logical(file) && file)
-        file = prefixFileName(out, prefix)
-
-    file(out) = file
+        file = prefixFileName(sc, prefix)
 
     writeCode(out, file, overWrite = overWrite)
+    file(out) = file
+
     out
 }
