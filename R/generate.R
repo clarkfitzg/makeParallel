@@ -1,23 +1,3 @@
-setMethod("file", "DependGraph", function(description)
-{
-    srcfile = attr(description@code, "srcfile")
-    out = if(is.null(srcfile)) NA else srcfile$filename
-    as.character(out)
-})
-
-
-setMethod("file", "Schedule", function(description)
-{
-    callGeneric(description@graph)
-})
-
-
-setMethod("file", "GeneratedCode", function(description)
-{
-    callGeneric(description@schedule@graph)
-})
-
-
 # Code for a single row in a schedule
 row_schedule_code = function(row, expressions)
 {

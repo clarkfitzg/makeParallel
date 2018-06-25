@@ -1,3 +1,5 @@
+# Methods and functions associated with writing files.
+
 #' @export
 setMethod("writeCode", c("GeneratedCode", "NULL"), 
     function(x, file, overWrite = FALSE, prefix = "gen_", ...)
@@ -51,3 +53,23 @@ prefixFileName = function(file, prefix)
     dir = dirname(file)
     if(dir == ".") newname else file.path(dir, newname)
 }
+
+
+setMethod("file", "DependGraph", function(description)
+{
+    srcfile = attr(description@code, "srcfile")
+    out = if(is.null(srcfile)) NA else srcfile$filename
+    as.character(out)
+})
+
+
+setMethod("file", "Schedule", function(description)
+{
+    callGeneric(description@graph)
+})
+
+
+setMethod("file", "GeneratedCode", function(description)
+{
+    description@outfile
+})
