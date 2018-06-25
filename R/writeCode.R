@@ -4,7 +4,7 @@
 setMethod("writeCode", c("GeneratedCode", "logical"), 
     function(x, file, overWrite = FALSE, prefix = "gen_", ...)
 {
-    oldname = file(schedule)
+    oldname = file(schedule(x))
     fname = prefixFileName(oldname, prefix)
     if(file && !is.na(fname)){
         writeHelper(x, fname, overWrite = overWrite)
@@ -24,7 +24,8 @@ setMethod("writeCode", c("GeneratedCode", "missing"), function(x, file, ...)
 setMethod("writeCode", c("GeneratedCode", "character"),
     function(x, file, overWrite = FALSE, ...)
 {
-    writeHelper(x, file, overWrite = overWrite)
+    if(!is.na(file))
+        writeHelper(x, file, overWrite = overWrite)
     x@code
 })
 
@@ -46,12 +47,12 @@ writeHelper = function(x, fname, overWrite)
 # Extract the original file name from the schedule and prefix it.
 prefixFileName = function(oldname, prefix)
 {
-    if(!is.null(oldname)){
+    if(!is.na(oldname)){
         newname = paste0(prefix, basename(oldname))
         dir = dirname(oldname)
         if(dir == ".") newname else file.path(dir, newname)
-    #} else as.character(NA)
-    } else NA
+    } else as.character(NA)
+    #} else NA
 }
 
 
