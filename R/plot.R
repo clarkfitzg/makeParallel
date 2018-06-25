@@ -1,8 +1,3 @@
-#' @importFrom graphics plot
-# TODO:* Is this the correct way to make plot a generic so that I can set a
-# method for it?
-setGeneric("plot")
-
 
 plot_one_eval_block = function(row, blockwidth, rect_aes)
 {with(row, {

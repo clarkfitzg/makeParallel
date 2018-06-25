@@ -4,7 +4,8 @@
 setMethod("writeCode", c("GeneratedCode", "logical"), 
     function(x, file, overWrite = FALSE, prefix = "gen_", ...)
 {
-    fname = prefixFileName(x, prefix)
+    oldname = file(schedule)
+    fname = prefixFileName(oldname, prefix)
     if(file && !is.na(fname)){
         writeHelper(x, fname, overWrite = overWrite)
     }
@@ -43,9 +44,8 @@ writeHelper = function(x, fname, overWrite)
 
 
 # Extract the original file name from the schedule and prefix it.
-prefixFileName = function(schedule, prefix)
+prefixFileName = function(oldname, prefix)
 {
-    oldname = file(schedule)
     if(!is.null(oldname)){
         newname = paste0(prefix, basename(oldname))
         dir = dirname(oldname)
@@ -59,6 +59,10 @@ setMethod("file", "DependGraph", function(description)
 {
     srcfile = attr(description@code, "srcfile")
     out = if(is.null(srcfile)) NA else srcfile$filename
+    # This is what parse(text = "...") returns.
+    # It will fail is someone actually has an R script named "<text>".
+    if(out == "<text>")
+        out = NA
     as.character(out)
 })
 
@@ -75,7 +79,8 @@ setMethod("file", "GeneratedCode", function(description)
 })
 
 
-setMethod("file<-", c("GeneratedCode", "LogicalOrCharacter"), function(description, value)
+#setMethod("file<-", c("GeneratedCode", "LogicalOrCharacter"), function(description, value)
+setMethod("file<-", c("GeneratedCode", "character"), function(description, value)
 {
     description@file = value
     description

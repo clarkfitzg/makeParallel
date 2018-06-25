@@ -74,5 +74,15 @@ setGeneric("writeCode", function(x, file, ...)
 
 # Match parameter names with base::file. I don't know if there's a better
 # way.
-setGeneric("file<-", function(description, value)
+setGeneric("file<-", function(description, value, ...)
            standardGeneric("file<-"))
+
+
+# Seems like I shouldn't need this.
+setGeneric("file")
+
+
+#' @importFrom graphics plot
+# TODO:* Is this the correct way to make plot a generic so that I can set a
+# method for it?
+setGeneric("plot")
