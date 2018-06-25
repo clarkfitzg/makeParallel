@@ -47,12 +47,13 @@ makeParallel = function(code
     out = codeGenerator(sc)
     originalFile = file(graph)
 
-    fname = if(is.logical(file) && file && !is.na(originalFile))
-            prefixFileName(originalFile, prefix)
-        else as.character(NA)
+    if(is.logical(file) && file && !is.na(originalFile)){
+        file = prefixFileName(originalFile, prefix)
+    }
 
-    writeCode(out, fname, overWrite = overWrite)
-    file(out) = fname
+    file(out) = file
+
+    writeCode(out, file, overWrite = overWrite)
 
     out
 }
