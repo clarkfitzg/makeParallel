@@ -17,11 +17,10 @@ test_that("Defaults for generics used in parallelize.", {
     expect_s4_class(s, "Schedule")
     expect_s4_class(newcode, "GeneratedCode")
 
-    writeCode(newcode, "ex.R")
-    expect_equal(file(out), "ex.R")
-    expect_true(file.exists("ex.R"))
-
-    unlink("ex.R")
+    fn = "ex.R"
+    try(unlink(fn))
+    writeCode(newcode, fn)
+    expect_true(file.exists(fn))
 
 })
 

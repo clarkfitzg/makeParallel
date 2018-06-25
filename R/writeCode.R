@@ -4,10 +4,8 @@
 setMethod("writeCode", c("GeneratedCode", "logical"), 
     function(x, file, overWrite = FALSE, prefix = "gen_", ...)
 {
-    #srcfile = attr(x@schedule@graph@code, "srcfile")
-    srcfile = file(schedule(x))
-    if(file && !is.na(srcfile)){
-        fname = prefixFileName(srcfile, prefix)
+    fname = prefixFileName(x, prefix)
+    if(file && !is.na(fname)){
         writeHelper(x, fname, overWrite = overWrite)
     }
     x@code
@@ -46,12 +44,15 @@ writeHelper = function(x, file, overWrite)
 }
 
 
-# Put the prefix in front of filename
-prefixFileName = function(file, prefix)
+# Extract the original file name from the schedule and prefix it.
+prefixFileName = function(schedule, prefix)
 {
-    newname = paste0(prefix, basename(file))
-    dir = dirname(file)
-    if(dir == ".") newname else file.path(dir, newname)
+    srcfile = file(schedule)
+    if(!is.null(srcfile)){
+        newname = paste0(prefix, basename(file))
+        dir = dirname(file)
+        if(dir == ".") newname else file.path(dir, newname)
+    } else as.character(NA)
 }
 
 

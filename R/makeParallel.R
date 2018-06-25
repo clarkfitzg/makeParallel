@@ -45,9 +45,12 @@ makeParallel = function(code
         graph = runMeasure(graph)
     sc = scheduler(graph, ...)
     out = codeGenerator(sc)
+
     if(is.logical(file) && file)
-        # Construct an appropriate name and keep it around.
+        file = prefixFileName(out, prefix)
+
     file(out) = file
-    writeCode(out, file, overWrite = overWrite, prefix = prefix)
+
+    writeCode(out, file, overWrite = overWrite)
     out
 }
