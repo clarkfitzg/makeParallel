@@ -16,10 +16,11 @@
 #'  from a \code{\link{DependGraph}}.
 #' @param ..., additional arguments to scheduler
 #' @param prefix character added to front of file name
-#' @param file character where to write the generated script. If NULL and
-#'  code is a file then use \code{prefix} to make a new name and write a
-#'  script if code was a file name.
-#' @param overWrite logical write over existing script
+#' @param file character where to write the generated script. If this is a
+#'  logical TRUE and code is a file then use \code{prefix} to make a new
+#'  name and write a script if code was a file name. If logical FALSE then
+#'  don't write anything.
+#' @param overWrite logical write over existing generated file
 #' @return code object of class \code{\link{GeneratedCode}}
 #' @examples
 #' \dontrun{
@@ -36,7 +37,7 @@ makeParallel = function(code
     , ...
 #    , code_generator_args = list()
     , prefix = "gen_"
-    , file = NULL
+    , file = TRUE
     , overWrite = FALSE
     )
 {
