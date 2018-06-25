@@ -79,7 +79,7 @@ setGeneric("file<-", function(description, value, ...)
 
 
 # Seems like I shouldn't need this.
-setGeneric("file")
+#setGeneric("file")
 
 
 #' @importFrom graphics plot

@@ -55,6 +55,7 @@ prefixFileName = function(oldname, prefix)
 }
 
 
+#' @export
 setMethod("file", "DependGraph", function(description)
 {
     srcfile = attr(description@code, "srcfile")
@@ -67,12 +68,14 @@ setMethod("file", "DependGraph", function(description)
 })
 
 
+#' @export
 setMethod("file", "Schedule", function(description)
 {
     callGeneric(description@graph)
 })
 
 
+#' @export
 setMethod("file", "GeneratedCode", function(description)
 {
     description@file
@@ -80,6 +83,8 @@ setMethod("file", "GeneratedCode", function(description)
 
 
 #setMethod("file<-", c("GeneratedCode", "LogicalOrCharacter"), function(description, value)
+
+#' @export
 setMethod("file<-", c("GeneratedCode", "character"), function(description, value)
 {
     description@file = value

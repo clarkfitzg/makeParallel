@@ -65,7 +65,7 @@ test_that("whole workflow on files", {
 
     plot(schedule(out))
 
-    expect_true(file(out))
+    expect_equal(file(out), genfile)
 
     expect_true(file.exists(genfile))
 
