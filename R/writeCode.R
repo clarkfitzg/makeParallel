@@ -65,8 +65,15 @@ setMethod("file", "DependGraph", function(description)
     # don't want this name. So this function will fail is someone actually
     # has an R script named "<text>".
 
-    if(is.null(srcfile) || srcfile == "<text>") as.character(NA)
-        else srcfile$filename
+    if(is.environment(srcfile)){
+        out = srcfile$filename
+        if(out == "<text>")
+            out = NA
+    } else {
+        out = NA
+    }
+
+    as.character(out)
 })
 
 
