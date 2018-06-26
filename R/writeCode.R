@@ -60,12 +60,13 @@ prefixFileName = function(oldname, prefix)
 setMethod("file", "DependGraph", function(description)
 {
     srcfile = attr(description@code, "srcfile")
-    out = if(is.null(srcfile)) NA else srcfile$filename
-    # This is what parse(text = "...") returns.
-    # It will fail is someone actually has an R script named "<text>".
-    if(out == "<text>")
-        out = NA
-    as.character(out)
+
+    # Interactively using parse(text = "...") names the file "<text>". We
+    # don't want this name. So this function will fail is someone actually
+    # has an R script named "<text>".
+
+    if(is.null(srcfile) || srcfile == "<text>") as.character(NA)
+        else srcfile$filename
 })
 
 

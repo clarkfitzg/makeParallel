@@ -40,7 +40,7 @@ test_that("Multiple assignment in single expression", {
         x = y = z = 1
         a = b = c = 2
         f(x, y, z, a, b, c)
-    ")
+    ", keep.source = FALSE)
 
     out = makeParallel(code, scheduler = scheduleTaskList)
 
