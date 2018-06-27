@@ -35,6 +35,8 @@ package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf
 included as a recommended package with R since R 2.14, provides the core
 functionality to do multiprocessing.
 
+TODO: Maybe do a couple different vignettes- one more conceptual, one end
+user focused.
 
 ## quick start
 

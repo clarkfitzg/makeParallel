@@ -3,6 +3,7 @@
 export(generate)
 export(inferGraph)
 export(makeParallel)
+export(mapSchedule)
 export(runMeasure)
 export(schedule)
 export(scheduleTaskList)
