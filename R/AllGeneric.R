@@ -6,16 +6,14 @@ NULL
 # before we do the inferGraph.
 
 
-#' Task Dependency Graph
+#' Infer Task Dependency Graph
 #'
-#' Create a data frame of edges representing the expression (task) dependencies
-#' implicit in code.
+#' Statically analyze code to determine implicit dependencies
 #'
 #' @export
 #' @param code the file path to a script or an object that can be coerced
 #'  to an expression.
-#' @return data frame of edges with attribute information suitable for use
-#'  with \code{\link[igraph]{graph_from_data_frame}}.
+#' @return object of class \linkS4class{DependGraph}
 setGeneric("inferGraph", function(code, ...)
            standardGeneric("inferGraph"))
 
@@ -31,8 +29,9 @@ setGeneric("inferGraph", function(code, ...)
 #'
 #' Creates the schedule for a dependency graph. The schedule is the
 #' assignment of the expressions to different processors at different
-#' times. There are many possible scheduling algorithms. The default is a
-#' simple map reduce using R's apply family of functions.
+#' times. There are many possible scheduling algorithms. The default is
+#' \code{\link{mapSchedule}}, which does
+#' simple map parallelism using R's apply family of functions.
 #'
 #' @references See \emph{Task Scheduling for Parallel Systems}, Sinnen, O.
 #' for a thorough treatment of what it means to have a valid schedule.
@@ -52,6 +51,16 @@ setMethod("schedule", "GeneratedCode", function(graph, ...)
 })
 
 
+# TODO:* Should the documentation for all these things live together?
+
+#' Generate Code From A Schedule
+#'
+#' @param schedule object inheriting from class \linkS4class{Schedule}
+#' @return x object of class \linkS4class{GeneratedCode}
+#' @seealso \code{\link{schedule}} generic function to create
+#' \linkS4class{Schedule}, \code{\link{writeCode}} to write and extract the
+#' actual code, and
+#' \code{\link{makeParallel}} to do everything all at once.
 #' @export
 setGeneric("generate", function(schedule, ...)
            standardGeneric("generate"))
@@ -59,14 +68,14 @@ setGeneric("generate", function(schedule, ...)
 
 #' Write Generated Code
 #'
-#' This writes the 
+#' Write the generated code to a file and return the code.
 #'
 #' @param x object of class \linkS4class{GeneratedCode}
-#' @param file character name of a file to write the code. missing or NULL
-#'  arguments here will return an R expression object with the generated
-#'  code.
-#' @return expression R language object, ie. the same thing returned from
-#'  \link{\code{parse}}.
+#' @param file character name of a file to write the code, possibly
+#' missing.
+#' @return expression R language object, suitable for further manipulation
+#' @seealso \code{\link{generate}} to generate the code from a schedule,
+#' \code{\link{makeParallel}} to do everything all at once.
 #' @export
 setGeneric("writeCode", function(x, file, ...) 
            standardGeneric("writeCode"))

@@ -159,22 +159,50 @@ parallelism.
 
 ![basic model](basic_model.png)
 
+
 ## Extensibility
+
+`makeParallel` allows us to pass in functions that customize the behavior.
+For example, we may want the generated code to explicitly set the number of
+parallel workers as specified by the option `mc.cores` in the parallel
+package. We can do that as follows:
+
+```{r}
+
+coresGenerate <- function(schedule, MC_CORES = 2L, ...)
+{
+    # Rely on the method dispatch for the actual work.
+    out <- generate(schedule, ...)
+
+    # Construct an expression containing the desired code, in this case
+    # something along the lines of:
+    # options(mc.cores = 2L)
+    setCores <- substitute(options(mc.cores = MC_CORES)
+                          , list(MC_CORES = MC_CORES))
+
+    # Combine the newly constructed expression with what would have been
+    # generated otherwise and assign it back into the object.
+    out@code <- c(setCores, writeCode(out, FALSE))
+    out
+}
+
+```
+
 
 Some schedulers must be tied to their code generators. `inferGraph,
 schedule`, and `generate` are all generic functions, so we can allow user
-defined types to extend the system through R's S4 object oriented
-programming system. For example, one could define a scheduling algorithm
-that explicitly sets the number of workers by extending `MapSchedule`.
+defined classes to extend the system through R's S4 object oriented
+programming system. For example, we can define a scheduling algorithm that
+explicitly sets the number of workers. We can do this by extending
+`MapSchedule` and building on the functionality that already exists.
 
 ```{r}
-setClass("WorkerMapSchedule", c(maxWorker = "integer"), contains = "MapSchedule")
+setClass("WorkerMapSchedule", c(mc.cores = "integer"), contains = "MapSchedule")
 
-# TODO: Come back to this point
-workerMapSchedule = function(graph, maxWorker = 2L, ...)
+workerMapSchedule = function(graph, mc.cores = 2L, ...)
 {
-    message("Scheduling.")
-    result
+    message("Do something fancy here.")
+    out = mapSchedule(graph, ...)
 }
 
 generate_code.ForkJoinSchedule = function(schedule, ...)

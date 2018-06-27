@@ -70,11 +70,10 @@ replaceApply2 = function(expr, map = mclapplyNames)
 }
 
 
-
-#' Create Code That Uses Data Parallelism
+#' Data Parallel Scheduler
 #'
-#' This function transforms R code from serial into parallel.
-#' It detects parallelism through the use of top level calls to R's
+#' This function
+#' detects parallelism through the use of top level calls to R's
 #' apply family of functions and through analysis of \code{for} loops.
 #' Currently supported apply style functions include
 #' \code{\link[base]{lapply}} and \code{\link[base]{mapply}}. It doesn't
@@ -161,17 +160,18 @@ replaceApply2 = function(expr, map = mclapplyNames)
 #' eval(writeCode(p))
 #' x1
 #' x2
-#setMethod("schedule", "DependGraph", function(graph, maxWorkers, epsilonTime, ...)
-setMethod("schedule", "DependGraph", function(graph, ...)
+mapSchedule = function(graph, ...)
 {
-
     # TODO: 
     # - Use maxworkers argument
     # - actually put evaluation schedule in here.
     # - Allow users to choose fork or SNOW clusters, and default to
     #   whatever their current system is.
     new("MapSchedule", graph = graph, evaluation = data.frame())
-})
+}
+
+
+setMethod("schedule", "DependGraph", mapSchedule)
 
 
 setMethod("generate", "MapSchedule", function(schedule, ...)
