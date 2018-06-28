@@ -162,62 +162,101 @@ parallelism.
 ![basic model](basic_model.png)
 
 
-## Extensibility
+## Customizability
 
 `makeParallel` allows us to pass in functions that customize the behavior.
 For example, we may want the generated code to explicitly set the number of
 parallel workers as specified by the option `mc.cores` in the parallel
-package. We can do that as follows:
+package. The following function prepends the expression
+`options(mc.cores = N)` to the generated code.
 
 ```{r}
-
-coresGenerate <- function(schedule, MC_CORES = 2L, ...)
+coresGenerate <- function(schedule, mc.cores = 2L, ...)
 {
     # Rely on the method dispatch for the actual work.
     out <- generate(schedule, ...)
 
-    # Construct an expression containing the desired code, in this case
-    # something along the lines of:
-    # options(mc.cores = 2L)
+    # Construct an expression containing the desired code.
     setCores <- substitute(options(mc.cores = MC_CORES)
-                          , list(MC_CORES = MC_CORES))
+                          , list(MC_CORES = mc.cores))
 
     # Combine the newly constructed expression with what would have been
-    # generated otherwise and assign it back into the object.
-    out@code <- c(setCores, writeCode(out, FALSE))
+    # generated otherwise. Passing `file = FALSE` ensures we don't write
+    # to a file.
+    out@code <- c(setCores, writeCode(out, file = FALSE))
     out
 }
-
 ```
 
+We can use this function as follows:
+
+```{r}
+lapplyCode <- parse(text = "
+    x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
+    m1 <- lapply(x, mean)
+")
+
+transformed <- makeParallel(lapplyCode, generator = coresGenerate,
+                            generatorArgs = list(mc.cores = 3L))
+```
+
+When we extract the code from this object with `writeCode` we see that it
+sets `options(mc.cores = 3L)` as the first line.
+
+```{r}
+writeCode(transformed)
+```
+
+
+## Extensibility
 
 Some schedulers must be tied to their code generators. `inferGraph,
 schedule`, and `generate` are all generic functions, so we can allow user
 defined classes to extend the system through R's S4 object oriented
-programming system. For example, we can define a scheduling algorithm that
-explicitly sets the number of workers. We can do this by extending
-`MapSchedule` and building on the functionality that already exists.
+programming system. 
+
+Building on the previous example, we can define a class `WorkerMapSchedule`
+containing `MapSchedule` that adds a slot for `mc.cores`.
 
 ```{r}
 setClass("WorkerMapSchedule", c(mc.cores = "integer"), contains = "MapSchedule")
-
-workerMapSchedule = function(graph, mc.cores = 2L, ...)
-{
-    message("Do something fancy here.")
-    out = mapSchedule(graph, ...)
-}
-
-generate_code.ForkJoinSchedule = function(schedule, ...)
-{
-    # ... more code here ...
-}
 ```
 
-We can call this new code as follows:
+Here's a helper constructor function:
 
 ```{r}
-makeParallel(code, scheduler = fork_join_schedule)
+workerMapSchedule = function(graph, mc.cores = 2L, ...)
+{
+    message(sprintf("User defined scheduler, mc.cores = %s", mc.cores))
+    out = mapSchedule(graph, ...)
+    new("WorkerMapSchedule", out, mc.cores = mc.cores)
+}
 ```
+
+Now we need to associate a code generator with `WorkerMapSchedule`.
+Since we've already defined `coresGenerate` above we can just wrap that.
+
+```{r}
+setMethod("generate", "WorkerMapSchedule", function(schedule, ...)
+    coresGenerate(as(schedule, "MapSchedule"), mc.cores = schedule@mc.cores, ...)
+)
+```
+
+Finally, we can use the code as follows:
+
+```{r}
+transformed <- makeParallel(code, scheduler = workerMapSchedule, mc.cores = 3L)
+
+writeCode(transformed)
+```
+
+In this section we went beyond the basic customization in the previous
+section in two ways. First, we extended the existing class hierarchy by
+defining our own scheduler. Second, we defined methods and relied on method
+dispatch to control some aspects of the code generation process. We did not
+have to touch the dependency graph computations.
+
+## Summary
 
 Users can specify the scheduling and code generation steps by passing
 functions or defining methods. Here's an associated mental model.
@@ -227,7 +266,7 @@ functions or defining methods. Here's an associated mental model.
 In summary, `makeParallel` can be used in the following ways:
 
 - `makeParallel(code)` simple, common use case
-- `makeParallel("some_script.R")` methods for different classes of
+- `makeParallel("some_script.R")` dispatches on the class of
   the first argument.
 - `makeParallel(taskgraph = tg)` skips the setup part of the function in
   case the user has already done that or they have a special task graph to
