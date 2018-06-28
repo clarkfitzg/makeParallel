@@ -1,8 +1,8 @@
 ---
-title: "makeParallel"
+title: "makeParallel concepts"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{makeParallel}
+  %\VignetteIndexEntry{makeParallel-concepts}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,6 +12,10 @@ vignette: >
 Status](https://travis-ci.org/clarkfitzg/makeParallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/makeParallel)
 -->
 
+This vignette explains the concepts used by makeParallel. If you would
+like to quickly get started then see the vignette titled "makeParallel
+Quick Start", `vignette("makeParallel-quickstart")`.
+
 # makeParallel
 
 _experimental package to transform serial R code into parallel_
@@ -19,7 +23,7 @@ _experimental package to transform serial R code into parallel_
 The main idea of this package is to transform serial R programs written in
 base R into parallel programs. In this sense it acts as a
 [transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler). This
-automatic program tranformation differs from current parallel technologies
+automatic program transformation differs from current parallel technologies
 which require the user to explicitly write code for a specified parallel
 programming model. The broader goal is to bring in more information on the
 system and the data to compute on. In this way we build more intelligence
@@ -35,51 +39,11 @@ package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf
 included as a recommended package with R since R 2.14, provides the core
 functionality to do multiprocessing.
 
-TODO: Maybe do a couple different vignettes- one more conceptual, one end
-user focused.
 
-## quick start
+This is the basic computational model for the steps in inferring task
+parallelism.
 
-`makeParallel` can directly replace serial code with parallel versions. The
-following example comes from the documentation for `lapply`:
-
-```{r}
-library(makeParallel)
-
-input <- parse(text = "
-    x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
-    m1 <- lapply(x, mean)
-    m2 <- list()
-    for(i in seq_along(x)) {
-        m2[[i]] = mean(x[[i]])
-    }
-    ")
-
-transformed <- makeParallel(input)
-```
-
-Usually we call `makeParallel()` on the name of a file containing an R
-script. But we can also call it directly on the code as we do here, which
-makes for a self contained example.
-
-The resulting object has transformed
-both the `for` loop and the `lapply` to `parallel::mclapply`. This will
-not run in parallel on a Windows system- keep reading to see how to do
-this.
-
-```{r}
-input
-
-newcode <- writeCode(transformed)
-
-newcode
-
-eval(newcode)
-
-# same result as evaluating the serial code
-m1
-m2
-```
+![basic model](basic_model.png)
 
 
 ## task parallelism
@@ -144,22 +108,6 @@ write by hand:
 ```{r}
 writeCode(pcode)
 ```
-
-
-At the simplest level users write:
-
-```{r, eval = FALSE}
-makeParallel("some_script.R")
-```
-
-`makeParallel` determines that `some_script.R` is a file on your computer,
-runs all of the steps, and by default writes the newly generated code to
-`gen_some_script.R`.
-
-This is the basic computational model for the steps in inferring task
-parallelism.
-
-![basic model](basic_model.png)
 
 
 ## Customizability

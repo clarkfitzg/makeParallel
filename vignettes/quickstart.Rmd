@@ -1,0 +1,78 @@
+---
+title: "makeParallel quick start"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{makeParallel-quickstart}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This vignette provides a brief introduction to using the makeParallel
+package. If you would like to learn the details then see the vignette
+titled "makeParallel concepts", `vignette("makeParallel-concepts")`.
+
+## bare minimum background
+
+If you're totally new to parallel programming then read this first.
+
+Nearly all modern desktop and laptop computers have multiple physical
+processors. Parallel code uses multiple physical processors to do several
+computations at the same time. This is sometimes faster, but not always. R
+usually requires programmers to explicitly use parallelism, for example
+with the recommended `parallel` package. Writing parallel code requires
+more expertise from us, the users. The purpose of this package is to
+generate more efficient parallel code so that we don't have to.
+
+## quick start
+
+The core of the package is the function `makeParallel`. As the name
+implies, this function makes parallel code from serial R code. At the
+simplest level suppose we've written an R script and saved it in a file
+called `some_script.R` in our working directory. Then we can write:
+
+```{r, eval = FALSE}
+makeParallel("some_script.R")
+```
+
+`makeParallel` returns an object of class `GeneratedCode` and by default
+writes the new code to a file `gen_some_script.R`.
+
+`makeParallel` can directly replace serial code with parallel versions. The
+following example comes from the documentation for `lapply`:
+
+```{r}
+library(makeParallel)
+
+input <- parse(text = "
+    x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
+    m1 <- lapply(x, mean)
+    m2 <- list()
+    for(i in seq_along(x)) {
+        m2[[i]] = mean(x[[i]])
+    }
+    ")
+
+transformed <- makeParallel(input)
+
+writeCode(transformed)
+```
+
+The resulting object has transformed both the `for` loop and the `lapply`
+to `parallel::mclapply`. Note this will not run in parallel on a Windows
+system. Accomadating Windows is a feature planned for a later release.
+
+```{r}
+input
+
+newcode <- writeCode(transformed)
+
+newcode
+
+eval(newcode)
+
+# same result as evaluating the serial code
+m1
+m2
+```
+
+
