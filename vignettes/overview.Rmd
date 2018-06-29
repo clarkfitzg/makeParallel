@@ -40,11 +40,28 @@ included as a recommended package with R since R 2.14, provides the core
 functionality to do multiprocessing.
 
 
-This is the basic computational model for the steps in inferring task
-parallelism.
+The following diagram illustrates the computational model for the steps in inferring task
+parallelism as implemented in the function `makeParallel`.
 
 ![basic model](basic_model.png)
 
+In this diagram the rectangles represent base classes from the package, and
+the edges represent generic methods. The diagram depicts the following:
+
+1. The end user supplies some input code, which could be the name of a file
+   or an actual expression.
+2. `inferGraph` statically analyzes the code and constructs a dependency
+   graph between the expressions based primarily on [use-definition
+   chains](https://en.wikipedia.org/wiki/Use-define_chain).
+3. `schedule` assigns each expression to a time and processor while
+   respecting the constraints of the dependency graph.
+4. `generate` creates executable code from the schedule.
+5. `writeCode` simply writes the code to a file and returns the expression
+   containing the code.
+
+These steps are all designed to be modular. The most interesting step to
+change is the `scheduler`. In general scheduling a task graph is NP hard,
+and many algorithms exist to solve this problem.
 
 ## Types of parallelism
 
@@ -264,3 +281,4 @@ The following features are planned, but not yet implemented.
 
 1. Allow users to pass information about the data, ie. dimensions.
 2. Infer dimensions and run time when possible.
+3. Generate code that uses systems besides R, for example Apache Hive.

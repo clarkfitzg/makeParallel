@@ -10,6 +10,7 @@ $(info R package is: $(PKG))
 RFILES = $(wildcard R/*.R)
 TESTFILES = $(wildcard tests/testthat/test*.R)
 VIGNETTES = $(wildcard vignettes/*.Rmd)
+GRAPHVIZ_PNGS = $(addsuffix .png, $(basename $(wildcard vignettes/*.dot)))
 
 #GEN_SCRIPT_OUTPUT = $(addsuffix .log, $(wildcard tests/testthat/scripts/script*.R))
 ## Log files that go with each test
@@ -33,7 +34,7 @@ $(PKG): $(RFILES) $(TESTFILES) $(VIGNETTES) DESCRIPTION
 check: $(PKG)
 	R CMD check $(PKG) --as-cran
 
-docs: $(VIGNETTES)
+docs: $(VIGNETTES) $(GRAPHVIZ_PNGS)
 	make install
 	R -e "tools::buildVignettes(dir = '.')"
 

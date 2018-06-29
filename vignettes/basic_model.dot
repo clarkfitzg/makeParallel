@@ -1,32 +1,22 @@
 digraph G {
-rankdir = LR;
-//rankdir = TB;
+//rankdir = LR;
+rankdir = TB;
 
-//edge [fontname = "courier"];
-
-label = "Rectangles represent data structures
-Ovals represent functions
-";
-labeljust=right;
+node [shape = "none"];
+InCode [label = "input\ncode"];
+OutCode [label = "output\ncode"];
 
 node [shape = "rectangle", fontname = "courier"];
-//------------------------------------------------------------
-Code [label = "Code"];
-TaskGraph [label = "TaskGraph"];
-Schedule [label = "Schedule"];
-GeneratedCode [label = "GeneratedCode"];
+edge [fontname = "courier"];
 
-node [shape = "oval"];
-//------------------------------------------------------------
-task_graph [label = "task_graph"];
-scheduler [label = "scheduler"];
-code_generator [label = "code_generator"];
+//label = "Rectangles represent data structures
+//Ovals represent functions
+//";
+//labeljust=right;
 
-Code -> task_graph;
-task_graph -> TaskGraph;
-TaskGraph -> scheduler;
-scheduler -> Schedule;
-Schedule -> code_generator;
-code_generator -> GeneratedCode;
+InCode -> DependGraph [label = " inferGraph"]
+DependGraph -> Schedule [label = " schedule"]
+Schedule -> GeneratedCode [label = " generate"]
+GeneratedCode -> OutCode [label = " writeCode"]
 
 }
