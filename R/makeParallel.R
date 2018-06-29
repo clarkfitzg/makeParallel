@@ -33,7 +33,7 @@ makeParallel = function(code
     , graph = inferGraph(code)
     , run = FALSE
     , scheduler = schedule
-    , codeGenerator = generate
+    , generator = generate
     , ...
 #    , code_generator_args = list()
     , prefix = "gen_"
@@ -44,7 +44,7 @@ makeParallel = function(code
     if(run)
         graph = runMeasure(graph)
     sc = scheduler(graph, ...)
-    out = codeGenerator(sc)
+    out = generator(sc)
 
     originalFile = file(graph)
 

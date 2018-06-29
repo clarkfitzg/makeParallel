@@ -4,6 +4,7 @@ gen_*.R
 tests/testthat/*.pdf
 tests/testthat/ex.R
 scratch/*
+vignettes/overview_files/*
 
 # History files
 .Rhistory

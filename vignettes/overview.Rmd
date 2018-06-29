@@ -46,7 +46,9 @@ parallelism.
 ![basic model](basic_model.png)
 
 
-## task parallelism
+## Types of parallelism
+
+By default, `schedule`
 
 Choosing a scheduler. The default scheduler is `data_scheduler`, which
 uses the more common data parallelism found in R. The alternative is
@@ -68,7 +70,7 @@ reading two large files, for example. If we happen to know how long
 each of the expressions will take to run we can pass these times in as an
 argument.
 
-```{r echo=FALSE, results='hide',message=FALSE}
+```{r echo=FALSE, eval=FALSE, results='hide',message=FALSE}
 
     n = 1e6
 
@@ -81,14 +83,16 @@ argument.
 ```
 
 ```{r, fig.width = 6, fig.height = 6}
+library(makeParallel)
+
 code = parse(text = "
     x = read.csv(xfile)
     y = read.csv(yfile)
     xy = sort(c(x[, 1], y[, 1]))
     ")
 
-pcode = makeParallel(code, scheduler = taskScheduleList
-    , exprTimes = c(1.25, 1.24, 0.2))
+pcode = makeParallel(code, scheduler = scheduleTaskList
+    , exprTime = c(1.25, 1.24, 0.2))
 
 plot(schedule(pcode))
 ```
@@ -155,6 +159,11 @@ sets `options(mc.cores = 3L)` as the first line.
 writeCode(transformed)
 ```
 
+```{r, echo = FALSE, results = "hide"}
+# Testing, make sure the docs do what they say!
+stopifnot(writeCode(transformed)[[1]] == quote(options(mc.cores = 3L)))
+```
+
 
 ## Extensibility
 
@@ -167,7 +176,7 @@ Building on the previous example, we can define a class `WorkerMapSchedule`
 containing `MapSchedule` that adds a slot for `mc.cores`.
 
 ```{r}
-setClass("WorkerMapSchedule", c(mc.cores = "integer"), contains = "MapSchedule")
+setClass("WorkerMapSchedule", slots = c(mc.cores = "integer"), contains = "MapSchedule")
 ```
 
 Here's a helper constructor function:
@@ -198,6 +207,12 @@ transformed <- makeParallel(code, scheduler = workerMapSchedule, mc.cores = 3L)
 writeCode(transformed)
 ```
 
+```{r, echo = FALSE, results = "hide"}
+# Testing, make sure the docs do what they say!
+stopifnot(writeCode(transformed)[[1]] == quote(options(mc.cores = 3L)))
+```
+
+
 In this section we went beyond the basic customization in the previous
 section in two ways. First, we extended the existing class hierarchy by
 defining our own scheduler. Second, we defined methods and relied on method
@@ -227,43 +242,25 @@ In summary, `makeParallel` can be used in the following ways:
   classes.
 
 
-## Next Steps
+## Diagnostics
 
-This package needs several more features before it can be used on general
-types of code.
+This package provides a few tools to inspect the generated schedules.
 
+
+## Road Map
+
+The following features are planned, but not yet implemented.
+
+### Short Term
+
+1. Show which code actually changed, perhaps by providing a `diff()`
+   method.
 1. Add constraints for processes, ie. code that performs plotting must
    happen in one process
 2. More efficient scheduling algorithms and code generation
-3. Detection of objects with reference semantics to throw appropriate
-   errors
+3. Detection of objects with reference semantics to handle appropriately.
 
+### Longer Term
 
-## Related Work
-
-Several existing packages provide a more consistent interface to parallel
-computation.
-
-Landau's [drake](https://ropensci.github.io/drake/) provides task
-parallelism similar to GNU make.
-
-Bengstton's
-[futures](https://cran.r-project.org/web/packages/future/index.html)
-provides a mechanism for parallel asynchronous evaluation of R code
-across different systems.
-
-Bischl and Lang's
-[parallelMap](https://cran.r-project.org/package=parallelMap) provides a
-parallel version of `Map()` supporting different execution backends
-including local, multicore, mpi and BatchJobs. The
-[batchtools](https://cran.r-project.org/package=batchtools) package
-supports HPC systems.
-
-Böhringer's
-[parallelize.dynamic](https://cran.r-project.org/package=parallelize.dynamic)
-provides the `parallelize_call()` function to dynamically parallelize a
-single function call.
-
-Wang's [valor](https://github.com/wanghc78/valor) vectorizes `lapply` calls
-into single function calls. In some sense this is the most related project,
-because the main purpose of valor is to actually transform code.
+1. Allow users to pass information about the data, ie. dimensions.
+2. Infer dimensions and run time when possible.

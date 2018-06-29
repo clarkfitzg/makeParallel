@@ -33,7 +33,7 @@ $(PKG): $(RFILES) $(TESTFILES) $(VIGNETTES) DESCRIPTION
 check: $(PKG)
 	R CMD check $(PKG) --as-cran
 
-vignettes: $(VIGNETTES)
+docs: $(VIGNETTES)
 	make install
 	R -e "tools::buildVignettes(dir = '.')"
 
