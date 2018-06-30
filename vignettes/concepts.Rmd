@@ -17,13 +17,13 @@ like to quickly get started then see the vignette titled "makeParallel
 Quick Start", `vignette("makeParallel-quickstart")`.
 
 This project is experimental and ambitious. If you would like to write
-parallel R today then you would do well to start with a stable established
+parallel R today then you would do well to start with an established
 package, such as the recommended [parallel
 package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf)
 which has been included with R since version 2.14. The CRAN Task View
 [High-Performance and Parallel Computing with
 R](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
-provides a comprehensive review of available third party software. 
+provides a thorough review of available third party software. 
 
 
 # makeParallel
@@ -63,6 +63,10 @@ We're currently working on extending makeParallel to take into account the
 size and nature of the data to be analyzed. For example, if the data won't
 fit into memory then this typically a totally different approach to reading
 the data and performing the computations.
+
+
+
+
 The main idea of this package is to transform serial R programs written in
 base R into parallel programs. In this sense it acts as a
 [transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler). This
@@ -79,7 +83,7 @@ parallelism as implemented in the function `makeParallel`.
 
 ![basic model](basic_model.png)
 
-In this diagram the rectangles represent base classes from the package, and
+In this diagram the rectangles represent base classes defined in this package, and
 the edges represent generic methods. The diagram depicts the following:
 
 1. The end user supplies some input code, which could be the name of a file
@@ -133,7 +137,7 @@ argument.
 
 ```
 
-```{r, fig.width = 6, fig.height = 6}
+```{r, fig.width = 8, fig.height = 6, results = "hide"}
 library(makeParallel)
 
 code = parse(text = "
@@ -158,18 +162,23 @@ poor schedule. In general task scheduling problem is NP hard, but we leave
 hooks in for users to supply their own scheduling algorithm.
 
 The generated code is this disgusting thing that no sane person would ever
-write by hand:
+write by hand. But it does have a few virtues:
+
+- It runs
+- It does the same thing as the serial version while being faster
+- We never had to explicitly create it.
 
 ```{r}
 writeCode(pcode)
 ```
 
 
+
 ## Customizability
 
 `makeParallel` allows us to pass in functions that customize the behavior.
 For example, we may want the generated code to explicitly set the number of
-parallel workers as specified by the option `mc.cores` in the parallel
+parallel workers to `N` as specified by the option `mc.cores` in the parallel
 package. The following function prepends the expression
 `options(mc.cores = N)` to the generated code.
 
@@ -184,8 +193,8 @@ coresGenerate <- function(schedule, mc.cores = 2L, ...)
                           , list(MC_CORES = mc.cores))
 
     # Combine the newly constructed expression with what would have been
-    # generated otherwise. Passing `file = FALSE` ensures we don't write
-    # to a file.
+    # generated otherwise. Passing `file = FALSE` ensures `writeCode`
+    # doesn't write to a file.
     out@code <- c(setCores, writeCode(out, file = FALSE))
     out
 }
@@ -223,7 +232,7 @@ schedule`, and `generate` are all generic functions, so we can allow user
 defined classes to extend the system through R's S4 object oriented
 programming system. 
 
-Building on the previous example, we can define a class `WorkerMapSchedule`
+Building on the example above, we can define a class `WorkerMapSchedule`
 containing `MapSchedule` that adds a slot for `mc.cores`.
 
 ```{r}
@@ -242,7 +251,8 @@ workerMapSchedule = function(graph, mc.cores = 2L, ...)
 ```
 
 Now we need to associate a code generator with `WorkerMapSchedule`.
-Since we've already defined `coresGenerate` above we can just wrap that.
+We can use an existing one or we can define our own.
+Since we've already defined `coresGenerate` above we'll just wrap that.
 
 ```{r}
 setMethod("generate", "WorkerMapSchedule", function(schedule, ...)
