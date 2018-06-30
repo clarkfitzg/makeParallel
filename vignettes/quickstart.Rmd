@@ -66,20 +66,24 @@ newcode <- writeCode(transformed)
 
 newcode
 
-eval(newcode)
 ```
 
-When we evaluate this we see that the results are the same. The one
-difference is that `lapply` added names to make the output more
-intelligible, which is a good thing.
-
-```{r, echo = FALSE, results = "hide"}
-stopifnot( all(Map(`==`, m1, m2)) )
-```
+We can evaluate this generated code and inspect the object m2.
 
 ```{r}
-m1
+eval(newcode)
 m2
+```
+
+We can also evaluate the original code and verify that it produces the same
+output.
+
+```{r}
+m2new <- m2
+eval(input)
+m2
+
+stopifnot( all(as.numeric(m2) == as.numeric(m2new)) )
 ```
 
 Ready to learn more? Read on in the "makeParallel concepts" vignette,
