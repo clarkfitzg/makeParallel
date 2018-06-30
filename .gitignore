@@ -5,6 +5,8 @@ tests/testthat/*.pdf
 tests/testthat/ex.R
 scratch/*
 vignettes/overview_files/*
+vignettes/figure/*
+vignettes/*.md
 
 # History files
 .Rhistory

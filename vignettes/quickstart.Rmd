@@ -11,7 +11,7 @@ This vignette provides a brief introduction to using the makeParallel
 package. If you would like to learn the details then see the vignette
 titled "makeParallel concepts", `vignette("makeParallel-concepts")`.
 
-## bare minimum background
+## background
 
 If you're totally new to parallel programming then read this first.
 
@@ -53,13 +53,11 @@ input <- parse(text = "
     ")
 
 transformed <- makeParallel(input)
-
-writeCode(transformed)
 ```
 
 The resulting object has transformed both the `for` loop and the `lapply`
 to `parallel::mclapply`. Note this will not run in parallel on a Windows
-system. Accomadating Windows is a feature planned for a later release.
+system. A future release will support Windows. 
 
 ```{r}
 input
@@ -69,8 +67,20 @@ newcode <- writeCode(transformed)
 newcode
 
 eval(newcode)
+```
 
-# same result as evaluating the serial code
+When we evaluate this we see that the results are the same. The one
+difference is that `lapply` added names to make the output more
+intelligible, which is a good thing.
+
+```{r, echo = FALSE, results = "hide"}
+stopifnot( all(Map(`==`, m1, m2)) )
+```
+
+```{r}
 m1
 m2
 ```
+
+Ready to learn more? Read on in the "makeParallel concepts" vignette,
+`vignette("makeParallel-concepts")`.
