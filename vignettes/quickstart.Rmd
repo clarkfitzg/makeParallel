@@ -26,7 +26,7 @@ generate more efficient parallel code so that we don't have to.
 ## quick start
 
 The core of the package is the function `makeParallel`. As the name
-implies, this function makes parallel code from serial R code. At the
+suggests, this function makes parallel code from serial R code. At the
 simplest level suppose we've written an R script and saved it in a file
 called `some_script.R` in our working directory. Then we can write:
 
@@ -59,16 +59,21 @@ The resulting object has transformed both the `for` loop and the `lapply`
 to `parallel::mclapply`. Note this will not run in parallel on a Windows
 system. A future release will support Windows. 
 
+Here is the code we started with.
+
 ```{r}
 input
+```
 
+`makeParallel` then generated this new code.
+
+```{r}
 newcode <- writeCode(transformed)
 
 newcode
-
 ```
 
-We can evaluate this generated code and inspect the object m2.
+We can evaluate the new code and inspect the object `m2`.
 
 ```{r}
 eval(newcode)
