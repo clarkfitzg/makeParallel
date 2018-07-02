@@ -20,11 +20,11 @@ setGeneric("inferGraph", function(code, ...)
            standardGeneric("inferGraph"))
 
 
-# Where to put this parameter?
-#' @param default_size numeric default size of the variables in bytes
-# default_size = object.size(1L), 
-#' @param epsilonTime numeric small positive number used to avoid
-#'  difficulties which would arise 
+# # Where to put this parameter?
+# #' @param default_size numeric default size of the variables in bytes
+# # default_size = object.size(1L), 
+# #' @param epsilonTime numeric small positive number used to avoid
+# #'  difficulties which would arise 
 
 
 #' Schedule Dependency Graph
@@ -58,11 +58,12 @@ setMethod("schedule", "GeneratedCode", function(graph, ...)
 # TODO:* Should the documentation for all these things live together?
 # TODO:* Eliminate ... from all method signatures where the don't belong?
 
+
 #' Generate Code From A Schedule
 #'
 #' @export
 #' @rdname generate
-#' @param schedule object inheriting from class \linkS4class{"Schedule"}
+#' @param schedule object inheriting from class \linkS4class{Schedule}
 #' @param ... additional arguments to methods
 #' @return x object of class \linkS4class{GeneratedCode}
 #' @seealso \code{\link{schedule}} generic function to create
