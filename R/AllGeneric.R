@@ -11,8 +11,10 @@ NULL
 #' Statically analyze code to determine implicit dependencies
 #'
 #' @export
+#' @rdname inferGraph
 #' @param code the file path to a script or an object that can be coerced
 #'  to an expression.
+#' @param ... additional arguments to methods
 #' @return object of class \linkS4class{DependGraph}
 setGeneric("inferGraph", function(code, ...)
            standardGeneric("inferGraph"))
@@ -37,14 +39,17 @@ setGeneric("inferGraph", function(code, ...)
 #' for a thorough treatment of what it means to have a valid schedule.
 #' 
 #' @export
+#' @rdname schedule
 #' @param graph object of class \linkS4class{DependGraph}
 #' @param maxWorkers integer maximum number of parallel workers
+#' @param ... additional arguments to methods
 #' 
 setGeneric("schedule", function(graph, maxWorkers = 2L, ...)
            standardGeneric("schedule"))
 
 
 #' @export
+#' @rdname schedule
 setMethod("schedule", "GeneratedCode", function(graph, ...)
 {
     graph@schedule
@@ -52,16 +57,19 @@ setMethod("schedule", "GeneratedCode", function(graph, ...)
 
 
 # TODO:* Should the documentation for all these things live together?
+# TODO:* Eliminate ... from all method signatures where the don't belong?
 
 #' Generate Code From A Schedule
 #'
+#' @export
+#' @rdname generate
 #' @param schedule object inheriting from class \linkS4class{Schedule}
+#' @param ... additional arguments to methods
 #' @return x object of class \linkS4class{GeneratedCode}
 #' @seealso \code{\link{schedule}} generic function to create
 #' \linkS4class{Schedule}, \code{\link{writeCode}} to write and extract the
 #' actual code, and
 #' \code{\link{makeParallel}} to do everything all at once.
-#' @export
 setGeneric("generate", function(schedule, ...)
            standardGeneric("generate"))
 
@@ -70,13 +78,14 @@ setGeneric("generate", function(schedule, ...)
 #'
 #' Write the generated code to a file and return the code.
 #'
+#' @export
+#' @rdname writeCode
 #' @param x object of class \linkS4class{GeneratedCode}
 #' @param file character name of a file to write the code, possibly
 #' missing.
 #' @return expression R language object, suitable for further manipulation
 #' @seealso \code{\link{generate}} to generate the code from a schedule,
 #' \code{\link{makeParallel}} to do everything all at once.
-#' @export
 setGeneric("writeCode", function(x, file, ...) 
            standardGeneric("writeCode"))
 

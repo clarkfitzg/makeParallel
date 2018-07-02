@@ -1,37 +1,37 @@
 
-plot_one_eval_block = function(row, blockwidth, rect_aes)
+plot_one_eval_block = function(row, blockHeight, rectAes)
 {with(row, {
     rect_args = list(xleft = start_time
-        , ybottom = processor - blockwidth
+        , ybottom = processor - blockHeight
         , xright = end_time
-        , ytop = processor + blockwidth
+        , ytop = processor + blockHeight
         )
-    do.call(rect, c(rect_args, rect_aes))
+    do.call(rect, c(rect_args, rectAes))
 
     text(x = (start_time + end_time) / 2, y = processor, labels = node)
 })}
 
 
-plot_one_transfer = function(row, blockwidth, rect_aes, send_color, receive_color
+plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
                              , text_adj = 1.2)
 {with(row, {
     send_rect_args = list(xleft = start_time_send
-        , ybottom = proc_send - blockwidth
+        , ybottom = proc_send - blockHeight
         , xright = end_time_send
-        , ytop = proc_send + blockwidth
+        , ytop = proc_send + blockHeight
         )
-    rect_aes[["col"]] = rect_aes[["border"]] = send_color
-    do.call(rect, c(send_rect_args, rect_aes))
+    rectAes[["col"]] = rectAes[["border"]] = sendColor
+    do.call(rect, c(send_rect_args, rectAes))
 
     receive_rect_args = list(xleft = start_time_receive
-        , ybottom = proc_receive - blockwidth
+        , ybottom = proc_receive - blockHeight
         , xright = end_time_receive
-        , ytop = proc_receive + blockwidth
+        , ytop = proc_receive + blockHeight
         )
-    rect_aes[["col"]] = rect_aes[["border"]] = receive_color
-    do.call(rect, c(receive_rect_args, rect_aes))
+    rectAes[["col"]] = rectAes[["border"]] = receiveColor
+    do.call(rect, c(receive_rect_args, rectAes))
 
-    delta = 1.1 * blockwidth
+    delta = 1.1 * blockHeight
     adj = c(text_adj, text_adj)
     # Arrows can go up or down
     if(proc_receive > proc_send){
@@ -51,11 +51,18 @@ plot_one_transfer = function(row, blockwidth, rect_aes, send_color, receive_colo
 #' Gantt chart of a schedule
 #'
 #' @export
-#' @param rect_aes list of additional arguments for \code{rect}.
+#' @param x \linkS4class{TaskSchedule}
+#' @param blockHeight height of rectangle, between 0 and 0.5
+#' @param main title
+#' @param evalColor color for evaluation blocks
+#' @param sendColor color for send blocks
+#' @param receiveColor color for receive blocks
+#' @param rectAes list of additional arguments for
+#'   \code{\link[graphics]{rect}}
 #' @param ... additional arguments to \code{plot}
-setMethod(plot, "TaskSchedule", function(x, blockwidth = 0.25, main = "schedule plot"
-    , eval_color = "gray", send_color = "orchid", receive_color = "slateblue"
-    , rect_aes = list(density = NA, border = "black", lwd = 2)
+setMethod(plot, "TaskSchedule", function(x, blockHeight = 0.25, main = "schedule plot"
+    , evalColor = "gray", sendColor = "orchid", receiveColor = "slateblue"
+    , rectAes = list(density = NA, border = "black", lwd = 2)
     , ...)
 {
     run = x@evaluation
@@ -64,17 +71,17 @@ setMethod(plot, "TaskSchedule", function(x, blockwidth = 0.25, main = "schedule 
     ylim = c(min(run$processor) - 1, max(run$processor) + 1)
     plot(xlim, ylim, type = "n", xlab = "time", ylab = "processor", main = main, ...)
 
-    rect_aes[["col"]] = eval_color
+    rectAes[["col"]] = evalColor
     by(run, seq(nrow(run)), plot_one_eval_block
-        , blockwidth = blockwidth
-        , rect_aes = rect_aes
+        , blockHeight = blockHeight
+        , rectAes = rectAes
         )
 
     by0(x@transfer, seq(nrow(x@transfer)), plot_one_transfer
-        , blockwidth = blockwidth
-        , rect_aes = rect_aes
-        , send_color = send_color
-        , receive_color = receive_color
+        , blockHeight = blockHeight
+        , rectAes = rectAes
+        , sendColor = sendColor
+        , receiveColor = receiveColor
         )
 
     NULL

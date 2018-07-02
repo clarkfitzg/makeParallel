@@ -59,6 +59,8 @@ add_source_node = function(g)
 }
 
 
+#' @export
+#' @rdname inferGraph
 setMethod("inferGraph", "character", function(code, ...)
 {
     #if(length(code) > 1) stop("pass a single R file name or a language object")
@@ -67,6 +69,8 @@ setMethod("inferGraph", "character", function(code, ...)
 })
 
 
+#' @export
+#' @rdname inferGraph
 setMethod("inferGraph", "language", function(code, ...)
 {
     expr = as.expression(code)
@@ -75,6 +79,7 @@ setMethod("inferGraph", "language", function(code, ...)
 
 
 #' @export
+#' @rdname inferGraph
 setMethod("inferGraph", "expression", function(code, ...)
 {
     expr = code

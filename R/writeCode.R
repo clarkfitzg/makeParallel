@@ -1,6 +1,7 @@
 # Methods and functions associated with writing files.
 
 #' @export
+#' @rdname writeCode
 setMethod("writeCode", c("GeneratedCode", "logical"), 
     function(x, file, overWrite = FALSE, prefix = "gen_", ...)
 {
@@ -14,6 +15,7 @@ setMethod("writeCode", c("GeneratedCode", "logical"),
 
 
 #' @export
+#' @rdname writeCode
 setMethod("writeCode", c("GeneratedCode", "missing"), function(x, file, ...)
 {
     callGeneric(x, file = TRUE, ...)
@@ -21,6 +23,7 @@ setMethod("writeCode", c("GeneratedCode", "missing"), function(x, file, ...)
 
 
 #' @export
+#' @rdname writeCode
 setMethod("writeCode", c("GeneratedCode", "character"),
     function(x, file, overWrite = FALSE, ...)
 {
@@ -57,6 +60,7 @@ prefixFileName = function(oldname, prefix)
 
 
 #' @export
+#' @rdname file
 setMethod("file", "DependGraph", function(description)
 {
     srcfile = attr(description@code, "srcfile")
@@ -78,6 +82,7 @@ setMethod("file", "DependGraph", function(description)
 
 
 #' @export
+#' @rdname file
 setMethod("file", "Schedule", function(description)
 {
     callGeneric(description@graph)
@@ -85,6 +90,7 @@ setMethod("file", "Schedule", function(description)
 
 
 #' @export
+#' @rdname file
 setMethod("file", "GeneratedCode", function(description)
 {
     description@file
@@ -93,7 +99,13 @@ setMethod("file", "GeneratedCode", function(description)
 
 #setMethod("file<-", c("GeneratedCode", "LogicalOrCharacter"), function(description, value)
 
+#' Set file
+#'
 #' @export
+#' @rdname file
+#' @param description \linkS4Class{GeneratedCode} (matches signature for
+#' \code{\link[base]{file}})
+#' @param value file name to associate with object
 setMethod("file<-", c("GeneratedCode", "character"), function(description, value)
 {
     description@file = value

@@ -15,8 +15,8 @@
 #' @param scheduler, function to produce a \linkS4class{Schedule}
 #'  from a \linkS4class{DependGraph}.
 #' @param ..., additional arguments to scheduler
-#' @param generator, function to produce a  from a \linkS4class{Schedule}}
-#' @param generatorArgs, list of named arguments to use with
+#' @param generator function to produce a  from a \linkS4class{Schedule}
+#' @param generatorArgs list of named arguments to use with
 #'  \code{generator}
 #' @param prefix character added to front of file name
 #' @param file character where to write the generated script. If this is a

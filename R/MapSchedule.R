@@ -125,9 +125,7 @@ replaceApply2 = function(expr, map = mclapplyNames)
 #' }
 #'
 #' @export
-#' @param code file name, expression from \code{\link[base]{parse}}
-#' @param map data frame with corresponding serial and parallel columns
-#' @param gen_script_prefix character added to front of file name
+#' @param graph \linkS4class{DependGraph}
 #' @examples
 #' \dontrun{
 #' makeParallel("my_slow_serial.R")
@@ -135,21 +133,21 @@ replaceApply2 = function(expr, map = mclapplyNames)
 #'
 #' # Each iteration of the for loop writes to a different file- good!
 #' # If they write to the same file this will break.
-#' makeParallel(parse(text = "
-#'      fnames = paste0(1:10, '.txt')
+#' pfile <- makeParallel(parse(text = "
+#'      fnames <- paste0(1:10, '.txt')
 #'      for(f in fname){
-#'          writeLines("testing...", f)
+#'          writeLines('testing...', f)
 #'      }"))
 #'
 #' # A couple examples in one script
-#' serial_code = parse(text = "
-#'      x1 = lapply(1:10, exp)
-#'      n = 10
-#'      x2 = rep(NA, n)
-#'      for(i in seq(n)) x2[[i]] = exp(i + 1)
+#' serial_code <- parse(text = "
+#'      x1 <- lapply(1:10, exp)
+#'      n <- 10
+#'      x2 <- rep(NA, n)
+#'      for(i in seq(n)) x2[[i]] <- exp(i + 1)
 #' ")
 #'
-#' p = makeParallel(serial_code)
+#' p <- makeParallel(serial_code)
 #'
 #' eval(serial_code)
 #' x1
@@ -171,9 +169,13 @@ mapSchedule = function(graph, ...)
 }
 
 
+#' @export
+#' @rdname schedule
 setMethod("schedule", "DependGraph", mapSchedule)
 
 
+#' @export
+#' @rdname generate
 setMethod("generate", "MapSchedule", function(schedule, ...)
 {
     pp_expr = preprocess(schedule@graph@code)

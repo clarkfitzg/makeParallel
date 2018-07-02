@@ -44,6 +44,7 @@ test_that("Multiple assignment in single expression", {
 
     out = makeParallel(code, scheduler = scheduleTaskList)
 
+    # This test is specific to the implementation, and may need to change.
     # The first two lines will be assigned to different processors, so
     # three transfers should happen regardless of which processor evaluates
     # the last line.

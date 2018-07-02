@@ -77,6 +77,8 @@ gen_snow_worker = function(processor, schedule)
 #' Produces executable code that relies on a SNOW cluster on a single
 #' machine and sockets.
 #' 
+#' @export
+#' @rdname generate
 #' @param list as returned by scheduling algorithm such as that returned
 #'  from \code{\link{min_start_time}}
 #' @param port_start first local port to use, can possibly use up to n * (n -
@@ -84,7 +86,6 @@ gen_snow_worker = function(processor, schedule)
 #' @param min_timeout timeout for socket connection will be at least this
 #'  many seconds.
 #' @return code list of scripts
-#' @export
 setMethod("generate", "TaskSchedule", function(schedule, port_start = 33000L, min_timeout = 600)
 {
     if(nrow(schedule@transfer) == 0){
