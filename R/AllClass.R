@@ -15,9 +15,16 @@
 # Graphs
 ############################################################
 
+#' Dependency graph between expressions
+#'
+#' @export
+#' @slot code input code
+#' @slot graph data frame representing the graph with indices corresponding
+#'  to code
 DependGraph = setClass("DependGraph",
     slots = c(code = "expression", graph = "data.frame"))
 
+#' @export
 MeasuredDependGraph = setClass("MeasuredDependGraph",
     slots = c(time = "numeric"),
     # Also attaches variable sizes to the graph
@@ -27,13 +34,20 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
 # Schedules
 ############################################################
 
+#' Schedule base class
+#'
+#' @export
+#' @slot graph \linkS4class{DependGraph} used to create the schedule
+#' @slot evaluation data.frame assigning expressions to processors
 Schedule = setClass("Schedule", 
     slots = c(graph = "DependGraph"
         , evaluation = "data.frame"
         ))
 
+#' @export
 SerialSchedule = setClass("SerialSchedule", contains = "Schedule")
 
+#' @export
 TaskSchedule = setClass("TaskSchedule",
     slots = c(transfer = "data.frame"
               , maxWorker = "integer"
@@ -42,6 +56,7 @@ TaskSchedule = setClass("TaskSchedule",
               , bandwidth = "numeric"
     ), contains = "Schedule")
 
+#' @export
 MapSchedule = setClass("MapSchedule", contains = "Schedule")
 
 
@@ -51,6 +66,12 @@ MapSchedule = setClass("MapSchedule", contains = "Schedule")
 #setClassUnion("LogicalOrCharacter", c("logical", "character"))
 
 
+#' Generated code ready to write
+#'
+#' @export
+#' @slot schedule contains all information to generate code
+#' @slot code executable R code
+#' @slot file name of a file where code will be written
 setClass("GeneratedCode",
     slots = c(schedule = "Schedule"
               , code = "expression"

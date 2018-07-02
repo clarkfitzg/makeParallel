@@ -81,19 +81,16 @@ gen_snow_worker = function(processor, schedule)
 #' 
 #' @export
 #' @rdname generate
-#' @param list as returned by scheduling algorithm such as that returned
-#'  from \code{\link{min_start_time}}
-#' @param port_start first local port to use, can possibly use up to n * (n -
+#' @param portStart first local port to use, can possibly use up to n * (n -
 #'  1) / 2 subsequent ports if every pair of n workers must communicate.
-#' @param min_timeout timeout for socket connection will be at least this
+#' @param minTimeout timeout for socket connection will be at least this
 #'  many seconds.
-#' @return code list of scripts
-setMethod("generate", "TaskSchedule", function(schedule, port_start = 33000L, min_timeout = 600)
+setMethod("generate", "TaskSchedule", function(schedule, portStart = 33000L, minTimeout = 600)
 {
     if(nrow(schedule@transfer) == 0){
         gen_socket_code_no_comm(schedule)
     } else {
-        gen_socket_code_comm(schedule, port_start, min_timeout)
+        gen_socket_code_comm(schedule, portStart, minTimeout)
     }
 })
 
@@ -121,7 +118,7 @@ gen_socket_code_no_comm = function(schedule)
 }
 
 
-gen_socket_code_comm = function(schedule, port_start, min_timeout)
+gen_socket_code_comm = function(schedule, portStart, minTimeout)
 {
     workers = unique(schedule@evaluation$processor)
     
@@ -134,7 +131,7 @@ gen_socket_code_comm = function(schedule, port_start, min_timeout)
     socket_map$server = apply(socket_map, 1, min)
     socket_map$client = apply(socket_map, 1, max)
     socket_map = unique(socket_map[, c("server", "client")])
-    socket_map$port = seq(from = port_start, length.out = nrow(socket_map))
+    socket_map$port = seq(from = portStart, length.out = nrow(socket_map))
 
     # Ugly code, but the generated output is easy to read
     socket_map_csv_tmp = ""
@@ -148,7 +145,7 @@ gen_socket_code_comm = function(schedule, port_start, min_timeout)
         gen_time = Sys.time()
         , version = utils::sessionInfo()$otherPkgs$autoparallel$Version
         , nworkers = length(unique(schedule@evaluation$processor))
-        , timeout = max(min_timeout, timeFinish(schedule))
+        , timeout = max(minTimeout, timeFinish(schedule))
         , socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")
         , worker_code = paste0("c(\n'", worker_code, "'\n)")
     ))
