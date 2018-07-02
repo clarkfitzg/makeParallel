@@ -40,25 +40,6 @@ use_def = function(x, all_uses, all_definitions)
 }
 
 
-# Shuffle vectors x and y together, ie. (x[1], y[1], x[2], y[2], ...)
-shuffle = function(x, y)
-{
-    as.vector(rbind(x, y))
-}
-
-
-# Add Source Node To Graph
-#
-# Add a source node with index 0 for each node without parents, return resulting graph.
-add_source_node = function(g)
-{
-    incoming = as_adj_list(g, "in")
-    noparents = which(sapply(incoming, function(x) length(x) == 0))
-    edges = shuffle(1, noparents)
-    add_edges(g, edges)
-}
-
-
 #' @export
 #' @rdname inferGraph
 setMethod("inferGraph", "character", function(code, ...)
@@ -117,17 +98,3 @@ setMethod("inferGraph", "expression", function(code, ...)
 
     new("DependGraph", code = expr, graph = tg)
 })
-
-
-# Count Number Of Nodes In Longest Path For DAG
-longest_path = function(dag)
-{
-
-    longest = rep(NA, length(V(dag)))
-
-    # Assume that it's topologically sorted
-    visitor = function(graph, data, extra) NULL
-
-    bfs(dag, 0, neimode = "out", callback = visitor)
-
-}

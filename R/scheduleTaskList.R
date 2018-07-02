@@ -40,7 +40,7 @@
 scheduleTaskList = function(graph, maxWorker = 2L
     , exprTime = NULL
     , exprTimeDefault = 10e-6
-    , sizeDefault = object.size(1L)
+    , sizeDefault = utils::object.size(1L)
     , overhead = 8e-6
     , bandwidth = 1.5e9
 ){

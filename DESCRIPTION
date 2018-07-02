@@ -10,8 +10,10 @@ Depends:
     R (>= 3.1.0)
 Imports:
     methods,
+    utils,
     graphics,
     parallel,
+    codetools,
     CodeDepends,
     whisker
 Suggests: 

@@ -71,6 +71,8 @@ gen_snow_worker = function(processor, schedule)
     ))
 } 
 
+# TODO:* Collect the names of all the formals for every publicly exported
+# function and check them for uniformity.
 
 #' Generate Task Parallel Code For SNOW Cluster
 #'
@@ -110,7 +112,7 @@ gen_socket_code_no_comm = function(schedule)
 
     output_code = whisker::whisker.render(template, list(
         gen_time = Sys.time()
-        , version = sessionInfo()$otherPkgs$autoparallel$Version
+        , version = utils::sessionInfo()$otherPkgs$autoparallel$Version
         , nworkers = length(unique(schedule@evaluation$processor))
         , worker_code = paste0("c(\n'", worker_code, "'\n)")
     ))
@@ -135,15 +137,16 @@ gen_socket_code_comm = function(schedule, port_start, min_timeout)
     socket_map$port = seq(from = port_start, length.out = nrow(socket_map))
 
     # Ugly code, but the generated output is easy to read
+    socket_map_csv_tmp = ""
     con = textConnection("socket_map_csv_tmp", open = "w", local = TRUE)
-    write.csv(socket_map, con, row.names = FALSE)
+    utils::write.csv(socket_map, con, row.names = FALSE)
 
     template = readLines(
         system.file("templates/snow_manager.R", package = "autoparallel"))
 
     output_code = whisker::whisker.render(template, list(
         gen_time = Sys.time()
-        , version = sessionInfo()$otherPkgs$autoparallel$Version
+        , version = utils::sessionInfo()$otherPkgs$autoparallel$Version
         , nworkers = length(unique(schedule@evaluation$processor))
         , timeout = max(min_timeout, timeFinish(schedule))
         , socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")

@@ -35,7 +35,7 @@ runMeasure = function(code, graph = inferGraph(code), envir = globalenv(), timer
         from_rows = tg$type == "use-def" & tg$from == i
         vars_to_measure = tg[from_rows, "value"]
         for(v in vars_to_measure){
-            size = as.numeric(object.size(get(v, envir)))
+            size = as.numeric(utils::object.size(get(v, envir)))
             tg[from_rows & tg$value == v, "size"] = size
         }
     }

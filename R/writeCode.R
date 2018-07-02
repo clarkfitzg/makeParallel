@@ -103,11 +103,10 @@ setMethod("file", "GeneratedCode", function(description)
 #'
 #' @export
 #' @rdname file
-#' @param description \linkS4Class{GeneratedCode} (matches signature for
-#' \code{\link[base]{file}})
+#' @param x \linkS4class{GeneratedCode}
 #' @param value file name to associate with object
-setMethod("file<-", c("GeneratedCode", "character"), function(description, value)
+setMethod("file<-", c("GeneratedCode", "character"), function(x, value)
 {
-    description@file = value
-    description
+    x@file = value
+    x
 })
