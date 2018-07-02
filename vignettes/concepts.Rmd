@@ -22,7 +22,7 @@ package, such as the recommended [parallel
 package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf)
 which has been included with R since version 2.14. The CRAN Task View
 [High-Performance and Parallel Computing with
-R](https://cran.r-project.org/web/views/HighPerformanceComputing.html)
+R](https://cran.r-project.org/view=HighPerformanceComputing)
 provides a thorough review of available third party software. 
 
 

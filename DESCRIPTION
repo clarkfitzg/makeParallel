@@ -1,6 +1,6 @@
 Package: makeParallel
 Version: 0.0.1
-Date: 2017-06-12
+Date: 2018-07-04
 Title: Transform Serial R Code into Parallel R Code
 Authors@R: person("Clark", "Fitzgerald", role = c("aut", "cre"),
                      email = "clarkfitzg@gmail.com")
