@@ -14,6 +14,13 @@
 #' This is a greedy algorithm that assigns each expression to the earliest
 #' possible processor.
 #'
+#' This function is experimental and unstable. If you're trying to actually
+#' speed up your code through parallelism then consider using the default
+#' method in \code{\link{schedule}} for data parallelism.
+#' This function rewrites code to use task parallelism.
+#' Task parallelism means two or more processors run different R
+#' expressions simultaneously.
+#'
 #' @references Algorithm 10 in \emph{Task Scheduling for Parallel
 #' Systems}, Sinnen, O.
 #'
@@ -23,6 +30,7 @@
 #' @param exprTime time in seconds to execute each expression
 #' @param exprTimeDefault numeric time in seconds to execute a single
 #'  expression. This will only be used if \code{exprTime} is NULL.
+#' @param sizeDefault numeric default size of objects to transfer in bytes
 #' @param overhead numeric seconds to send any object
 #' @param bandwidth numeric speed that the network can transfer an object
 #'  between processors in bytes per second. We don't take network
@@ -40,7 +48,7 @@
 scheduleTaskList = function(graph, maxWorker = 2L
     , exprTime = NULL
     , exprTimeDefault = 10e-6
-    , sizeDefault = utils::object.size(1L)
+    , sizeDefault = as.numeric(utils::object.size(1L))
     , overhead = 8e-6
     , bandwidth = 1.5e9
 ){

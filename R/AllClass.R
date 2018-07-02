@@ -24,7 +24,12 @@
 DependGraph = setClass("DependGraph",
     slots = c(code = "expression", graph = "data.frame"))
 
+
+#' Graph where each expression has been executed, timed, and the size of
+#' the variables have been measured.
+#'
 #' @export
+#' @slot time time in seconds to run each expression
 MeasuredDependGraph = setClass("MeasuredDependGraph",
     slots = c(time = "numeric"),
     # Also attaches variable sizes to the graph
@@ -44,9 +49,21 @@ Schedule = setClass("Schedule",
         , evaluation = "data.frame"
         ))
 
+
+#' Schedule that contains no parallelism at all
+#'
 #' @export
 SerialSchedule = setClass("SerialSchedule", contains = "Schedule")
 
+
+#' Task Parallel Schedule
+#'
+#' @slot transfer transfer variables between processes
+#' @slot maxWorker maximum number of processors, similar to \code{mc.cores}
+#'  in the parallel package
+#' @slot exprTime time in seconds to evaluate each expression
+#' @slot overhead minimum time in seconds to evaluate a single expression
+#' @slot bandwidth network bandwidth in bytes per second
 #' @export
 TaskSchedule = setClass("TaskSchedule",
     slots = c(transfer = "data.frame"
@@ -56,6 +73,11 @@ TaskSchedule = setClass("TaskSchedule",
               , bandwidth = "numeric"
     ), contains = "Schedule")
 
+
+#' Data parallel schedule
+#'
+#' Class for schedules that should be parallelized with apply style parallelism
+#'
 #' @export
 MapSchedule = setClass("MapSchedule", contains = "Schedule")
 

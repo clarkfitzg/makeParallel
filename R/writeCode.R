@@ -1,9 +1,11 @@
 # Methods and functions associated with writing files.
 
+#' @param overWrite logical write over existing file
+#' @param prefix character prefix for generating file names
 #' @export
 #' @rdname writeCode
 setMethod("writeCode", c("GeneratedCode", "logical"), 
-    function(x, file, overWrite = FALSE, prefix = "gen_", ...)
+    function(x, file, overWrite = FALSE, prefix = "gen_")
 {
     oldname = file(schedule(x))
     fname = prefixFileName(oldname, prefix)
@@ -99,12 +101,8 @@ setMethod("file", "GeneratedCode", function(description)
 
 #setMethod("file<-", c("GeneratedCode", "LogicalOrCharacter"), function(description, value)
 
-#' Set file
-#'
 #' @export
-#' @rdname file
-#' @param x \linkS4class{GeneratedCode}
-#' @param value file name to associate with object
+#' @rdname file<-
 setMethod("file<-", c("GeneratedCode", "character"), function(x, value)
 {
     x@file = value

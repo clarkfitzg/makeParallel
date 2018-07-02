@@ -83,6 +83,7 @@ setGeneric("generate", function(schedule, ...)
 #' @param x object of class \linkS4class{GeneratedCode}
 #' @param file character name of a file to write the code, possibly
 #' missing.
+#' @param ... additional arguments to methods
 #' @return expression R language object, suitable for further manipulation
 #' @seealso \code{\link{generate}} to generate the code from a schedule,
 #' \code{\link{makeParallel}} to do everything all at once.
@@ -90,14 +91,14 @@ setGeneric("writeCode", function(x, file, ...)
            standardGeneric("writeCode"))
 
 
-# Match parameter names with base::file. I don't know if there's a better
-# way.
+#' Set File for generated code object
+#'
+#' @export
+#' @rdname file<-
+#' @param x \linkS4class{GeneratedCode}
+#' @param value file name to associate with object
 setGeneric("file<-", function(x, value, ...)
            standardGeneric("file<-"))
-
-
-# Seems like I shouldn't need this.
-#setGeneric("file")
 
 
 #' @importFrom graphics plot

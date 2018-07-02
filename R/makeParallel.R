@@ -1,13 +1,5 @@
 #' Create Parallel Code From Serial
 #'
-#' This function is experimental and unstable. If you're trying to actually
-#' speed up your code through parallelism then consider
-#' \code{\link{data_parallel}}.
-#'
-#' This function detects task parallelism in code and rewrites code to use it.
-#' Task parallelism means two or more processors run different R
-#' expressions simultaneously.
-#'
 #' @export
 #' @param code file name or expression from \code{\link[base]{parse}}
 #' @param graph object of class \linkS4class{DependGraph}

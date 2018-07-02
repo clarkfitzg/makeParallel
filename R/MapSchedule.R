@@ -158,7 +158,7 @@ replaceApply2 = function(expr, map = mclapplyNames)
 #' eval(writeCode(p))
 #' x1
 #' x2
-mapSchedule = function(graph, ...)
+mapSchedule = function(graph)
 {
     # TODO: 
     # - Use maxworkers argument
