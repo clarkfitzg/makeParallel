@@ -1,6 +1,5 @@
 ^\.travis\.yml$
 ^codecov\.yml$
 Makefile
-travis\.yml\.backup$
 TODO\.txt$
 README\.md
