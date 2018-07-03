@@ -63,7 +63,7 @@ gen_snow_worker = function(processor, schedule)
     allcode = allcode[order(allcode$start_time), ]
 
     template = readLines(
-        system.file("templates/snow_worker.R", package = "autoparallel"))
+        system.file("templates/snow_worker.R", package = "makeParallel"))
 
     whisker::whisker.render(template,
         list(processor = processor
@@ -105,11 +105,11 @@ gen_socket_code_no_comm = function(schedule)
     worker_code = paste(worker_code, collapse = "', \n\n############################################################\n\n'")
 
     template = readLines(
-        system.file("templates/snow_notransfer.R", package = "autoparallel"))
+        system.file("templates/snow_notransfer.R", package = "makeParallel"))
 
     output_code = whisker::whisker.render(template, list(
         gen_time = Sys.time()
-        , version = utils::sessionInfo()$otherPkgs$autoparallel$Version
+        , version = utils::sessionInfo()$otherPkgs$makeParallel$Version
         , nworkers = length(unique(schedule@evaluation$processor))
         , worker_code = paste0("c(\n'", worker_code, "'\n)")
     ))
@@ -139,11 +139,11 @@ gen_socket_code_comm = function(schedule, portStart, minTimeout)
     utils::write.csv(socket_map, con, row.names = FALSE)
 
     template = readLines(
-        system.file("templates/snow_manager.R", package = "autoparallel"))
+        system.file("templates/snow_manager.R", package = "makeParallel"))
 
     output_code = whisker::whisker.render(template, list(
         gen_time = Sys.time()
-        , version = utils::sessionInfo()$otherPkgs$autoparallel$Version
+        , version = utils::sessionInfo()$otherPkgs$makeParallel$Version
         , nworkers = length(unique(schedule@evaluation$processor))
         , timeout = max(minTimeout, timeFinish(schedule))
         , socket_map_csv = paste(socket_map_csv_tmp, collapse = "\n")
