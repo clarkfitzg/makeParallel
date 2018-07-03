@@ -83,8 +83,11 @@ setMethod("file", "DependGraph", function(description)
 })
 
 
+#' Get File containing code
+#'
 #' @export
 #' @rdname file
+#' @param description object that may have a file associated with it
 setMethod("file", "Schedule", function(description)
 {
     callGeneric(description@graph)
@@ -102,9 +105,9 @@ setMethod("file", "GeneratedCode", function(description)
 #setMethod("file<-", c("GeneratedCode", "LogicalOrCharacter"), function(description, value)
 
 #' @export
-#' @rdname file<-
-setMethod("file<-", c("GeneratedCode", "character"), function(x, value)
+#' @rdname fileSetter
+setMethod("file<-", c("GeneratedCode", "character"), function(description, value)
 {
-    x@file = value
-    x
+    description@file = value
+    description
 })

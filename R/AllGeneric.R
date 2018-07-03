@@ -94,10 +94,10 @@ setGeneric("writeCode", function(x, file, ...)
 #' Set File for generated code object
 #'
 #' @export
-#' @rdname file<-
-#' @param x \linkS4class{GeneratedCode}
+#' @rdname fileSetter
+#' @param description \linkS4class{GeneratedCode}
 #' @param value file name to associate with object
-setGeneric("file<-", function(x, value, ...)
+setGeneric("file<-", function(description, value)
            standardGeneric("file<-"))
 
 
