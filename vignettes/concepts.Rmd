@@ -10,6 +10,22 @@ vignette: >
 <!--
 [![Travis-CI Build
 Status](https://travis-ci.org/clarkfitzg/makeParallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/makeParallel)
+
+Copied this over from future package
+
+<%@meta language="R-vignette" content="--------------------------------
+%\VignetteIndexEntry{Generating Parallel Code with the makeParallel Package}
+%\VignetteAuthor{Clark Fitzgerald}
+%\VignetteKeyword{R}
+%\VignetteKeyword{package}
+%\VignetteKeyword{vignette}
+%\VignetteKeyword{future}
+%\VignetteKeyword{promise}
+%\VignetteEngine{R.rsp::rsp}
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteTangle{FALSE}
+--------------------------------------------------------------------"%>
+# <%@meta name="title"%>
 -->
 
 This vignette explains the concepts used by makeParallel. If you would

@@ -18,17 +18,18 @@ GRAPHVIZ_PNGS = $(addsuffix .png, $(basename $(wildcard vignettes/*.dot)))
 #	Rscript $<
 
 # User local install
-install: $(RFILES) DESCRIPTION
+install: $(PKG)
+	R CMD INSTALL $<
+
+NAMESPACE: $(RFILES)
 	R -e "devtools::document()"
-	R CMD INSTALL .
 
 test: $(TESTFILES) $(GEN_SCRIPT_OUTPUT)
 	make install
 	cd tests && Rscript testthat.R && cd ..
 
-$(PKG): $(RFILES) $(TESTFILES) $(VIGNETTES) DESCRIPTION
+$(PKG): $(RFILES) $(TESTFILES) $(VIGNETTES) DESCRIPTION NAMESPACE
 	rm -f $(PKG)  # Otherwise it's included in build
-	make install
 	R CMD build .
 
 check: $(PKG)

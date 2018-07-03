@@ -1,5 +1,13 @@
 #' Create Parallel Code From Serial
 #'
+#' This is the most important function in the package, it performs all the
+#' steps required to generate parallel code. Change the default arguments
+#' to customize how this happens.
+#' By default it writes generated code to a file, pass \code{file = FALSE}
+#' to prevent this.
+#'
+#' For more details see the \code{vignette("makeParallel-concepts")}.
+#'
 #' @export
 #' @param code file name or expression from \code{\link[base]{parse}}
 #' @param graph object of class \linkS4class{DependGraph}
@@ -7,7 +15,7 @@
 #' @param scheduler, function to produce a \linkS4class{Schedule}
 #'  from a \linkS4class{DependGraph}.
 #' @param ..., additional arguments to scheduler
-#' @param generator function to produce a  from a \linkS4class{Schedule}
+#' @param generator function to produce \linkS4class{GeneratedCode} from a \linkS4class{Schedule}
 #' @param generatorArgs list of named arguments to use with
 #'  \code{generator}
 #' @param prefix character added to front of file name
@@ -18,12 +26,19 @@
 #' @param overWrite logical write over existing generated file
 #' @return code object of class \linkS4class{GeneratedCode}
 #' @examples
-#' \dontrun{
-#' makeParallel("my_slow_serial.R")
-#' }
-#' pcode = makeParallel(parse(text = "x = 1:100
-#' y = rep(1, 100)
-#' z = x + y"))
+#' # Try running this on an existing R script
+#' \dontrun{makeParallel("my_slow_serial.R")}
+#'
+#' # All the defaults
+#' d <- makeParallel(parse(text = "lapply(mtcars, mean)"))
+#' writeCode(d)
+#'
+#' # Select a different scheduling function
+#' pcode <- makeParallel(parse(text = "x <- 1:100
+#' y <- rep(1, 100)
+#' z <- x + y"), scheduler = scheduleTaskList)
+#' 
+#' plot(schedule(pcode))
 makeParallel = function(code
     , graph = inferGraph(code)
     , run = FALSE
