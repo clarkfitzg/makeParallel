@@ -26,8 +26,8 @@ generate more efficient parallel code so that we don't have to.
 ## quick start
 
 The core of the package is the function `makeParallel`. As the name
-suggests, this function makes parallel code from serial R code. At the
-simplest level suppose we've written an R script and saved it in a file
+suggests, this function makes parallel code from serial R code. 
+Suppose we've written an R script and saved it in a file
 called `some_script.R` in our working directory. Then we can write:
 
 ```{r, eval = FALSE}

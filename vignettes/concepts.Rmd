@@ -44,11 +44,8 @@ provides a thorough review of available third party software.
 
 # makeParallel
 
-This is a package to take general R code and transform it into
-parallel code. General R code means code that just uses functions in base
-R, no additional packages.
-
-This differs from most approaches to parallel programming in R. Most
+This is a package to take general R code and transform it into parallel
+code. This differs from most approaches to parallel programming in R. Most
 conventional approaches define a certain API that the user then defines
 their program around. The problem with this is that then this code becomes
 tied to the package, so one has to write code in different ways.
@@ -59,17 +56,17 @@ underlying improvements in the system, and change your code in ways that
 you may have never thought of, or that were manually infeasible.
 
 
-## Technique
+## Static Analysis
 
 Code transformation relies on static code analysis. This means we don't
 actually run any code until the user specifically asks for it.
 The [CodeDepends package](https://github.com/duncantl/CodeDepends)
-currently provides many underlying tools.
+currently provides most of the underlying tools.
 
-As we build more tools that are useful for general purpose static R code
+As we build more tools that may be useful for general purpose static R code
 analyis we've been putting them in the [CodeAnalysis
-package](https://github.com/duncantl/CodeAnalysis) which this package will
-eventually come to depend on.
+package](https://github.com/duncantl/CodeAnalysis). This package will most
+likely come to depend on the CodeAnalysis.
 
 ## Plans
 
@@ -342,3 +339,13 @@ The following features are planned, but not yet implemented.
 1. Allow users to pass information about the data, ie. dimensions.
 2. Infer dimensions and run time when possible.
 3. Generate code that uses systems besides R, for example Apache Hive.
+
+## Challenges
+
+1. Non standard evaluation (NSE) makes static code analysis more difficult
+   because it changes the semantics of the language.
+   The CodeDepends package supports this by providing [function
+   handlers](https://github.com/duncantl/CodeDepends/blob/master/R/functionHandlers.R),
+   which essentially collect the usage information in a custom way for each
+   function with NSE. Thus we need to know exactly what each of these
+   functions does.
