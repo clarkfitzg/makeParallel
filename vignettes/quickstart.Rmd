@@ -7,9 +7,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-This vignette provides a brief introduction to using the makeParallel
-package. If you would like to learn the details then see the vignette
-titled "makeParallel concepts", `vignette("makeParallel-concepts")`.
+> This vignette provides a brief introduction to using the makeParallel
+> package. If you would like to learn the details then see the vignette
+> titled "makeParallel concepts", `vignette("makeParallel-concepts")`.
 
 ## background
 

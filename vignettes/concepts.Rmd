@@ -28,9 +28,11 @@ Copied this over from future package
 # <%@meta name="title"%>
 -->
 
-This vignette explains the concepts used by makeParallel. If you would
-like to quickly get started then see the vignette titled "makeParallel
-Quick Start", `vignette("makeParallel-quickstart")`.
+> This vignette explains the concepts used by makeParallel. If you would
+> like to quickly get started then see the vignette titled "makeParallel
+> Quick Start", `vignette("makeParallel-quickstart")`.
+
+## Comparison to conventional approach
 
 This project is experimental and ambitious. If you would like to write
 parallel R today then you would do well to start with an established
@@ -41,48 +43,37 @@ which has been included with R since version 2.14. The CRAN Task View
 R](https://cran.r-project.org/view=HighPerformanceComputing)
 provides a thorough review of available third party software. 
 
+M
 
-# makeParallel
+makeParallel takes general R code and automatically transforms it into
+parallel code. Thus the __system__ must determine a correct and reasonably
+efficient way to execute parts of the program in parallel. In contrast,
+most conventional approaches to parallel programming require the __user__
+to specify when and where the program should run in parallel. They do this
+by providing their own programming model / API.
 
-This is a package to take general R code and transform it into parallel
-code. This differs from most approaches to parallel programming in R. Most
-conventional approaches define a certain API that the user then defines
-their program around. The problem with this is that then this code becomes
+The problem with this is that then this code becomes
 tied to the package, so one has to write code in different ways.
+
+
 
 The appeal of this approach is that you don't have to change your code in
 any way. By allowing this _system_ to change your code you can benefit from
 underlying improvements in the system, and change your code in ways that
 you may have never thought of, or that were manually infeasible.
+This is akin to an optimizing compiler. As the compiler becomes smarter,
+the same programs run faster, with no change to the underlying code.
 
-
-## Static Analysis
-
-Code transformation relies on static code analysis. This means we don't
-actually run any code until the user specifically asks for it.
-The [CodeDepends package](https://github.com/duncantl/CodeDepends)
-currently provides most of the underlying tools.
-
-As we build more tools that may be useful for general purpose static R code
-analyis we've been putting them in the [CodeAnalysis
-package](https://github.com/duncantl/CodeAnalysis). This package will most
-likely come to depend on the CodeAnalysis.
-
-## Plans
-
-__Use information on data__
-
-We're currently working on extending makeParallel to take into account the
-size and nature of the data to be analyzed. For example, if the data won't
-fit into memory then this typically a totally different approach to reading
-the data and performing the computations.
+Writing parallel programs is more difficult than writing serial programs.
 
 
 
 
-The main idea of this package is to transform serial R programs written in
-base R into parallel programs. In this sense it acts as a
-[transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler). This
+
+makeParallel creates R code from R code, so in this sense it acts as a
+[transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler). 
+
+This
 automatic program transformation differs from current parallel technologies
 which require the user to explicitly write code according to a particular
 programming model / API. The broader goal is to bring in more information on the
@@ -91,7 +82,15 @@ into the system, freeing the user to write higher level code that also
 performs better.
 
 
-The following diagram illustrates the computational model for the steps in inferring task
+
+<!--
+Could compare to multi threaded BLAS
+-->
+
+# makeParallel
+
+
+The following diagram illustrates the computational model for the steps in inferring
 parallelism as implemented in the function `makeParallel`.
 
 ![basic model](basic_model.png)
@@ -184,7 +183,6 @@ write by hand. But it does have a few virtues:
 ```{r}
 writeCode(pcode)
 ```
-
 
 
 ## Customizability
@@ -293,6 +291,7 @@ defining our own scheduler. Second, we defined methods and relied on method
 dispatch to control some aspects of the code generation process. We did not
 have to touch the dependency graph computations.
 
+
 ## Summary
 
 Users can specify the scheduling and code generation steps by passing
@@ -316,6 +315,21 @@ In summary, `makeParallel` can be used in the following ways:
   classes.
 
 
+## Static Analysis
+
+Code transformation relies on static code analysis. This means we don't
+actually run any code until the user specifically asks for it.
+The [CodeDepends package](https://github.com/duncantl/CodeDepends)
+currently provides most of the underlying tools.
+
+As we build more tools that may be useful for general purpose static R code
+analyis we've been putting them in the [CodeAnalysis
+package](https://github.com/duncantl/CodeAnalysis). This package will most
+likely come to depend on the CodeAnalysis.
+
+
+
+
 ## Diagnostics
 
 This package provides a few tools to inspect the generated schedules.
@@ -324,6 +338,18 @@ This package provides a few tools to inspect the generated schedules.
 ## Road Map
 
 The following features are planned, but not yet implemented.
+
+## Plans
+
+__Use information on data__
+
+We're currently working on extending makeParallel to take into account the
+size and nature of the data to be analyzed. For example, if the data won't
+fit into memory then this typically a totally different approach to reading
+the data and performing the computations.
+
+
+
 
 ### Short Term
 
@@ -343,9 +369,8 @@ The following features are planned, but not yet implemented.
 ## Challenges
 
 1. Non standard evaluation (NSE) makes static code analysis more difficult
-   because it changes the semantics of the language.
-   The CodeDepends package supports this by providing [function
+   because it changes the semantics of the language. The CodeDepends
+   package supports this by providing [function
    handlers](https://github.com/duncantl/CodeDepends/blob/master/R/functionHandlers.R),
-   which essentially collect the usage information in a custom way for each
-   function with NSE. Thus we need to know exactly what each of these
-   functions does.
+   which allows the user to specify how each non standard function behaves.
+   This introduces some ambiguity.
