@@ -32,31 +32,62 @@ Copied this over from future package
 > like to quickly get started then see the vignette titled "makeParallel
 > Quick Start", `vignette("makeParallel-quickstart")`.
 
+This project is experimental and ambitious. To write parallel R today
+consider using an established package, such as the recommended [parallel
+package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf)
+which has been included with R since version 2.14. The CRAN Task View
+[High-Performance and Parallel Computing with
+R](https://cran.r-project.org/view=HighPerformanceComputing) provides a
+thorough review of available third party software. 
+
+
+## Big Picture
+
+makeParallel makes code parallel. It statically analyzes code to detect
+dependencies between statements and implements a modular system for
+generating new code.
+
+The appeal of this approach is that we don't have to change our code to
+make it parallel.
+By allowing this _system_ to change our code we can benefit from
+underlying improvements in the system, and change code in ways that
+we may have never thought of, or that were manually infeasible.
+This is akin to an optimizing compiler. As the compiler becomes smarter,
+the same programs run faster, with no change to the underlying code.
+makeParallel creates R code from R code, so in this sense it acts as a
+[transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler). 
+
+The broader goal is to bring in more information on the
+system and the data to compute on. In this way we build more intelligence
+into the system, freeing the user to write higher level code that also
+performs better.
+
+
 ## Comparison to conventional approach
+
 
 Most conventional approaches to parallel programming require the __user__
 to specify when and where the program should run in parallel. They do this
 by providing their own programming models and application programming
-interfaces. The conventional approach has advantages and disadvantages.
-Well defined interfaces are helpful for understanding and for debugging.
+interfaces. The conventional approach has several advantages. First of all,
+it works. It scales up to huge clusters. Well defined interfaces simplify
+understanding and debugging. The approach also has disadvantages. It
+usually requires programmers to use more knowledge of the underlying
+system, data, and computations to use it effectively.
+
+
+R's functional programming model makes it amenable to automatic
+parallelization. 
+
 
 <!--
 Parallelism is used to make code run faster. The standard advice for making
 code run faster is:
 
-1. Write simple code that does what you want
+1. Write simple code that does what we want
 2. Profile it to see what's slow
 3. Make the slow parts faster
 -->
-
-This fits in well with the conventional approach to optimizing code for
-performance, namely to first write a simple, expressive version and then 
-
-Profiling shows where the program is slow so that the prog
-The programmer can profile to determine where 
-
-R's functional programming model makes it amenable to automatic
-parallelization. 
 
 In contrast to the conventional approach, makeParallel takes general R code
 and automatically transforms it into parallel code. Thus the __system__
@@ -65,46 +96,15 @@ the program in parallel.
 
 makeParallel relies on existing infrastructure for the conventional
 approach wherever possible. For example, it uses `parallel::makeCluster` to
-initialize clusters of workers communicating over sockets.
+initialize clusters of workers communicating over sockets. Indeed, the
+conventional approaches provide the lower level tools and hence were a
+prerequisite before we could really try something like this.
 
-The problem with this is that then this code becomes
-tied to the package, so one has to write code in different ways.
-
-
-
-The appeal of this approach is that you don't have to change your code in
-any way. By allowing this _system_ to change your code you can benefit from
-underlying improvements in the system, and change your code in ways that
-you may have never thought of, or that were manually infeasible.
-This is akin to an optimizing compiler. As the compiler becomes smarter,
-the same programs run faster, with no change to the underlying code.
 
 Writing parallel programs is more difficult than writing serial programs.
 
 
-This project is experimental and ambitious. If you would like to write
-parallel R today then you would do well to start with an established
-package, such as the recommended [parallel
-package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf)
-which has been included with R since version 2.14. The CRAN Task View
-[High-Performance and Parallel Computing with
-R](https://cran.r-project.org/view=HighPerformanceComputing)
-provides a thorough review of available third party software. 
 
-
-
-
-
-makeParallel creates R code from R code, so in this sense it acts as a
-[transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler). 
-
-This
-automatic program transformation differs from current parallel technologies
-which require the user to explicitly write code according to a particular
-programming model / API. The broader goal is to bring in more information on the
-system and the data to compute on. In this way we build more intelligence
-into the system, freeing the user to write higher level code that also
-performs better.
 
 
 
@@ -112,7 +112,7 @@ performs better.
 Could compare to multi threaded BLAS
 -->
 
-# makeParallel
+## Basic Model
 
 
 The following diagram illustrates the computational model for the steps in inferring
