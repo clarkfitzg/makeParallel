@@ -51,9 +51,9 @@ setGeneric("inferGraph", function(code, ...)
 #' @export
 #' @rdname schedule
 #' @param graph object of class \linkS4class{DependGraph}
-#' @param maxWorkers integer maximum number of parallel workers
+#' @param maxWorker integer maximum number of parallel workers
 #' @param ... additional arguments to methods
-setGeneric("schedule", function(graph, maxWorkers = 2L, ...)
+setGeneric("schedule", function(graph, maxWorker = 2L, ...)
            standardGeneric("schedule"))
 
 
@@ -90,14 +90,14 @@ setGeneric("generate", function(schedule, ...)
 #'
 #' @export
 #' @rdname writeCode
-#' @param x object of class \linkS4class{GeneratedCode}
+#' @param code object of class \linkS4class{GeneratedCode}
 #' @param file character name of a file to write the code, possibly
 #' missing.
 #' @param ... additional arguments to methods
 #' @return expression R language object, suitable for further manipulation
 #' @seealso \code{\link{generate}} to generate the code from a schedule,
 #' \code{\link{makeParallel}} to do everything all at once.
-setGeneric("writeCode", function(x, file, ...) 
+setGeneric("writeCode", function(code, file, ...) 
            standardGeneric("writeCode"))
 
 

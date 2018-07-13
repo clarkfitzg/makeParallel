@@ -5,44 +5,44 @@
 #' @export
 #' @rdname writeCode
 setMethod("writeCode", c("GeneratedCode", "logical"), 
-    function(x, file, overWrite = FALSE, prefix = "gen_")
+    function(code, file, overWrite = FALSE, prefix = "gen_")
 {
-    oldname = file(schedule(x))
+    oldname = file(schedule(code))
     fname = prefixFileName(oldname, prefix)
     if(file && !is.na(fname)){
-        writeHelper(x, fname, overWrite = overWrite)
+        writeHelper(code, fname, overWrite = overWrite)
     }
-    x@code
+    code@code
 })
 
 
 #' @export
 #' @rdname writeCode
-setMethod("writeCode", c("GeneratedCode", "missing"), function(x, file, ...)
+setMethod("writeCode", c("GeneratedCode", "missing"), function(code, file, ...)
 {
-    callGeneric(x, file = TRUE, ...)
+    callGeneric(code, file = TRUE, ...)
 })
 
 
 #' @export
 #' @rdname writeCode
 setMethod("writeCode", c("GeneratedCode", "character"),
-    function(x, file, overWrite = FALSE, ...)
+    function(code, file, overWrite = FALSE, ...)
 {
     if(!is.na(file))
-        writeHelper(x, file, overWrite = overWrite)
-    x@code
+        writeHelper(code, file, overWrite = overWrite)
+    code@code
 })
 
 
-writeHelper = function(x, fname, overWrite)
+writeHelper = function(code, fname, overWrite)
 {
     if(file.exists(fname) && !overWrite){
         e = simpleError(sprintf("The file %s already exists. Pass overWrite = TRUE to replace %s with a new version.", fname, fname))
         class(e) = c("FileExistsError", class(e))
         stop(e)
     }
-    content = as.character(x@code)
+    content = as.character(code@code)
     writeLines(content, fname)
     message(sprintf("generated parallel code is in %s", fname))
     fname
