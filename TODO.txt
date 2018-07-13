@@ -1,5 +1,7 @@
 TODO list:
 
+- handle library calls
+- igraph conversion example
 - Properly cite references
 - Make sure that links work using 
 - Pass R CMD check

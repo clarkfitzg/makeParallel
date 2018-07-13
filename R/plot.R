@@ -13,7 +13,7 @@ plot_one_eval_block = function(row, blockHeight, rectAes)
 
 
 plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
-                             , text_adj = 1.2)
+                             , labelTransfer, text_adj = 1.2)
 {with(row, {
     send_rect_args = list(xleft = start_time_send
         , ybottom = proc_send - blockHeight
@@ -44,7 +44,8 @@ plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
         , x1 = mean(c(end_time_receive, start_time_receive))
         , y1 = proc_receive + delta
         )
-    text(x_send, y_send, varname, adj = adj)
+    if(labelTransfer)
+        text(x_send, y_send, varname, adj = adj)
 })}
 
 
@@ -57,19 +58,23 @@ plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
 #' @param evalColor color for evaluation blocks
 #' @param sendColor color for send blocks
 #' @param receiveColor color for receive blocks
+#' @param labelTransfer add labels for transfer arrows?
 #' @param rectAes list of additional arguments for
 #'   \code{\link[graphics]{rect}}
 #' @param ... additional arguments to \code{plot}
 setMethod(plot, "TaskSchedule", function(x, blockHeight = 0.25, main = "schedule plot"
     , evalColor = "gray", sendColor = "orchid", receiveColor = "slateblue"
-    , rectAes = list(density = NA, border = "black", lwd = 2)
+    , labelTransfer = TRUE, rectAes = list(density = NA, border = "black", lwd = 2)
     , ...)
 {
     run = x@evaluation
 
     xlim = c(min(run$start_time), max(run$end_time))
-    ylim = c(min(run$processor) - 1, max(run$processor) + 1)
-    plot(xlim, ylim, type = "n", xlab = "time", ylab = "processor", main = main, ...)
+    ylim = c(min(run$processor) - 0.5, max(run$processor) + 0.5)
+    plot(xlim, ylim, type = "n", yaxt = "n"
+         , xlab = "time", ylab = "processor", main = main, ...)
+
+    axis(2, at = seq(max(run$processor)))
 
     rectAes[["col"]] = evalColor
     by(run, seq(nrow(run)), plot_one_eval_block
@@ -82,6 +87,7 @@ setMethod(plot, "TaskSchedule", function(x, blockHeight = 0.25, main = "schedule
         , rectAes = rectAes
         , sendColor = sendColor
         , receiveColor = receiveColor
+        , labelTransfer = labelTransfer
         )
 
     NULL

@@ -21,8 +21,7 @@ Suggests:
     roxygen2,
     knitr,
     rmarkdown,
-    testthat,
-    data.table
+    testthat
 Description: This experimental package provides tools to automatically
     transform serial R code into more efficient parallel versions.
     The primary intended use case is a R script that takes too
