@@ -22,11 +22,10 @@ NULL
 #'   b <- 2
 #'   c <- a + b
 #'   d <- b * c
-#' "
-#' if(require(igraph)){
-#'   ig <- as(g, "igraph")
-#'   plot(ig)
-#' }
+#' "))
+#'
+#' ig <- as(g, "igraph")
+#' plot(ig)
 setGeneric("inferGraph", function(code, ...)
            standardGeneric("inferGraph"))
 
