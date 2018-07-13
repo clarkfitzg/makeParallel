@@ -109,9 +109,3 @@ setGeneric("writeCode", function(code, file, ...)
 #' @param value file name to associate with object
 setGeneric("file<-", function(description, value)
            standardGeneric("file<-"))
-
-
-#' @importFrom graphics plot
-# TODO:* Is this the correct way to make plot a generic so that I can set a
-# method for it?
-setGeneric("plot")

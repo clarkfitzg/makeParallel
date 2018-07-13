@@ -1,3 +1,10 @@
+#' @importFrom graphics plot
+NULL
+
+# TODO: (ask Duncan) Is this the correct way to make plot a generic so that
+# I can set a method for it?
+setGeneric("plot")
+
 
 plot_one_eval_block = function(row, blockHeight, rectAes)
 {with(row, {

@@ -107,3 +107,6 @@ GeneratedCode = function(schedule, code)
     new("GeneratedCode", schedule = schedule, code = code
         , file = as.character(NA))
 }
+
+
+setOldClass("igraph")
