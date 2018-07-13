@@ -6,7 +6,7 @@ plot_one_eval_block = function(row, blockHeight, rectAes)
         , xright = end_time
         , ytop = processor + blockHeight
         )
-    do.call(rect, c(rect_args, rectAes))
+    do.call(graphics::rect, c(rect_args, rectAes))
 
     text(x = (start_time + end_time) / 2, y = processor, labels = node)
 })}
@@ -21,7 +21,7 @@ plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
         , ytop = proc_send + blockHeight
         )
     rectAes[["col"]] = rectAes[["border"]] = sendColor
-    do.call(rect, c(send_rect_args, rectAes))
+    do.call(graphics::rect, c(send_rect_args, rectAes))
 
     receive_rect_args = list(xleft = start_time_receive
         , ybottom = proc_receive - blockHeight
@@ -29,7 +29,7 @@ plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
         , ytop = proc_receive + blockHeight
         )
     rectAes[["col"]] = rectAes[["border"]] = receiveColor
-    do.call(rect, c(receive_rect_args, rectAes))
+    do.call(graphics::rect, c(receive_rect_args, rectAes))
 
     delta = 1.1 * blockHeight
     adj = c(text_adj, text_adj)
@@ -74,7 +74,7 @@ setMethod(plot, "TaskSchedule", function(x, blockHeight = 0.25, main = "schedule
     plot(xlim, ylim, type = "n", yaxt = "n"
          , xlab = "time", ylab = "processor", main = main, ...)
 
-    axis(2, at = seq(max(run$processor)))
+    graphics::axis(2, at = seq(max(run$processor)))
 
     rectAes[["col"]] = evalColor
     by(run, seq(nrow(run)), plot_one_eval_block
