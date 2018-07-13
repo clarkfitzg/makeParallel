@@ -1,5 +1,7 @@
 #' Run and Measure Code
 #'
+#' Will export this once I the full pipeline works.
+#'
 #' Run the serial code in the task graph and measure how long each expression
 #' takes to run as well as the object sizes of each variable that can
 #' possibly be transferred.
@@ -9,7 +11,6 @@
 #' this application since the focus is on measuring statements that take at
 #' least on the order of 1 second to run. 
 #'
-#' @export
 #' @param code to be passed into \code{\link{inferGraph}}
 #' @param graph object of class \code{DependGraph}
 #' @param envir environment to evaluate the code in

@@ -28,7 +28,7 @@ DependGraph = setClass("DependGraph",
 #' Graph where each expression has been executed, timed, and the size of
 #' the variables have been measured.
 #'
-#' @export
+#' Will export once full pipeline works.
 #' @slot time time in seconds to run each expression
 MeasuredDependGraph = setClass("MeasuredDependGraph",
     slots = c(time = "numeric"),

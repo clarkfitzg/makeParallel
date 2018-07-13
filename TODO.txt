@@ -1,17 +1,13 @@
 TODO list:
 
 - handle library calls
-- igraph conversion example
 - Properly cite references
 - Make sure that links work using 
-- Pass R CMD check
 - Only write to tmp directories
 - Drop all the functions and objects that I don't use
 - All items in code marked `TODO:*`
 - Make sure documentation can be accessed
 - Revisit Apache hive code generation function
-- Make sure object naming convention and argument names are consistent for
-  all exported objects.
 - Move some simple cases from tests to the function examples
 
 Can defer:
@@ -20,6 +16,10 @@ Can defer:
 
 Done:
 
+- Make sure object naming convention and argument names are consistent for
+  all exported objects.
+- Pass R CMD check
+- igraph conversion example
 - Add error classes to messages
 - Unit tests passing
 - Run tests on generated code
