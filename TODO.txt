@@ -1,9 +1,11 @@
 TODO list:
 
+- Only write to tmp directories
+- Don't open up sockets for tests on CRAN machines
+
 - handle library calls
 - Properly cite references
 - Make sure that links work using 
-- Only write to tmp directories
 - Drop all the functions and objects that I don't use
 - All items in code marked `TODO:*`
 - Make sure documentation can be accessed
