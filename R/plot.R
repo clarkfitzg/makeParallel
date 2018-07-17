@@ -67,7 +67,7 @@ plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
 #' @param rectAes list of additional arguments for
 #'   \code{\link[graphics]{rect}}
 #' @param ... additional arguments to \code{plot}
-setMethod(plot, "TaskSchedule", function(x, blockHeight = 0.25, main = "schedule plot"
+setMethod(plot, c("TaskSchedule", "missing"), function(x, blockHeight = 0.25, main = "schedule plot"
     , evalColor = "gray", sendColor = "orchid", receiveColor = "slateblue"
     , labelTransfer = TRUE, rectAes = list(density = NA, border = "black", lwd = 2)
     , ...)
