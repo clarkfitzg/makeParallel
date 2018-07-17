@@ -43,27 +43,22 @@ thorough review of available third party software.
 
 ## Big Picture
 
-makeParallel makes code parallel. It statically analyzes code to detect
-dependencies between statements and implements a modular system for
+makeParallel makes code parallel. It statically analyzes entire scripts to
+detect dependencies between statements and implements a modular system for
 generating new code.
 
 The appeal of this approach is that we don't have to change our code to
-make it parallel.
-By allowing this _system_ to change our code we can benefit from
-underlying improvements in the system, and change code in ways that
-we may have never thought of, or that were manually infeasible.
-This is akin to an optimizing compiler. As the compiler becomes smarter,
-the same programs run faster, with no change to the underlying code.
-makeParallel creates R code from R code, so in this sense it acts as a
+make it parallel. We can write higher level code that also performs better.
+By allowing this _system_ to change our code we can benefit from underlying
+improvements in the system, and change code in ways that we may have never
+thought of, or that were manually infeasible. This is akin to an optimizing
+compiler. As the compiler becomes smarter, the same programs run faster,
+with no change to the underlying code. makeParallel creates R code from R
+code, so in this sense it acts as a
 [transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler). 
-
-The next step is to bring in more information on the system and the data to
-analyze. In this way we build more intelligence into the system, freeing
-the user to write higher level code that also performs better.
 
 
 ## Comparison to conventional approach
-
 
 Most conventional approaches to parallel programming require the __user__
 to specify when and where the program should run in parallel. They do this
@@ -88,7 +83,7 @@ and automatically transforms it into parallel code. Thus the __system__
 must determine a correct and reasonably efficient way to execute parts of
 the program in parallel.
 
-makeParallel relies on existing infrastructure wherever possible. For
+makeParallel builds on existing infrastructure wherever possible. For
 example, it uses `parallel::makeCluster` to initialize clusters of workers
 communicating over sockets. Indeed, the conventional approaches provide the
 lower level tools.
@@ -194,19 +189,19 @@ plot(schedule(pcode))
 
 This plot illustrates the schedule returned from the scheduling algorithm.
 The completion time of the script is the last time a processor is busy on
-the graph. Efficient schedules complete earlier. This plot is a useful
+the graph. More efficient schedules complete earlier. This plot is a useful
 diagnostic- if all cores are mostly busy that's a good sign. If only one
 core does almost all the work then either 1) the code can't be improved
 through task parallelism, or 2) the default scheduling algorithm chose a
-poor schedule. In general task scheduling problem is NP hard, but we leave
-hooks in for users to supply their own scheduling algorithm.
+poor schedule. The task scheduling problem is a very rich problem with many
+published algorithms, so we leave hooks in for users to supply their own
+scheduling algorithm.
 
-The generated code is this disgusting thing that no sane person would ever
+The generated code is a beastly thing that no sane person would ever
 write by hand. But it does have a few virtues:
 
 - It runs
 - It does the same thing as the serial version while being faster
-- We never had to explicitly create it.
 
 ```{r}
 writeCode(pcode)
@@ -323,24 +318,26 @@ have to touch the dependency graph computations.
 ## Summary
 
 Users can specify the scheduling and code generation steps by passing
-functions or defining methods. Here's an associated mental model.
+functions or defining methods. Here's an associated mental model for the
+possible steps taken by the `makeParallel` function.
 
 ![extensible model](extensible.png)
+
+The shaded nodes are not yet fully implemented.
 
 In summary, `makeParallel` can be used in the following ways:
 
 - `makeParallel(code)` simple, common use case
 - `makeParallel("some_script.R")` dispatches on the class of
   the first argument.
-- `makeParallel(taskgraph = tg)` skips the setup part of the function in
-  case the user has already done that or they have a special task graph to
-  use.
-- `makeParallel(code, scheduler = my_scheduler, code_generator =
+- `makeParallel(graph = g)` skips the dependency graph inference in
+  case the user would like to supply their own graph.
+- `makeParallel(code, scheduler = my_scheduler, generator =
   my_code_generator)` allows users to both customize the steps in the process
     by passing in their own functions to perform them.
-- `makeParallel(code, scheduler = fork_join_schedule)` dispatches on the
-  class allowing users to extend the system through defining their own
-  classes.
+- `makeParallel(code, scheduler = scheduleTaskList)` dispatches on the
+  class of the resulting objects allowing users to extend the system
+  through defining their own classes.
 
 
 ## Static Analysis
@@ -352,57 +349,51 @@ currently provides most of the underlying tools.
 
 As we build more tools that may be useful for general purpose static R code
 analyis we've been putting them in the [CodeAnalysis
-package](https://github.com/duncantl/CodeAnalysis). This package will most
-likely come to depend on the CodeAnalysis.
+package](https://github.com/duncantl/CodeAnalysis). makeParallel will most
+likely come to depend on CodeAnalysis.
 
-
-
-
-## Diagnostics
-
-This package provides a few tools to inspect the generated schedules.
-
-
-## Road Map
-
-The following features are planned, but not yet implemented.
 
 ## Plans
 
-__Use information on data__
-
-We're currently working on extending makeParallel to take into account the
-size and nature of the data to be analyzed. For example, if the data won't
-fit into memory then this typically a totally different approach to reading
-the data and performing the computations.
-
-
-
+The following features are planned, but not yet implemented.
 
 ### Short Term
 
-1. Show which code actually changed, perhaps by providing a `diff()`
-   method.
+1. Handle calls to `library()`
+2. Generate code for Windows
+3. Use measured information on expression run time and object sizes
 1. Add constraints for processes, ie. code that performs plotting must
    happen in one process
-2. More efficient scheduling algorithms and code generation
-3. Detection of objects with reference semantics to handle appropriately.
+1. Show which code actually changed, perhaps by providing a `diff()`
+   method
+2. More efficient scheduling algorithms
+3. Detection of objects with reference semantics to handle appropriately
 
 ### Longer Term
 
-1. Allow users to pass information about the data, ie. dimensions.
+1. Allow users to pass information about the data, ie. dimensions and types.
 2. Infer dimensions and run time when possible.
 3. Generate code that uses systems besides R, for example Apache Hive.
 
+
 ## Challenges
 
-1. Non standard evaluation (NSE) makes static code analysis more difficult
-   because it changes the semantics of the language. The CodeDepends
-   package supports this by providing [function
-   handlers](https://github.com/duncantl/CodeDepends/blob/master/R/functionHandlers.R),
-   which allows the user to specify how each non standard function behaves.
-   This introduces some ambiguity.
+Some R code is more difficult to parallelize. This package currently
+doesn't handle the following cases.
 
-### Acknowledgements
+1. Non standard evaluation (NSE) complicates static code analysis
+   because it changes the semantics of the language.
+   [data.table](https://cran.r-project.org/package=data.table) and
+   [dplyr](https://cran.r-project.org/package=dplyr) are two popular
+   packages that use NSE.
+2. Objects with reference semantics can change in method calls, so they
+   require much more synchronization to run in parallel. Environments,
+   reference classes, and R6 classes are examples of such objects.
+
+
+## Acknowledgements
 
 Thanks Duncan Temple Lang and Nick Ulle for providing feedback.
+
+Thanks to all those who have let me look at their code, especially Scott Devine,
+Nistara Randhawa, and Lynna Chu.

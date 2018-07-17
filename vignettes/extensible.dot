@@ -23,41 +23,43 @@ parallel_package_code_generator [label = "parallel package\ncode generator"];
 
 node [shape = "oval", fontname = "courier"];
 //------------------------------------------------------------
-depend_graph;
-serial_scheduler;
-task_scheduler;
-map_scheduler;
-serial_scheduler;
+inferGraph;
+scheduleTaskList;
+map_scheduler [label = "schedule\n(default)"];
 
 node [style = "filled", shape = "oval", fontname = "courier"];
 //------------------------------------------------------------
-forkjoin_scheduler;
+scheduleForkJoin;
+scheduleCluster;
 ForkJoinSchedule [shape = "rectangle"];
 
 node [fontname = "arial"];
 hive_code_generator [label = "Apache Hive\ncode generator"];
+snow_code_generator [label = "SNOW code\ngenerator"];
 future_code_generator [label = "R future package\ncode generator"];
 mcparallel_code_generator [label = "parallel::mcparallel\ncode generator"];
 
 
-file_name -> depend_graph;
-parsed_expression -> depend_graph;
-depend_graph -> DependGraph;
-DependGraph -> task_scheduler;
+file_name -> inferGraph;
+parsed_expression -> inferGraph;
+inferGraph -> DependGraph;
+DependGraph -> scheduleTaskList;
 DependGraph -> map_scheduler;
-DependGraph -> serial_scheduler;
-DependGraph -> forkjoin_scheduler;
-task_scheduler -> TaskSchedule;
-serial_scheduler -> SerialSchedule;
+DependGraph -> scheduleForkJoin;
+DependGraph -> scheduleCluster
+scheduleTaskList -> TaskSchedule;
+scheduleCluster -> TaskSchedule;
 map_scheduler -> MapSchedule;
 SerialSchedule -> GeneratedCode [label = "non op"];
 TaskSchedule -> socket_code_generator;
 MapSchedule -> parallel_package_code_generator;
 MapSchedule -> hive_code_generator;
+MapSchedule -> snow_code_generator;
 hive_code_generator -> GeneratedCode;
+snow_code_generator -> GeneratedCode;
 socket_code_generator -> GeneratedCode;
 parallel_package_code_generator -> GeneratedCode;
-forkjoin_scheduler -> ForkJoinSchedule;
+scheduleForkJoin -> ForkJoinSchedule;
 ForkJoinSchedule -> future_code_generator;
 ForkJoinSchedule -> mcparallel_code_generator;
 future_code_generator -> GeneratedCode;
@@ -66,7 +68,8 @@ mcparallel_code_generator -> GeneratedCode;
 // Bypass
 edge [style = "dotted"];
 //------------------------------------------------------------
-task_scheduler -> SerialSchedule;
+scheduleTaskList -> SerialSchedule;
 map_scheduler -> SerialSchedule;
-forkjoin_scheduler -> SerialSchedule;
+scheduleForkJoin -> SerialSchedule;
+scheduleCluster -> SerialSchedule;
 }
