@@ -1,6 +1,6 @@
 Package: makeParallel
 Version: 0.0.1
-Date: 2018-07-04
+Date: 2018-07-18
 Title: Transform Serial R Code into Parallel R Code
 Authors@R: person("Clark", "Fitzgerald", role = c("aut", "cre"),
                      email = "clarkfitzg@gmail.com")
@@ -22,10 +22,10 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-Description: This experimental package provides tools to automatically
-    transform serial R code into more efficient parallel versions.
-    The primary intended use case is a R script that takes too
-    long, ie. at least more than one second.
+Description: This experimental package provides tools to automate the
+    transformation of serial R code into more efficient parallel versions. It
+    does this by statically analyzing entire scripts to detect dependencies
+    between statements. It implements a modular system for generating new code.
 License: MIT + file LICENSE
 URL: https://github.com/clarkfitzg/makeParallel
 BugReports: https://github.com/clarkfitzg/makeParallel

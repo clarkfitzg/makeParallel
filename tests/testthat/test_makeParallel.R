@@ -10,6 +10,7 @@ oldcode = parse(text = "
 test_that("Defaults for generics used in parallelize.", {
 
     g = inferGraph(oldcode)
+
     s = schedule(g)
     newcode = generate(s)
 
