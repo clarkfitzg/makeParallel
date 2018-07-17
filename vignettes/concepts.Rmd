@@ -57,10 +57,9 @@ the same programs run faster, with no change to the underlying code.
 makeParallel creates R code from R code, so in this sense it acts as a
 [transpiler](https://en.wikipedia.org/wiki/Source-to-source_compiler). 
 
-The broader goal is to bring in more information on the
-system and the data to compute on. In this way we build more intelligence
-into the system, freeing the user to write higher level code that also
-performs better.
+The next step is to bring in more information on the system and the data to
+analyze. In this way we build more intelligence into the system, freeing
+the user to write higher level code that also performs better.
 
 
 ## Comparison to conventional approach
@@ -74,11 +73,6 @@ it works. It scales up to huge clusters. Well defined interfaces simplify
 understanding and debugging. The approach also has disadvantages. It
 usually requires programmers to use more knowledge of the underlying
 system, data, and computations to use it effectively.
-
-
-R's functional programming model makes it amenable to automatic
-parallelization. 
-
 
 <!--
 Parallelism is used to make code run faster. The standard advice for making
@@ -94,18 +88,10 @@ and automatically transforms it into parallel code. Thus the __system__
 must determine a correct and reasonably efficient way to execute parts of
 the program in parallel.
 
-makeParallel relies on existing infrastructure for the conventional
-approach wherever possible. For example, it uses `parallel::makeCluster` to
-initialize clusters of workers communicating over sockets. Indeed, the
-conventional approaches provide the lower level tools and hence were a
-prerequisite before we could really try something like this.
-
-
-Writing parallel programs is more difficult than writing serial programs.
-
-
-
-
+makeParallel relies on existing infrastructure wherever possible. For
+example, it uses `parallel::makeCluster` to initialize clusters of workers
+communicating over sockets. Indeed, the conventional approaches provide the
+lower level tools.
 
 
 <!--
@@ -126,41 +112,58 @@ the edges represent generic methods. The diagram depicts the following:
 1. The end user supplies some input code, which could be the name of a file
    or an actual expression.
 2. `inferGraph` statically analyzes the code and constructs a dependency
-   graph between the expressions based primarily on [use-definition
-   chains](https://en.wikipedia.org/wiki/Use-define_chain).
-3. `schedule` assigns each expression to a time and processor while
-   respecting the constraints of the dependency graph.
+   graph between the expressions currently based on [use-definition
+   chains](https://en.wikipedia.org/wiki/Use-define_chain). A future version
+   of the software will allow other types of constraints, such as requiring
+   two expressions to run on the same processor.
+3. `schedule` assigns each expression to a processor and orders the
+   expression on each processor, while respecting the constraints of the
+   dependency graph.
 4. `generate` creates executable code from the schedule.
 5. `writeCode` simply writes the code to a file and returns the expression
    containing the code.
 
-These steps are all designed to be modular. The most interesting step to
-change is the `scheduler`. In general scheduling a task graph is NP hard,
-and many algorithms exist to solve this problem.
-
-## Types of parallelism
-
-By default, `schedule`
-
-Choosing a scheduler. The default scheduler is `data_scheduler`, which
-uses the more common data parallelism found in R. The alternative is
-`task_scheduler`, which uses task parallelism to generate a schedule.
-`data_scheduler` and `task_scheduler` are generic functions. _Why? They
-don't dispatch on any args. Ah, but they could do different things
-depending on the system. Hmm, could I fit the Hive code generation into
-this model? Maybe possible. It would be nice to design it in such a way
-that I'm not limited from extending it later, if possible._
+These steps are all designed to be modular. The most interesting step is
+the `scheduler`. In general scheduling a task graph is NP hard, and many
+algorithms exist to solve this problem.
 
 
-Data parallelism executes the same code on different data. R's vectorized
-computational model is amenable to data parallelism. In contrast, task
-parallelism executes multiple different pieces of code simultaneously. 
+## Data Parallelism
 
-The only way to get a speedup from task parallelism is if two or more long
-running parts of the program can run simultaneously. This could happen when
-reading two large files, for example. If we happen to know how long
-each of the expressions will take to run we can pass these times in as an
-argument.
+The default scheduler produces a `MapSchedule` which represents data
+parallelism. This captures the common and useful case of "embarrassingly
+parallel" operations. These come from replacing apply type functions with
+equivalent parallel versions. The current implementation is basic and does
+the following:
+
+- Identifies `for` loops that can be parallelized
+- Replaces top level `lapply` and `mapply` with their `mc` equivalents from
+  the parallel package
+- Avoids nested parallelism
+
+Future versions may include the following features. If you need these
+sooner then get in touch.
+
+- Marking expressions that can be embarrassingly parallel
+- Deciding whether or not to run each expression in parallel
+- Generating code for Windows
+- Handling more apply style functions, ie. `apply, replicate`
+- Making vectorized operations parallel
+- Splitting data and keeping it distributed for the duration of the
+  program
+
+
+## Task Parallelism
+
+Task parallelism means two or more workers execute two or more different
+blocks of code simultaneously.
+
+The only way to get a speedup from task parallelism is if the dependency
+graph _allows_ two or more long running parts of the program to run
+simultaneously. This could happen when reading two large files, for
+example. `scheduleTaskList` implements a standard list scheduling
+algorithm. The algorithm needs the execution time for each expression
+to work properly so we pass it in explicitly below.
 
 ```{r echo=FALSE, eval=FALSE, results='hide',message=FALSE}
 
@@ -399,3 +402,7 @@ the data and performing the computations.
    handlers](https://github.com/duncantl/CodeDepends/blob/master/R/functionHandlers.R),
    which allows the user to specify how each non standard function behaves.
    This introduces some ambiguity.
+
+### Acknowledgements
+
+Thanks Duncan Temple Lang and Nick Ulle for providing feedback.
