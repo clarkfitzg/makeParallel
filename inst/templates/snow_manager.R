@@ -18,17 +18,17 @@ close.NULL = function(...) NULL
 
 
 #' Connect workers as peers
-connect = function(server, client, port, sleep = 0.1, ...)
+connect = function(server, client, port, timeout, sleep = 0.1, ...)
 {
     if(ID == server){
         con = socketConnection(port = port, server = TRUE
-                , blocking = TRUE, open = "a+b", ...)
+                , blocking = TRUE, open = "a+b", timeout = timeout, ...)
         workers[[client]] <<- con
     }
     if(ID == client){
         Sys.sleep(sleep)
         con = socketConnection(port = port, server = FALSE
-                , blocking = TRUE, open = "a+b", ...)
+                , blocking = TRUE, open = "a+b", timeout = timeout, ...)
         workers[[server]] <<- con
     }
     NULL
