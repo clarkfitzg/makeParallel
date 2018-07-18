@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 library(testthat)
-library(autoparallel)
+library(makeParallel)
 
 
 expect_generated = function(script, scheduler = scheduleTaskList, plot = FALSE, ...)
@@ -22,16 +22,17 @@ expect_generated = function(script, scheduler = scheduleTaskList, plot = FALSE, 
     }
 
     # Serial
-    source(script)
+    source(script, local = new.env())
     file.rename(outfile, serfile)
     expected = readLines(serfile)
 
     # Parallel
     # Generated scripts have a cluster `cls`. It needs to be cleaned up if
     # something fails midway through.
-    on.exit(try(parallel::stopCluster(cls), silent = TRUE))
-    # TODO:*
-    source(p@outfile)
+    #on.exit(try(parallel::stopCluster(cls), silent = TRUE))
+
+    code = writeCode(p, file = FALSE)
+    eval(code, envir = new.env())
     actual = readLines(outfile)
     
     expect_equal(actual, expected)

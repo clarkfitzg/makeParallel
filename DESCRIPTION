@@ -5,7 +5,6 @@ Title: Transform Serial R Code into Parallel R Code
 Authors@R: person("Clark", "Fitzgerald", role = c("aut", "cre"),
                      email = "clarkfitzg@gmail.com",
                      comment = c(ORCID = "0000-0003-3446-6389"))
-Author: Clark Fitzgerald [aut, cre]
 Maintainer: Clark Fitzgerald <clarkfitzg@gmail.com>
 Depends:
     R (>= 3.1.0)
@@ -25,14 +24,13 @@ Suggests:
     testthat
 Description:
     This experimental package automates the transformation of serial R code
-into more efficient parallel versions. It identifies task parallelism by
-statically analyzing entire scripts to detect dependencies between
-statements. It implements a customizable, extensible system for scheduling
-and generating new code. It includes a reference implementation of the
-'List Scheduling' approach to the general task scheduling problem of scheduling different
-statements on different processors discussed in Sinnen (2007)
-<ISBN:0471735760>.
-
+    into more efficient parallel versions. It identifies task parallelism by
+    statically analyzing entire scripts to detect dependencies between
+    statements. It implements a customizable, extensible system for scheduling
+    and generating new code. It includes a reference implementation of the
+    'List Scheduling' approach to the general task scheduling problem of scheduling different
+    statements on different processors discussed in Sinnen (2007)
+    <ISBN:0471735760>.
 License: MIT + file LICENSE
 URL: https://github.com/clarkfitzg/makeParallel
 BugReports: https://github.com/clarkfitzg/makeParallel
