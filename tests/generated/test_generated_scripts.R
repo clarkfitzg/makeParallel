@@ -1,6 +1,13 @@
 #!/usr/bin/env Rscript
 
-library(testthat)
+# This scripts tests generated code. It requires certain ports to be open,
+# writes local files, and sometimes uses 3 worker processes, so it can't
+# run on CRAN.
+#
+# Each script should write results to a file following the current naming
+# convention. For example, script1.R writes output to script1.R.log.
+
+
 library(makeParallel)
 
 
@@ -32,35 +39,26 @@ expect_generated = function(script, scheduler = scheduleTaskList, plot = FALSE, 
     #on.exit(try(parallel::stopCluster(cls), silent = TRUE))
 
     code = writeCode(p, file = FALSE)
-    eval(code, envir = new.env())
+    eval(code)
     actual = readLines(outfile)
     
-    expect_equal(actual, expected)
+    stopifnot(identical(actual, expected))
 
     cat(sprintf("Pass %s\n\n", script))
 }
 
-
-test_that("expect_generated fails when it should fail.", {
-    # That's right, this is a test of the tests :)
-
-    expect_error(expect_generated("fail.R")
-        , regexp = "non-numeric argument to binary operator")
-
-})
+# A test of the test :)
+e = tryCatch(expect_generated("fail.R"), error = identity)
 
 
-test_that("Generated code from simple examples actually executes", {
+# Special cases:
+############################################################
 
-    #pkg_root = system.file(package = "autoparallel")
-    scripts = Sys.glob("script*.R")
+expect_generated("script3.R", maxWorker = 3)
 
-    #scripts = system.file("inst", "generated", package = "autoparallel")
 
-    # First do all of them with defaults
-    lapply(scripts, expect_generated)
+# Run all with the defaults:
+############################################################
 
-    # Then pass in some extra arguments
-    expect_generated("script3.R", maxWorker = 3)
-
-})
+scripts = Sys.glob("script*.R")
+lapply(scripts, expect_generated)
