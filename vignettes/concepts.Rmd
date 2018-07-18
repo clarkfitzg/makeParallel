@@ -361,8 +361,6 @@ The following features are planned, but not yet implemented.
 
 1. Handle calls to `library()`
 2. Generate code for Windows
-1. Identify conditional versus unconditional variable assignment and handle
-   appropriately
 3. Use measured information on expression run time and object sizes
 1. Add constraints for processes, ie. code that performs plotting must
    happen in one process
@@ -373,7 +371,13 @@ The following features are planned, but not yet implemented.
 
 ### Longer Term
 
-1. Allow users to pass information about the data, ie. dimensions and types.
+1. Identify conditional versus unconditional data dependencies and handle
+   appropriately
+2. Handle [output
+   dependencies](https://en.wikipedia.org/wiki/Data_dependency#Output_dependency)
+   aka Write After Write (WAW) dependencies.
+1. Allow users to pass information about the data, ie. dimensions and
+   types.
 2. Infer dimensions and run time when possible.
 3. Generate code that uses systems besides R, for example Apache Hive.
 
