@@ -71,9 +71,6 @@ gen_snow_worker = function(processor, schedule)
     ))
 } 
 
-# TODO:* Collect the names of all the formals for every publicly exported
-# function and check them for uniformity.
-
 #' Generate Task Parallel Code For SNOW Cluster
 #'
 #' Produces executable code that relies on a SNOW cluster on a single

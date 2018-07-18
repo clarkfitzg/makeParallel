@@ -35,7 +35,7 @@ connect = function(server, client, port, sleep = 0.1, ...)
 }
 
 
-clusterExport(cls, c("workers", "connect", "close.NULL"))
+clusterExport(cls, c("workers", "connect", "close.NULL"), envir = environment())
 
 # Each worker has an ID
 clusterMap(cls, assign, "ID", seq(nworkers)
