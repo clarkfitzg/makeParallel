@@ -11,6 +11,7 @@ RFILES = $(wildcard R/*.R)
 TESTFILES = $(wildcard tests/testthat/test*.R)
 VIGNETTES = $(wildcard vignettes/*.Rmd)
 GRAPHVIZ_PNGS = $(addsuffix .png, $(basename $(wildcard vignettes/*.dot)))
+TEMPLATES = $(wildcard inst/templates/*.R)
 
 #GEN_SCRIPT_OUTPUT = $(addsuffix .log, $(wildcard tests/testthat/scripts/script*.R))
 ## Log files that go with each test
@@ -27,7 +28,7 @@ test: $(TESTFILES) $(GEN_SCRIPT_OUTPUT)
 	make install
 	cd tests && Rscript testthat.R && cd ..
 
-$(PKG): $(RFILES) $(TESTFILES) $(VIGNETTES) DESCRIPTION
+$(PKG): $(RFILES) $(TESTFILES) $(TEMPLATES) $(VIGNETTES) DESCRIPTION
 	R -e "devtools::document()"
 	rm -f $(PKG)  # Otherwise it's included in build
 	R CMD build .
