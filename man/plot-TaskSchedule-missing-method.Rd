@@ -7,8 +7,8 @@
 \usage{
 \S4method{plot}{TaskSchedule,missing}(x, blockHeight = 0.25,
   main = "schedule plot", evalColor = "gray", sendColor = "orchid",
-  receiveColor = "slateblue", labelTransfer = TRUE, rectAes = list(density
-  = NA, border = "black", lwd = 2), ...)
+  receiveColor = "slateblue", labelTransfer = TRUE, labelExpr = NULL,
+  rectAes = list(density = NA, border = "black", lwd = 2), ...)
 }
 \arguments{
 \item{x}{\linkS4class{TaskSchedule}}
@@ -23,7 +23,10 @@
 
 \item{receiveColor}{color for receive blocks}
 
-\item{labelTransfer}{add labels for transfer arrows?}
+\item{labelTransfer}{add labels for transfer arrows}
+
+\item{labelExpr}{NULL to use default numbering labels, FALSE to suppress
+labels, or a character vector of custom labels.}
 
 \item{rectAes}{list of additional arguments for
 \code{\link[graphics]{rect}}}

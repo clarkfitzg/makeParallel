@@ -4,7 +4,7 @@ NULL
 setGeneric("plot")
 
 
-plot_one_eval_block = function(row, blockHeight, rectAes)
+plot_one_eval_block = function(row, blockHeight, rectAes, labelExpr)
 {with(row, {
     rect_args = list(xleft = start_time
         , ybottom = processor - blockHeight
@@ -13,7 +13,11 @@ plot_one_eval_block = function(row, blockHeight, rectAes)
         )
     do.call(graphics::rect, c(rect_args, rectAes))
 
-    text(x = (start_time + end_time) / 2, y = processor, labels = node)
+    if(is.null(labelExpr) || labelExpr){
+        lab = if(is.null(labelExpr)) node else label
+        text(x = (start_time + end_time) / 2, y = processor, labels = lab)
+    }
+
 })}
 
 
@@ -63,13 +67,16 @@ plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
 #' @param evalColor color for evaluation blocks
 #' @param sendColor color for send blocks
 #' @param receiveColor color for receive blocks
-#' @param labelTransfer add labels for transfer arrows?
+#' @param labelTransfer add labels for transfer arrows
+#' @param labelExpr NULL to use default numbering labels, FALSE to suppress
+#' labels, or a character vector of custom labels.
 #' @param rectAes list of additional arguments for
 #'   \code{\link[graphics]{rect}}
 #' @param ... additional arguments to \code{plot}
 setMethod(plot, c("TaskSchedule", "missing"), function(x, blockHeight = 0.25, main = "schedule plot"
+    , xlab = "Time (seconds)", ylab = "Processor"
     , evalColor = "gray", sendColor = "orchid", receiveColor = "slateblue"
-    , labelTransfer = TRUE, rectAes = list(density = NA, border = "black", lwd = 2)
+    , labelTransfer = TRUE, labelExpr = NULL, rectAes = list(density = NA, border = "black", lwd = 2)
     , ...)
 {
     run = x@evaluation
@@ -77,14 +84,20 @@ setMethod(plot, c("TaskSchedule", "missing"), function(x, blockHeight = 0.25, ma
     xlim = c(min(run$start_time), max(run$end_time))
     ylim = c(min(run$processor) - 0.5, max(run$processor) + 0.5)
     plot(xlim, ylim, type = "n", yaxt = "n"
-         , xlab = "time", ylab = "processor", main = main, ...)
+         , xlab = xlab, ylab = ylab, main = main, ...)
 
     graphics::axis(2, at = seq(max(run$processor)))
+
+    if(is.character(labelExpr)){
+        run$label = labelExpr
+        labelExpr = TRUE
+    }
 
     rectAes[["col"]] = evalColor
     by(run, seq(nrow(run)), plot_one_eval_block
         , blockHeight = blockHeight
         , rectAes = rectAes
+        , labelExpr = labelExpr
         )
 
     by0(x@transfer, seq(nrow(x@transfer)), plot_one_transfer
