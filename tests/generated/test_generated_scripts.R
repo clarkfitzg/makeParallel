@@ -62,3 +62,29 @@ expect_generated("script3.R", maxWorker = 3)
 
 scripts = Sys.glob("script*.R")
 lapply(scripts, expect_generated)
+
+
+# Debugging environment issues
+############################################################
+if(FALSE){
+
+    expect_generated(scripts[[1]])
+
+    # Now in debugger
+
+    clusterEvalQ(cls, workers)
+    # Should see a list with 1 open connection and 1 NULL
+
+    # Instead they're all NULL, which means that they were never opened.
+    # socket_map looks as expected
+
+    # Here's the line that should open the connections:
+by(socket_map, seq(nrow(socket_map)), function(x) {
+    clusterCall(cls, connect, x$server, x$client, x$port, timeout = timeout)
+})
+
+# But it doesn't. Why?
+# Does it have to do with the global assignment to workers?
+
+
+}
