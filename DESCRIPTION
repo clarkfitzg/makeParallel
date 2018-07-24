@@ -1,5 +1,5 @@
 Package: makeParallel
-Version: 0.0.1
+Version: 0.1.0
 Date: 2018-07-18
 Title: Transform Serial R Code into Parallel R Code
 Authors@R: person("Clark", "Fitzgerald", role = c("aut", "cre"),
@@ -28,8 +28,8 @@ Description:
     statically analyzing entire scripts to detect dependencies between
     statements. It implements a customizable, extensible system for scheduling
     and generating new code. It includes a reference implementation of the
-    'List Scheduling' approach to the general task scheduling problem of scheduling different
-    statements on different processors discussed in Sinnen (2007)
+    'List Scheduling' approach to the general task scheduling problem of scheduling 
+    statements on multiple processors discussed in Sinnen (2007)
     <ISBN:0471735760>.
 License: MIT + file LICENSE
 URL: https://github.com/clarkfitzg/makeParallel

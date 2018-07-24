@@ -18,6 +18,10 @@
 
 \item{main}{title}
 
+\item{xlab}{x axis label}
+
+\item{ylab}{y ayis label}
+
 \item{evalColor}{color for evaluation blocks}
 
 \item{sendColor}{color for send blocks}

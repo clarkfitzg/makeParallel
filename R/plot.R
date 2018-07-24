@@ -64,6 +64,8 @@ plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
 #' @param x \linkS4class{TaskSchedule}
 #' @param blockHeight height of rectangle, between 0 and 0.5
 #' @param main title
+#' @param xlab x axis label
+#' @param ylab y ayis label
 #' @param evalColor color for evaluation blocks
 #' @param sendColor color for send blocks
 #' @param receiveColor color for receive blocks
