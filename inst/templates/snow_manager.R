@@ -34,6 +34,10 @@ connect = function(server, client, port, timeout, sleep = 0.1, ...)
     NULL
 }
 
+# Setting environment so that <<- in `connect` works correctly and to avoid
+# transferring potentially large amounts of data in case the user evaluates
+# this code from within an environment, ie. a function.
+environment(connect) = environment(close.NULL) = .GlobalEnv
 
 clusterExport(cls, c("workers", "connect", "close.NULL"), envir = environment())
 
