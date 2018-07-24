@@ -26,8 +26,8 @@
 #' @param overWrite logical write over existing generated file
 #' @return code object of class \linkS4class{GeneratedCode}
 #' @examples
-#' # Try running this on an existing R script
-#' \dontrun{makeParallel("my_slow_serial.R")}
+#' # Try running this on an existing R script to create "gen_script.R"
+#' \dontrun{makeParallel("script.R")}
 #'
 #' # All the defaults
 #' d <- makeParallel(parse(text = "lapply(mtcars, mean)"))

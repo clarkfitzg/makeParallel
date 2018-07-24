@@ -1,3 +1,6 @@
+temp_dir = tempdir()
+
+
 oldcode = parse(text = "
     v1 = 'foo1'
     v2 = 'foo2'
@@ -18,10 +21,10 @@ test_that("Defaults for generics used in parallelize.", {
     expect_s4_class(s, "Schedule")
     expect_s4_class(newcode, "GeneratedCode")
 
-    fn = "ex.R"
-    try(unlink(fn))
+    fn = tempfile()
     writeCode(newcode, fn)
     expect_true(file.exists(fn))
+    unlink(fn)
 
 })
 
@@ -57,9 +60,9 @@ test_that("Multiple assignment in single expression", {
 
 test_that("whole workflow on files", {
 
-    exfile = "example.R"
-    genfile = "gen_example.R"
-    try(unlink(genfile))
+    exfile = file.path(temp_dir, "example.R")
+    file.copy(from = "example.R", to = exfile)
+    genfile = file.path(temp_dir, "gen_example.R")
 
     out = makeParallel(exfile, scheduler = scheduleTaskList, maxWorker = 3)
 
@@ -72,22 +75,26 @@ test_that("whole workflow on files", {
     expect_true(file.exists(genfile))
 
     # 'Catching different types of errors' - This would make a nice blog post.
-    e = tryCatch(makeParallel(exfile), error = identity)
+    e = tryCatch(makeParallel(exfile, file = genfile), error = identity)
     expect_true(is(e, "FileExistsError"))
 
     makeParallel(exfile, overWrite = TRUE)
-    unlink(genfile)
 
-    fname = "some_file_created_in_test.R"
+    unlink(genfile)
+    makeParallel(exfile, file = FALSE)
+    expect_false(file.exists(genfile))
+
+    fname = file.path(temp_dir, "some_file_created_in_test.R")
     out = makeParallel(exfile, scheduler = scheduleTaskList, file = fname)
     expect_true(file.exists(fname))
     expect_equal(fname, file(out))
-    unlink(fname)
 
-    out = makeParallel("example.R", scheduler = scheduleTaskList, prefix = "GEN")
-    fn = "GENexample.R"
+    out = makeParallel(exfile, scheduler = scheduleTaskList, prefix = "GEN")
+    fn = file.path(temp_dir, "GENexample.R")
     expect_true(file.exists(fn))
     expect_equal(fn, file(out))
-    unlink(fn)
 
 })
+
+
+unlink(temp_dir, recursive = TRUE)
