@@ -1,4 +1,4 @@
-temp_dir = tempdir()
+temp_dir = normalizePath(tempdir())
 
 
 oldcode = parse(text = "

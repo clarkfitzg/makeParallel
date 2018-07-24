@@ -1,6 +1,7 @@
 ^\.travis\.yml$
 ^codecov\.yml$
 Makefile
-TODO\.txt$
-README\.md
+TODO.txt
+README.md
 cran_comments.md
+NEWS.md

@@ -56,6 +56,7 @@ prefixFileName = function(oldname, prefix)
         newname = paste0(prefix, basename(oldname))
         dir = dirname(oldname)
         if(dir == ".") newname else file.path(dir, newname)
+        # normalizePath needed here?
     } else as.character(NA)
     #} else NA
 }

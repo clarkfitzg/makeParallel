@@ -23,10 +23,12 @@ Suggests:
     rmarkdown,
     testthat
 Description:
+    Writing parallel R code can be difficult, particularly for code
+    that is not "embarrassingly parallel".
     This experimental package automates the transformation of serial R code
     into more efficient parallel versions. It identifies task parallelism by
     statically analyzing entire scripts to detect dependencies between
-    statements. It implements a customizable, extensible system for scheduling
+    statements. It implements an extensible system for scheduling
     and generating new code. It includes a reference implementation of the
     'List Scheduling' approach to the general task scheduling problem of scheduling 
     statements on multiple processors discussed in Sinnen (2007)
