@@ -54,5 +54,5 @@ plot(s)
 }
 \references{
 Algorithm 10 in \emph{Task Scheduling for Parallel
-Systems}, Sinnen, O.
+Systems}, Sinnen (2007)
 }
