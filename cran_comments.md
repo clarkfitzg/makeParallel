@@ -1,6 +1,7 @@
 ## Test environments
-* ubuntu 16.04, R 3.4.4
-* win-builder (devel and release)
+* ubuntu 16.04 local (R 3.4.4)
+* ubuntu 14.04 travis-ci (R devel and release)
+* win-builder (R devel and release)
 
 ## R CMD check results
 There were no ERRORs or WARNINGs.
