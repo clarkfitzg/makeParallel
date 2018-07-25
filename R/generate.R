@@ -130,10 +130,11 @@ gen_socket_code_comm = function(schedule, portStart, minTimeout)
     socket_map = unique(socket_map[, c("server", "client")])
     socket_map$port = seq(from = portStart, length.out = nrow(socket_map))
 
-    # Ugly code, but the generated output is easy to read
+    # A little strange code, but the generated output is easy to read
     socket_map_csv_tmp = ""
     con = textConnection("socket_map_csv_tmp", open = "w", local = TRUE)
     utils::write.csv(socket_map, con, row.names = FALSE)
+    close(con)
 
     template = readLines(
         system.file("templates/snow_manager.R", package = "makeParallel"))
