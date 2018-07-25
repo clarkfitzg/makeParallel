@@ -2,9 +2,6 @@
 
 Transform Serial R Code into Parallel R Code
 
-[![Build
-Status](https://travis-ci.org/clarkfitzg/makeParallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/makeParallel)
-
 Writing parallel R code can be difficult, particularly for code that is
 not "embarrassingly parallel". This experimental package automates the
 transformation of serial R code into more efficient parallel versions. It
@@ -19,3 +16,13 @@ Quickstart:
 
 Concepts:
 [vignettes/concepts.Rmd](https://github.com/clarkfitzg/makeParallel/blob/master/vignettes/concepts.Rmd).
+
+<!--
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/makeParallel)](https://cran.r-project.org/package=makeParallel)
+-->
+
+[![Build
+Status](https://travis-ci.org/clarkfitzg/makeParallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/makeParallel)
+
+[![AppVeyor Build
+Status](https://ci.appveyor.com/api/projects/status/github/clarkfitzg/makeParallel?branch=master&svg=true)](https://ci.appveyor.com/project/clarkfitzg/makeParallel)

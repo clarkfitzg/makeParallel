@@ -5,3 +5,4 @@ TODO.txt
 README.md
 cran_comments.md
 NEWS.md
+^appveyor\.yml$
