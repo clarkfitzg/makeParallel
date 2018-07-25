@@ -1,23 +1,22 @@
 TODO list:
 
-- Only write to tmp directories
-- Don't open up sockets for tests on CRAN machines
-
 - handle library calls
-- Properly cite references
-- Make sure that links work using 
-- Drop all the functions and objects that I don't use
-- All items in code marked `TODO:*`
-- Make sure documentation can be accessed
-- Revisit Apache hive code generation function
 - Move some simple cases from tests to the function examples
 
 Can defer:
 
+- See about using CodeDepends::getTaskGraph
+- Revisit Apache hive code generation function
 - Global option for overwriting files
 
 Done:
 
+- Make sure documentation can be accessed
+- Properly cite references
+- Drop all the functions and objects that I don't use
+- All items in code marked `TODO:*`
+- Don't open up sockets for tests on CRAN machines
+- Only write to tmp directories
 - Make sure object naming convention and argument names are consistent for
   all exported objects.
 - Pass R CMD check
