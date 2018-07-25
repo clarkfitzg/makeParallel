@@ -3,4 +3,6 @@
 * win-builder (devel and release)
 
 ## R CMD check results
-There were no ERRORs, WARNINGs, or NOTEs.
+There were no ERRORs or WARNINGs.
+
+This is the first submission of this package, so there is a NOTE.

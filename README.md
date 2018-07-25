@@ -12,8 +12,7 @@ identifies task parallelism by statically analyzing entire scripts to
 detect dependencies between statements. It implements an extensible system
 for scheduling and generating new code. It includes a reference
 implementation of the 'List Scheduling' approach to the general task
-scheduling problem of scheduling statements on multiple processors
-discussed in Sinnen (2007) <ISBN:0471735760>.
+scheduling problem of scheduling statements on multiple processors.
 
 Quickstart:
 [vignettes/quickstart.Rmd](https://github.com/clarkfitzg/makeParallel/blob/master/vignettes/quickstart.Rmd).

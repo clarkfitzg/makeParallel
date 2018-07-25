@@ -22,7 +22,7 @@
 #' expressions simultaneously.
 #'
 #' @references Algorithm 10 in \emph{Task Scheduling for Parallel
-#' Systems}, Sinnen, O.
+#' Systems}, Sinnen (2007)
 #'
 #' @export
 #' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}

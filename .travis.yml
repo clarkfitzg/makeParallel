@@ -6,3 +6,10 @@ cache: packages
 r:
   - release
   - devel
+
+# I think this is necessary because CodeDepends depends on the graph
+# package in BioConductor.
+# https://community.rstudio.com/t/r-devel-error-on-travis-ci-and-appveyor/2708
+# https://github.com/r-lib/devtools/issues/1530
+install:
+  - R -e 'install.packages("CodeDepends")'
