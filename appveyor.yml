@@ -15,6 +15,9 @@ cache:
 
 # Adapt as necessary starting from here
 
+# Worked in .travis.yml, so copying it here.
+bioc_packages: graph
+
 build_script:
   - travis-tool.sh install_deps
 
