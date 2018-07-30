@@ -30,7 +30,7 @@ directory.
 
 ```{r}
 d <- tempdir()
-oldscript <- system.file("tests/testthat/mp_example.R", package = "makeParallel")
+oldscript <- system.file("examples/mp_example.R", package = "makeParallel")
 script <- file.path(d, "mp_example.R")
 file.copy(oldscript, script)
 list.files(d)
@@ -55,6 +55,7 @@ list.files(d)
 
 ```{r, echo = FALSE, results = "hide"}
 stopifnot("gen_mp_example.R" %in% list.files(d))
+unlink(d, recursive = TRUE)
 ```
 
 <!--
@@ -117,8 +118,3 @@ stopifnot( all(as.numeric(m2) == as.numeric(m2new)) )
 
 Ready to learn more? Read on in the "makeParallel concepts" vignette,
 `vignette("makeParallel-concepts")`.
-
-```{r, echo = FALSE, results = "hide"}
-setwd(olddir)
-unlink(td, recursive = TRUE)
-```

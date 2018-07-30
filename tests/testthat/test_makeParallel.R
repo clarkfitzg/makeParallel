@@ -1,6 +1,5 @@
 temp_dir = normalizePath(tempdir(), winslash = "/")
 
-
 oldcode = parse(text = "
     v1 = 'foo1'
     v2 = 'foo2'
@@ -61,7 +60,8 @@ test_that("Multiple assignment in single expression", {
 test_that("whole workflow on files", {
 
     exfile = file.path(temp_dir, "mp_example.R")
-    file.copy(from = "mp_example.R", to = exfile)
+    oldscript = system.file("examples/mp_example.R", package = "makeParallel")
+    file.copy(from = oldscript, to = exfile)
     genfile = file.path(temp_dir, "gen_mp_example.R")
 
     out = makeParallel(exfile, file = TRUE, scheduler = scheduleTaskList, maxWorker = 3)
