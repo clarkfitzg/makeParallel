@@ -30,18 +30,25 @@
 #' @param overWrite logical write over existing generated file
 #' @return code object of class \linkS4class{GeneratedCode}
 #' @examples
-#' # Try running this on an existing R script to create "gen_script.R"
-#' \dontrun{makeParallel("script.R")}
+#' # Make an existing R script parallel
+#' script <- system.file("examples/mp_example.R", package = "makeParallel")
+#' makeParallel(script)
 #'
-#' # All the defaults
+#' # Write generated code to a new file
+#' makeParallel(script, file = tempfile())
+#'
+#' # Pass in code directly
 #' d <- makeParallel(parse(text = "lapply(mtcars, mean)"))
+#'
+#' # Now we can examine generated code
 #' writeCode(d)
 #'
-#' # Select a different scheduling function
+#' # Specify a different scheduler
 #' pcode <- makeParallel(parse(text = "x <- 1:100
 #' y <- rep(1, 100)
 #' z <- x + y"), scheduler = scheduleTaskList)
 #' 
+#' # Some schedules have plotting methods
 #' plot(schedule(pcode))
 makeParallel = function(code
     , graph = inferGraph(code)
