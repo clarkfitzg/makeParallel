@@ -35,7 +35,11 @@
 #' makeParallel(script)
 #'
 #' # Write generated code to a new file
-#' makeParallel(script, file = tempfile())
+#' newfile <- tempfile()
+#' makeParallel(script, file = newfile)
+#'
+#' # Clean up
+#' unlink(newfile)
 #'
 #' # Pass in code directly
 #' d <- makeParallel(parse(text = "lapply(mtcars, mean)"))

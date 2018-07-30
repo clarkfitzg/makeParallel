@@ -9,7 +9,8 @@ vignette: >
 
 > This vignette provides a brief introduction to using the makeParallel
 > package. If you would like to learn the details then see the vignette
-> titled "makeParallel concepts", `vignette("makeParallel-concepts")`.
+> titled "makeParallel concepts",
+> `vignette("concepts", package = "makeParallel")`.
 
 ## background
 
@@ -23,7 +24,7 @@ with the recommended `parallel` package. Writing parallel code requires
 more expertise from us, the users. The purpose of this package is to
 generate more efficient parallel code so that we don't have to.
 
-## quick start
+## setup
 
 Let's start with an existing R script `mp_example.R` in an otherwise empty
 directory.
@@ -35,6 +36,8 @@ script <- file.path(d, "mp_example.R")
 file.copy(oldscript, script)
 list.files(d)
 ```
+
+## quick start
 
 The function `makeParallel` wraps most of the other steps and forms the
 core of this package. As the name suggests, this function makes parallel

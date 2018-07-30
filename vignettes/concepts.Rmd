@@ -30,7 +30,7 @@ Copied this over from future package
 
 > This vignette explains the concepts used by makeParallel. If you would
 > like to quickly get started then see the vignette titled "makeParallel
-> Quick Start", `vignette("makeParallel-quickstart")`.
+> Quick Start", `vignette("quickstart", package = "makeParallel")`.
 
 This project is experimental and ambitious. To write parallel R today
 consider using an established package, such as the recommended [parallel
@@ -227,9 +227,8 @@ coresGenerate <- function(schedule, mc.cores = 2L, ...)
                           , list(MC_CORES = mc.cores))
 
     # Combine the newly constructed expression with what would have been
-    # generated otherwise. Passing `file = FALSE` ensures `writeCode`
-    # doesn't write to a file.
-    out@code <- c(setCores, writeCode(out, file = FALSE))
+    # generated otherwise.
+    out@code <- c(setCores, writeCode(out))
     out
 }
 ```
@@ -387,11 +386,12 @@ The following features are planned, but not yet implemented.
 Some R code is more difficult to parallelize. This package currently
 doesn't handle the following cases.
 
-1. Non standard evaluation (NSE) complicates static code analysis
-   because it changes the semantics of the language.
+1. Non standard evaluation (NSE) complicates static code analysis because
+   it changes the semantics of the language. Familiar R functions with NSE
+   include `library()` and the `~` syntax for modeling. Some third party
+   packages use NSE extensively. Examples include
    [data.table](https://cran.r-project.org/package=data.table) and
-   [dplyr](https://cran.r-project.org/package=dplyr) are two popular
-   packages that use NSE.
+   [dplyr](https://cran.r-project.org/package=dplyr).
 2. Objects with reference semantics can change in method calls, so they
    require much more synchronization to run in parallel. Environments,
    reference classes, and R6 classes are examples of such objects.
