@@ -127,9 +127,6 @@ replaceApply2 = function(expr, map = mclapplyNames)
 #' @export
 #' @param graph \linkS4class{DependGraph}
 #' @examples
-#' \dontrun{
-#' makeParallel("my_slow_serial.R")
-#' }
 #'
 #' # Each iteration of the for loop writes to a different file- good!
 #' # If they write to the same file this will break.

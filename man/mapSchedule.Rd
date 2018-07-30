@@ -64,9 +64,6 @@ Road map of features to implement:
 }
 }
 \examples{
-\dontrun{
-makeParallel("my_slow_serial.R")
-}
 
 # Each iteration of the for loop writes to a different file- good!
 # If they write to the same file this will break.
