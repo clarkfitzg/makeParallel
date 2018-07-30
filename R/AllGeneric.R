@@ -89,10 +89,9 @@ setGeneric("generate", function(schedule, ...)
 #' Write the generated code to a file and return the code.
 #'
 #' @export
+#' @inheritParams makeParallel
 #' @rdname writeCode
 #' @param code object of class \linkS4class{GeneratedCode}
-#' @param file character name of a file to write the code, possibly
-#' missing.
 #' @param ... additional arguments to methods
 #' @return expression R language object, suitable for further manipulation
 #' @seealso \code{\link{generate}} to generate the code from a schedule,

@@ -20,7 +20,7 @@ setMethod("writeCode", c("GeneratedCode", "logical"),
 #' @rdname writeCode
 setMethod("writeCode", c("GeneratedCode", "missing"), function(code, file, ...)
 {
-    callGeneric(code, file = TRUE, ...)
+    callGeneric(code, file = FALSE, ...)
 })
 
 

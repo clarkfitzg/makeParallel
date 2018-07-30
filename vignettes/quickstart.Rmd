@@ -25,24 +25,48 @@ generate more efficient parallel code so that we don't have to.
 
 ## quick start
 
-The core of the package is the function `makeParallel`. As the name
-suggests, this function makes parallel code from serial R code. 
-Suppose we've written an R script and saved it in a file
-called `some_script.R` in our working directory. Then we can write:
+Let's start with an existing R script `mp_example.R` in an otherwise empty
+directory.
 
-```{r, eval = FALSE}
-makeParallel("some_script.R")
+```{r}
+d <- tempdir()
+oldscript <- system.file("tests/testthat/mp_example.R", package = "makeParallel")
+script <- file.path(d, "mp_example.R")
+file.copy(oldscript, script)
+list.files(d)
 ```
 
-`makeParallel` returns an object of class `GeneratedCode` and by default
-writes the new code to a file `gen_some_script.R`.
+The function `makeParallel` wraps most of the other steps and forms the
+core of this package. As the name suggests, this function makes parallel
+code from serial R code. We can use it on an existing script as follows:
+
+```{r}
+library(makeParallel)
+
+g <- makeParallel(script, file = TRUE)
+```
+
+Specifying `file = TRUE` means that `makeParallel` will write the newly
+generated code into a file based on the original name.
+
+```{r}
+list.files(d)
+```
+
+```{r, echo = FALSE, results = "hide"}
+stopifnot("gen_mp_example.R" %in% list.files(d))
+```
+
+<!--
+`makeParallel` returns an object of class `GeneratedCode` which contains
+the newly created executable code as well as the results of the
+intermediate steps. 
+-->
 
 `makeParallel` can directly replace serial code with parallel versions. The
 following example comes from the documentation for `lapply`:
 
 ```{r}
-library(makeParallel)
-
 input <- parse(text = "
     x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
     m1 <- lapply(x, mean)
@@ -93,3 +117,8 @@ stopifnot( all(as.numeric(m2) == as.numeric(m2new)) )
 
 Ready to learn more? Read on in the "makeParallel concepts" vignette,
 `vignette("makeParallel-concepts")`.
+
+```{r, echo = FALSE, results = "hide"}
+setwd(olddir)
+unlink(td, recursive = TRUE)
+```

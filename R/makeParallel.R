@@ -1,12 +1,16 @@
-#' Create Parallel Code From Serial
+#' Make Parallel Code From Serial
 #'
-#' This is the most important function in the package, it performs all the
-#' steps required to generate parallel code. Change the default arguments
-#' to customize how this happens.
-#' By default it writes generated code to a file, pass \code{file = FALSE}
-#' to prevent this.
+#' \code{makeParallel} is a high level function that performs all the steps
+#' to generate parallel code, namely:
 #'
-#' For more details see the \code{vignette("makeParallel-concepts")}.
+#' \enumerate{
+#'  \item Infer the task graph
+#'  \item Schedule the statements
+#'  \item Generate parallel code
+#' }
+#'
+#' The arguments allow the user to control every aspect of this process.
+#' For more details see \code{vignette("makeParallel-concepts")}.
 #'
 #' @export
 #' @param code file name or expression from \code{\link[base]{parse}}
@@ -18,11 +22,11 @@
 #' @param generator function to produce \linkS4class{GeneratedCode} from a \linkS4class{Schedule}
 #' @param generatorArgs list of named arguments to use with
 #'  \code{generator}
+#' @param file character name of the file to write the generated script. 
+#'  If FALSE then don't write anything to disk.
+#'  If TRUE and code comes from a file then use \code{prefix} to make a new
+#'  name and write a script.
 #' @param prefix character added to front of file name
-#' @param file character where to write the generated script. If this is a
-#'  logical TRUE and code is a file then use \code{prefix} to make a new
-#'  name and write a script if code was a file name. If logical FALSE then
-#'  don't write anything to disk.
 #' @param overWrite logical write over existing generated file
 #' @return code object of class \linkS4class{GeneratedCode}
 #' @examples
@@ -46,8 +50,8 @@ makeParallel = function(code
     , ...
     , generator = generate
     , generatorArgs = list()
+    , file = FALSE
     , prefix = "gen_"
-    , file = TRUE
     , overWrite = FALSE
     )
 {

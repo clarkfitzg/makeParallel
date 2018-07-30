@@ -2,11 +2,11 @@
 % Please edit documentation in R/makeParallel.R
 \name{makeParallel}
 \alias{makeParallel}
-\title{Create Parallel Code From Serial}
+\title{Make Parallel Code From Serial}
 \usage{
 makeParallel(code, graph = inferGraph(code), run = FALSE,
   scheduler = schedule, ..., generator = generate, generatorArgs = list(),
-  prefix = "gen_", file = TRUE, overWrite = FALSE)
+  file = FALSE, prefix = "gen_", overWrite = FALSE)
 }
 \arguments{
 \item{code}{file name or expression from \code{\link[base]{parse}}}
@@ -25,12 +25,12 @@ from a \linkS4class{DependGraph}.}
 \item{generatorArgs}{list of named arguments to use with
 \code{generator}}
 
-\item{prefix}{character added to front of file name}
+\item{file}{character name of the file to write the generated script. 
+If FALSE then don't write anything to disk.
+If TRUE and code comes from a file then use \code{prefix} to make a new
+name and write a script.}
 
-\item{file}{character where to write the generated script. If this is a
-logical TRUE and code is a file then use \code{prefix} to make a new
-name and write a script if code was a file name. If logical FALSE then
-don't write anything to disk.}
+\item{prefix}{character added to front of file name}
 
 \item{overWrite}{logical write over existing generated file}
 }
@@ -38,14 +38,18 @@ don't write anything to disk.}
 code object of class \linkS4class{GeneratedCode}
 }
 \description{
-This is the most important function in the package, it performs all the
-steps required to generate parallel code. Change the default arguments
-to customize how this happens.
-By default it writes generated code to a file, pass \code{file = FALSE}
-to prevent this.
+\code{makeParallel} is a high level function that performs all the steps
+to generate parallel code, namely:
 }
 \details{
-For more details see the \code{vignette("makeParallel-concepts")}.
+\enumerate{
+ \item Infer the task graph
+ \item Schedule the statements
+ \item Generate parallel code
+}
+
+The arguments allow the user to control every aspect of this process.
+For more details see \code{vignette("makeParallel-concepts")}.
 }
 \examples{
 # Try running this on an existing R script to create "gen_script.R"

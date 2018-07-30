@@ -34,7 +34,7 @@ $(PKG): $(RFILES) $(TESTFILES) $(TEMPLATES) $(VIGNETTES) DESCRIPTION
 	R CMD build .
 
 check: $(PKG)
-	R CMD check $(PKG) --as-cran
+	R CMD check $(PKG) --as-cran --run-dontrun
 
 docs: $(VIGNETTES) $(GRAPHVIZ_PNGS)
 	make install

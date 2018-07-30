@@ -60,11 +60,11 @@ test_that("Multiple assignment in single expression", {
 
 test_that("whole workflow on files", {
 
-    exfile = file.path(temp_dir, "example.R")
-    file.copy(from = "example.R", to = exfile)
-    genfile = file.path(temp_dir, "gen_example.R")
+    exfile = file.path(temp_dir, "mp_example.R")
+    file.copy(from = "mp_example.R", to = exfile)
+    genfile = file.path(temp_dir, "gen_mp_example.R")
 
-    out = makeParallel(exfile, scheduler = scheduleTaskList, maxWorker = 3)
+    out = makeParallel(exfile, file = TRUE, scheduler = scheduleTaskList, maxWorker = 3)
 
     expect_s4_class(out, "GeneratedCode")
 
@@ -78,7 +78,7 @@ test_that("whole workflow on files", {
     e = tryCatch(makeParallel(exfile, file = genfile), error = identity)
     expect_true(is(e, "FileExistsError"))
 
-    makeParallel(exfile, overWrite = TRUE)
+    makeParallel(exfile, file = TRUE, overWrite = TRUE)
 
     unlink(genfile)
     makeParallel(exfile, file = FALSE)
@@ -89,8 +89,8 @@ test_that("whole workflow on files", {
     expect_true(file.exists(fname))
     expect_equal(fname, file(out))
 
-    out = makeParallel(exfile, scheduler = scheduleTaskList, prefix = "GEN")
-    fn = file.path(temp_dir, "GENexample.R")
+    out = makeParallel(exfile, file = TRUE, scheduler = scheduleTaskList, prefix = "GEN")
+    fn = file.path(temp_dir, "GENmp_example.R")
     expect_true(file.exists(fn))
     expect_equal(fn, file(out))
 
