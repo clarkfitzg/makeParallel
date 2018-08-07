@@ -80,6 +80,10 @@ scheduleTaskList = function(graph, maxWorker = 2L
             , proc_send = integer()
             , proc_receive = integer()
             , varname = character()
+        # origin_node is the expression number that defined `varname`, so
+        # that together (origin_node, varname) can uniquely identify
+        # variables and avoid requirement of single static assignment
+            , origin_node = integer()
             , stringsAsFactors = FALSE
         ))
 
@@ -213,7 +217,7 @@ add_send_receive = function(processor, node_from, node_to, graph, schedule
     for(i in seq(nrow(tg_from_to))){
         schedule = add_single_send_receive(tg_from_to[i, ], schedule
             , proc_send, proc_receive
-            , overhead, bandwidth)
+            , overhead, bandwidth, origin_node = node_from)
     }
     schedule
 }
@@ -221,8 +225,22 @@ add_send_receive = function(processor, node_from, node_to, graph, schedule
 
 add_single_send_receive = function(tg_from_to, schedule
     , proc_send, proc_receive
-    , overhead, bandwidth)
+    , overhead, bandwidth
+    , origin_node
+    )
 {
+    varname = tg_from_to[, "value"]
+
+    # If the variable has already been transferred then there is no need to
+    # transfer it again.
+    sent = schedule$transfer[
+            schedule$transfer$varname == varname &&
+            schedule$transfer$origin_node == origin_node, ]
+
+    if(nrow(sent) >= 1){
+        return(schedule)
+    }
+
     start_time_send = proc_finish_time(proc_send, schedule)
     tc = transfer_cost(tg_from_to, overhead, bandwidth)
 
@@ -236,7 +254,8 @@ add_single_send_receive = function(tg_from_to, schedule
             , end_time_receive = start_time_receive + tc
             , proc_send = proc_send
             , proc_receive = proc_receive
-            , varname = tg_from_to[, "value"]
+            , varname = varname
+            , origin_node = origin_node
             , stringsAsFactors = FALSE
             )
 
