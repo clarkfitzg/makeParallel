@@ -231,14 +231,16 @@ add_single_send_receive = function(tg_from_to, schedule
 {
     varname = tg_from_to[, "value"]
 
-    # If the variable has already been transferred then there is no need to
-    # transfer it again.
-    sent = schedule$transfer[
-            schedule$transfer$varname == varname &&
-            schedule$transfer$origin_node == origin_node, ]
+    if(nrow(schedule$transfer) >= 1){
+        # If the variable has already been transferred then there is no
+        # need to transfer it again.
+        sent = schedule$transfer[
+                schedule$transfer$varname == varname &
+                schedule$transfer$origin_node == origin_node, ]
 
-    if(nrow(sent) >= 1){
-        return(schedule)
+        if(nrow(sent) >= 1){
+            return(schedule)
+        }
     }
 
     start_time_send = proc_finish_time(proc_send, schedule)
