@@ -52,6 +52,7 @@ test_that("Multiple assignment in single expression", {
     # three transfers should happen regardless of which processor evaluates
     # the last line.
     trans = schedule(out)@transfer
+
     expect_equal(3, nrow(trans))
 
 })
