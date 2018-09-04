@@ -118,10 +118,19 @@ setMethod(plot, c("TaskSchedule", "missing"), function(x, blockHeight = 0.25, ma
 #' 
 #' Produces a PDF image using graphviz
 #'
+#' @export
 #' @param graph dependGraph
 #' @param file character where to save file
-#' @param ... additional arguments to \code{dot} command line program
-plotDOT = function(graph, file, ...)
+#' @param args character additional arguments to \code{dot} command line program
+plotDOT = function(graph, file, args = "")
 {
     g = as(graph, "igraph")
+
+    dotfile = tempfile()
+    igraph::write_graph(g, dotfile, format = "dot")
+
+    allargs = c("-Tpdf", dotfile, "-o", file, args)
+    system2("dot", allargs)
+
+    unlink(dotfile)
 }
