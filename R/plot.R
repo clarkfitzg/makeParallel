@@ -112,3 +112,16 @@ setMethod(plot, c("TaskSchedule", "missing"), function(x, blockHeight = 0.25, ma
 
     NULL
 })
+
+
+#' Plot Dependency Graph
+#' 
+#' Produces a PDF image using graphviz
+#'
+#' @param graph dependGraph
+#' @param file character where to save file
+#' @param ... additional arguments to \code{dot} command line program
+plotDOT = function(graph, file, ...)
+{
+    g = as(graph, "igraph")
+}
