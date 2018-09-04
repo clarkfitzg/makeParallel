@@ -4,6 +4,9 @@
 setAs("DependGraph", "igraph", function(from)
 {
     if(requireNamespace("igraph", quietly = TRUE)){
-        igraph::graph_from_data_frame(from@graph)
+        g = igraph::graph_from_data_frame(from@graph)
+        # From https://stackoverflow.com/questions/17433402/r-igraph-rename-vertices
+        V(g)$label = as(from@code, "character")
+        g
     } else stop("Install igraph to use this conversion.")
 })
