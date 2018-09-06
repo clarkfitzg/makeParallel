@@ -1,5 +1,5 @@
-empty_edges = data.frame(from = integer(), to = integer()
-        , type = integer(), value = integer(), size = numeric())
+empty_edges = function() data.frame(from = integer(), to = integer()
+        , type = character(), value = list())
 
 
 # Where does x show up in locs
@@ -27,7 +27,7 @@ use_def = function(x, all_uses, all_definitions)
     varname = x
     uses = where_index(varname, all_uses)
     if(length(uses) == 0){
-        return(empty_edges)
+        return(empty_edges())
     }
     defs = c(where_index(varname, all_definitions), Inf)
 
@@ -77,7 +77,7 @@ setMethod("inferGraph", "expression", function(code, ...)
 
     # Degenerate case
     if (n <= 1){
-        tg = empty_edges
+        tg = empty_edges()
     } else {
         inputs = lapply(info, methods::slot, "inputs")
         outputs = lapply(info, methods::slot, "outputs")

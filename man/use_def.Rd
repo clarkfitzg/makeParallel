@@ -9,7 +9,7 @@ use_def(x, all_uses, all_definitions)
 \arguments{
 \item{x}{variable name}
 
-\item{all_uses}{list containing variable names uses in each expression}
+\item{all_uses}{list containing variable names used in each expression}
 
 \item{all_definitions}{list containing variable names defined in each expression}
 }
