@@ -18,7 +18,7 @@ where_index = function(x, locs)
 #' variable x to the most recent definition or update of x.
 #' 
 #' @param x variable name
-#' @param all_uses list containing variable names uses in each expression
+#' @param all_uses list containing variable names used in each expression
 #' @param all_definitions list containing variable names defined in each expression
 #' @return data frame of edges suitable for use with
 #'  \code{\link[igraph]{graph_from_data_frame}}.
@@ -35,7 +35,7 @@ use_def = function(x, all_uses, all_definitions)
                        , to = uses
                        )
     edges$type = "use-def"
-    edges$value = replicate(nrow(edges), list(varname = varname))
+    edges$value = replicate(nrow(edges), list(varname = varname), simplify = FALSE)
     edges
 }
 

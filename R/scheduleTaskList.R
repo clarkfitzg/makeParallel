@@ -62,10 +62,6 @@ scheduleTaskList = function(graph, maxWorker = 2L
         exprTime = rep(exprTimeDefault, nnodes)
     }
 
-    if(!("size" %in% colnames(tg))){
-        tg[, "size"] = sizeDefault
-    }
-
     # Initialize by scheduling the first expression on the first worker.
     schedule = list(
         eval = data.frame(processor = 1L
