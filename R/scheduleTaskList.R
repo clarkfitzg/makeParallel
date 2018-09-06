@@ -97,6 +97,7 @@ scheduleTaskList = function(graph, maxWorker = 2L
         allprocs = lapply(procs, data_ready_time
                 , node = node, graph = tg, schedule = schedule
                 , overhead = overhead, bandwidth = bandwidth
+                , sizeDefault = sizeDefault
                 )
 
         start_times = sapply(allprocs, `[[`, "time")
@@ -132,7 +133,7 @@ which_processor = function(node, schedule)
 }
 
 
-data_ready_time = function(proc, node, graph, schedule, overhead, bandwidth)
+data_ready_time = function(proc, node, graph, schedule, overhead, bandwidth, sizeDefault)
 {
     # Transfer from predecessors to current node
     preds = predecessors(node, graph)
@@ -155,6 +156,7 @@ data_ready_time = function(proc, node, graph, schedule, overhead, bandwidth)
         schedule = add_send_receive(proc, node_from = p, node_to = node
                 , graph = graph, schedule = schedule
                 , overhead = overhead, bandwidth = bandwidth
+                , sizeDefault = sizeDefault
                 )
     }
 
@@ -168,10 +170,15 @@ data_ready_time = function(proc, node, graph, schedule, overhead, bandwidth)
 # Def 4.4 p. 77
 # This is the place to include models for latency.
 # @param tg_row is a single row from a task graph
-transfer_cost = function(tg_row, overhead, bandwidth)
+transfer_cost = function(tg_row, overhead, bandwidth, sizeDefault)
 {
     if(nrow(tg_row) > 1) stop("Did not expect multiple transfers here.")
-    tg_row[, "size"] / bandwidth + overhead
+
+    # I don't like the nesting [[1]] here, but this keeps it extensible.
+    size = tg_row[, "value"][[1]][["size"]]
+    if(is.null(size)) size = sizeDefault
+
+    size / bandwidth + overhead
 }
 
 
@@ -197,7 +204,7 @@ predecessors = function(node, graph)
 # Account for the constraint from one node to another, and return an
 # updated schedule.
 add_send_receive = function(processor, node_from, node_to, graph, schedule
-        , overhead, bandwidth)
+        , overhead, bandwidth, sizeDefault)
 {
     # TODO: This will probably break if we evaluate the same node multiple
     # times, but that's a future problem.
@@ -217,7 +224,8 @@ add_send_receive = function(processor, node_from, node_to, graph, schedule
     for(i in seq(nrow(tg_from_to))){
         schedule = add_single_send_receive(tg_from_to[i, ], schedule
             , proc_send, proc_receive
-            , overhead, bandwidth, origin_node = node_from)
+            , overhead, bandwidth, origin_node = node_from
+            , sizeDefault = sizeDefault)
     }
     schedule
 }
@@ -227,6 +235,7 @@ add_single_send_receive = function(tg_from_to, schedule
     , proc_send, proc_receive
     , overhead, bandwidth
     , origin_node
+    , sizeDefault
     )
 {
     varname = tg_from_to[, "value"]
@@ -244,7 +253,7 @@ add_single_send_receive = function(tg_from_to, schedule
     }
 
     start_time_send = proc_finish_time(proc_send, schedule)
-    tc = transfer_cost(tg_from_to, overhead, bandwidth)
+    tc = transfer_cost(tg_from_to, overhead, bandwidth, sizeDefault)
 
     # TODO: Hardcoding in 0 latency here and other places. Will need to fix
     # this when running on actual distributed machines.
