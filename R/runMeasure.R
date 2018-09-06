@@ -39,9 +39,9 @@ runMeasure = function(code, graph = inferGraph(code), envir = globalenv(), timer
         # size multiple times. Seems like more trouble than it's worth to
         # do it in a non redundant way.
         for(row_index in from_rows){
-            varname = tg$value[[row_index]]$varname
+            varname = tg[["value"]][[row_index]][["varname"]]
             size = as.numeric(utils::object.size(get(varname, envir)))
-            tg$value[[row_index]]$size = size
+            tg[["value"]][[row_index]][["size"]] = size
         }
     }
 

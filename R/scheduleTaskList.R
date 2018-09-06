@@ -171,7 +171,7 @@ transfer_cost = function(tg_row, overhead, bandwidth, sizeDefault)
     if(nrow(tg_row) > 1) stop("Did not expect multiple transfers here.")
 
     # I don't like the nesting [[1]] here, but this keeps it extensible.
-    size = tg_row[, "value"][[1]][["size"]]
+    size = tg_row[["value"]][[1]][["size"]]
     if(is.null(size)) size = sizeDefault
 
     size / bandwidth + overhead
