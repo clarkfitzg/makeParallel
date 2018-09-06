@@ -4,7 +4,7 @@
 \alias{XXX}
 \title{Estimate Time To Execute Function}
 \usage{
-XXX()
+XXX(maxWorker, sizeInput, sizeOutput)
 }
 \arguments{
 \item{maxWorker}{integer number of parallel workers to use}

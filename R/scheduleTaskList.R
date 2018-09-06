@@ -181,7 +181,6 @@ transfer_cost = function(tg_row, overhead, bandwidth, sizeDefault)
 # Time when the processor has finished all scheduled tasks
 proc_finish_time = function(proc, schedule)
 {
-
     t_eval = schedule$eval[schedule$eval$processor == proc, "end_time"]
     trans = schedule$transfer
     t_send = trans[trans$proc_send == proc, "end_time_send"]

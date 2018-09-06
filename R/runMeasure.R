@@ -33,11 +33,15 @@ runMeasure = function(code, graph = inferGraph(code), envir = globalenv(), timer
         end_time = timer()
         times[i] = end_time - start_time
 
-        from_rows = tg$type == "use-def" & tg$from == i
-        vars_to_measure = tg[from_rows, "value"]
-        for(v in vars_to_measure){
-            size = as.numeric(utils::object.size(get(v, envir)))
-            tg[from_rows & tg$value == v, "size"] = size
+        from_rows = which(tg$type == "use-def" & tg$from == i)
+
+        # This is redundant because we may check and store the same object
+        # size multiple times. Seems like more trouble than it's worth to
+        # do it in a non redundant way.
+        for(row_index in from_rows){
+            varname = tg$value[[row_index]]$varname
+            size = as.numeric(utils::object.size(get(varname, envir)))
+            tg$value[[row_index]]$size = size
         }
     }
 

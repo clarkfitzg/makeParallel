@@ -13,7 +13,7 @@
 #'   be Inf if parallel will never be faster than serial.}
 #'   \item{}{}
 #' }
-XXX = function()
+XXX = function(maxWorker, sizeInput, sizeOutput)
 {
 }
 
