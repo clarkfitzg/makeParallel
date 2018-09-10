@@ -1,3 +1,7 @@
+# TODO: I haven't limited the number of processors yet- so this assumes we
+# have unlimited processors. Not a huge deal.
+
+
 #' Single sequential forks scheduler
 #'
 #' TODO: Inherit parameters from scheduleTaskList
@@ -15,21 +19,25 @@ scheduleFork = function(graph
 
     nnodes = length(graph@code)
 
-    # Indices of expressions that we may want to fork
-    expr_to_fork = rep(TRUE, nnodes)
-    expr_to_fork[exprTime < overhead] = FALSE
+    might_fork = seq(nnodes)
+    might_fork = might_fork[exprTime > overhead]
 
-    partialSchedule = data.frame(expression = seq(nnodes), fork = "run")
+    partialSchedule = data.frame(expression = seq(nnodes), fork = "run", time = exprTime)
 
-    for(i in seq_len(sum(expr_to_fork))){
-        reduction = sapply(which(expr_to_fork), reductionTime
-                            , partialSchedule = partialSchedule, graph = graph, exprTime = exprTime)
-        if(all(reduction > 0)){
+    # I imagine this pattern generalizes to other greedy algorithms.
+    # But I'm not going to generalize it now.
+    for(i in seq_len(might_fork)){
+        reduction = sapply(might_fork, forkTimeReduction
+                       , partialSchedule = partialSchedule
+                       , graph = graph
+                       )
+        if(all(reduction < 0)){
             break
         }
-        partialSchedule = addFork(max(reduction), partialSchedule)
+        node_to_fork = might_fork[which.max(reduction)]
+        might_fork = setdiff(might_fork, chosen)
+        partialSchedule = scheduleOne(node_to_fork, partialSchedule, graph)
     }
-
 
     new("ForkSchedule", graph = graph
             , fork = partialSchedule
@@ -39,6 +47,23 @@ scheduleFork = function(graph
             )
 }
 
-reductionTime = function()
+
+# How long does the partial schedule take to complete if we fork one node?
+forkTimeReduction = function(node_to_fork, partialSchedule, graph)
+{
+    newSchedule = scheduleOne(node_to_fork, partialSchedule, graph)
+    runTime(partialSchedule) - runTime(newSchedule)
+}
+
+
+# How long does the partial schedule take to complete?
+runTime = function(partialSchedule)
+{
+    sum(partialSchedule[, "time"])
+}
+
+
+# Add a single node to the partial schedule
+scheduleOne = function(node_to_fork, partialSchedule, graph)
 {
 }
