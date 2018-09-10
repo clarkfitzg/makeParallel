@@ -13,6 +13,8 @@ Task Parallel Schedule
 \describe{
 \item{\code{transfer}}{transfer variables between processes}
 
+\item{\code{evaluation}}{data.frame assigning expressions to processors}
+
 \item{\code{maxWorker}}{maximum number of processors, similar to \code{mc.cores}
 in the parallel package}
 

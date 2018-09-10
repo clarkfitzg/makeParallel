@@ -12,7 +12,5 @@ Schedule base class
 
 \describe{
 \item{\code{graph}}{\linkS4class{DependGraph} used to create the schedule}
-
-\item{\code{evaluation}}{data.frame assigning expressions to processors}
 }}
 

@@ -7,6 +7,7 @@
 #' TODO: Inherit parameters from scheduleTaskList
 #'
 #' @export
+#' @inheritParams scheduleTaskList
 #' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
 #'  expression. This will only be used if \code{exprTime} is NULL.
 #' @param exprTime numeric time to execute each expression
@@ -35,7 +36,7 @@ scheduleFork = function(graph
             break
         }
         node_to_fork = might_fork[which.max(reduction)]
-        might_fork = setdiff(might_fork, chosen)
+        might_fork = setdiff(might_fork, node_to_fork)
         partialSchedule = scheduleOne(node_to_fork, partialSchedule, graph)
     }
 
@@ -63,7 +64,24 @@ runTime = function(partialSchedule)
 }
 
 
-# Add a single node to the partial schedule
+# Add a single node to the partial schedule. The problem is how to permute
+# the expressions to make it fast. What do we allow to permute? Can't be
+# everything, because that's n! permutations every time, takes too long.
+# Then we need some way to say what parts of the partial schedule are
+# fixed.
+#
+# A naive way is to push the existing statements as far away as possible
+# from each other so that the new one has the maximum amount of time to run
+# in parallel before the results are needed. But if we do that on every
+# iteration then it's likely that we'll slow down and interfere with what
+# we did on the previous iterations.
+#
+# The most naive way is to just replace the actual execution of the
+# statement with the fork start, and insert the return statement
+# immediately before the first statement that needs the result. This never
+# permutes anything, so it's essentially equivalent to replacing all assignments
+# with future assignments like %<-% everywhere.
+
 scheduleOne = function(node_to_fork, partialSchedule, graph)
 {
 }

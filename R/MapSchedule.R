@@ -162,7 +162,7 @@ mapSchedule = function(graph)
     # - actually put evaluation schedule in here.
     # - Allow users to choose fork or SNOW clusters, and default to
     #   whatever their current system is.
-    new("MapSchedule", graph = graph, evaluation = data.frame())
+    new("MapSchedule", graph = graph)
 }
 
 

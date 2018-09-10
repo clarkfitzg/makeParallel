@@ -48,7 +48,6 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
 #'
 #' @export
 #' @slot graph \linkS4class{DependGraph} used to create the schedule
-#' @slot evaluation data.frame assigning expressions to processors
 Schedule = setClass("Schedule", 
     slots = c(graph = "DependGraph"
         ))
@@ -63,14 +62,15 @@ SerialSchedule = setClass("SerialSchedule", contains = "Schedule")
 #' Task Parallel Schedule
 #'
 #' @slot transfer transfer variables between processes
+#' @slot evaluation data.frame assigning expressions to processors
 #' @slot maxWorker maximum number of processors, similar to \code{mc.cores}
 #'  in the parallel package
 #' @slot exprTime time in seconds to evaluate each expression
 #' @slot overhead minimum time in seconds to evaluate a single expression
 #' @slot bandwidth network bandwidth in bytes per second
 #' @export
-TaskSchedule = setClass("TaskSchedule",
-    slots = c(transfer = "data.frame"
+TaskSchedule = setClass("TaskSchedule"
+    , slots = c(transfer = "data.frame"
               , evaluation = "data.frame"
               , maxWorker = "integer"
               , exprTime = "numeric"
@@ -94,7 +94,7 @@ MapSchedule = setClass("MapSchedule", contains = "Schedule")
 #'
 #' @export
 ForkSchedule = setClass("ForkSchedule"
-    slots = c(fork = "data.frame"
+    , slots = c(fork = "data.frame"
               , exprTime = "numeric"
               , overhead = "numeric"
               , bandwidth = "numeric"
