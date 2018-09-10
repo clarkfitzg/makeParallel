@@ -82,6 +82,16 @@ TaskSchedule = setClass("TaskSchedule",
 MapSchedule = setClass("MapSchedule", contains = "Schedule")
 
 
+#' Fork based parallel schedule
+#'
+#' Class for schedules that should be parallelized by forks from one single
+#' process
+#'
+#' @export
+ForkSchedule = setClass("ForkSchedule", contains = "Schedule"
+              , exprTime = "numeric")
+
+
 # Generated Code
 ############################################################
 
