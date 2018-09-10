@@ -38,6 +38,11 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
 
 # Schedules
 ############################################################
+# I'm not quite sure how to organize the slots and inheritance in these
+# objects. My current principles are:
+#   - Add slots when I realize I need them
+#   - Keep the names consistent
+
 
 #' Schedule base class
 #'
@@ -46,7 +51,6 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
 #' @slot evaluation data.frame assigning expressions to processors
 Schedule = setClass("Schedule", 
     slots = c(graph = "DependGraph"
-        , evaluation = "data.frame"
         ))
 
 
@@ -67,6 +71,7 @@ SerialSchedule = setClass("SerialSchedule", contains = "Schedule")
 #' @export
 TaskSchedule = setClass("TaskSchedule",
     slots = c(transfer = "data.frame"
+              , evaluation = "data.frame"
               , maxWorker = "integer"
               , exprTime = "numeric"
               , overhead = "numeric"
@@ -88,8 +93,12 @@ MapSchedule = setClass("MapSchedule", contains = "Schedule")
 #' process
 #'
 #' @export
-ForkSchedule = setClass("ForkSchedule", contains = "Schedule"
-              , exprTime = "numeric")
+ForkSchedule = setClass("ForkSchedule"
+    slots = c(fork = "data.frame"
+              , exprTime = "numeric"
+              , overhead = "numeric"
+              , bandwidth = "numeric"
+    ), contains = "Schedule")
 
 
 # Generated Code
