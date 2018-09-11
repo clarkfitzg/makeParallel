@@ -4,14 +4,7 @@
 \name{MeasuredDependGraph-class}
 \alias{MeasuredDependGraph-class}
 \alias{MeasuredDependGraph}
-\title{Graph where each expression has been executed, timed, and the size of
-the variables have been measured.}
+\title{Graph where the size of each variable that can be transferred is known}
 \description{
-Will export once full pipeline works.
+Graph where the size of each variable that can be transferred is known
 }
-\section{Slots}{
-
-\describe{
-\item{\code{time}}{time in seconds to run each expression}
-}}
-

@@ -19,7 +19,6 @@
 #'
 #' @export
 #' @param graph object of class \linkS4class{TimedDependGraph}
-#' @param times 
 #' @return integer vector to permute the expressions in \code{x@code}
 #' @examples
 #' graph <- inferGraph(code = parse(text = "x <- 1:100

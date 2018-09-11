@@ -3,22 +3,27 @@
 \docType{methods}
 \name{inferGraph}
 \alias{inferGraph}
-\alias{inferGraph,character-method}
-\alias{inferGraph,language-method}
-\alias{inferGraph,expression-method}
+\alias{inferGraph,character,missing-method}
+\alias{inferGraph,language,missing-method}
+\alias{inferGraph,expression,missing-method}
+\alias{inferGraph,ANY,numeric-method}
 \title{Infer Task Dependency Graph}
 \usage{
-inferGraph(code, ...)
+inferGraph(code, time, ...)
 
-\S4method{inferGraph}{character}(code, ...)
+\S4method{inferGraph}{character,missing}(code, time, ...)
 
-\S4method{inferGraph}{language}(code, ...)
+\S4method{inferGraph}{language,missing}(code, time, ...)
 
-\S4method{inferGraph}{expression}(code, ...)
+\S4method{inferGraph}{expression,missing}(code, time, ...)
+
+\S4method{inferGraph}{ANY,numeric}(code, time, ...)
 }
 \arguments{
 \item{code}{the file path to a script or an object that can be coerced
 to an expression.}
+
+\item{time}{time to run each expression}
 
 \item{...}{additional arguments to methods}
 }
@@ -38,4 +43,7 @@ g <- inferGraph(parse(text = "
 
 ig <- as(g, "igraph")
 plot(ig)
+
+# To specify the time each expression takes:
+g2 <- inferGraph(g@code, time = c(1.1, 2, 0.5, 6))
 }

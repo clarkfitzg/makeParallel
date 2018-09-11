@@ -1,4 +1,4 @@
-testthat("basic ordering", 
+test_that("basic ordering", 
 {
 
 graph <- inferGraph(code = parse(text = "x <- 1:100

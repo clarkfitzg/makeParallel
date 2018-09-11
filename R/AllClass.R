@@ -34,6 +34,14 @@ TimedDependGraph = setClass("TimedDependGraph",
     contains = "DependGraph")
 
 
+#' Graph where the size of each variable that can be transferred is known
+#'
+#' @export
+MeasuredDependGraph = setClass("MeasuredDependGraph",
+    contains = "TimedDependGraph")
+
+
+
 # Schedules
 ############################################################
 # I'm not quite sure how to organize the slots and inheritance in these
