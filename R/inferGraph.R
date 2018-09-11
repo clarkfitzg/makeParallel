@@ -42,7 +42,9 @@ use_def = function(x, all_uses, all_definitions)
 
 #' @export
 #' @rdname inferGraph
-setMethod("inferGraph", "character", function(code, ...)
+setMethod("inferGraph"
+          , signature(code = "character", time = "missing")
+          , function(code, time ...)
 {
     #if(length(code) > 1) stop("pass a single R file name or a language object")
     expr = parse(code, keep.source = TRUE)
@@ -52,7 +54,9 @@ setMethod("inferGraph", "character", function(code, ...)
 
 #' @export
 #' @rdname inferGraph
-setMethod("inferGraph", "language", function(code, ...)
+setMethod("inferGraph"
+          , signature(code = "language", time = "missing")
+          , function(code, time ...)
 {
     expr = as.expression(code)
     callGeneric(expr, ...)
@@ -61,7 +65,9 @@ setMethod("inferGraph", "language", function(code, ...)
 
 #' @export
 #' @rdname inferGraph
-setMethod("inferGraph", "expression", function(code, ...)
+setMethod("inferGraph"
+          , signature(code = "expression", time = "missing")
+          , function(code, time ...)
 {
     expr = code
     info = lapply(expr, CodeDepends::getInputs)
@@ -97,4 +103,15 @@ setMethod("inferGraph", "expression", function(code, ...)
     }
 
     new("DependGraph", code = expr, graph = tg)
+})
+
+
+#' @export
+#' @rdname inferGraph
+setMethod("inferGraph"
+          , signature(code = "ANY", time = "numeric")
+          , function(code, time ...)
+{
+    g = callGeneric(code, ...)
+    TimedDependGraph(g, time = time)
 })

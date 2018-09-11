@@ -14,6 +14,7 @@ NULL
 #' @rdname inferGraph
 #' @param code the file path to a script or an object that can be coerced
 #'  to an expression.
+#' @param time time to run each expression
 #' @param ... additional arguments to methods
 #' @return object of class \linkS4class{DependGraph}
 #' @examples
@@ -26,7 +27,10 @@ NULL
 #'
 #' ig <- as(g, "igraph")
 #' plot(ig)
-setGeneric("inferGraph", function(code, ...)
+#'
+#' # To specify the time each expression takes:
+#' g2 <- inferGraph(g@code, time = c(1.1, 2, 0.5, 6))
+setGeneric("inferGraph", function(code, time, ...)
            standardGeneric("inferGraph"))
 
 
