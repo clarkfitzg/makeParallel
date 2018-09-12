@@ -8,14 +8,13 @@
 #' of the longest path starting at that node and going to the end of the
 #' program.
 #'
-#' This permutation respects the partial order of the graph, so
-#' executing the permuted code will produce the same result as the original
-#' code.
-#'
-#' There are many possible node precedence orders. Bottom level
-#' order provides good average performance. 
+#' This permutation respects the partial order of the graph, so executing
+#' the permuted code will produce the same result as the original code.
+#' There are many possible node precedence orders. 
 #'
 #' @references \emph{Task Scheduling for Parallel Systems}, Sinnen, O.
+#' claim bottom level order provides good average performance. I'm not sure
+#' if this claim holds for general data analysis scripts.
 #'
 #' @export
 #' @param graph object of class \linkS4class{TimedDependGraph}
@@ -27,4 +26,27 @@
 #' bl <- orderBottomLevel(graph)
 orderBottomLevel = function(graph)
 {
+    bl = bottomLevel(graph)
+    order(bl, decreasing = TRUE)
+}
+
+
+bottomLevel = function(graph)
+{
+    n = length(graph@code)
+    alltimes = graph@time
+    bl = rep(0, n)
+    g = graph@graph
+    for(node in seq(n, 1)){
+        nodetime = alltimes[node]
+        bl[node] = oneBottomLevel(node, nodetime, g, bl)
+    }
+    bl
+}
+
+
+oneBottomLevel = function(node, nodetime, graph, bl)
+{
+    s = successors(node, graph)
+    if(length(s) == 0) nodetime else bl[s] + nodetime
 }

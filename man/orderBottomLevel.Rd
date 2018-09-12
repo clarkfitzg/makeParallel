@@ -19,12 +19,9 @@ of the longest path starting at that node and going to the end of the
 program.
 }
 \details{
-This permutation respects the partial order of the graph, so
-executing the permuted code will produce the same result as the original
-code.
-
-There are many possible node precedence orders. Bottom level
-order provides good average performance.
+This permutation respects the partial order of the graph, so executing
+the permuted code will produce the same result as the original code.
+There are many possible node precedence orders.
 }
 \examples{
 graph <- inferGraph(code = parse(text = "x <- 1:100
@@ -34,4 +31,6 @@ bl <- orderBottomLevel(graph)
 }
 \references{
 \emph{Task Scheduling for Parallel Systems}, Sinnen, O.
+claim bottom level order provides good average performance. I'm not sure
+if this claim holds for general data analysis scripts.
 }

@@ -196,6 +196,13 @@ predecessors = function(node, graph)
 }
 
 
+# The nodes that immediately depend on node
+successors = function(node, graph)
+{
+    unique(graph[graph$from == node, "to"])
+}
+
+
 # Account for the constraint from one node to another, and return an
 # updated schedule.
 add_send_receive = function(processor, node_from, node_to, graph, schedule
