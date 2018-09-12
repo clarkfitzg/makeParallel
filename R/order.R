@@ -50,6 +50,5 @@ bottomLevel = function(graph)
 oneBottomLevel = function(node, nodetime, graph, bl)
 {
     s = successors(node, graph)
-    # TODO: max
-    if(length(s) == 0) nodetime else bl[s] + nodetime
+    if(length(s) == 0) nodetime else max(bl[s]) + nodetime
 }
