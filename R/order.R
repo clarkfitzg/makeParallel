@@ -37,6 +37,8 @@ bottomLevel = function(graph)
     alltimes = graph@time
     bl = rep(0, n)
     g = graph@graph
+    # Iterating in reverse guarantees bl elements are defined for all
+    # successors.
     for(node in seq(n, 1)){
         nodetime = alltimes[node]
         bl[node] = oneBottomLevel(node, nodetime, g, bl)
@@ -48,5 +50,6 @@ bottomLevel = function(graph)
 oneBottomLevel = function(node, nodetime, graph, bl)
 {
     s = successors(node, graph)
+    # TODO: max
     if(length(s) == 0) nodetime else bl[s] + nodetime
 }
