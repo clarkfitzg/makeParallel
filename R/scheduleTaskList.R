@@ -25,9 +25,11 @@
 #' Systems}, Sinnen (2007)
 #'
 #' @export
-#' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
+#' @param graph \linkS4class{DependGraph} as returned from \code{\link{inferGraph}}
 #' @param maxWorker integer maximum number of processors
-#' @param order TODO
+#' @param graphOrder function that takes in a \code{graph} and
+#'  returns a permutation of \code{1:length(graph@code)} that respects the
+#'  topological ordering of the graph.
 #' @param exprTimeDefault numeric time in seconds to execute a single
 #'  expression. This will only be used if \code{exprTime} is NULL.
 #' @param sizeDefault numeric default size of objects to transfer in bytes
@@ -45,9 +47,10 @@
 #' g <- inferGraph(code)
 #' s <- scheduleTaskList(g)
 #' plot(s)
-scheduleTaskList = function(graph, maxWorker = 2L
-    , exprTime = NULL
-#    TODO: use bottom level ordering.
+scheduleTaskList = function(graph
+    , maxWorker = 2L
+    #, exprTime = NULL
+    , orderFun = orderBottomLevel
     , exprTimeDefault = 10e-6
     , sizeDefault = as.numeric(utils::object.size(1L))
     , overhead = 8e-6
@@ -55,20 +58,24 @@ scheduleTaskList = function(graph, maxWorker = 2L
 ){
 
     procs = seq(maxWorker)
-    nnodes = length(graph@code)
     tg = graph@graph
 
-    # TODO:*  use expression times from MeasuredDependGraph
-    if(is.null(exprTime)){
-        exprTime = rep(exprTimeDefault, nnodes)
+    if(!is(graph, "TimedDependGraph")){
+        warning(sprintf("Graph isn't a TimedDependGraph, so expression times are unknown.
+Defaulting to a value of %f seconds for every statement.", exprTimeDefault))
+        graph = TimedDependGraph(graph
+            , exprTime = rep(exprTimeDefault, length(graph@code)))
     }
+
+    exprTime = graph@exprTime
+    node_permutation = orderFun(graph)
 
     # Initialize by scheduling the first expression on the first worker.
     schedule = list(
         eval = data.frame(processor = 1L
             , start_time = 0
-            , end_time = exprTime[1]
-            , node = 1L
+            , end_time = exprTime[node_permutation[1]]
+            , node = node_permutation[1]
             ),
         transfer = data.frame(start_time_send = numeric()
             , start_time_receive = numeric()
@@ -90,7 +97,7 @@ scheduleTaskList = function(graph, maxWorker = 2L
     # eliminating duplicated variable names. For the moment I will assume
     # the variable names are unique.
 
-    for(node in seq(2, nnodes)){
+    for(node in node_permutation[-1]){
         allprocs = lapply(procs, data_ready_time
                 , node = node, graph = tg, schedule = schedule
                 , overhead = overhead, bandwidth = bandwidth
@@ -115,7 +122,6 @@ scheduleTaskList = function(graph, maxWorker = 2L
         , evaluation = schedule$eval
         , transfer = schedule$transfer
         , maxWorker = as.integer(maxWorker)
-        , exprTime = exprTime
         , overhead = overhead
         , bandwidth = bandwidth
         )

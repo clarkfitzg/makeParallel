@@ -17,7 +17,7 @@
 #' if this claim holds for general data analysis scripts.
 #'
 #' @export
-#' @param graph object of class \linkS4class{TimedDependGraph}
+#' @param graph \linkS4class{TimedDependGraph}
 #' @return integer vector to permute the expressions in \code{x@code}
 #' @examples
 #' graph <- inferGraph(code = parse(text = "x <- 1:100
