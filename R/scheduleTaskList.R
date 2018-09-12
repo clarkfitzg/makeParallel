@@ -30,7 +30,7 @@
 #' @param graphOrder function that takes in a \code{graph} and
 #'  returns a permutation of \code{1:length(graph@code)} that respects the
 #'  topological ordering of the graph.
-#' @param exprTimeDefault numeric time in seconds to execute a single
+#' @param timeDefault numeric time in seconds to execute a single
 #'  expression. This will only be used if \code{exprTime} is NULL.
 #' @param sizeDefault numeric default size of objects to transfer in bytes
 #' @param overhead numeric seconds to send any object
@@ -51,7 +51,7 @@ scheduleTaskList = function(graph
     , maxWorker = 2L
     #, exprTime = NULL
     , orderFun = orderBottomLevel
-    , exprTimeDefault = 10e-6
+    , timeDefault = 10e-6
     , sizeDefault = as.numeric(utils::object.size(1L))
     , overhead = 8e-6
     , bandwidth = 1.5e9
@@ -64,7 +64,7 @@ scheduleTaskList = function(graph
         warning(sprintf("Graph isn't a TimedDependGraph, so expression times are unknown.
 Defaulting to a value of %f seconds for every statement.", exprTimeDefault))
         graph = TimedDependGraph(graph
-            , exprTime = rep(exprTimeDefault, length(graph@code)))
+            , time = rep(timeDefault, length(graph@code)))
     }
 
     exprTime = graph@exprTime

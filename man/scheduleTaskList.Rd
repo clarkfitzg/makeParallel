@@ -4,18 +4,16 @@
 \alias{scheduleTaskList}
 \title{Minimize Expression Start Time}
 \usage{
-scheduleTaskList(graph, maxWorker = 2L, exprTime = NULL,
-  exprTimeDefault = 1e-05, sizeDefault = as.numeric(utils::object.size(1L)),
+scheduleTaskList(graph, maxWorker = 2L, orderFun = orderBottomLevel,
+  timeDefault = 1e-05, sizeDefault = as.numeric(utils::object.size(1L)),
   overhead = 8e-06, bandwidth = 1.5e+09)
 }
 \arguments{
-\item{graph}{object of class \code{DependGraph} as returned from \code{\link{inferGraph}}}
+\item{graph}{\linkS4class{DependGraph} as returned from \code{\link{inferGraph}}}
 
 \item{maxWorker}{integer maximum number of processors}
 
-\item{exprTime}{time in seconds to execute each expression}
-
-\item{exprTimeDefault}{numeric time in seconds to execute a single
+\item{timeDefault}{numeric time in seconds to execute a single
 expression. This will only be used if \code{exprTime} is NULL.}
 
 \item{sizeDefault}{numeric default size of objects to transfer in bytes}
@@ -26,6 +24,10 @@ expression. This will only be used if \code{exprTime} is NULL.}
 between processors in bytes per second. We don't take network
 contention into account. This will have to be extended to account for
 multiple machines.}
+
+\item{graphOrder}{function that takes in a \code{graph} and
+returns a permutation of \code{1:length(graph@code)} that respects the
+topological ordering of the graph.}
 }
 \value{
 schedule object of class \code{TaskSchedule}

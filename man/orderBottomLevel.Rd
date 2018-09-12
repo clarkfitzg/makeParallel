@@ -7,7 +7,7 @@
 orderBottomLevel(graph)
 }
 \arguments{
-\item{graph}{object of class \linkS4class{TimedDependGraph}}
+\item{graph}{\linkS4class{TimedDependGraph}}
 }
 \value{
 integer vector to permute the expressions in \code{x@code}

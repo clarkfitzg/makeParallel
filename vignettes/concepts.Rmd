@@ -175,14 +175,13 @@ to work properly so we pass it in explicitly below.
 ```{r, fig.width = 8, fig.height = 6, results = "hide"}
 library(makeParallel)
 
-code = parse(text = "
+graph = inferGraph(parse(text = "
     x = read.csv(xfile)
     y = read.csv(yfile)
     xy = sort(c(x[, 1], y[, 1]))
-    ")
+    "), time = c(1.25, 1.24, 0.2))
 
-pcode = makeParallel(code, scheduler = scheduleTaskList
-    , exprTime = c(1.25, 1.24, 0.2))
+pcode = makeParallel(graph, scheduler = scheduleTaskList)
 
 plot(schedule(pcode))
 ```
