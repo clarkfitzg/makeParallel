@@ -27,7 +27,7 @@
 #' @export
 #' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
 #' @param maxWorker integer maximum number of processors
-#' @param exprTime time in seconds to execute each expression
+#' @param order TODO
 #' @param exprTimeDefault numeric time in seconds to execute a single
 #'  expression. This will only be used if \code{exprTime} is NULL.
 #' @param sizeDefault numeric default size of objects to transfer in bytes
@@ -47,6 +47,7 @@
 #' plot(s)
 scheduleTaskList = function(graph, maxWorker = 2L
     , exprTime = NULL
+#    TODO: use bottom level ordering.
     , exprTimeDefault = 10e-6
     , sizeDefault = as.numeric(utils::object.size(1L))
     , overhead = 8e-6
