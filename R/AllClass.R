@@ -17,6 +17,10 @@
 
 #' Dependency graph between expressions
 #'
+#' Subclasses of this class contain all the information that we know about
+#' the code and the problem, such as the time to run each expression and
+#' the variable sizes.
+#'
 #' @export
 #' @slot code input code
 #' @slot graph data frame representing the graph with indices corresponding
@@ -51,6 +55,9 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
 
 
 #' Schedule base class
+#'
+#' Subclasses of schedule contain an abstract plan to run the code in
+#' parallel using various models.
 #'
 #' @export
 #' @slot graph \linkS4class{DependGraph} used to create the schedule
@@ -111,6 +118,9 @@ ForkSchedule = setClass("ForkSchedule"
 
 
 #' Generated code ready to write
+#'
+#' This class contains code that is ready to run and execute, as well as
+#' the steps taken to generate this code.
 #'
 #' @export
 #' @slot schedule contains all information to generate code
