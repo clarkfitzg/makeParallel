@@ -13,4 +13,4 @@ test_that("Defaults", {
 
     expect_warning(scheduleTaskList(g), "TimedDependGraph")
 
-}
+})

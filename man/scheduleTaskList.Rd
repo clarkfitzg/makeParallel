@@ -13,6 +13,10 @@ scheduleTaskList(graph, maxWorker = 2L, orderFun = orderBottomLevel,
 
 \item{maxWorker}{integer maximum number of processors}
 
+\item{orderFun}{function that takes in a \code{graph} and
+returns a permutation of \code{1:length(graph@code)} that respects the
+topological ordering of the graph.}
+
 \item{timeDefault}{numeric time in seconds to execute a single
 expression. Expression times default to this value, with a warning, if
 we can't find \code{time} from \code{graph}.}
@@ -25,10 +29,6 @@ we can't find \code{time} from \code{graph}.}
 between processors in bytes per second. We don't take network
 contention into account. This will have to be extended to account for
 multiple machines.}
-
-\item{graphOrder}{function that takes in a \code{graph} and
-returns a permutation of \code{1:length(graph@code)} that respects the
-topological ordering of the graph.}
 }
 \value{
 schedule object of class \code{TaskSchedule}

@@ -8,7 +8,7 @@ scheduleFork(graph, overhead = 1000, bandwidth = 1.5e+09)
 }
 \arguments{
 \item{graph}{object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
-expression. This will only be used if \code{exprTime} is NULL.}
+expression.}
 
 \item{overhead}{numeric seconds to send any object}
 

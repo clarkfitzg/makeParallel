@@ -9,7 +9,7 @@
 #' @export
 #' @inheritParams scheduleTaskList
 #' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
-#'  expression. This will only be used if \code{exprTime} is NULL.
+#'  expression.
 #' @return schedule object of class \code{ForkSchedule}
 scheduleFork = function(graph
     , overhead = 1e3
@@ -19,9 +19,9 @@ scheduleFork = function(graph
     nnodes = length(graph@code)
 
     might_fork = seq(nnodes)
-    might_fork = might_fork[exprTime > overhead]
+    might_fork = might_fork[time(graph) > overhead]
 
-    partialSchedule = data.frame(expression = seq(nnodes), fork = "run", time = exprTime)
+    partialSchedule = data.frame(expression = seq(nnodes), fork = "run", time = time(graph))
 
     # I imagine this pattern generalizes to other greedy algorithms.
     # But I'm not going to generalize it now.
@@ -40,7 +40,6 @@ scheduleFork = function(graph
 
     new("ForkSchedule", graph = graph
             , fork = partialSchedule
-            , exprTime = exprTime
             , overhead = overhead
             , bandwidth = bandwidth
             )
@@ -64,4 +63,3 @@ runTime = function(partialSchedule)
 scheduleOne = function(node_to_fork, partialSchedule, graph)
 {
 }
-

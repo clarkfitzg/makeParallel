@@ -70,7 +70,13 @@ setMethod("schedule", "GeneratedCode", function(graph, ...)
 })
 
 
+#' Expression Run Time
+#'
+#' Extract a numeric vector of expression run times
+#'
 #' @export
+#' @rdname time
+#' @param x object containing expression run times
 setMethod("time", "TimedDependGraph", function(x)
 {
     x@time
@@ -78,6 +84,7 @@ setMethod("time", "TimedDependGraph", function(x)
 
 
 #' @export
+#' @rdname time
 setMethod("time", "Schedule", function(x)
 {
     callGeneric(x@graph)

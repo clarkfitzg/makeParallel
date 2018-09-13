@@ -27,7 +27,7 @@
 #' @export
 #' @param graph \linkS4class{DependGraph} as returned from \code{\link{inferGraph}}
 #' @param maxWorker integer maximum number of processors
-#' @param graphOrder function that takes in a \code{graph} and
+#' @param orderFun function that takes in a \code{graph} and
 #'  returns a permutation of \code{1:length(graph@code)} that respects the
 #'  topological ordering of the graph.
 #' @param timeDefault numeric time in seconds to execute a single
@@ -50,7 +50,6 @@
 #' plot(s)
 scheduleTaskList = function(graph
     , maxWorker = 2L
-    #, exprTime = NULL
     , orderFun = orderBottomLevel
     , timeDefault = 10e-6
     , sizeDefault = as.numeric(utils::object.size(1L))
@@ -63,7 +62,7 @@ scheduleTaskList = function(graph
 
     if(!is(graph, "TimedDependGraph")){
         warning(sprintf("Graph isn't a TimedDependGraph, so expression times are unknown.
-Defaulting to a value of %f seconds for every statement.", exprTimeDefault))
+Defaulting to a value of %f seconds for every statement.", timeDefault))
         graph = TimedDependGraph(graph
             , time = rep(timeDefault, length(graph@code)))
     }
