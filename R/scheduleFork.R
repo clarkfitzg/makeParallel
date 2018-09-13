@@ -19,8 +19,8 @@ forkOne = function(node, allnodes, graph)
 # respect to node
 partition = function(node, allnodes, graph)
 {
-    out = list(ancestors = ancestors(node, allnodes, graph)
-            , descendants = descendants(node, allnodes, graph)
+    out = list(ancestors = familytree(node, "ancestors", allnodes, graph)
+            , descendants = familytree(node, "descendants", allnodes, graph)
             )
     related = do.call(c, out)
     out[["independent"]] = setdiff(allnodes, related)
@@ -28,6 +28,13 @@ partition = function(node, allnodes, graph)
 }
 
 
-ancestors = function(node, allnodes, graph)
+# Recursively compute part of a family tree and intersect with allnodes
+familytree = function(node, direction, allnodes, graph)
 {
+    onegen = switch(direction, ancestors = predecessors, descendants = successors)
+    g1 = onegen(node, graph)
+    g1 = intersect(g1, allnodes)
+    g2plus = sapply(g1, familytree, direction = direction
+                     , allnodes = allnodes, graph = graph)
+    c(g1, g2plus)
 }
