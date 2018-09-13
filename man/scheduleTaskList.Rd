@@ -14,7 +14,8 @@ scheduleTaskList(graph, maxWorker = 2L, orderFun = orderBottomLevel,
 \item{maxWorker}{integer maximum number of processors}
 
 \item{timeDefault}{numeric time in seconds to execute a single
-expression. This will only be used if \code{exprTime} is NULL.}
+expression. Expression times default to this value, with a warning, if
+we can't find \code{time} from \code{graph}.}
 
 \item{sizeDefault}{numeric default size of objects to transfer in bytes}
 

@@ -31,7 +31,8 @@
 #'  returns a permutation of \code{1:length(graph@code)} that respects the
 #'  topological ordering of the graph.
 #' @param timeDefault numeric time in seconds to execute a single
-#'  expression. This will only be used if \code{exprTime} is NULL.
+#'  expression. Expression times default to this value, with a warning, if
+#'  we can't find \code{time} from \code{graph}.
 #' @param sizeDefault numeric default size of objects to transfer in bytes
 #' @param overhead numeric seconds to send any object
 #' @param bandwidth numeric speed that the network can transfer an object
@@ -67,7 +68,7 @@ Defaulting to a value of %f seconds for every statement.", exprTimeDefault))
             , time = rep(timeDefault, length(graph@code)))
     }
 
-    exprTime = graph@exprTime
+    exprTime = time(graph)
     node_permutation = orderFun(graph)
 
     # Initialize by scheduling the first expression on the first worker.

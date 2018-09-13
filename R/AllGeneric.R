@@ -1,4 +1,5 @@
 #' @import methods
+#' @importFrom stats time
 NULL
 
 
@@ -66,6 +67,20 @@ setGeneric("schedule", function(graph, maxWorker = 2L, ...)
 setMethod("schedule", "GeneratedCode", function(graph, ...)
 {
     graph@schedule
+})
+
+
+#' @export
+setMethod("time", "TimedDependGraph", function(x)
+{
+    x@time
+})
+
+
+#' @export
+setMethod("time", "Schedule", function(x)
+{
+    callGeneric(x@graph)
 })
 
 

@@ -18,8 +18,6 @@ Task Parallel Schedule
 \item{\code{maxWorker}}{maximum number of processors, similar to \code{mc.cores}
 in the parallel package}
 
-\item{\code{exprTime}}{time in seconds to evaluate each expression}
-
 \item{\code{overhead}}{minimum time in seconds to evaluate a single expression}
 
 \item{\code{bandwidth}}{network bandwidth in bytes per second}

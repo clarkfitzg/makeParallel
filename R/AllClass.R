@@ -71,7 +71,6 @@ SerialSchedule = setClass("SerialSchedule", contains = "Schedule")
 #' @slot evaluation data.frame assigning expressions to processors
 #' @slot maxWorker maximum number of processors, similar to \code{mc.cores}
 #'  in the parallel package
-#' @slot exprTime time in seconds to evaluate each expression
 #' @slot overhead minimum time in seconds to evaluate a single expression
 #' @slot bandwidth network bandwidth in bytes per second
 #' @export
@@ -79,7 +78,6 @@ TaskSchedule = setClass("TaskSchedule"
     , slots = c(transfer = "data.frame"
               , evaluation = "data.frame"
               , maxWorker = "integer"
-              , exprTime = "numeric"
               , overhead = "numeric"
               , bandwidth = "numeric"
     ), contains = "Schedule")
@@ -101,7 +99,6 @@ MapSchedule = setClass("MapSchedule", contains = "Schedule")
 #' @export
 ForkSchedule = setClass("ForkSchedule"
     , slots = c(fork = "data.frame"
-              , exprTime = "numeric"
               , overhead = "numeric"
               , bandwidth = "numeric"
     ), contains = "Schedule")

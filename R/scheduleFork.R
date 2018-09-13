@@ -10,10 +10,8 @@
 #' @inheritParams scheduleTaskList
 #' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
 #'  expression. This will only be used if \code{exprTime} is NULL.
-#' @param exprTime numeric time to execute each expression
 #' @return schedule object of class \code{ForkSchedule}
 scheduleFork = function(graph
-    , exprTime
     , overhead = 1e3
     , bandwidth = 1.5e9
 ){
