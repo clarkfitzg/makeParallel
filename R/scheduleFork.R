@@ -49,7 +49,7 @@ scheduleFork = function(graph
 # join node as late as possible.
 forkOne = function(node, schedule, graphdf)
 {
-    blocks = blocksplit(node, schedule)
+    blocks = blockSplit(node, schedule)
 
     p = partition(node, blocks[["hasnode"]], graphdf)
 
@@ -69,14 +69,52 @@ forkOne = function(node, schedule, graphdf)
 }
 
 
-# Each node is located in a block defined with end
-blocksplit = function(node, schedule)
+# Boolean vector identifying forks and joins
+forkJoinLocation = function(schedule)
 {
-    list(before = 
-         , hasnode = 
-         , after = 
-         )
+    tbl = table(schedule)
+    repeats = names(tbl)[tbl == 2]
+    repeats = as.integer(repeats)
+    schedule %in% repeats
 }
+
+
+# Each node is located in a block between fork statements, or the program
+# start or end.
+blockSplit = function(node, schedule)
+{
+    # This function is called repeatedly with the same schedule, so many of
+    # these steps will be redundant. I'll come back and optimize it if it
+    # becomes an issue.
+
+    # This code is ugly for what it does. I wrote a vectorized version,
+    # it's even worse.
+
+    fj = forkJoinLocation(schedule)
+
+    idx = which(schedule == node)
+
+    # Walk left until we find a fork
+    leftIndex = idx
+    while(!fj[leftIndex] && leftIndex > 1){
+        leftIndex = leftIndex - 1
+    }
+
+    # Walk right
+    n = length(schedule)
+    rightIndex = idx
+    while(!fj[rightIndex] && rightIndex < n){
+        rightIndex = rightIndex + 1
+    }
+
+    list(before = schedule[seq(1, leftIndex)]
+         , hasnode = schedule[seq(leftIndex + 1, rightIndex - 1)]
+         , after = schedule[seq(rightIndex, n)]
+         )
+
+}
+
+
 
 
 # Partition nodegroup into ancestors, descendants, and independent with
@@ -84,8 +122,8 @@ blocksplit = function(node, schedule)
 # topological order with respect to the graph.
 partition = function(node, nodegroup, graph)
 {
-    out = list(ancestors = familytree(node, "ancestors", nodegroup, graph)
-            , descendants = familytree(node, "descendants", nodegroup, graph)
+    out = list(ancestors = familyTree(node, "ancestors", nodegroup, graph)
+            , descendants = familyTree(node, "descendants", nodegroup, graph)
             )
     related = do.call(c, out)
     out[["independent"]] = setdiff(nodegroup, related)
@@ -94,12 +132,12 @@ partition = function(node, nodegroup, graph)
 
 
 # Recursively compute part of a family tree and intersect with nodegroup
-familytree = function(node, direction, nodegroup, graph)
+familyTree = function(node, direction, nodegroup, graph)
 {
     onegen = switch(direction, ancestors = predecessors, descendants = successors)
     g1 = onegen(node, graph)
     g1 = intersect(g1, nodegroup)
-    g2plus = sapply(g1, familytree, direction = direction
+    g2plus = sapply(g1, familyTree, direction = direction
                      , nodegroup = nodegroup, graph = graph)
     c(g1, g2plus)
 }
