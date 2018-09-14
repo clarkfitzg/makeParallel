@@ -45,19 +45,43 @@ scheduleFork = function(graph
 }
 
 
+# The main idea is that we would like to fork node as soon as possible and
+# join node as late as possible.
 forkOne = function(node, schedule, graphdf)
 {
-    p = partition(node, schedule, graphdf)
+    blocks = blocksplit(node, schedule)
+
+    p = partition(node, blocks[["hasnode"]], graphdf)
+
+    new_schedule = list(blocks[["before"]]
+                        , p[["ancestors"]]
+                        , list(node)
+                        , p[["independent"]]
+                        , list(node)
+                        , p[["descendants"]]
+                        , blocks[["after"]]
+                        )
     
     list(node = node
-         , schedule = new_schedule
+         , schedule = unlist(new_schedule)
          , reduction = reduction
          )
 }
 
 
+# Each node is located in a block defined with end
+blocksplit = function(node, schedule)
+{
+    list(before = 
+         , hasnode = 
+         , after = 
+         )
+}
+
+
 # Partition nodegroup into ancestors, descendants, and independent with
-# respect to node
+# respect to node. Returning the groups in sorted order guarantees a valid
+# topological order with respect to the graph.
 partition = function(node, nodegroup, graph)
 {
     out = list(ancestors = familytree(node, "ancestors", nodegroup, graph)
@@ -65,7 +89,7 @@ partition = function(node, nodegroup, graph)
             )
     related = do.call(c, out)
     out[["independent"]] = setdiff(nodegroup, related)
-    out
+    lapply(out, sort)
 }
 
 
