@@ -9,11 +9,12 @@ scheduleFork = function(graph
 ){
     nnodes = length(graph@code)
     graphdf = graph@graph
+    times = time(graph)
 
     # This algorithm works by continually removing elements from this
     # vector.
     might_fork = seq(nnodes)
-    might_fork = might_fork[time(graph) > overhead]
+    might_fork = might_fork[times > overhead]
 
     cur_schedule = seq(nnodes)
 
@@ -21,7 +22,8 @@ scheduleFork = function(graph
     # But I'm not going to generalize it now.
     for(i in seq_len(might_fork)){
         forks = lapply(might_fork, forkOne
-                       , schedule = cur_schedule, graphdf = graphdf)
+                       , schedule = cur_schedule, graphdf = graphdf
+                       , times = times, overhead = overhead)
 
         # Remove forked nodes that slow down the program.
         reduction = sapply(forks, `[[`, "reduction")
@@ -47,7 +49,8 @@ scheduleFork = function(graph
 
 # The main idea is that we would like to fork node as soon as possible and
 # join node as late as possible.
-forkOne = function(node, schedule, graphdf)
+# TODO: add join overhead as a function of data transferred.
+forkOne = function(node, schedule, graphdf, times, overhead)
 {
     blocks = blockSplit(node, schedule)
 
@@ -61,10 +64,13 @@ forkOne = function(node, schedule, graphdf)
                         , p[["descendants"]]
                         , blocks[["after"]]
                         )
+
+    time_ind = sum(times[p[["independent"]]])
+    time_node = times[node]
     
     list(node = node
          , schedule = unlist(new_schedule)
-         , reduction = reduction
+         , reduction = time_node + time_ind - max(time_node + time_ind) - overhead
          )
 }
 
@@ -87,13 +93,12 @@ blockSplit = function(node, schedule)
     # these steps will be redundant. I'll come back and optimize it if it
     # becomes an issue.
 
-    sentinel = min(schedule) - 1L
-
     # This code is ugly for what it does. I wrote a vectorized version,
     # it's even worse.
 
     # Represent the end and beginning of the program in the same way as a
     # fork to simplify the logic.
+    sentinel = min(schedule) - 1L
     schedule0 = c(sentinel, schedule, sentinel)
 
     fj = forkJoinLocation(schedule0)
@@ -116,12 +121,11 @@ blockSplit = function(node, schedule)
     before = schedule0[seq(1, leftIndex)]
     after = schedule0[seq(rightIndex, n)]
 
-    # Strip the artifical 0's back out
+    # Remove the sentinels before returning.
     list(before = before[before != sentinel]
          , hasnode = schedule0[seq(leftIndex + 1, rightIndex - 1)]
          , after = after[after != sentinel0]
          )
-
 }
 
 
