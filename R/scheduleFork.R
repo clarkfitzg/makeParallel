@@ -90,9 +90,13 @@ blockSplit = function(node, schedule)
     # This code is ugly for what it does. I wrote a vectorized version,
     # it's even worse.
 
-    fj = forkJoinLocation(schedule)
+    # Represent the end and beginning of the program in the same way as a
+    # fork to simplify the logic.
+    schedule0 = c(0, schedule, 0)
 
-    idx = which(schedule == node)
+    fj = forkJoinLocation(schedule0)
+
+    idx = which(schedule0 == node)
 
     # Walk left until we find a fork
     leftIndex = idx
@@ -101,20 +105,22 @@ blockSplit = function(node, schedule)
     }
 
     # Walk right
-    n = length(schedule)
+    n = length(schedule0)
     rightIndex = idx
     while(!fj[rightIndex] && rightIndex < n){
         rightIndex = rightIndex + 1
     }
 
-    list(before = schedule[seq(1, leftIndex)]
-         , hasnode = schedule[seq(leftIndex + 1, rightIndex - 1)]
-         , after = schedule[seq(rightIndex, n)]
+    before = schedule0[seq(1, leftIndex)]
+    after = schedule0[seq(rightIndex, n)]
+
+    # Strip the artifical 0's back out
+    list(before = before[before != 0]
+         , hasnode = schedule0[seq(leftIndex + 1, rightIndex - 1)]
+         , after = after[after != 0]
          )
 
 }
-
-
 
 
 # Partition nodegroup into ancestors, descendants, and independent with
