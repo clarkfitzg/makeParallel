@@ -4,22 +4,16 @@
 \alias{scheduleFork}
 \title{Single sequential forks scheduler}
 \usage{
-scheduleFork(graph, overhead = 1000, bandwidth = 1.5e+09)
+scheduleFork(graph, overhead = 1e-03)
 }
 \arguments{
-\item{graph}{object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
-expression.}
+\item{graph}{\linkS4class{DependGraph} as returned from \code{\link{inferGraph}}}
 
-\item{overhead}{numeric seconds to send any object}
-
-\item{bandwidth}{numeric speed that the network can transfer an object
-between processors in bytes per second. We don't take network
-contention into account. This will have to be extended to account for
-multiple machines.}
+\item{overhead}{seconds required to initialize a fork}
 }
 \value{
-schedule object of class \code{ForkSchedule}
+schedule \linkS4class{ForkSchedule}
 }
 \description{
-TODO: Inherit parameters from scheduleTaskList
+Single sequential forks scheduler
 }

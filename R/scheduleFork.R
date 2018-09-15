@@ -3,7 +3,7 @@
 #' @export
 #' @inheritParams scheduleTaskList
 #' @param overhead seconds required to initialize a fork
-#' @return schedule \linkS4Class{ForkSchedule}
+#' @return schedule \linkS4class{ForkSchedule}
 scheduleFork = function(graph
     , overhead = 1e-3
 ){
@@ -20,7 +20,7 @@ scheduleFork = function(graph
 
     # I imagine this pattern generalizes to other greedy algorithms.
     # But I'm not going to generalize it now.
-    for(i in seq_len(might_fork)){
+    for(i in seq_along(might_fork)){
         forks = lapply(might_fork, forkOne
                        , schedule = cur_schedule, graphdf = graphdf
                        , times = times, overhead = overhead)
@@ -28,7 +28,7 @@ scheduleFork = function(graph
         # Remove forked nodes that slow down the program.
         reduction = sapply(forks, `[[`, "reduction")
         slowdowns = reduction < 0
-        might_fork = setdiff(might_fork, mightfork[slowdowns])
+        might_fork = setdiff(might_fork, might_fork[slowdowns])
         if(length(might_fork) == 0)
             break
 
@@ -124,7 +124,7 @@ blockSplit = function(node, schedule)
     # Remove the sentinels before returning.
     list(before = before[before != sentinel]
          , hasnode = schedule0[seq(leftIndex + 1, rightIndex - 1)]
-         , after = after[after != sentinel0]
+         , after = after[after != sentinel]
          )
 }
 
@@ -151,5 +151,5 @@ familyTree = function(node, direction, nodegroup, graph)
     g1 = intersect(g1, nodegroup)
     g2plus = sapply(g1, familyTree, direction = direction
                      , nodegroup = nodegroup, graph = graph)
-    c(g1, g2plus)
+    as.integer(c(g1, g2plus))
 }

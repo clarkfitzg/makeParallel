@@ -10,6 +10,11 @@ test_that("fork schedule", {
 
     s = scheduleFork(g)
 
+    stop("
+I have to decide better how to represent and test this, but
+it's not working now. One of these should fork.
+         ")
+
     plot(s)
 
 })

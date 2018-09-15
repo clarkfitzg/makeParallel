@@ -6,7 +6,8 @@
 \alias{Schedule}
 \title{Schedule base class}
 \description{
-Schedule base class
+Subclasses of schedule contain an abstract plan to run the code in
+parallel using various models.
 }
 \section{Slots}{
 

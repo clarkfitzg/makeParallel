@@ -6,7 +6,9 @@
 \alias{DependGraph}
 \title{Dependency graph between expressions}
 \description{
-Dependency graph between expressions
+Subclasses of this class contain all the information that we know about
+the code and the problem, such as the time to run each expression and
+the variable sizes.
 }
 \section{Slots}{
 

@@ -5,7 +5,8 @@
 \alias{GeneratedCode-class}
 \title{Generated code ready to write}
 \description{
-Generated code ready to write
+This class contains code that is ready to run and execute, as well as
+the steps taken to generate this code.
 }
 \section{Slots}{
 
