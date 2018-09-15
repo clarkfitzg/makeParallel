@@ -87,12 +87,14 @@ blockSplit = function(node, schedule)
     # these steps will be redundant. I'll come back and optimize it if it
     # becomes an issue.
 
+    sentinel = min(schedule) - 1L
+
     # This code is ugly for what it does. I wrote a vectorized version,
     # it's even worse.
 
     # Represent the end and beginning of the program in the same way as a
     # fork to simplify the logic.
-    schedule0 = c(0, schedule, 0)
+    schedule0 = c(sentinel, schedule, sentinel)
 
     fj = forkJoinLocation(schedule0)
 
@@ -115,9 +117,9 @@ blockSplit = function(node, schedule)
     after = schedule0[seq(rightIndex, n)]
 
     # Strip the artifical 0's back out
-    list(before = before[before != 0]
+    list(before = before[before != sentinel]
          , hasnode = schedule0[seq(leftIndex + 1, rightIndex - 1)]
-         , after = after[after != 0]
+         , after = after[after != sentinel0]
          )
 
 }

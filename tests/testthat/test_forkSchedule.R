@@ -27,7 +27,7 @@ test_that("Helper functions", {
 
     expect_equal(blockSplit(1, schedule),
         list(before = integer()
-             , hasnode = c(1)
+             , hasnode = c(1, 2)
              , after = c(2, 3, 4, 5, 3, 6)
     ))
 
