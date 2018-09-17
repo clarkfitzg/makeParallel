@@ -20,6 +20,23 @@ test_that("fork schedule", {
 })
 
 
+test_that("fork schedule on a larger script", {
+
+    codewall = parse("codewall.R")
+
+    # Some times are large, some not.
+    set.seed(8439)
+    n = length(codewall)
+    times = runif(n)
+    epsilon = 1e-4
+    times[sample.int(n, size = floor(n/2))] = epsilon
+
+    g = inferGraph(codewall, time = times)
+
+    s = scheduleFork(g)
+})
+
+
 test_that("Helper functions", {
 
     schedule = c(1, 2, 3, 4, 5, 3, 6)
