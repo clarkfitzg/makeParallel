@@ -34,6 +34,7 @@ test_that("fork schedule on a larger script", {
     g = inferGraph(codewall, time = times)
 
     s = scheduleFork(g)
+
 })
 
 

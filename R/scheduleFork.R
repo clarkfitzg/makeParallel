@@ -166,7 +166,7 @@ familyTree = function(node, direction, nodegroup, graph)
     onegen = switch(direction, ancestors = predecessors, descendants = successors)
     g1 = onegen(node, graph)
     g1 = intersect(g1, nodegroup)
-    g2plus = sapply(g1, familyTree, direction = direction
+    g2plus = lapply(g1, familyTree, direction = direction
                      , nodegroup = nodegroup, graph = graph)
-    as.integer(c(g1, g2plus))
+    as.integer(c(g1, unlist(g2plus)))
 }
