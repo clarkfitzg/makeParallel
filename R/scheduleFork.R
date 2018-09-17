@@ -7,6 +7,20 @@
 scheduleFork = function(graph
     , overhead = 1e-3
 ){
+    scheduleForkSeq(graph, overhead)
+}
+
+
+#' Single sequential forks scheduler
+#'
+#' @inheritParams scheduleTaskList
+#' @param overhead seconds required to initialize a fork
+#' @return schedule integer representing the schedule. If an index appears
+#' twice, then the first appearance is the fork, and the second is the
+#' join. Indices appearing once mean don't fork.
+scheduleForkSeq = function(graph
+    , overhead
+){
     nnodes = length(graph@code)
     graphdf = graph@graph
     times = time(graph)
@@ -47,12 +61,13 @@ scheduleFork = function(graph
 }
 
 
+
 # The main idea is that we would like to fork node as soon as possible and
 # join node as late as possible.
 # TODO: add join overhead as a function of data transferred.
 forkOne = function(node, schedule, graphdf, times, overhead)
 {
-    blocks = blockSplit(node, schedule)
+    blocks = forkSplit(node, schedule)
 
     p = partition(node, blocks[["hasnode"]], graphdf)
 
@@ -70,7 +85,7 @@ forkOne = function(node, schedule, graphdf, times, overhead)
     
     list(node = node
          , schedule = unlist(new_schedule)
-         , reduction = time_node + time_ind - max(time_node + time_ind) - overhead
+         , reduction = time_node + time_ind - max(time_node, time_ind) - overhead
          )
 }
 
@@ -85,9 +100,10 @@ forkJoinLocation = function(schedule)
 }
 
 
+# Split the schedule vector based on the locations of the forks.
 # Each node is located in a block between fork statements, or the program
 # start or end.
-blockSplit = function(node, schedule)
+forkSplit = function(node, schedule)
 {
     # This function is called repeatedly with the same schedule, so many of
     # these steps will be redundant. I'll come back and optimize it if it
@@ -132,13 +148,14 @@ blockSplit = function(node, schedule)
 # Partition nodegroup into ancestors, descendants, and independent with
 # respect to node. Returning the groups in sorted order guarantees a valid
 # topological order with respect to the graph.
+# This is a more general function than forkSplit
 partition = function(node, nodegroup, graph)
 {
     out = list(ancestors = familyTree(node, "ancestors", nodegroup, graph)
             , descendants = familyTree(node, "descendants", nodegroup, graph)
             )
     related = do.call(c, out)
-    out[["independent"]] = setdiff(nodegroup, related)
+    out[["independent"]] = setdiff(nodegroup, c(node, related))
     lapply(out, sort)
 }
 
