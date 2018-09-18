@@ -80,6 +80,18 @@ lowestAvailable = function(start_time, end_time, start_time_i, end_time_i, proce
 # end_time_i?
 available = function(candidate, start_time, end_time, start_time_i, end_time_i, processor)
 {
+    same_proc = processor == candidate & !is.na(processor)
+    start = start_time[same_proc]
+    end = end_time[same_proc]
+    ol = mapply(overlap, start, end, start_time_i, end_time_i)
+    !any(ol)
+}
+
+
+# Do the intervals [left1, right1] and [left2, right2] overlap?
+overlap = function(left1, right1, left2, right2)
+{
+    right2 < left1 || right1 < left2
 }
 
 
