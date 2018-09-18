@@ -4,6 +4,12 @@ NULL
 setGeneric("plot")
 
 
+# Accepts and plots a single row of a data frame containing the following columns:
+# - start_time
+# - end_time
+# - processor
+# - node (optional)
+# - label (optional)
 plot_one_eval_block = function(row, blockHeight, rectAes, labelExpr)
 {with(row, {
     rect_args = list(xleft = start_time

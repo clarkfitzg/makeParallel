@@ -7,17 +7,73 @@
 scheduleFork = function(graph
     , overhead = 1e-3
 ){
-    scheduleForkSeq(graph, overhead)
+    sequence = scheduleForkSeq(graph, overhead)
+
+    fork = sequenceToFork(sequence, graph@times, overhead)
+
+    ForkSchedule(graph = graph
+                 , fork = fork
+                 , sequence = sequence
+                 , overhead = overhead
+                 )
 }
 
 
-#' Single sequential forks scheduler
-#'
-#' @inheritParams scheduleTaskList
-#' @param overhead seconds required to initialize a fork
-#' @return schedule integer representing the schedule. If an index appears
-#' twice, then the first appearance is the fork, and the second is the
-#' join. Indices appearing once mean don't fork.
+# - start_time
+# - end_time
+# - processor
+# - node (optional)
+# - label (optional)
+sequenceToFork = function(sequence, exprTimes, overhead)
+{
+    n = length(sequence)
+    start_time = end_time = processor = node = rep(NA, n)
+
+    cases = forkJoinRun(sequence)
+
+    time = 0
+    for(i in seq(n)){
+        node_i = sequence[i]
+        node[i] = node_i
+        switch(cases[i]
+            , run = {
+                start_time[i] = time
+                time = time + exprTimes[node_i]
+                end_time[i] = time
+                processor[i] = 1L
+            }
+            , fork = {
+                time = time + overhead
+                start_time[i] = time
+                end_time_i = time + exprTimes[node_i]
+                end_time[i] = end_time_i
+                processor[i] = lowestAvailable(start_time, end_time
+                    , start_time_i = time, end_time_i = end_time_i
+                    , processor = processor)
+            }
+            , join = {
+                # Rely on this running in sequence, so the fork is already
+                # there. Don't update anything else because this row will
+                # be removed in the end.
+                time = end_time[node == node_i & !is.na(end_time)]
+            }
+        )
+    }
+
+    out = data.frame(start_time, end_time, processor, node)
+    complete.cases(out)
+}
+
+
+# What is the lowest available processor?
+lowestAvailable = function(start_time, end_time, start_time_i, end_time_i, processor)
+{
+}
+
+
+# @return schedule integer representing the schedule. If an index appears
+# twice, then the first appearance is the fork, and the second is the
+# join. Indices appearing once mean don't fork.
 scheduleForkSeq = function(graph
     , overhead
 ){
@@ -96,6 +152,23 @@ forkJoinLocation = function(schedule)
     repeats = names(tbl)[tbl == 2]
     repeats = as.integer(repeats)
     schedule %in% repeats
+}
+
+
+# Either a fork, join, or run
+forkJoinRun = function(schedule)
+{
+    out = rep("run", length(schedule))
+    fj = forkJoinLocation(schedule)
+    forkNodes = unique(schedule[fj])
+    for(node in forkNodes){
+        locs = which(schedule == forkNodes)
+        # There can only be two locations,
+        # and forks always precede the join.
+        out[locs[1]] = "fork"
+        out[locs[2]] = "join"
+    }
+    out
 }
 
 

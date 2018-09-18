@@ -103,9 +103,11 @@ MapSchedule = setClass("MapSchedule", contains = "Schedule")
 #' Class for schedules that should be parallelized by forks from one single
 #' process
 #'
+#' @slot sequence vector of statement indices
 #' @export
 ForkSchedule = setClass("ForkSchedule"
     , slots = c(fork = "data.frame"
+                , sequence = "integer"
               , overhead = "numeric"
               , bandwidth = "numeric"
     ), contains = "Schedule")
