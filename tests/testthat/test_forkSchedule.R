@@ -35,6 +35,9 @@ test_that("fork schedule on a larger script", {
 
     s = scheduleFork(g)
 
+    # TODO: Write plot method
+    plot(s)
+
 })
 
 

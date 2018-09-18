@@ -25,8 +25,8 @@ scheduleForkSeq = function(graph
     graphdf = graph@graph
     times = time(graph)
 
-    # This algorithm works by continually removing elements from this
-    # vector.
+    # Remove elements from this vector at each iteration.
+    # When it's empty we stop.
     might_fork = seq(nnodes)
     might_fork = might_fork[times > overhead]
 
@@ -59,7 +59,6 @@ scheduleForkSeq = function(graph
 
     cur_schedule
 }
-
 
 
 # The main idea is that we would like to fork node as soon as possible and
@@ -168,5 +167,5 @@ familyTree = function(node, direction, nodegroup, graph)
     g1 = intersect(g1, nodegroup)
     g2plus = lapply(g1, familyTree, direction = direction
                      , nodegroup = nodegroup, graph = graph)
-    as.integer(c(g1, unlist(g2plus)))
+    as.integer(unique(c(g1, unlist(g2plus))))
 }
