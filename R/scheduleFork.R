@@ -53,9 +53,10 @@ sequenceToFork = function(sequence, exprTimes, overhead)
             }
             , join = {
                 # Rely on this running in sequence, so the fork is already
-                # there. Don't update anything else because this row will
-                # be removed in the end.
-                time = end_time[node == node_i & !is.na(end_time)]
+                # there. No need to do any updates because the join rows
+                # will be dropped.
+                fork_done_time = end_time[node == node_i & !is.na(end_time)]
+                time = max(time, fork_done_time)
             }
         )
     }
@@ -67,6 +68,17 @@ sequenceToFork = function(sequence, exprTimes, overhead)
 
 # What is the lowest available processor?
 lowestAvailable = function(start_time, end_time, start_time_i, end_time_i, processor)
+{
+    candidate = 2L
+    while(!available(candidate, start_time, end_time, start_time_i, end_time_i, processor))
+        candidate = candidate + 1L
+    candidate
+}
+
+
+# Is candidate available to be assigned between start_time_i and
+# end_time_i?
+available = function(candidate, start_time, end_time, start_time_i, end_time_i, processor)
 {
 }
 
