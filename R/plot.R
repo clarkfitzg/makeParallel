@@ -66,7 +66,6 @@ plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
 
 #' Gantt chart of a schedule
 #'
-#' @export
 #' @param x \linkS4class{TaskSchedule}
 #' @param blockHeight height of rectangle, between 0 and 0.5
 #' @param main title
@@ -81,10 +80,11 @@ plot_one_transfer = function(row, blockHeight, rectAes, sendColor, receiveColor
 #' @param rectAes list of additional arguments for
 #'   \code{\link[graphics]{rect}}
 #' @param ... additional arguments to \code{plot}
-setMethod(plot, c("TaskSchedule", "missing"), function(x, blockHeight = 0.25, main = "schedule plot"
+plotBlocks = function(x, blockHeight = 0.25, main = "schedule plot"
     , xlab = "Time (seconds)", ylab = "Processor"
     , evalColor = "gray", sendColor = "orchid", receiveColor = "slateblue"
-    , labelTransfer = TRUE, labelExpr = NULL, rectAes = list(density = NA, border = "black", lwd = 2)
+    , labelTransfer = TRUE, labelExpr = NULL
+    , rectAes = list(density = NA, border = "black", lwd = 2)
     , ...)
 {
     run = x@evaluation
@@ -108,7 +108,9 @@ setMethod(plot, c("TaskSchedule", "missing"), function(x, blockHeight = 0.25, ma
         , labelExpr = labelExpr
         )
 
-    by0(x@transfer, seq(nrow(x@transfer)), plot_one_transfer
+    xfer = transfer(x)
+
+    by0(xfer, seq(nrow(xfer)), plot_one_transfer
         , blockHeight = blockHeight
         , rectAes = rectAes
         , sendColor = sendColor
@@ -117,7 +119,12 @@ setMethod(plot, c("TaskSchedule", "missing"), function(x, blockHeight = 0.25, ma
         )
 
     NULL
-})
+}
+
+
+setMethod(plot, c("TaskSchedule", "missing"), plotBlocks)
+
+setMethod(plot, c("ForkSchedule", "missing"), plotBlocks)
 
 
 #' Plot Dependency Graph

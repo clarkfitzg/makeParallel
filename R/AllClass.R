@@ -98,6 +98,7 @@ TaskSchedule = setClass("TaskSchedule"
 MapSchedule = setClass("MapSchedule", contains = "Schedule")
 
 
+
 #' Fork based parallel schedule
 #'
 #' Class for schedules that should be parallelized by forks from one single
@@ -106,11 +107,8 @@ MapSchedule = setClass("MapSchedule", contains = "Schedule")
 #' @slot sequence vector of statement indices
 #' @export
 ForkSchedule = setClass("ForkSchedule"
-    , slots = c(fork = "data.frame"
-                , sequence = "integer"
-              , overhead = "numeric"
-              , bandwidth = "numeric"
-    ), contains = "Schedule")
+    , slots = c(sequence = "integer")
+    , contains = "TaskSchedule")
 
 
 # Generated Code

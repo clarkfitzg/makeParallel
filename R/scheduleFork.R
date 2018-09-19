@@ -6,15 +6,19 @@
 #' @return schedule \linkS4class{ForkSchedule}
 scheduleFork = function(graph
     , overhead = 1e-3
+    , bandwidth = 1.5e9
 ){
     sequence = scheduleForkSeq(graph, overhead)
 
-    fork = sequenceToFork(sequence, graph@time, overhead)
-
+    evaluation = sequenceToFork(sequence, graph@time, overhead)
+ 
     ForkSchedule(graph = graph
-                 , fork = fork
+                 , evaluation = evaluation
                  , sequence = sequence
                  , overhead = overhead
+                 , transfer = data.frame() # TODO: actually put these in
+                 , maxWorker = max(evaluation[, "processor"])
+                 , bandwidth = bandwidth
                  )
 }
 
