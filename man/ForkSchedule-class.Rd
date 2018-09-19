@@ -9,3 +9,9 @@
 Class for schedules that should be parallelized by forks from one single
 process
 }
+\section{Slots}{
+
+\describe{
+\item{\code{sequence}}{vector of statement indices}
+}}
+

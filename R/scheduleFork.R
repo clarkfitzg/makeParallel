@@ -9,7 +9,7 @@ scheduleFork = function(graph
 ){
     sequence = scheduleForkSeq(graph, overhead)
 
-    fork = sequenceToFork(sequence, graph@times, overhead)
+    fork = sequenceToFork(sequence, graph@time, overhead)
 
     ForkSchedule(graph = graph
                  , fork = fork
