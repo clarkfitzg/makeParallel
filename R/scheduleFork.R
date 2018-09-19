@@ -62,7 +62,7 @@ sequenceToFork = function(sequence, exprTimes, overhead)
     }
 
     out = data.frame(start_time, end_time, processor, node)
-    complete.cases(out)
+    out[cases != "join", ]
 }
 
 
@@ -81,6 +81,10 @@ lowestAvailable = function(start_time, end_time, start_time_i, end_time_i, proce
 available = function(candidate, start_time, end_time, start_time_i, end_time_i, processor)
 {
     same_proc = processor == candidate & !is.na(processor)
+    if(!any(same_proc)){
+        # Nothing assigned on this processor yet
+        return(TRUE)
+    }
     start = start_time[same_proc]
     end = end_time[same_proc]
     ol = mapply(overlap, start, end, start_time_i, end_time_i)
