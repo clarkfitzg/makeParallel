@@ -4,12 +4,17 @@
 \alias{scheduleFork}
 \title{Single sequential forks scheduler}
 \usage{
-scheduleFork(graph, overhead = 1e-03)
+scheduleFork(graph, overhead = 1e-03, bandwidth = 1.5e+09)
 }
 \arguments{
 \item{graph}{\linkS4class{DependGraph} as returned from \code{\link{inferGraph}}}
 
 \item{overhead}{seconds required to initialize a fork}
+
+\item{bandwidth}{numeric speed that the network can transfer an object
+between processors in bytes per second. We don't take network
+contention into account. This will have to be extended to account for
+multiple machines.}
 }
 \value{
 schedule \linkS4class{ForkSchedule}
