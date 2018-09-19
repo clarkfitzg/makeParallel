@@ -8,8 +8,6 @@ test_that("fork schedule", {
 
     g = inferGraph(code, time = c(2, 3, 1))
 
-    scheduleForkSeq = scheduleFork
-
     s = scheduleForkSeq(g, overhead = 1e-3)
 
     # Exactly one statement should be forked and thus appear twice.
