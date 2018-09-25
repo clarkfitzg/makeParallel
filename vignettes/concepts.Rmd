@@ -352,3 +352,22 @@ doesn't handle the following cases.
 Thanks Duncan Temple Lang and Nick Ulle for providing feedback.
 
 Thanks to all those who have let me look at their code, especially Scott Devine, Nistara Randhawa, and Lynna Chu.
+
+
+## Changes
+
+A couple things are becoming clear to me:
+1. We need to preserve the code as it comes into the function, since we infer everything from this original code.
+2. It's often easier to do the scheduling on modified code.
+
+Therefore it would be useful to have two versions of the code- one original, and one modified.
+Nick and I have spoke about this before: putting the code in 'canonical form'.
+I'll call it 'standard form', so I can use a more common word.
+
+The main thing I want right now from the modified code is to group plotting edges.
+We could also change `for` loops -> `lapply` at this step.
+In the future I could see wanting more, for example, breaking down subexpressions, and scheduling those individually.
+
+All of these things will require us to change the timing information.
+
+For scheduling we only need the modified code, and the graph that comes from the modified code.
