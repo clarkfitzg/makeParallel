@@ -36,7 +36,6 @@ This project is experimental and ambitious.
 To write parallel R today consider using an established package, such as the recommended [parallel package](https://stat.ethz.ch/R-manual/R-devel/library/parallel/doc/parallel.pdf) which has been included with R since version 2.14.
 The CRAN Task View [High-Performance and Parallel Computing with R](https://cran.r-project.org/view=HighPerformanceComputing) provides a thorough review of available third party software.
 
-
 ## Big Picture
 
 makeParallel makes code parallel.
@@ -115,8 +114,7 @@ These come from replacing apply type functions with equivalent parallel versions
 The current implementation is basic and does the following:
 
 - Identifies `for` loops that can be parallelized
-- Replaces top level `lapply` and `mapply` with their `mc` equivalents from
-  the parallel package
+- Replaces top level `lapply` and `mapply` with their `mc` equivalents from the parallel package
 - Avoids nested parallelism
 
 Future versions may include the following features.
@@ -334,7 +332,6 @@ The following features are planned, but not yet implemented.
 2. Infer dimensions and run time when possible.
 3. Generate code that uses systems besides R, for example Apache Hive.
 
-
 ## Challenges
 
 Some R code is more difficult to parallelize. This package currently
@@ -344,10 +341,8 @@ doesn't handle the following cases.
   Familiar R functions with NSE include `library()` and the `~` syntax for modeling.
   Some third party packages use NSE extensively.
   Examples include [data.table](https://cran.r-project.org/package=data.table) and [dplyr](https://cran.r-project.org/package=dplyr).
-
 2.Objects with reference semantics can change in method calls, so they require much more synchronization to run in parallel.
   Environments, reference classes, and R6 classes are examples of such objects.
-
 
 ## Acknowledgements
 

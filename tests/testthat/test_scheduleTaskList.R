@@ -14,3 +14,20 @@ test_that("Defaults", {
     expect_warning(scheduleTaskList(g), "TimedDependGraph")
 
 })
+
+
+test_that("Plotting", {
+
+    code = parse(text = "
+        x = 1:10
+        y = sin(x)
+        pdf('sin.pdf')
+        plot(x, y)
+        dev.off()
+        ")
+
+    g = inferGraph(code)
+
+    s = scheduleTaskList(g)
+
+})
