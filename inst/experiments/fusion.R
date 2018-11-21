@@ -60,3 +60,10 @@ code$vectorized = code$func %in% rhsVectorFuncs
 
 # This relates to something I did years ago, and that foreach and futures
 # also do- check which variables are needed and possibly export them.
+
+# If the data fits in memory then these two approaches are pretty similar.
+# The latter will have more overhead because it communicates at every
+# vectorized statement. The code analysis and fusion approach becomes
+# appealing when we apply it to a data set that's larger than memory,
+# because it minimizes the number of passes that we have to make through
+# the data.
