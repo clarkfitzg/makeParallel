@@ -1,4 +1,4 @@
-#' Convert Code Into Standard Form
-standardize = function(code)
-{
-}
+# Convert Code Into Standard Form
+#standardize = function(code)
+#{
+#}

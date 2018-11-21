@@ -45,3 +45,18 @@ code$vectorized = code$func %in% rhsVectorFuncs
 # function call. Then we still have the data loaded on all the workers, so
 # we can continue to run the remainder of the program in this fork - join
 # manner, leaving as much of the data distributed as possible.
+
+# This only really operates on one single object or table at a time.
+
+# Alternatively we can do something simpler and more dynamic, closer to the
+# way that R typically operates:
+# Evaluate each statement either in serial on the manager or in parallel on
+# the object distributed among the workers. Then we need to maintain a list
+# of what objects are distributed. For example, we start knowing that `x` is
+# distributed, and then we run:
+#       cond = x < 0
+# so we know that `cond` is also distributed, because it's the result of a
+# vectorized function call on `x`.
+
+# This relates to something I did years ago, and that foreach and futures
+# also do- check which variables are needed and possibly export them.
