@@ -11,10 +11,28 @@ g@graph$value
 lhsVectorFuncs = c("[")
 
 # There are many, many more
-rhsVectorFuncs = c("`<`", "`[`", "exp", "identity")
+rhsVectorFuncs = c("`<`", "`[`", "exp")
 
-# I can also do this more rigorously by specifying which arguments a
+loadFuncs = c("load")
+saveFuncs = c("save")
+
+types = data.frame(name = c(rhsVectorFuncs, loadFuncs, saveFuncs)
+    , type = c(rep("vector", length(rhsVectorFuncs))
+                 , rep("load", length(loadFuncs))
+                 , rep("save", length(saveFuncs))
+                 )
+    , stringsAsFactors = FALSE)
+
+# Classify a function into one of several possible types.
+# I will need to do this more rigorously by specifying which arguments a
 # function is vectorized in and using `match.call`
+funcType = function(funcName, funcTypeTable, fallbackType = "general")
+{
+    funcName = as.character(funcName)
+    index = match(funcName, funcTypeTable$name)
+    if(is.na(index)) fallbackType 
+        else funcTypeTable[index, "type"]
+}
 
 # Various forms might make the code easier to manipulate.
 # Here's a form that puts everything in terms of
@@ -27,7 +45,7 @@ code = list(lhs = lapply(g@code, `[[`, 2)
     , args = lapply(g@code, function(e) as.list(e[[3]])[-1])
     )
 
-code$vectorized = code$func %in% rhsVectorFuncs
+code$funcType = sapply(code$func, funcType, funcTypeTable = types)
 
 # Now we can fuse the vectorized functions based on the graph structure.
 # What exactly does this mean?
@@ -66,4 +84,7 @@ code$vectorized = code$func %in% rhsVectorFuncs
 # vectorized statement. The code analysis and fusion approach becomes
 # appealing when we apply it to a data set that's larger than memory,
 # because it minimizes the number of passes that we have to make through
-# the data.
+# the data. Extending to include the reduce will also help with the 2nd
+# case.
+
+
