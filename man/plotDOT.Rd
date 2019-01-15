@@ -4,12 +4,14 @@
 \alias{plotDOT}
 \title{Plot Dependency Graph}
 \usage{
-plotDOT(graph, file, args = "")
+plotDOT(graph, file = NULL, dotfile = NULL, args = "")
 }
 \arguments{
 \item{graph}{dependGraph}
 
-\item{file}{character where to save file}
+\item{file}{character where to save pdf image}
+
+\item{dotfile}{character where to save dot commands to produce plot}
 
 \item{args}{character additional arguments to \code{dot} command line program}
 }

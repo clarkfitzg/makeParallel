@@ -126,17 +126,22 @@ setMethod(plot, c("TaskSchedule", "missing"), function(x, blockHeight = 0.25, ma
 #'
 #' @export
 #' @param graph dependGraph
-#' @param file character where to save file
+#' @param file character where to save pdf image
+#' @param dotfile character where to save dot commands to produce plot
 #' @param args character additional arguments to \code{dot} command line program
-plotDOT = function(graph, file, args = "")
+plotDOT = function(graph, file = NULL, dotfile = NULL, args = "")
 {
     g = as(graph, "igraph")
 
-    dotfile = tempfile()
+    if(is.null(dotfile)){
+        dotfile = tempfile()
+        on.exit(unlink(dotfile))
+    }
+
     igraph::write_graph(g, dotfile, format = "dot")
 
-    allargs = c("-Tpdf", dotfile, "-o", file, args)
-    system2("dot", allargs)
-
-    unlink(dotfile)
+    if(!is.null(file)){
+        allargs = c("-Tpdf", dotfile, "-o", file, args)
+        system2("dot", allargs)
+    }
 }
