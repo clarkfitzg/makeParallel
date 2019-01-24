@@ -37,4 +37,12 @@ gdf = g@graph
 vblock_condition = (gdf[, "from"] %in% v) & (gdf[, "to"] %in% v)
 
 vector_block_edges = gdf[vblock_condition, ]
+
 vector_block_edges
+
+# "being a large vector / object" is a property of a variable.
+# Edges come from variable usage.
+# Nodes are function calls.
+# A function call is vectorized in some of its parameters.
+# We can consider a node to be a vectorized function call if that function is vectorized in all of the parameters where a large vector is passed.
+
