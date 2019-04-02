@@ -4,8 +4,8 @@ test_that("simple case of input and output data descriptions", {
         y = 2L * x
     ", keep.source = FALSE)
 
-    xfile = temp.file()
-    yfile = temp.file()
+    xfile = tempfile()
+    yfile = tempfile()
 
     xdata = 1:5
     saveRDS(xdata, xfile)
@@ -26,4 +26,4 @@ test_that("simple case of input and output data descriptions", {
     expect_identical(y, y_actual, 2L * x)
 
     unlink(c(xfile, yfile))
-}
+})

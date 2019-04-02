@@ -10,13 +10,13 @@
 \usage{
 writeCode(code, file, ...)
 
-\S4method{writeCode}{GeneratedCode,logical}(code, file, overWrite = FALSE,
-  prefix = "gen_")
+\S4method{writeCode}{GeneratedCode,logical}(code, file,
+  overWrite = FALSE, prefix = "gen_")
 
 \S4method{writeCode}{GeneratedCode,missing}(code, file, ...)
 
-\S4method{writeCode}{GeneratedCode,character}(code, file, overWrite = FALSE,
-  ...)
+\S4method{writeCode}{GeneratedCode,character}(code, file,
+  overWrite = FALSE, ...)
 }
 \arguments{
 \item{code}{object of class \linkS4class{GeneratedCode}}

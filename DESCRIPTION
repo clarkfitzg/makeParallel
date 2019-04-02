@@ -35,5 +35,5 @@ Description:
 License: MIT + file LICENSE
 URL: https://github.com/clarkfitzg/makeParallel
 BugReports: https://github.com/clarkfitzg/makeParallel
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr

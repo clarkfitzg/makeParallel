@@ -5,8 +5,9 @@
 \title{Make Parallel Code From Serial}
 \usage{
 makeParallel(code, graph = inferGraph(code), run = FALSE,
-  scheduler = schedule, ..., generator = generate, generatorArgs = list(),
-  file = FALSE, prefix = "gen_", overWrite = FALSE)
+  scheduler = schedule, ..., generator = generate,
+  generatorArgs = list(), file = FALSE, prefix = "gen_",
+  overWrite = FALSE)
 }
 \arguments{
 \item{code}{file name or expression from \code{\link[base]{parse}}}

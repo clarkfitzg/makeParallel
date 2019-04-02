@@ -6,10 +6,10 @@
 \title{Gantt chart of a schedule}
 \usage{
 \S4method{plot}{TaskSchedule,missing}(x, blockHeight = 0.25,
-  main = "schedule plot", xlab = "Time (seconds)", ylab = "Processor",
-  evalColor = "gray", sendColor = "orchid", receiveColor = "slateblue",
-  labelTransfer = TRUE, labelExpr = NULL, rectAes = list(density = NA,
-  border = "black", lwd = 2), ...)
+  main = "schedule plot", xlab = "Time (seconds)",
+  ylab = "Processor", evalColor = "gray", sendColor = "orchid",
+  receiveColor = "slateblue", labelTransfer = TRUE, labelExpr = NULL,
+  rectAes = list(density = NA, border = "black", lwd = 2), ...)
 }
 \arguments{
 \item{x}{\linkS4class{TaskSchedule}}

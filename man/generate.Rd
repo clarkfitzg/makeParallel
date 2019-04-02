@@ -29,8 +29,6 @@ many seconds.}
 x object of class \linkS4class{GeneratedCode}
 }
 \description{
-Generate Code From A Schedule
-
 Produces executable code that relies on a SNOW cluster on a single
 machine and sockets.
 }
