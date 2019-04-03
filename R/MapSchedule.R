@@ -189,7 +189,7 @@ setMethod("schedule",
 #' @export
 #' @rdname generate
 setMethod("schedule",
-    signature(graph = "DependGraph", data = "DataSource", save = "DataSink"),
+    signature(graph = "DependGraph", data = "list"),
     function (graph, data, save, maxWorker = 2L, ...) 
 {
     # Insert the calls to load and save the data.

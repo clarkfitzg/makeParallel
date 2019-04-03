@@ -56,8 +56,9 @@ setGeneric("inferGraph", function(code, time, ...)
 #' @export
 #' @rdname schedule
 #' @param graph \linkS4class{DependGraph}, code dependency graph
-#' @param data \linkS4class{DataSource}, input data description
-#' @param save \linkS4class{DataSink}, output data description
+#' @param data list of data descriptions. 
+#'      Each element is a \linkS4class{DataSource}.
+#'      The names of the list elements correspond to the variables in the code that these objects are bound to.
 #' @param maxWorker integer maximum number of parallel workers
 #' @param ... additional arguments to methods
 setGeneric("schedule", function(graph, data, save, maxWorker = 2L, ...)

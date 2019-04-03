@@ -1,20 +1,22 @@
-test_that("simple case of input and output data descriptions", {
+test_that("simple case of chunked input data descriptions", {
 
     incode = parse(text = "
         y = 2L * x
     ", keep.source = FALSE)
 
-    xfile = tempfile()
-    yfile = tempfile()
+    xfile1 = tempfile()
+    xfile2 = tempfile()
 
-    xdata = 1:5
-    saveRDS(xdata, xfile)
+    saveRDS(1:5, xfile1)
+    saveRDS(6:10, xfile2)
 
-    xdescription = DataSource(symbol = "x", fun = readRDS, args = list(file = xfile))
-    ydescription = DataSink(symbol = "y", fun = saveRDS, args = list(file = yfile))
+    # What is bothering me?
+    # I'm going to have to evaluate and deparse the list of arguments to insert them into the script.
+    # This sounds dangerous.
 
-    # Could also handle lists of data sources / sinks.
-    out = makeParallel(incode, data = xdescription, save = ydescription)
+    xdescription = ChunkDataSource(fun = readRDS, args = list(xfile1, xfile2))
+
+    out = makeParallel(incode, data = list(x = xdescription))
 
     outcode = writeCode(out)
 

@@ -47,39 +47,16 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
 
 # Data Descriptions
 ############################################################
-# Plan to extend these with chunked data 
-# These seem more complicated than they need to be, since they could just be expressions.
-# Ah, but I could add coercion methods to and from data descriptions and expressions.
 
-
-#' Description of Data
+#' Description of a Chunked Data Source
+#'
+#' Contains information necessary to load chunks of data into an R session.
 #'
 #' @export
-#' @slot symbol name of the variable representing the object as used in source code
-#' @slot fun function that reads or writes the data
-#' @slot args arguments to fun so that do.call(fun, args) will read or write the data
-DataDescription = setClass("DataDescription",
-    slots = c(symbol = "character", fun = "function", args = "list")
-    )
-
-
-#' Description of a Data Source
-#'
-#' Contains information necessary to load data into an R session
-#'
-#' @export
-DataSource = setClass("DataSource",
-    contains = "DataDescription"
-    )
-
-
-# I'm not quite convinced that this sink is necessary.
-
-#' Description of a Data Sink
-#'
-#' @export
-DataSink = setClass("DataSink",
-    contains = "DataDescription"
+#' @slot fun function that reads in a chunk of the data
+#' @slot args arguments to fun so that calling \code{fun} with \code{args[[i]]} will load the ith chunk of data
+ChunkDataSource = setClass("ChunkDataSource",
+    slots = c(fun = "function", args = "list")
     )
 
 
