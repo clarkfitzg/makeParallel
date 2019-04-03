@@ -58,10 +58,10 @@ test_that("Multiple assignment in single expression", {
 
 test_that("whole workflow on files", {
 
-    exfile = file.path(tempdir(), "mp_example.R")
+    exfile = tempfile()
     oldscript = system.file("examples/mp_example.R", package = "makeParallel")
     file.copy(from = oldscript, to = exfile)
-    genfile = file.path(tempdir(), "gen_mp_example.R")
+    genfile = file.path(dirname(exfile), paste0("gen_", basename(exfile)))
 
     out = makeParallel(exfile, file = TRUE, scheduler = scheduleTaskList, maxWorker = 3)
 
@@ -83,13 +83,13 @@ test_that("whole workflow on files", {
     makeParallel(exfile, file = FALSE)
     expect_false(file.exists(genfile))
 
-    fname = file.path(tempdir(), "some_file_created_in_test.R")
+    fname = tempfile()
     out = makeParallel(exfile, scheduler = scheduleTaskList, file = fname)
     expect_true(file.exists(fname))
     expect_equal(fname, file(out))
 
     out = makeParallel(exfile, file = TRUE, scheduler = scheduleTaskList, prefix = "GEN")
-    fn = file.path(tempdir(), "GENmp_example.R")
+    fn = file.path(dirname(exfile), paste0("GEN", basename(exfile)))
     expect_true(file.exists(fn))
     expect_equal(fn, file(out))
 
