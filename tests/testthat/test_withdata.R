@@ -4,7 +4,7 @@ test_that("simple case of input and output data descriptions", {
         y = 2L * x
     ", keep.source = FALSE)
 
-    xfile = tempfile()
+    xfile = tempfile(tmpdir = )
     yfile = tempfile()
 
     xdata = 1:5
@@ -25,5 +25,4 @@ test_that("simple case of input and output data descriptions", {
     # symbols x, y should be available after we evaluate the code
     expect_identical(y, y_actual, 2L * x)
 
-    unlink(c(xfile, yfile))
 })
