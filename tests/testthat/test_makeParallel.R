@@ -1,5 +1,3 @@
-temp_dir = normalizePath(tempdir(), winslash = "/")
-
 oldcode = parse(text = "
     v1 = 'foo1'
     v2 = 'foo2'
@@ -96,6 +94,3 @@ test_that("whole workflow on files", {
     expect_equal(fn, file(out))
 
 })
-
-
-unlink(temp_dir, recursive = TRUE)
