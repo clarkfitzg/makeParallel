@@ -61,10 +61,10 @@ setGeneric("inferGraph", function(code, time, ...)
 #'      The names of the list elements correspond to the variables in the code that these objects are bound to.
 #' @param maxWorker integer maximum number of parallel workers
 #' @param ... additional arguments to methods
-setGeneric("schedule", function(graph, data, save, maxWorker = 2L, ...)
+setGeneric("schedule", function(graph, data, maxWorker = 2L, ...)
            standardGeneric("schedule"))
 
-method.skeleton("schedule", c("DependGraph", "missing", "missing"))
+#method.skeleton("schedule", c("DependGraph", "missing"))
 
 
 #' @export
