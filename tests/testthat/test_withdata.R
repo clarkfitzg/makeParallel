@@ -14,7 +14,7 @@ test_that("simple case of input and output data descriptions", {
     ydescription = DataSink(symbol = "y", fun = saveRDS, args = list(file = yfile))
 
     # Could also handle lists of data sources / sinks.
-    out = makeParallel(code, data = xdescription, save = ydescription)
+    out = makeParallel(incode, data = xdescription, save = ydescription)
 
     outcode = writeCode(out)
 
