@@ -63,6 +63,8 @@ setGeneric("inferGraph", function(code, time, ...)
 setGeneric("schedule", function(graph, data, save, maxWorker = 2L, ...)
            standardGeneric("schedule"))
 
+method.skeleton("schedule", c("DependGraph", "missing", "missing"))
+
 
 #' @export
 #' @rdname schedule

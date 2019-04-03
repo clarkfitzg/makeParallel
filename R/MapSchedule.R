@@ -2,6 +2,8 @@ mclapplyNames = c("mapply", "lapply", "Map")
 names(mclapplyNames) = paste0("parallel::mc", mclapplyNames)
 
 
+# TODO: take this out, put it in CodeAnalysis
+
 # Apply preprocessing steps to code
 # I'll likely come back and generalize this
 preprocess = function(code)
@@ -173,13 +175,29 @@ setMethod("schedule", "DependGraph", mapSchedule)
 
 #' @export
 #' @rdname generate
-setMethod("generate", "MapSchedule", function(schedule, ...)
+setMethod("schedule",
+    signature(graph = "DependGraph", data = "missing", save = "missing"),
+    function (graph, data, save, maxWorker = 2L, ...) 
 {
     pp_expr = preprocess(schedule@graph@code)
     pcode = lapply(pp_expr, replaceApply)
     pcode = as.expression(pcode)
     GeneratedCode(schedule = schedule, code = pcode)
 })
+
+
+#' @export
+#' @rdname generate
+setMethod("schedule",
+    signature(graph = "DependGraph", data = "DataSource", save = "DataSink"),
+    function (graph, data, save, maxWorker = 2L, ...) 
+{
+    # Insert the calls to load and save the data.
+    # Ack, why would anyone do this?
+    # It can be done directly from the dependency graph, no data description required.
+    # I should go right to the chunked data sources, because that's the actual use case.
+})
+
 
 
 # We could put some OO structure on these, but I'll wait until I have a
