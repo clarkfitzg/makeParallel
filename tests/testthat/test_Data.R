@@ -4,7 +4,7 @@ test_that("simple case of input and output data descriptions", {
         y = 2L * x
     ", keep.source = FALSE)
 
-    xfile = tempfile(tmpdir = )
+    xfile = tempfile()
     yfile = tempfile()
 
     xdata = 1:5

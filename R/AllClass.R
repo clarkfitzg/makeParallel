@@ -73,6 +73,8 @@ DataSource = setClass("DataSource",
     )
 
 
+# I'm not quite convinced that this sink is necessary.
+
 #' Description of a Data Sink
 #'
 #' @export
