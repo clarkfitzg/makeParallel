@@ -22,6 +22,7 @@ test_that("simple case of chunked input data descriptions", {
     out = makeParallel(incode
                        , scheduler = scheduleTaskList
                        , data = list(x = xdescription)
+                       , maxWorker = 1L
                        )
 
     outcode = writeCode(out)

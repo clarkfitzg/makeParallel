@@ -61,6 +61,9 @@ scheduleTaskList = function(graph
 ){
     graph = expandData(graph, data)
 
+    # TODO: Change this to handle the out of memory case.
+    if(maxWorker == 1L) return(SerialSchedule(graph))
+
     procs = seq(maxWorker)
     tg = graph@graph
 

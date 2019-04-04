@@ -2,6 +2,7 @@
 
 export("file<-")
 export(dataSource)
+export(expandData)
 export(generate)
 export(inferGraph)
 export(makeParallel)
