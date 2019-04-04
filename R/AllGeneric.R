@@ -75,6 +75,23 @@ setMethod("schedule", "GeneratedCode", function(graph, ...)
 })
 
 
+#' Describe Data Source
+#'
+#' @export
+#' @param expr code to load chunks of the data
+#' @rdname dataSource
+setGeneric("dataSource", function(expr, ...)
+           standardGeneric("dataSource"))
+
+#' @export
+#' @rdname dataSource
+setMethod("dataSource", signature(expr = "expression"),
+function(expr, ...)
+{
+    ChunkDataSource(expr = expr)
+})
+
+
 #' Expression Run Time
 #'
 #' Extract a numeric vector of expression run times

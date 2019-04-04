@@ -17,7 +17,7 @@ test_that("simple case of chunked input data descriptions", {
         substitute(readRDS(xfile2), e)
     ))
 
-    xdescription = ChunkDataSource(expr = chunk_load_code)
+    xdescription = dataSource(expr = chunk_load_code)
 
     out = makeParallel(incode, data = list(x = xdescription))
 
