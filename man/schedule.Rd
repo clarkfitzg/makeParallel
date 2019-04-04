@@ -3,18 +3,22 @@
 \docType{methods}
 \name{schedule}
 \alias{schedule}
-\alias{schedule,GeneratedCode-method}
-\alias{schedule,DependGraph-method}
+\alias{schedule,GeneratedCode,ANY-method}
+\alias{schedule,DependGraph,ANY-method}
 \title{Schedule Dependency Graph}
 \usage{
-schedule(graph, maxWorker = 2L, ...)
+schedule(graph, data, maxWorker = 2L, ...)
 
-\S4method{schedule}{GeneratedCode}(graph, maxWorker = 2L, ...)
+\S4method{schedule}{GeneratedCode,ANY}(graph, data, maxWorker = 2L, ...)
 
-\S4method{schedule}{DependGraph}(graph)
+\S4method{schedule}{DependGraph,ANY}(graph)
 }
 \arguments{
-\item{graph}{object of class \linkS4class{DependGraph}}
+\item{graph}{\linkS4class{DependGraph}, code dependency graph}
+
+\item{data}{list of data descriptions. 
+Each element is a \linkS4class{DataSource}.
+The names of the list elements correspond to the variables in the code that these objects are bound to.}
 
 \item{maxWorker}{integer maximum number of parallel workers}
 

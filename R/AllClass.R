@@ -1,3 +1,8 @@
+# I'm not quite sure how to organize the slots and inheritance in these
+# objects. My current principles are:
+#   - Add slots when I realize I need them
+#   - Keep the names consistent
+
 # Not necessary, comes from methods package?
 # setOldClass("expression")
 
@@ -53,20 +58,14 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
 #' Contains information necessary to load chunks of data into an R session.
 #'
 #' @export
-#' @slot fun function that reads in a chunk of the data
-#' @slot args arguments to fun so that calling \code{fun} with \code{args[[i]]} will load the ith chunk of data
+#' @slot expr expression such that evaluating \code{expr[[i]]} produces the ith chunk of data
 ChunkDataSource = setClass("ChunkDataSource",
-    slots = c(fun = "function", args = "list")
+    slots = c(expr = "expression")
     )
 
 
 # Schedules
 ############################################################
-# I'm not quite sure how to organize the slots and inheritance in these
-# objects. My current principles are:
-#   - Add slots when I realize I need them
-#   - Keep the names consistent
-
 
 #' Schedule base class
 #'
