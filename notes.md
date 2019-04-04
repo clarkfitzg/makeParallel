@@ -55,9 +55,9 @@ Let's think about the most sane way for the generated code to look:
 y = 2 * x
 
 # After:
-x1_env = load("x1_chunk.rds")
+x1_env = load("x1_description.rds")
 x1 = x1_env$compute()
-x2_env = load("x2_chunk.rds")
+x2_env = load("x2_description.rds")
 x2 = x2_env$compute()
 
 y1 = 2 * x1
@@ -71,3 +71,7 @@ Some issues that will come up:
 
 - Propagating the times for the expressions
 - Avoiding name conflicts
+
+------------------------------------------------------------
+
+Looking back over this, it seems like a faster way to start might be to just assume that we have an expression that will produce the chunk.

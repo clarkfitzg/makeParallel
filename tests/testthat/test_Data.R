@@ -10,7 +10,14 @@ test_that("simple case of chunked input data descriptions", {
     saveRDS(1:5, xfile1)
     saveRDS(6:10, xfile2)
 
-    xdescription = ChunkDataSource(fun = readRDS, args = list(xfile1, xfile2))
+    # Build the expression by pulling the literals out
+    e = environment()
+    chunk_load_code = as.expression(list(
+        substitute(readRDS(xfile1), env=e),
+        substitute(readRDS(xfile2), env=e)
+    ))
+
+    xdescription = ChunkDataSource()
 
     out = makeParallel(incode, data = list(x = xdescription))
 
