@@ -3,14 +3,13 @@
 \docType{methods}
 \name{generate}
 \alias{generate}
-\alias{schedule,DependGraph,missing-method}
+\alias{generate,MapSchedule-method}
 \alias{generate,TaskSchedule-method}
 \title{Generate Code From A Schedule}
 \usage{
 generate(schedule, ...)
 
-\S4method{schedule}{DependGraph,missing}(graph, data, maxWorker = 2L,
-  ...)
+\S4method{generate}{MapSchedule}(schedule, ...)
 
 \S4method{generate}{TaskSchedule}(schedule, portStart = 33000L,
   minTimeout = 600)

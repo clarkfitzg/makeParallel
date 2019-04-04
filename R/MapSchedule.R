@@ -170,14 +170,13 @@ mapSchedule = function(graph)
 
 #' @export
 #' @rdname schedule
-setMethod("schedule", "DependGraph", mapSchedule)
+setMethod("schedule", signature(graph = "DependGraph", data = "missing"), mapSchedule)
 
 
 #' @export
 #' @rdname generate
-setMethod("schedule",
-    signature(graph = "DependGraph", data = "missing"),
-    function (graph, data, maxWorker = 2L, ...) 
+setMethod("generate", signature(schedule = "MapSchedule"),
+function (schedule, ...) 
 {
     pp_expr = preprocess(schedule@graph@code)
     pcode = lapply(pp_expr, replaceApply)

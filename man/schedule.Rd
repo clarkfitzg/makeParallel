@@ -4,14 +4,14 @@
 \name{schedule}
 \alias{schedule}
 \alias{schedule,GeneratedCode,ANY-method}
-\alias{schedule,DependGraph,ANY-method}
+\alias{schedule,DependGraph,missing-method}
 \title{Schedule Dependency Graph}
 \usage{
 schedule(graph, data, maxWorker = 2L, ...)
 
 \S4method{schedule}{GeneratedCode,ANY}(graph, data, maxWorker = 2L, ...)
 
-\S4method{schedule}{DependGraph,ANY}(graph)
+\S4method{schedule}{DependGraph,missing}(graph)
 }
 \arguments{
 \item{graph}{\linkS4class{DependGraph}, code dependency graph}
