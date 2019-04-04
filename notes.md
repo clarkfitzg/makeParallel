@@ -43,6 +43,8 @@ x2 = readRDS("x2.rds")
 Insert anywhere before the first usage of `x`.
 Mark `x` as a distributed object.
 
+For now I'm just going to assume this naming scheme will work.
+
 Side note: we could potentially 'unmark' `x` later if it's redefined.
 
 ------------------------------------------------------------
