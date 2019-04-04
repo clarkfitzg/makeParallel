@@ -43,6 +43,8 @@ x2 = readRDS("x2.rds")
 Insert anywhere before the first usage of `x`.
 Mark `x` as a distributed object.
 
+Side note: we could potentially 'unmark' `x` later if it's redefined.
+
 ------------------------------------------------------------
 
 ```{r}
@@ -62,7 +64,10 @@ ym = median(y)
 
 `median` is a general function with no defined reduce method, so we need to bring together the chunks of `y` before we can call it.
 
+------------------------------------------------------------
 
+I was thinking to subclass `DependGraph` to store the expanded code.
+But I think it's more sane to have a function that just directly expands the code, because this will be fewer special cases to handle.
 
 
 ------------------------------------------------------------

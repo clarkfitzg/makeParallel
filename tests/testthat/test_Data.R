@@ -19,7 +19,10 @@ test_that("simple case of chunked input data descriptions", {
 
     xdescription = dataSource(expr = chunk_load_code)
 
-    out = makeParallel(incode, data = list(x = xdescription))
+    out = makeParallel(incode
+                       , scheduler = scheduleTaskList
+                       , data = list(x = xdescription)
+                       )
 
     outcode = writeCode(out)
 

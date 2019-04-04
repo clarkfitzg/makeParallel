@@ -34,6 +34,15 @@ DependGraph = setClass("DependGraph",
     slots = c(code = "expression", graph = "data.frame"))
 
 
+#' Graph with code for the data chunks and expanded vectorized statements
+#'
+#' @export
+#' @slot originalGraph the original code used to 
+DataDependGraph = setClass("DataDependGraph",
+    slots = c(originalGraph = "DependGraph"),
+    contains = "DependGraph")
+
+
 #' Graph where the run time for each expression is known
 #'
 #' @export
