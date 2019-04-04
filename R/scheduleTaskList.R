@@ -25,7 +25,9 @@
 #' Systems}, Sinnen (2007)
 #'
 #' @export
+#' @rdname scheduleTaskList
 #' @param graph \linkS4class{DependGraph} as returned from \code{\link{inferGraph}}
+#' @param data list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}
 #' @param maxWorker integer maximum number of processors
 #' @param orderFun function that takes in a \code{graph} and
 #'  returns a permutation of \code{1:length(graph@code)} that respects the
@@ -49,6 +51,7 @@
 #' s <- scheduleTaskList(g)
 #' plot(s)
 scheduleTaskList = function(graph
+    , data = list()
     , maxWorker = 2L
     , orderFun = orderBottomLevel
     , timeDefault = 10e-6
@@ -56,6 +59,7 @@ scheduleTaskList = function(graph
     , overhead = 8e-6
     , bandwidth = 1.5e9
 ){
+    graph = expandData(graph, data)
 
     procs = seq(maxWorker)
     tg = graph@graph

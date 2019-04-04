@@ -66,7 +66,7 @@ ym = median(y)
 
 ------------------------------------------------------------
 
-I was thinking to subclass `DependGraph` to store the expanded code.
+I was thinking to subclass `DependGraph` to store the expanded code that I listed above.
 But I think it's more sane to have a function that just directly expands the code, because this will be fewer special cases to handle.
 
 
