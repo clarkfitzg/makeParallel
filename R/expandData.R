@@ -8,8 +8,17 @@ expandData = function(graph, data, .vectorfuncs = vectorfuncs)
 {
     if(length(data) == 0) return(graph)
 
-    # The code starts out with assignments.
-    newcode = Map(initialAssignmentCode, names(data), data)
+    initial_assignments = mapply(initialAssignmentCode, names(data), data, USE.NAMES = FALSE)
+
+    oldcode = graph@code
+    newcode = vector(mode = "list", length = length(oldcode))
+    big_objects = names(data)
+    for(i in seq_along(oldcode)){
+
+        newcode[[i]] = 
+    }
+    newcode = c(initial_assignments, newcode)
+    inferGraph(newcode)
 }
 
 
@@ -19,8 +28,8 @@ initialAssignmentCode = function(varname, code)
     nm = paste0(varname, "_", seq_along(code))
     nm = lapply(nm, as.symbol)
     #code = as.list(code)
-    out = Map(call, '=', nm, code)
-    as.expression(unname(out))
+    out = mapply(call, '=', nm, code, USE.NAMES = FALSE)
+    as.expression(out)
 }
 
 
