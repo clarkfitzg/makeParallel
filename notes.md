@@ -3,6 +3,50 @@
 Working notes as I enhance the package.
 
 ------------------------------------------------------------
+------------------------------------------------------------
+------------------------------------------------------------
+
+Thu Apr  4 08:42:23 PDT 2019
+
+I need to specify what the vectorized functions are, so that the scheduling step can break them up to operate on the chunks.
+Here's the goal of what we want to do:
+
+```
+# Before:
+y = 2 * x
+
+# After:
+x1 = readRDS("x1.rds")
+x2 = readRDS("x2.rds")
+
+y1 = 2 * x1
+y2 = 2 * x2
+
+y = c(y1, y2)
+```
+
+Here are rules that describe how every block should come about.
+
+```{r}
+x1 = readRDS("x1.rds")
+x2 = readRDS("x2.rds")
+```
+Insert anywhere before the first usage of `x`.
+
+------------------------------------------------------------
+
+```{r}
+y1 = 2 * x1
+y2 = 2 * x2
+```
+
+`2 * x` is a vectorized function call.
+Replace all vectorized function calls
+
+
+------------------------------------------------------------
+------------------------------------------------------------
+------------------------------------------------------------
 
 Wed Apr  3 10:20:45 PDT 2019
 
@@ -75,3 +119,5 @@ Some issues that will come up:
 ------------------------------------------------------------
 
 Looking back over this, it seems like a faster way to start might be to just assume that we have an expression that will produce the chunk.
+Then I can directly insert them, and not have to mess around with this loading and evaluating.
+Indeed, the expression could just be a call to `source` or `load`.
