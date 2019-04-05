@@ -1,43 +1,62 @@
 #' Expand Data Description
 #'
-#' Insert the chunked data loading calls directly into the code, and expand vectorized function calls.
+#' Insert the chunked data loading calls directly into the code, expand vectorized function calls,
+#' and collapse variables before calling non vectorized function calls.
 #'
 #' @export
 #' @rdname scheduleTaskList
-expandData = function(graph, data, .vectorfuncs = vectorfuncs)
+expandData = function(graph, dataLoadExpr)
 {
-    if(length(data) == 0) return(graph)
+    if(length(dataLoadExpr) == 0) return(graph)
 
-    initial_assignments = mapply(initialAssignmentCode, names(data), data, USE.NAMES = FALSE)
+    chunkLoadCode = lapply(dataLoadExpr, slot, "expr")
+
+    mangledNames = Map(simpleNameMangler, names(chunkLoadCode), chunkLoadCode)
+
+    initialAssignments = mapply(initialAssignmentCode, mangledNames, chunkLoadCode, USE.NAMES = FALSE)
+
+    vars = list(expanded = mangledNames
+                , collapsed = list())
 
     oldcode = graph@code
     newcode = vector(mode = "list", length = length(oldcode))
-    big_objects = names(data)
-    for(i in seq_along(oldcode)){
 
-        newcode[[i]] = 
+    for(i in seq_along(oldcode)){
+        expr = oldcode[[i]]
+        tmp = expandCollapse(expr, vars)
+        vars = tmp$vars
+        newcode[[i]] = tmp$expr
     }
     newcode = c(initial_assignments, newcode)
     inferGraph(newcode)
 }
 
 
-initialAssignmentCode = function(varname, code)
+simpleNameMangler = function(varname, expr, sep = "_")
 {
     # TODO: check that this name mangling scheme is not problematic.
-    nm = paste0(varname, "_", seq_along(code))
-    nm = lapply(nm, as.symbol)
-    #code = as.list(code)
+    paste0(varname, sep, seq_along(expr))
+}
+
+
+initialAssignmentCode = function(varname, code)
+{
+    nm = lapply(varname, as.symbol)
     out = mapply(call, '=', nm, code, USE.NAMES = FALSE)
     as.expression(out)
 }
 
 
-if(FALSE){
-    # developing, will move these to tests eventually
+expandCollapse = function(expr, vars)
+{
+}
 
-    e = parse(text = "1 + 2
-              3 + 4")
+
+if(FALSE){
+    # developing, may move these to tests eventually
+
+    dataLoadExpr = list(x = makeParallel:::ChunkDataSource(expr=parse(text = "1 + 2
+              3 + 4")))
 
     initialAssignmentCode("x", e)
 
