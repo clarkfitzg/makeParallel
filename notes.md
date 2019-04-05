@@ -6,6 +6,20 @@ Working notes as I enhance the package.
 ------------------------------------------------------------
 ------------------------------------------------------------
 
+Fri Apr  5 09:16:16 PDT 2019
+
+I need to write down the algorithm for expanding / collapsing the code in greater detail.
+This must be described somewhere in the computer science literature.
+Terms I'm trying to search in Google scholar:
+
+- tasks from map. Nope.
+- task graph from map. Nope.
+
+
+------------------------------------------------------------
+------------------------------------------------------------
+------------------------------------------------------------
+
 Thu Apr  4 08:42:23 PDT 2019
 
 I need to specify what the vectorized functions are, so that the scheduling step can break them up to operate on the chunks.

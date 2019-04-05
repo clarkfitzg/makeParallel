@@ -11,7 +11,7 @@ expandData = function(graph, dataLoadExpr)
 
     chunkLoadCode = lapply(dataLoadExpr, slot, "expr")
 
-    mangledNames = Map(simpleNameMangler, names(chunkLoadCode), chunkLoadCode)
+    mangledNames = Map(appendNumber, names(chunkLoadCode), chunkLoadCode)
 
     initialAssignments = mapply(initialAssignmentCode, mangledNames, chunkLoadCode, USE.NAMES = FALSE)
 
@@ -32,7 +32,7 @@ expandData = function(graph, dataLoadExpr)
 }
 
 
-simpleNameMangler = function(varname, expr, sep = "_")
+appendNumber = function(varname, expr, sep = "_")
 {
     # TODO: check that this name mangling scheme is not problematic.
     paste0(varname, sep, seq_along(expr))
@@ -67,6 +67,19 @@ expandCollapse = function(expr, vars)
     # Yuck this is a mess.
     # Instead, I can start out just handling statements that look like:
     # y = f(x, z, ...)
+    if(expr[[1]] == "="){
+        rhs = expr[[3]]
+        if(is.call(rhs) && !any(sapply(rhs, is.call))){
+        # rhs is a single, non nested call
+            rhs_char = as.character(rhs)
+            fname = rhs_char[1]
+            args = rhs_char[-1]
+        }
+    # Chunked variable appears somewhere else
+    } else if(){
+        # No chunked variable, don't change it.
+    } else {
+    }
 
     list(vars = newvars, expr = newexpr)
 }
@@ -78,7 +91,7 @@ if(FALSE){
     dataLoadExpr = list(x = makeParallel:::ChunkDataSource(expr=parse(text = "1 + 2
               3 + 4")))
 
-    expr = quote(y <- sin(x))
+    expr = parse(text = "y = x + 2")[[1]]
 
     find_var = makeParallel:::find_var
 
