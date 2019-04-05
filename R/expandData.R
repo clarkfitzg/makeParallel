@@ -63,25 +63,54 @@ expandCollapse = function(expr, vars)
 #            }
 #        }
 #    }
-
     # Yuck this is a mess.
     # Instead, I can start out just handling statements that look like:
     # y = f(x, z, ...)
-    if(expr[[1]] == "="){
-        rhs = expr[[3]]
-        if(is.call(rhs) && !any(sapply(rhs, is.call))){
-        # rhs is a single, non nested call
+
+
+    vars_in_expr = sapply(names(vars$expanded), function(var){
+        finds = find_var(expr, var)
+        if(0 < length(finds)) var else NULL
+    })
+    
+    if(0 < length(vars_in_expr)){
+        if(isSimpleAssignFunc(expr)){
+        } else {
+        # Chunked variable appears somewhere else
+            newexpr = collapseVector(expr, vars)
+        }
+    }
+
             rhs_char = as.character(rhs)
             fname = rhs_char[1]
             args = rhs_char[-1]
-        }
-    # Chunked variable appears somewhere else
+
     } else if(){
         # No chunked variable, don't change it.
     } else {
     }
 
     list(vars = newvars, expr = newexpr)
+}
+
+
+collapseVector = function(expr, vars)
+{
+}
+
+# Verify that expr has the form
+# y = f(x1, x2, ..., xn)
+isSimpleAssignFunc = function(expr)
+{
+    result = FALSE
+    if(expr[[1]] == "="){
+        rhs = expr[[3]]
+        if(is.call(rhs) && !any(sapply(rhs, is.call))){
+            # rhs is a single, non nested call
+            result = TRUE
+        }
+    }
+    result
 }
 
 

@@ -15,6 +15,22 @@ Terms I'm trying to search in Google scholar:
 - tasks from map. Nope.
 - task graph from map. Nope.
 
+------------------------------------------------------------
+
+Wow, there are really a lot of tricky cases to think about for this expansion business.
+I'm noticing as I implement the most basic one and ignore the rest!
+Nuances include:
+
+- Identifying which arguments a function is vectorized in.
+- Handling two or more chunked data objects.
+    What if the chunking doesn't line up?
+    How to know that it does?
+    What if the same object is passed in two places?
+- Should we collapse variables multiple times?
+
+Thinking again about putting the code in a "standard form".
+The code analysis steps should be able to say whether this is a valid transformation.
+
 
 ------------------------------------------------------------
 ------------------------------------------------------------
