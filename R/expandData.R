@@ -39,6 +39,7 @@ simpleNameMangler = function(varname, expr, sep = "_")
 }
 
 
+# Generate code to do the initial assignment
 initialAssignmentCode = function(varname, code)
 {
     nm = lapply(varname, as.symbol)
@@ -49,6 +50,25 @@ initialAssignmentCode = function(varname, code)
 
 expandCollapse = function(expr, vars)
 {
+#    for(v in names(vars$expanded)){
+#        found = find_var(expr, v)
+#        for(loc in found){
+#            usage = expr[[loc[-length(loc)]]]
+#            if(is.call(usage) 
+#               && as.character(usage[[1]]) %in% vectorfuncs 
+#               ){
+#                expandVector(expr, v)
+#            } else {
+#                collapseVector(expr, v)
+#            }
+#        }
+#    }
+
+    # Yuck this is a mess.
+    # Instead, I can start out just handling statements that look like:
+    # y = f(x, z, ...)
+
+    list(vars = newvars, expr = newexpr)
 }
 
 
@@ -58,7 +78,9 @@ if(FALSE){
     dataLoadExpr = list(x = makeParallel:::ChunkDataSource(expr=parse(text = "1 + 2
               3 + 4")))
 
-    initialAssignmentCode("x", e)
+    expr = quote(y <- sin(x))
+
+    find_var = makeParallel:::find_var
 
 }
 
