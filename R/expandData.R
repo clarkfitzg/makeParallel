@@ -89,7 +89,6 @@ expandCollapse = function(expr, vars)
 
 expandVector = function(expr, vars)
 {
-    newexpr = as.expression(expr)
     rhs = expr[[3]]
     function_name = as.character(rhs[[1]])
     if(!function_name %in% vectorfuncs){
@@ -129,7 +128,7 @@ expandExpr = function(expr, vars_to_expand)
     newexpr = lapply(iterator, function(...) expr)
 
     for(i in iterator){
-        varname_lookup = lapply(vars_to_expand, `[[`, i)
+        varname_lookup = lapply(vars_to_expand, function(var) as.symbol(var[i]))
         newexpr[[i]] = substitute_q(expr, varname_lookup)
     }
     newexpr
@@ -138,6 +137,8 @@ expandExpr = function(expr, vars_to_expand)
 
 collapseVector = function(expr, vars)
 {
+    # If the variable has already been collapsed, then we don't need to do it again.
+
     list(vars = newvars, expr = newexpr)
 }
 
