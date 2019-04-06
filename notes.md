@@ -27,9 +27,33 @@ Nuances include:
     How to know that it does?
     What if the same object is passed in two places?
 - Should we collapse variables multiple times?
+- How do we deal with variables that have the same name, and updates to variables?
 
 Thinking again about putting the code in a "standard form".
 The code analysis steps should be able to say whether this is a valid transformation.
+
+One idea: We can pick and choose which versions of the data we use, for example:
+
+```{r}
+# Before
+y = general_func(x)
+z = vector_func(x)
+w = foo(x)
+
+# After
+x_1 = ... # Loading code
+x_2 = ...
+
+x_collapsed = c(x_1, x_2)
+y = general_func(x_collapsed)
+
+z_1 = vector_func(x_1)
+z_2 = vector_func(x_2)
+
+w = foo(x_collapsed)
+```
+
+If `x` ever changes we'll need to update both versions.
 
 
 ------------------------------------------------------------
