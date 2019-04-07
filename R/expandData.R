@@ -16,7 +16,7 @@ expandData = function(graph, dataLoadExpr)
     initialAssignments = mapply(initialAssignmentCode, mangledNames, chunkLoadCode, USE.NAMES = FALSE)
 
     vars = list(expanded = mangledNames
-                , collected = list())
+                , collected = c())
 
     oldcode = graph@code
     newcode = vector(mode = "list", length = length(oldcode))
@@ -99,7 +99,7 @@ expandVector = function(expr, vars)
     }
 
     function_args = as.character(rhs[-1])
-    names_to_expand = intersect(names(vars), function_args)
+    names_to_expand = intersect(names(vars$expanded), function_args)
 
     lhs = as.character(expr[[2]])
 
@@ -153,17 +153,26 @@ expandExpr = function(expr, vars_to_expand)
 #
 collectVector = function(expr, vars)
 {
-    # If the variable has already been collectd, then we don't need to do it again.
+    vars_used = CodeDepends::getInputs(expr)@inputs
+    vars_to_collect = intersect(vars_used, names(vars$expanded))
 
-    list(vars = newvars, expr = newexpr)
+    # If the variable has already been collected, then we don't need to do it again.
+    vars_to_collect = setdiff(vars_to_collect, vars$collected)
+
+    collect_code = Map(collectOneVariable, vars_to_collect, vars$expanded[vars_to_collect])
+
+    vars$collected = c(vars$collected, vars_to_collect)
+
+    list(vars = vars, expr = c(collect_code, expr))
 }
 
 
-collectOneVariable = function(expr, var)
+collectOneVariable = function(vname, chunked_varnames)
 {
-    # we already know it looks like:
-    # y = f(x, z, ...)
-    args
+    # Easier to build it from the strings.
+    args = paste(chunked_varnames, collapse = ", ")
+    expr = paste(vname, "= c(", args, ")")
+    parse(text = expr)
 }
 
 
@@ -201,6 +210,10 @@ if(FALSE){
 vars_to_expand = list(a = c("a1", "a2"), b = c("b1", "b2"))
 
 expandExpr(e, vars_to_expand)
+
+    CodeDepends::getInputs(expr)@inputs
+
+    collectOneVariable("x", c("x_1", "x_2", "x_3"))
 
 }
 
