@@ -1,7 +1,7 @@
 #' Expand Data Description
 #'
 #' Insert the chunked data loading calls directly into the code, expand vectorized function calls,
-#' and collapse variables before calling non vectorized function calls.
+#' and collect variables before calling non vectorized function calls.
 #'
 #' @export
 #' @rdname scheduleTaskList
@@ -16,7 +16,7 @@ expandData = function(graph, dataLoadExpr)
     initialAssignments = mapply(initialAssignmentCode, mangledNames, chunkLoadCode, USE.NAMES = FALSE)
 
     vars = list(expanded = mangledNames
-                , collapsed = list())
+                , collected = list())
 
     oldcode = graph@code
     newcode = vector(mode = "list", length = length(oldcode))
@@ -32,9 +32,10 @@ expandData = function(graph, dataLoadExpr)
 }
 
 
+# TODO: check that this name mangling scheme is not problematic.
+# Also, could parameterize these functions.
 appendNumber = function(varname, expr, sep = "_")
 {
-    # TODO: check that this name mangling scheme is not problematic.
     paste0(varname, sep, seq_along(expr))
 }
 
@@ -59,7 +60,7 @@ expandCollapse = function(expr, vars)
 #               ){
 #                expandVector(expr, v)
 #            } else {
-#                collapseVector(expr, v)
+#                collectVector(expr, v)
 #            }
 #        }
 #    }
@@ -77,8 +78,9 @@ expandCollapse = function(expr, vars)
         if(isSimpleAssignFunc(expr)){
             expandVector(expr, vars)
         } else {
-            # Variable appears in the expression, which is a general function call.
-            collapseVector(expr, vars)
+            # Variable appears in the expression, but the expression is not a simple assign,
+            # so we treat it as a general function call.
+            collectVector(expr, vars)
         }
     } else {
         # No chunked variables appear, don't change it.
@@ -87,12 +89,13 @@ expandCollapse = function(expr, vars)
 }
 
 
+# Take a single vectorized call and expand it into many calls.
 expandVector = function(expr, vars)
 {
     rhs = expr[[3]]
     function_name = as.character(rhs[[1]])
     if(!function_name %in% vectorfuncs){
-        return(collapseVector(expr, vars))
+        return(collectVector(expr, vars))
     }
 
     function_args = as.character(rhs[-1])
@@ -114,11 +117,15 @@ expandVector = function(expr, vars)
 
 
 # vars_to_expand is a list like list(a = c("a1", "a2"), b = c("b1", "b2"))
-# This function then does the actual expansion from:
+# This function then does the actual expansion.
+#
+# Before:
 # b = f(a)
-# to
-# b1 = f(a1)
+#
+# After:
+# b1 = f(a1)    # <-- This is what expand means
 # b2 = f(a2)
+#
 expandExpr = function(expr, vars_to_expand)
 {
 
@@ -135,15 +142,24 @@ expandExpr = function(expr, vars_to_expand)
 }
 
 
-collapseVector = function(expr, vars)
+# collect vectorized variables that expr uses and are not already collected.
+#
+# Before:
+# f(x)
+#
+# After:
+# x = c(x1, x2, ..., xk)  # <-- this is what collect means
+# f(x)
+#
+collectVector = function(expr, vars)
 {
-    # If the variable has already been collapsed, then we don't need to do it again.
+    # If the variable has already been collectd, then we don't need to do it again.
 
     list(vars = newvars, expr = newexpr)
 }
 
 
-collapseOneVariable = function(expr, var)
+collectOneVariable = function(expr, var)
 {
     # we already know it looks like:
     # y = f(x, z, ...)
