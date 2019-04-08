@@ -135,7 +135,8 @@ setGeneric("generate", function(schedule, ...)
 #' @export
 #' @rdname generate
 setMethod("generate", "SerialSchedule", function(schedule, ...)
-          schedule@graph@code)
+          GeneratedCode(schedule = schedule, code = schedule@graph@code)
+          )
 
 
 #' Write Generated Code
@@ -151,7 +152,8 @@ setMethod("generate", "SerialSchedule", function(schedule, ...)
 #' @seealso \code{\link{generate}} to generate the code from a schedule,
 #' \code{\link{makeParallel}} to do everything all at once.
 setGeneric("writeCode", function(code, file, ...) 
-           standardGeneric("writeCode"))
+           standardGeneric("writeCode")
+           )
 
 
 #' Set File for generated code object

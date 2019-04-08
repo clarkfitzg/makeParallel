@@ -18,7 +18,7 @@ expandData = function(graph, dataLoadExpr)
     vars = list(expanded = mangledNames
                 , collected = c())
 
-    oldCode = graph@Code
+    oldCode = graph@code
     newExpressions = vector(mode = "list", length = length(oldCode))
 
     for(i in seq_along(oldCode)){

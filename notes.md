@@ -6,6 +6,17 @@ Working notes as I enhance the package.
 ------------------------------------------------------------
 ------------------------------------------------------------
 
+Mon Apr  8 11:23:15 PDT 2019
+
+Now that I'm making code transformations I think it would be useful to record every transformation that I make.
+This could go inside the dependency graph.
+
+
+------------------------------------------------------------
+------------------------------------------------------------
+------------------------------------------------------------
+
+
 Fri Apr  5 09:16:16 PDT 2019
 
 I need to write down the algorithm for expanding / collapsing the code in greater detail.

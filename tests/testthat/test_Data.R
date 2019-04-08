@@ -4,6 +4,7 @@ test_that("simple case of chunked input data descriptions", {
 
     incode = parse(text = "
         y = 2L * x
+        m_y = median(y)
     ", keep.source = FALSE)
 
     xfile1 = tempfile()
@@ -31,9 +32,12 @@ test_that("simple case of chunked input data descriptions", {
 
     eval(outcode)
 
-    y_actual = readRDS(yfile)
+    # These variable names subject to change.
+    y_out = c(y_1, y_2)
 
-    # symbols x, y should be available after we evaluate the code
-    expect_identical(y, y_actual, 2L * x)
+    # Makes y available, writign over previous version
+    eval(incode)
+
+    expect_identical(y, y_out)
 
 })
