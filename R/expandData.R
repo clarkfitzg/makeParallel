@@ -18,25 +18,28 @@ expandData = function(graph, dataLoadExpr)
     vars = list(expanded = mangledNames
                 , collected = c())
 
-    oldcode = graph@code
-    newcode = vector(mode = "list", length = length(oldcode))
+    oldCode = graph@Code
+    newExpressions = vector(mode = "list", length = length(oldCode))
 
-    for(i in seq_along(oldcode)){
-        expr = oldcode[[i]]
+    for(i in seq_along(oldCode)){
+        expr = oldCode[[i]]
         tmp = expandCollapse(expr, vars)
         vars = tmp$vars
-        newcode[[i]] = tmp$expr
+        newExpressions[[i]] = tmp$expr
     }
-    newcode = c(initialAssignments, newcode)
-    inferGraph(newcode)
+
+    newCode = do.call(c, newExpressions)
+
+    completeCode = c(initialAssignments, newCode)
+    inferGraph(completeCode)
 }
 
 
 # TODO: check that this name mangling scheme is not problematic.
 # Also, could parameterize these functions.
-appendNumber = function(varname, expr, sep = "_")
+appendNumber = function(varname, obj, n = seq_along(obj), sep = "_")
 {
-    paste0(varname, sep, seq_along(expr))
+    paste0(varname, sep, n)
 }
 
 
@@ -49,6 +52,8 @@ initialAssignmentCode = function(varname, code)
 }
 
 
+# returns updated versions of vars and expr in a list
+# expr is an expression rather than a single call, because this function will turn a single call into many.
 expandCollapse = function(expr, vars)
 {
 #    for(v in names(vars$expanded)){
@@ -105,8 +110,8 @@ expandVector = function(expr, vars)
 
     # Record the lhs as now being an expanded variable
     # TODO: Check that the variables have the same number of chunks.
-    first_one_var_names =  vars$expanded[names_to_expand[1]]
-    vars$expanded[lhs] = appendNumber(lhs, first_one_var_names)
+    first_one_var_names =  vars$expanded[[names_to_expand[1]]]
+    vars$expanded[[lhs]] = appendNumber(lhs, first_one_var_names)
 
     names_to_expand = c(names_to_expand, lhs)
 
@@ -223,6 +228,7 @@ expandExpr(e, vars_to_expand)
 # - Identify which arguments they are vectorized in
 vectorfuncs = c("*")
 
+# https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Substitutions
 # http://adv-r.had.co.nz/Computing-on-the-language.html#substitute
 substitute_q <- function(x, env) {
       call <- substitute(substitute(y, env), list(y = x))
