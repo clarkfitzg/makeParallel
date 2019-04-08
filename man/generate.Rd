@@ -3,11 +3,14 @@
 \docType{methods}
 \name{generate}
 \alias{generate}
+\alias{generate,SerialSchedule-method}
 \alias{generate,MapSchedule-method}
 \alias{generate,TaskSchedule-method}
 \title{Generate Code From A Schedule}
 \usage{
 generate(schedule, ...)
+
+\S4method{generate}{SerialSchedule}(schedule, ...)
 
 \S4method{generate}{MapSchedule}(schedule, ...)
 

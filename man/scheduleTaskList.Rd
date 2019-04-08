@@ -5,7 +5,7 @@
 \alias{scheduleTaskList}
 \title{Expand Data Description}
 \usage{
-expandData(graph, data, .vectorfuncs = vectorfuncs)
+expandData(graph, dataLoadExpr)
 
 scheduleTaskList(graph, data = list(), maxWorker = 2L,
   orderFun = orderBottomLevel, timeDefault = 1e-05,
@@ -40,7 +40,8 @@ multiple machines.}
 schedule object of class \code{TaskSchedule}
 }
 \description{
-Inserts the chunked data loading calls directly into the code, and expands vectorized function calls.
+Insert the chunked data loading calls directly into the code, expand vectorized function calls,
+and collect variables before calling non vectorized function calls.
 
 Implementation of "list scheduling".
 This is a greedy algorithm that assigns each expression to the earliest

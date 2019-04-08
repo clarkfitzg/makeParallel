@@ -27,7 +27,7 @@ expandData = function(graph, dataLoadExpr)
         vars = tmp$vars
         newcode[[i]] = tmp$expr
     }
-    newcode = c(initial_assignments, newcode)
+    newcode = c(initialAssignments, newcode)
     inferGraph(newcode)
 }
 
@@ -112,7 +112,7 @@ expandVector = function(expr, vars)
 
     newexpr = expandExpr(expr, vars$expanded[names_to_expand])
 
-    list(vars = newvars, expr = newexpr)
+    list(vars = vars, expr = newexpr)
 }
 
 
@@ -138,7 +138,7 @@ expandExpr = function(expr, vars_to_expand)
         varname_lookup = lapply(vars_to_expand, function(var) as.symbol(var[i]))
         newexpr[[i]] = substitute_q(expr, varname_lookup)
     }
-    newexpr
+    as.expression(newexpr)
 }
 
 

@@ -1,3 +1,5 @@
+library(makeParallel)
+
 test_that("simple case of chunked input data descriptions", {
 
     incode = parse(text = "

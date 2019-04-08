@@ -132,6 +132,12 @@ setGeneric("generate", function(schedule, ...)
            standardGeneric("generate"))
 
 
+#' @export
+#' @rdname generate
+setMethod("generate", "SerialSchedule", function(schedule, ...)
+          schedule@graph@code)
+
+
 #' Write Generated Code
 #'
 #' Write the generated code to a file and return the code.
