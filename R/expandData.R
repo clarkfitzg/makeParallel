@@ -23,7 +23,7 @@ expandData = function(graph, dataLoadExpr)
 
     for(i in seq_along(oldCode)){
         expr = oldCode[[i]]
-        tmp = expandCollapse(expr, vars)
+        tmp = expandCollect(expr, vars)
         vars = tmp$vars
         newExpressions[[i]] = tmp$expr
     }
@@ -54,7 +54,7 @@ initialAssignmentCode = function(varname, code)
 
 # returns updated versions of vars and expr in a list
 # expr is an expression rather than a single call, because this function will turn a single call into many.
-expandCollapse = function(expr, vars)
+expandCollect = function(expr, vars)
 {
 #    for(v in names(vars$expanded)){
 #        found = find_var(expr, v)
@@ -166,9 +166,11 @@ collectVector = function(expr, vars)
 
     collect_code = Map(collectOneVariable, vars_to_collect, vars$expanded[vars_to_collect])
 
+    collect_code_all_vars = do.call(c, unname(collect_code))
+
     vars$collected = c(vars$collected, vars_to_collect)
 
-    list(vars = vars, expr = c(collect_code, expr))
+    list(vars = vars, expr = c(collect_code_all_vars, expr))
 }
 
 

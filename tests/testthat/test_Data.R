@@ -33,6 +33,7 @@ test_that("simple case of chunked input data descriptions", {
     eval(outcode)
 
     # These variable names subject to change.
+    x = c(x_1, x_2)
     y_out = c(y_1, y_2)
 
     # Makes y available, writign over previous version
