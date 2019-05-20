@@ -80,16 +80,26 @@ setMethod("schedule", "GeneratedCode", function(graph, ...)
 #' @export
 #' @param expr code to load chunks of the data
 #' @rdname dataSource
-setGeneric("dataSource", function(expr, ...)
+setGeneric("dataSource", function(expr, args, ...)
            standardGeneric("dataSource"))
+
 
 #' @export
 #' @rdname dataSource
-setMethod("dataSource", signature(expr = "expression"),
-function(expr, ...)
+setMethod("dataSource", signature(expr = "expression", args = "missing"),
+function(expr, args, ...)
 {
-    ChunkDataSource(expr = expr)
+    ChunkDataSource(expr = expr, ...)
 })
+
+
+# #' @export
+# #' @rdname dataSource
+# setMethod("dataSource", signature(expr = "expression", args = "vector"),
+# function(expr, args, ...)
+# {
+#     ChunkDataSource(expr = expr, ...)
+# })
 
 
 #' Expression Run Time
