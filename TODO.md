@@ -1,3 +1,30 @@
+
+Mon May 20 09:54:07 PDT 2019
+
+Goal: get the PEMS example fully working.
+This means to the point where I can just call `makeParallel("pems.R", data = dd, workers = 10L)`, where `dd` is a data description written by the user.
+
+All of the semantics of the program should be contained within `pems.R`.
+One exception is the data reading code, since we'll generate that.
+
+First priorities:
+
+- implement data description.
+    This should include the values of the column to GROUP BY, along with counts.
+- get the version working that handles data that's already split in the files.
+- detect GROUP BY pattern in source code (code analysis).
+    This is really just looking for a `by`, or a `split`.
+
+Second priorities:
+
+- determine which columns in a data frame are used (code analysis).
+    I've done this elsewhere, just need to put it in here.
+- recursively detect function calls that are used (code analysis)
+- implement re-grouping operation, aka shuffle.
+
+
+------------------------------------------------------------
+
 TODO list:
 
 - handle library calls
