@@ -60,10 +60,17 @@ test_that("redefinitions based on columns", {
 })
 
 
-test_that("undetermined usage", {
+test_that("Not sure which columns are actually used", {
 
     e = parse(text = '
        foo(x)
     ')
     expect_null(columnsUsed(e, "x"))
+
+    e2 = parse(text = '
+       foo(x[, "col"])
+       foo(x)
+    ')
+    expect_null(columnsUsed(e2, "x"))
+
 })
