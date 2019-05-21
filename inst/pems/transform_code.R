@@ -4,6 +4,7 @@ library(makeParallel)
 # Needs to express that the files are split based on the station ID
 #
 # fun: The first argument is the name of a function
+#		Another way of doing this is to say that it's a delimited text file, and then pick the function.
 # args: Vector of arguments for the first argument.
 #       Calling fun(args[[i]]) loads the ith chunk.
 # ------------ Everything after is optional ------------
@@ -16,8 +17,7 @@ library(makeParallel)
 # colClasses: Classes of the columns (see read.table)
 #
 pems_ds = dataSource("read.csv", args = list.files("stationID"), class = "data.frame", splitColumn = "station",
-	columns = c(
-		timeperiod = "character", station = "integer"
+	columns = c(timeperiod = "character", station = "integer"
 		, flow1 = "integer", occupancy1 = "numeric", speed1 = "numeric"
 		, flow2 = "integer", occupancy2 = "numeric", speed2 = "numeric"
 		, flow3 = "integer", occupancy3 = "numeric", speed3 = "numeric"

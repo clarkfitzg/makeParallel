@@ -53,8 +53,13 @@ npbin = function(x)
 
 # We'll generate the reading code
 
+# From this line we can infer that we only need these 3 columns.
+# How do we know for sure?
+# Because it writes over the pems variable.
+# I wrote code to do this in the CodeAnalysis package.
 pems = pems[, c("station", "flow2", "occupancy2")]
  
+# The data description will tell us if the data starts grouped by the "station" column
 pems2 = split(pems, pems$station)
 
 results = lapply(pems2, npbin)
