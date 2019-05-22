@@ -65,6 +65,23 @@ ChunkDataSource = setClass("ChunkDataSource",
     )
 
 
+#' Description of Data Files
+#'
+#' Contains information necessary to generate a call to read in these data files
+#'
+#' @export
+#' @slot files absolute paths to all the files
+#' @slot format format of the input files
+#' @slot Rclass class of the data object in R, for example, \code{"data.frame"}
+#' @slot details list of details to help efficiently and correctly read in the data
+DataFiles = setClass("DataFiles",
+    slots = c(files = "character"
+              , format = "character"
+              , Rclass = "character"
+              , details = "list"
+    ))
+
+
 # Schedules
 ############################################################
 
