@@ -20,7 +20,7 @@ columnsUsed = function(code, dfname)
 }
 
 
-# Return a list with the columns used and a status
+# Return a list with the columns found and a status
 oneUsage = function(loc, code, dfname, subset_funcs = c("[", "[["), assign_funcs = c("=", "<-"))
 {
     out = list(status = "continue", found = NULL)
@@ -30,15 +30,24 @@ oneUsage = function(loc, code, dfname, subset_funcs = c("[", "[["), assign_funcs
 
     parent = code[[loc[-ll]]]
     parent_func = as.character(parent[[1]])
+
+    if(parent_func %in% assign_funcs){
+        # Assignment to the variable.
+        # This can be more robust - For now we'll handle it in the rhs.
+        return(out)
+    }
+
     if(!(parent_func %in% subset_funcs)){
         # We don't know about this function, so assume the worst, that it uses all columns
         out[["status"]] = "all_columns"
         return(out)
     }
 
-    colindex = switch(parent_func, "[" = 4L, "[[" = 3L)
+    # Assumes that the column is the last argument,
+    # which is true for common uses of `[` and `[[`.
+    # We can't use match.call here because `[` is Primitive
+    colcode = parent[[length(parent)]]
 
-    colcode = parent[[colindex]]
     if(is.character(colcode) || c_with_literals(colcode)){
         # It's just a character vector, safe to evaluate
         out[["found"]] = eval(colcode)
@@ -73,17 +82,4 @@ c_with_literals = function(expr)
             return(FALSE)
     }
     TRUE
-}
-
-
-
-if(FALSE){
-
-    find_var = makeParallel:::find_var
-    dfname = "x"
-    code = parse(text = "
-        foo(y)
-        bar(x[, 'col'])
-    ")
-        
 }
