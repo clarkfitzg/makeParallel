@@ -3,12 +3,12 @@
 \docType{methods}
 \name{dataSource}
 \alias{dataSource}
-\alias{dataSource,expression-method}
+\alias{dataSource,expression,missing-method}
 \title{Describe Data Source}
 \usage{
-dataSource(expr, ...)
+dataSource(expr, args, ...)
 
-\S4method{dataSource}{expression}(expr, ...)
+\S4method{dataSource}{expression,missing}(expr, args, ...)
 }
 \arguments{
 \item{expr}{code to load chunks of the data}
