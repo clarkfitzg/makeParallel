@@ -59,9 +59,8 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
 #'
 #' @export
 #' @slot expr expression such that evaluating \code{expr[[i]]} produces the ith chunk of data
-#' @slot class class of the data object, for example, \code{"data.frame"}
 ChunkDataSource = setClass("ChunkDataSource",
-    slots = c(expr = "expression", class = "character")
+    slots = c(expr = "expression")
     )
 
 
