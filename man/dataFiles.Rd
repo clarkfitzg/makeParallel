@@ -4,14 +4,16 @@
 \alias{dataFiles}
 \title{Description of Data Files}
 \usage{
-dataFiles(dir, format, Rclass, files = list.files(dir, full.names =
-  TRUE), ...)
+dataFiles(dir, format, varname, Rclass, files = list.files(dir,
+  full.names = TRUE), ...)
 }
 \arguments{
 \item{dir}{directory filled exclusively with data files}
 
 \item{format}{format of the input files
 TODO: infer this using the files themselves}
+
+\item{varname}{expected name of the object in code}
 
 \item{Rclass}{class of the data object in R, for example, \code{"data.frame"}}
 

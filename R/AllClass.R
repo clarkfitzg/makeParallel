@@ -64,24 +64,39 @@ ChunkDataSource = setClass("ChunkDataSource",
     )
 
 
+# #' Description of Data Files
+# #'
+# #' Contains information necessary to generate a call to read in these data files
+# #'
+# #' @export
+# #' @slot files absolute paths to all the files
+# #' @slot format format of the input files
+# #' @slot Rclass class of the data object in R, for example, \code{"data.frame"}
+# #' @slot varname expected variable name in the code
+# #' @slot details list of details to help efficiently and correctly read in the data
+# DataFiles = setClass("DataFiles",
+#     slots = c(files = "character"
+#               , format = "character"
+#               , Rclass = "character"
+#               , varname = "character"
+#               , details = "list"
+#     ))
+# 
+
 #' Description of Data Files
 #'
 #' Contains information necessary to generate a call to read in these data files
 #'
 #' @export
 #' @slot files absolute paths to all the files
-#' @slot format format of the input files
-#' @slot Rclass class of the data object in R, for example, \code{"data.frame"}
 #' @slot varname expected variable name in the code
 #' @slot details list of details to help efficiently and correctly read in the data
-DataFiles = setClass("DataFiles",
+TextTableFiles = setClass("TextTableFiles",
     slots = c(files = "character"
-              , format = "character"
-              , Rclass = "character"
               , varname = "character"
               , details = "list"
     ))
-
+ 
 
 # Schedules
 ############################################################

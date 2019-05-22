@@ -244,9 +244,14 @@ substitute_q <- function(x, env) {
 }
 
 
+setMethod("expandData", signature(code = "DependGraph", data = "TextTableFiles"),
+function(code, data, ...)
+{
+    expandData(code@code, data, ...)
+})
 
-#' @rdname scheduleTaskList
-setMethod("expandData", signature(code = "expression", data = "DataFiles"),
+
+setMethod("expandData", signature(code = "expression", data = "TextTableFiles"),
 function(code, data, ...)
 {
 
