@@ -12,6 +12,9 @@ function(code, data, ...)
     dataLoadExpr = data
     if(length(dataLoadExpr) == 0) return(graph)
 
+    # TODO: It probably makes more sense to loop and dispatch on every one of these arguments,
+    # rather than assuming it is a list of chunkedData objects.
+
     chunkLoadCode = lapply(dataLoadExpr, slot, "expr")
 
     mangledNames = Map(appendNumber, names(chunkLoadCode), chunkLoadCode)
@@ -239,3 +242,12 @@ substitute_q <- function(x, env) {
       call <- substitute(substitute(y, env), list(y = x))
   eval(call)
 }
+
+
+
+#' @rdname scheduleTaskList
+setMethod("expandData", signature(code = "expression", data = "DataFiles"),
+function(code, data, ...)
+{
+
+})

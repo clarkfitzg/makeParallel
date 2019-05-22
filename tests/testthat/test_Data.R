@@ -36,7 +36,7 @@ test_that("simple case of chunked input data descriptions", {
     x = c(x_1, x_2)
     y_out = c(y_1, y_2)
 
-    # Makes y available, writign over previous version
+    # Makes y available, writing over previous version
     eval(incode)
 
     expect_identical(y, y_out)
