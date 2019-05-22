@@ -9,21 +9,21 @@ columnsUsed = function(code, dfname)
     found = character()
     for(loc in locations){
         r = oneUsage(loc, code, dfname)
-        cmd = r[["cmd"]]
-        if(cmd == "all_columns")
+        status = r[["status"]]
+        if(status == "all_columns")
             return(NULL)
         found = c(found, r[["found"]])
-        if(cmd == "stop")
+        if(status == "complete")
             return(found)
     }
     found
 }
 
 
-# Return a list with the columns used and a command
+# Return a list with the columns used and a status
 oneUsage = function(loc, code, dfname, subset_funcs = c("[", "[["), assign_funcs = c("=", "<-"))
 {
-    out = list(cmd = "continue", found = NULL)
+    out = list(status = "continue", found = NULL)
     ll = length(loc)
 
     # Handle all possible cases
@@ -32,7 +32,7 @@ oneUsage = function(loc, code, dfname, subset_funcs = c("[", "[["), assign_funcs
     parent_func = as.character(parent[[1]])
     if(!(parent_func %in% subset_funcs)){
         # We don't know about this function, so assume the worst, that it uses all columns
-        out[["cmd"]] = "all_columns"
+        out[["status"]] = "all_columns"
         return(out)
     }
 
@@ -44,7 +44,7 @@ oneUsage = function(loc, code, dfname, subset_funcs = c("[", "[["), assign_funcs
         out[["found"]] = eval(colcode)
     } else {
         # It's not a simple character vector, so assume the worst, that it uses all columns
-        out[["cmd"]] = "all_columns"
+        out[["status"]] = "all_columns"
         return(out)
     }
 
@@ -55,10 +55,11 @@ oneUsage = function(loc, code, dfname, subset_funcs = c("[", "[["), assign_funcs
     if(grandparent_func %in% assign_funcs){
         varname = as.character(grandparent[[2L]])
         if(varname == dfname){
-            out[["status"]] = "finished"
+            out[["status"]] = "complete"
         }
     }
 
+    out
 }
 
 
