@@ -5,8 +5,11 @@
 #'
 #' @export
 #' @rdname scheduleTaskList
-expandData = function(graph, dataLoadExpr)
+setMethod("expandData", signature(code = "DependGraph", data = "list"),
+function(code, data, ...)
 {
+    graph = code
+    dataLoadExpr = data
     if(length(dataLoadExpr) == 0) return(graph)
 
     chunkLoadCode = lapply(dataLoadExpr, slot, "expr")
@@ -32,7 +35,7 @@ expandData = function(graph, dataLoadExpr)
 
     completeCode = c(initialAssignments, newCode)
     inferGraph(completeCode)
-}
+})
 
 
 # TODO: check that this name mangling scheme is not problematic.

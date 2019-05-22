@@ -21,7 +21,13 @@ Second priorities:
 - remove variables after we are done using them.
 
 
-------------------------------------------------------------
+## Expand Code
+
+We need a general way to expand code.
+One way is to dispatch on the class of the data description.
+Then when we see the data comes from `dataFiles`, we know how to generate the right expressions to load these.
+
+
 
 ## Data Description 1
 

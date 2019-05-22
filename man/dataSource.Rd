@@ -12,6 +12,8 @@ dataSource(expr, args, ...)
 }
 \arguments{
 \item{expr}{code to load chunks of the data}
+
+\item{...}{additional arguments to methods}
 }
 \description{
 Describe Data Source

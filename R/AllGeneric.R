@@ -80,6 +80,7 @@ setMethod("schedule", "GeneratedCode", function(graph, ...)
 #' @export
 #' @param expr code to load chunks of the data
 #' @rdname dataSource
+#' @param ... additional arguments to methods
 setGeneric("dataSource", function(expr, args, ...)
            standardGeneric("dataSource"))
 
@@ -91,6 +92,17 @@ function(expr, args, ...)
 {
     ChunkDataSource(expr = expr, ...)
 })
+
+
+#' Expand Data
+#'
+#' Updates code to include code to load data
+#'
+#' @param code object to update
+#' @param data description of external data to load
+#' @param ... additional arguments to methods
+setGeneric("expandData", function(code, data, ...)
+           standardGeneric("expandData"))
 
 
 # #' @export

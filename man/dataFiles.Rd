@@ -10,7 +10,8 @@ dataFiles(dir, format, Rclass, files = list.files(dir, full.names =
 \arguments{
 \item{dir}{directory filled exclusively with data files}
 
-\item{format}{format of the input files}
+\item{format}{format of the input files
+TODO: infer this using the files themselves}
 
 \item{Rclass}{class of the data object in R, for example, \code{"data.frame"}}
 
