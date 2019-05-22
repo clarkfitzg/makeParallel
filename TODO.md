@@ -14,12 +14,11 @@ First priorities:
 - get the version working that handles data that's already split in the files.
 - detect GROUP BY pattern in source code (code analysis).
     This is really just looking for a `by`, or a `split`.
+- X determine which columns in a data frame are used (code analysis).
 
 Second priorities:
 
-- determine which columns in a data frame are used (code analysis).
-    I've done this elsewhere, just need to put it in here.
-- recursively detect function calls that are used (code analysis)
+- recursively detect function calls that are used, so we can ship all the necessary functions to the workers (code analysis)
 - implement re-grouping operation, aka shuffle.
 
 

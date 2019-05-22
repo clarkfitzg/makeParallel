@@ -22,6 +22,7 @@ test_that("single literal for `[[`", {
         foo(x[["col"]])
     ')
     expect_equal(columnsUsed(e, "x"), "col")
+
 })
 
 
@@ -46,6 +47,7 @@ test_that("multiple literals for `[` combined with `c()`", {
        foo(x[, c("col1", "col2")])
     ')
     expect_equal(columnsUsed(e, "x"), c("col1", "col2"))
+
 })
 
 
@@ -57,6 +59,7 @@ test_that("redefinitions based on columns", {
        foo(x)
     ')
     expect_equal(columnsUsed(e, "x"), c("col1", "col2"))
+
 })
 
 

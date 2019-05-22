@@ -95,9 +95,11 @@ function(expr, args, ...)
 
 # #' @export
 # #' @rdname dataSource
-# setMethod("dataSource", signature(expr = "expression", args = "vector"),
+# setMethod("dataSource", signature(expr = "character", args = "vector"),
 # function(expr, args, ...)
 # {
+#     # Here expr is the name of a function.
+#     # Build up the expressions to 
 #     ChunkDataSource(expr = expr, ...)
 # })
 
