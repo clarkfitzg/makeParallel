@@ -4,6 +4,7 @@ language: R
 #sudo: false
 cache: packages
 bioc_packages: graph
+warnings_are_errors: false
 r:
   - release
   - devel
