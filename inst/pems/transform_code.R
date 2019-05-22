@@ -1,7 +1,8 @@
 library(makeParallel)
 
-pems_ds = dataFiles(dir = "stationID", format = "text", Rclass = "data.frame", splitColumn = "station",
-	columns = c(timeperiod = "character", station = "integer"
+pems_ds = dataFiles(dir = "stationID", format = "text", Rclass = "data.frame"
+    , splitColumn = "station", header = FALSE
+	, columns = c(timeperiod = "character", station = "integer"
 		, flow1 = "integer", occupancy1 = "numeric", speed1 = "numeric"
 		, flow2 = "integer", occupancy2 = "numeric", speed2 = "numeric"
 		, flow3 = "integer", occupancy3 = "numeric", speed3 = "numeric"

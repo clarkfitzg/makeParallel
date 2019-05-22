@@ -4,11 +4,12 @@ This means to the point where I can just call `makeParallel("pems.R", data = dd,
 All of the semantics of the program should be contained within `pems.R`.
 One exception is the data reading code, since we'll generate that.
 
-First priorities:
+The first priority is to get the version working that handles data that's already split in the files.
 
-- get the version working that handles data that's already split in the files.
 - detect GROUP BY pattern in source code (code analysis).
     This is really just looking for a `by`, or a `split`, particularly for the case when the data starts out split by that same variable.
+- expand the code into one statement per group based on the data description.
+- generate calls that read in the data and do column selection at the source.
 - X determine which columns in a data frame are used (code analysis).
 - X implement data description.
     This should include the values of the column to GROUP BY, along with counts.
@@ -17,6 +18,7 @@ Second priorities:
 
 - recursively detect function calls that are used, so we can ship all the necessary functions to the workers (code analysis)
 - implement re-grouping operation, aka shuffle.
+- remove variables after we are done using them.
 
 
 ------------------------------------------------------------
