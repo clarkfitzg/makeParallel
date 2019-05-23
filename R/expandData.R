@@ -5,15 +5,16 @@
 #'
 #' @export
 #' @rdname scheduleTaskList
-setMethod("expandData", signature(code = "DependGraph", data = "list"),
+setMethod("expandData", signature(code = "expression", data = "list"),
 function(code, data, ...)
 {
-    graph = code
     dataLoadExpr = data
-    if(length(dataLoadExpr) == 0) return(graph)
+    if(length(dataLoadExpr) == 0) return(code)
 
     # TODO: It probably makes more sense to loop and dispatch on every one of these arguments,
     # rather than assuming it is a list of chunkedData objects.
+    # This particular method may still be useful though-
+    # we need a class for a list of data objects that are chunked in the same way.
 
     chunkLoadCode = lapply(dataLoadExpr, slot, "expr")
 
@@ -24,11 +25,10 @@ function(code, data, ...)
     vars = list(expanded = mangledNames
                 , collected = c())
 
-    oldCode = graph@code
-    newExpressions = vector(mode = "list", length = length(oldCode))
+    newExpressions = vector(mode = "list", length = length(code))
 
-    for(i in seq_along(oldCode)){
-        expr = oldCode[[i]]
+    for(i in seq_along(code)){
+        expr = code[[i]]
         tmp = expandCollect(expr, vars)
         vars = tmp$vars
         newExpressions[[i]] = tmp$expr
@@ -37,7 +37,7 @@ function(code, data, ...)
     newCode = do.call(c, newExpressions)
 
     completeCode = c(initialAssignments, newCode)
-    inferGraph(completeCode)
+    completeCode
 })
 
 
