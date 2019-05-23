@@ -4,9 +4,8 @@
 #' and collect variables before calling non vectorized function calls.
 #'
 #' @export
-#' @rdname scheduleTaskList
-setMethod("expandData", signature(code = "expression", data = "list"),
-function(code, data, ...)
+setMethod("expandData", signature(code = "expression", data = "list", platform = "ANY"),
+function(code, data, platform, ...)
 {
     dataLoadExpr = data
     if(length(dataLoadExpr) == 0) return(code)

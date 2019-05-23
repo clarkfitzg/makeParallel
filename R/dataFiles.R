@@ -9,7 +9,7 @@
 #'      TODO: infer this using the files themselves
 #' @param varname expected name of the object in code
 #' @param Rclass class of the data object in R, for example, \code{"data.frame"}
-#' @param details list of details to help efficiently and correctly read in the data
+#' @param ... further details to help efficiently and correctly read in the data
 #' @return \linkS4class{DataFiles}
 dataFiles = function(dir, format, varname, Rclass, files = list.files(dir, full.names = TRUE), ...)
 {

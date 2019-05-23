@@ -16,6 +16,7 @@
 #' @param code file name or expression from \code{\link[base]{parse}}
 #' @param data list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}
 #' @param platform \linkS4class{Platform} to target for where the generated code will run
+#' @param fullCode the exact code to perform inference on
 #' @param graph object of class \linkS4class{DependGraph}
 #' @param run logical, evaluate the code once to gather timings?
 #' @param scheduler, function to produce a \linkS4class{Schedule}
