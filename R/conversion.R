@@ -12,6 +12,7 @@ setAs("DependGraph", "igraph", function(from)
 })
 
 
+# It might make more sense to have a class for a filename
 setAs("character", "expression", function(from)
 {
     # This means that to do a single string literal we'll need to coerce it to a string literal.
