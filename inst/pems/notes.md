@@ -28,7 +28,7 @@ When will we do this?
 It ought to happen before the scheduling, since many different scheduling algorithms can potentially take advantage of expanded code.
 I'm also leaning towards scheduling algorithms that are based at looking at all the fine grained statements.
 
-In this case the statement expansion should even come before the graph inference.
+In this case the statement expansion should even come before the graph inference, because the graph will change when the code is expanded.
 
 
 ## Expand Code

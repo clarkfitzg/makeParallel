@@ -8,14 +8,12 @@
 \usage{
 \S4method{expandData}{DependGraph,list}(code, data, ...)
 
-scheduleTaskList(graph, data = list(), maxWorker = 2L,
-  orderFun = orderBottomLevel, timeDefault = 1e-05,
+scheduleTaskList(graph, maxWorker = 2L, orderFun = orderBottomLevel,
+  timeDefault = 1e-05,
   sizeDefault = as.numeric(utils::object.size(1L)), overhead = 8e-06,
   bandwidth = 1.5e+09)
 }
 \arguments{
-\item{data}{list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}}
-
 \item{graph}{\linkS4class{DependGraph} as returned from \code{\link{inferGraph}}}
 
 \item{maxWorker}{integer maximum number of processors}
