@@ -21,12 +21,27 @@ Second priorities:
 - remove variables after we are done using them.
 
 
+## detecting the GROUP BY
+
+We need to find the GROUP BY particularly when the data is split into groups.
+When will we do this?
+It ought to happen before the scheduling, since many different scheduling algorithms can potentially take advantage of expanded code.
+I'm also leaning towards scheduling algorithms that are based at looking at all the fine grained statements.
+
+In this case the statement expansion should even come before the graph inference.
+
+
 ## Expand Code
 
 We need a general way to expand code.
 One way is to dispatch on the class of the data description.
 Then when we see the data comes from `dataFiles`, we know how to generate the right expressions to load these.
 
+I do need to start bringing in platform information now.
+If we have a POSIX machine then we can use the `cut` trick with `pipe`.
+If we have the data.table package we can select the columns at read.
+Otherwise we will have to read using the functions in base R.
+I was imagining that we only need the platform information in the end when we finallly generate the code, but in this case we're partially generating code as we go, so we need the information earlier.
 
 
 ## Data Description 1

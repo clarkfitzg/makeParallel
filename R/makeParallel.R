@@ -66,6 +66,7 @@ makeParallel = function(code
     , overWrite = FALSE
     )
 {
+    # TODO: Add data and platform arguments in here, this is where they actually belong.
     if(run)
         graph = runMeasure(graph)
     sc = scheduler(graph, ...)
