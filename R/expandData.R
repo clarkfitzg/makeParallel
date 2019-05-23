@@ -254,5 +254,5 @@ function(code, data, ...)
 setMethod("expandData", signature(code = "ANY", data = "NULL"),
 function(code, data, ...)
 {
-
+    as(code, "expression")
 })
