@@ -244,15 +244,40 @@ substitute_q <- function(x, env) {
 }
 
 
-setMethod("expandData", signature(code = "DependGraph", data = "TextTableFiles"),
+setMethod("expandData", signature(code = "DependGraph", data = "ANY"),
 function(code, data, ...)
 {
-    expandData(code@code, data, ...)
+    callGeneric(code@code, data, ...)
 })
 
 
 setMethod("expandData", signature(code = "ANY", data = "NULL"),
 function(code, data, ...)
 {
+    # If there's no data description there's nothing to expand
     as(code, "expression")
+})
+
+
+# The interesting case.
+setMethod("expandData", signature(code = "expression", data = "TextTableFiles", platform = "singleUnix"),
+function(code, data, ...)
+{
+    dots = list(...)
+    OS = dots[["OS.type"]]
+    used = columnsUsed(code, data@varname)
+    total_columns = data[["details"]][["colNames"]]
+    subset_of_columns = length(used) < length(total_columns)
+    
+    # Injecting the data loading code could definitely benefit from method dispatch.
+    # But isn't it the same as expanding data?
+    # I would like to dispatch on the characteristics of the platform.
+    # This suggests that I have classes for all the different platforms I want to use.
+    # This will also be useful later for generating code.
+    if(!is.null(OS) && OS == "unix" && subset_of_columns){
+        message("Generating pipe('cut ...') calls to perform column selection before loading to R.")
+        prependPipeCutCode(code, data, used)
+    } else {
+        prependReadCode(code, data)
+    }
 })
