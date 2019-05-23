@@ -260,7 +260,7 @@ function(code, data, platform, ...)
 
 
 # The interesting case.
-setMethod("expandData", signature(code = "expression", data = "TextTableFiles", platform = "UNIX"),
+setMethod("expandData", signature(code = "expression", data = "TextTableFiles", platform = "UnixPlatform"),
 function(code, data, platform, ...)
 {
     dots = list(...)

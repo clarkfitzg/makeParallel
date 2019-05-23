@@ -4,14 +4,16 @@
 \alias{expandData}
 \title{Expand Data}
 \usage{
-expandData(code, data, ...)
+expandData(code, data, platform, ...)
 }
 \arguments{
-\item{code}{object to update}
+\item{code}{file name or expression from \code{\link[base]{parse}}}
 
-\item{data}{description of external data to load}
+\item{data}{list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}}
 
-\item{...}{additional arguments to methods}
+\item{platform}{\linkS4class{Platform} to target for where the generated code will run}
+
+\item{...}{additional arguments to scheduler}
 }
 \description{
 Updates code to include code to load data

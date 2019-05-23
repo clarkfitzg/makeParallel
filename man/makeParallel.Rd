@@ -4,18 +4,19 @@
 \alias{makeParallel}
 \title{Make Parallel Code From Serial}
 \usage{
-makeParallel(code, data = NULL, OS.type = .Platform["OS.type"],
-  fullCode = expandData(as(code, "expression"), data, OS.type = OS.type),
-  graph = inferGraph(fullCode), run = FALSE, scheduler = schedule,
-  ..., generator = generate, generatorArgs = list(), file = FALSE,
-  prefix = "gen_", overWrite = FALSE)
+makeParallel(code, data = NULL, platform = inferPlatform(),
+  fullCode = expandData(as(code, "expression"), data, platform =
+  platform), graph = inferGraph(fullCode), run = FALSE,
+  scheduler = schedule, ..., generator = generate,
+  generatorArgs = list(), file = FALSE, prefix = "gen_",
+  overWrite = FALSE)
 }
 \arguments{
 \item{code}{file name or expression from \code{\link[base]{parse}}}
 
 \item{data}{list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}}
 
-\item{OS.type}{"unix" or "windows", see \code{.Platform}}
+\item{platform}{\linkS4class{Platform} to target for where the generated code will run}
 
 \item{graph}{object of class \linkS4class{DependGraph}}
 
