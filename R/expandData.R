@@ -262,21 +262,16 @@ function(code, data, platform, ...)
 setMethod("expandData", signature(code = "expression", data = "TextTableFiles", platform = "UnixPlatform"),
 function(code, data, platform, ...)
 {
-    dots = list(...)
-    OS = dots[["OS.type"]]
     used = columnsUsed(code, data@varname)
-    total_columns = data[["details"]][["colNames"]]
-    subset_of_columns = length(used) < length(total_columns)
+    all_columns = data[["details"]][["colNames"]]
     
-    # Injecting the data loading code could definitely benefit from method dispatch.
-    # But isn't it the same as expanding data?
-    # I would like to dispatch on the characteristics of the platform.
-    # This suggests that I have classes for all the different platforms I want to use.
-    # This will also be useful later for generating code.
-    if(!is.null(OS) && OS == "unix" && subset_of_columns){
-        message("Generating pipe('cut ...') calls to perform column selection before loading to R.")
-        prependPipeCutCode(code, data, used)
-    } else {
-        prependReadCode(code, data)
+    if(!is.null(all_columns) && length(used) < length(all_columns)){
+        return(prepend_data_load(code, data, platform, ...))
     }
+
+    # TODO: Make this more robust by checking that it's not possible for the delimiter to interfere with the behavior of cut.
+
+    message("Generating pipe('cut ...') calls to perform column selection before loading to R.")
+
+
 })

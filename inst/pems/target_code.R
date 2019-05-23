@@ -14,7 +14,7 @@ npbin = function(...) "see pems.R"
 # 1. A split based on a data partition
 # 2. An lapply on the results of that split
 
-pems_313368 = read.csv(
+pems2_313368 = read.csv(
     pipe("cut -d , -f 2,6,7 stationID/313368.csv")
     , col.names = c("station", "flow2", "occupancy2")
     , colClasses = c("integer", "integer", "numeric")
@@ -23,7 +23,7 @@ pems_313368 = read.csv(
 results_313368 = npbin(pems_313368)
 
 
-pems_313369 = read.csv(
+pems2_313369 = read.csv(
     pipe("cut -d , -f 2,6,7 stationID/313369.csv")
     , col.names = c("station", "flow2", "occupancy2")
     , colClasses = c("integer", "integer", "numeric")
