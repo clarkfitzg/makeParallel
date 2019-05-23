@@ -251,15 +251,7 @@ function(code, data, ...)
 })
 
 
-setMethod("expandData", signature(code = "expression", data = "NULL"),
-function(code, data, ...)
-{
-    # Nothing to do.
-    code
-})
-
-
-setMethod("expandData", signature(code = "expression", data = "TextTableFiles"),
+setMethod("expandData", signature(code = "ANY", data = "NULL"),
 function(code, data, ...)
 {
 

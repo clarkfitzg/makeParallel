@@ -59,7 +59,7 @@
 makeParallel = function(code
     , data = NULL
     , OS.type = .Platform["OS.type"]
-    , fullCode = expandData(code, data, OS.type = OS.type)
+    , fullCode = expandData(as(code, "expression"), data, OS.type = OS.type)
     , graph = inferGraph(fullCode)
     , run = FALSE
     , scheduler = schedule
@@ -71,7 +71,6 @@ makeParallel = function(code
     , overWrite = FALSE
     )
 {
-    # TODO: Add data and platform arguments in here, this is where they actually belong.
     if(run)
         graph = runMeasure(graph)
 

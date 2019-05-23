@@ -5,7 +5,7 @@
 \title{Make Parallel Code From Serial}
 \usage{
 makeParallel(code, data = NULL, OS.type = .Platform["OS.type"],
-  fullCode = as.expression(expandData(code, data, OS.type = OS.type)),
+  fullCode = expandData(as(code, "expression"), data, OS.type = OS.type),
   graph = inferGraph(fullCode), run = FALSE, scheduler = schedule,
   ..., generator = generate, generatorArgs = list(), file = FALSE,
   prefix = "gen_", overWrite = FALSE)
