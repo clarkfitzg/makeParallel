@@ -244,15 +244,15 @@ substitute_q <- function(x, env) {
 }
 
 
-setMethod("expandData", signature(code = "DependGraph", data = "ANY"),
-function(code, data, ...)
+setMethod("expandData", signature(code = "DependGraph", data = "ANY", platform = "ANY"),
+function(code, data, platform, ...)
 {
-    callGeneric(code@code, data, ...)
+    callGeneric(code@code, data, platform, ...)
 })
 
 
-setMethod("expandData", signature(code = "ANY", data = "NULL"),
-function(code, data, ...)
+setMethod("expandData", signature(code = "ANY", data = "NULL", platform = "ANY"),
+function(code, data, platform, ...)
 {
     # If there's no data description there's nothing to expand
     as(code, "expression")
@@ -260,8 +260,8 @@ function(code, data, ...)
 
 
 # The interesting case.
-setMethod("expandData", signature(code = "expression", data = "TextTableFiles", platform = "singleUnix"),
-function(code, data, ...)
+setMethod("expandData", signature(code = "expression", data = "TextTableFiles", platform = "UNIX"),
+function(code, data, platform, ...)
 {
     dots = list(...)
     OS = dots[["OS.type"]]

@@ -50,6 +50,25 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
     contains = "TimedDependGraph")
 
 
+# Platforms
+############################################################
+
+#' Description of a Platform
+#'
+#' Describes the physical and software infrastructure that we can use to generate parallel code.
+#'
+#' @export
+#' @slot workers number of parallel workers to use
+Platform = setClass("Platform",
+    slots = c(workers = "integer"))
+
+
+#' @export
+UnixPlatform = setClass("UnixPlatform",
+    contains = "Platform")
+
+
+
 # Data Descriptions
 ############################################################
 

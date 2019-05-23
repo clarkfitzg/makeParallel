@@ -145,3 +145,18 @@ by0 = function(x, ...){
 }
 
 
+#' Infer Current Platform
+#'
+#' When generating code in the absence of specific platform information we assume the code will run where it's generated.
+#'
+#' @export
+#' @return \linkS4class{Platform}
+inferPlatform = function()
+{
+    workers = parallel::detectCores()
+    if(.Platform[["OS.type"]] == "unix"){
+        UnixPlatform(workers = workers)
+    } else {
+        Platform(workers = workers)
+    }
+}

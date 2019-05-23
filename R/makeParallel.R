@@ -15,6 +15,7 @@
 #' @export
 #' @param code file name or expression from \code{\link[base]{parse}}
 #' @param data list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}
+#' @param platform \linkS4class{Platform} to target for where the generated code will run
 #' @param graph object of class \linkS4class{DependGraph}
 #' @param run logical, evaluate the code once to gather timings?
 #' @param scheduler, function to produce a \linkS4class{Schedule}
@@ -29,7 +30,6 @@
 #'  name and write a script.
 #' @param prefix character added to front of file name
 #' @param overWrite logical write over existing generated file
-#' @param OS.type "unix" or "windows", see \code{.Platform}
 #' @return code object of class \linkS4class{GeneratedCode}
 #' @examples
 #' # Make an existing R script parallel
@@ -58,8 +58,8 @@
 #' plot(schedule(pcode))
 makeParallel = function(code
     , data = NULL
-    , OS.type = .Platform["OS.type"]
-    , fullCode = expandData(as(code, "expression"), data, OS.type = OS.type)
+    , platform = inferPlatform()
+    , fullCode = expandData(as(code, "expression"), data, platform = platform)
     , graph = inferGraph(fullCode)
     , run = FALSE
     , scheduler = schedule

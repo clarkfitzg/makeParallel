@@ -98,10 +98,9 @@ function(expr, args, ...)
 #'
 #' Updates code to include code to load data
 #'
-#' @param code object to update
-#' @param data description of external data to load
-#' @param ... additional arguments to methods
-setGeneric("expandData", function(code, data, ...)
+#' @export
+#' @inheritParams makeParallel
+setGeneric("expandData", function(code, data, platform, ...)
            standardGeneric("expandData"))
 
 
