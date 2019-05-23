@@ -18,7 +18,7 @@ setAs("character", "expression", function(from)
     # This means that to do a single string literal we'll need to coerce it to a string literal.
     # For example, as.expression("foo")
     if(length(from) == 1){
-        parse(from)
+        parse(from, keep.source = TRUE)
     } else {
         stop("Expected a single file name.")
     }
