@@ -4,15 +4,18 @@
 \alias{makeParallel}
 \title{Make Parallel Code From Serial}
 \usage{
-makeParallel(code, data = list(), graph = expandData(inferGraph(code),
-  data), run = FALSE, scheduler = schedule, ...,
-  generator = generate, generatorArgs = list(), file = FALSE,
-  prefix = "gen_", overWrite = FALSE, OS.type = .Platform["OS.type"])
+makeParallel(code, data = NULL, OS.type = .Platform["OS.type"],
+  fullCode = as.expression(expandData(code, data, OS.type = OS.type)),
+  graph = inferGraph(fullCode), run = FALSE, scheduler = schedule,
+  ..., generator = generate, generatorArgs = list(), file = FALSE,
+  prefix = "gen_", overWrite = FALSE)
 }
 \arguments{
 \item{code}{file name or expression from \code{\link[base]{parse}}}
 
 \item{data}{list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}}
+
+\item{OS.type}{"unix" or "windows", see \code{.Platform}}
 
 \item{graph}{object of class \linkS4class{DependGraph}}
 
@@ -36,8 +39,6 @@ name and write a script.}
 \item{prefix}{character added to front of file name}
 
 \item{overWrite}{logical write over existing generated file}
-
-\item{OS.type}{"unix" or "windows", see \code{.Platform}}
 }
 \value{
 code object of class \linkS4class{GeneratedCode}

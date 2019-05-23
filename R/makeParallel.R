@@ -57,8 +57,10 @@
 #' # Some schedules have plotting methods
 #' plot(schedule(pcode))
 makeParallel = function(code
-    , data = list()
-    , graph = expandData(inferGraph(code), data)
+    , data = NULL
+    , OS.type = .Platform["OS.type"]
+    , fullCode = expandData(code, data, OS.type = OS.type)
+    , graph = inferGraph(fullCode)
     , run = FALSE
     , scheduler = schedule
     , ...
@@ -67,7 +69,6 @@ makeParallel = function(code
     , file = FALSE
     , prefix = "gen_"
     , overWrite = FALSE
-    , OS.type = .Platform["OS.type"]
     )
 {
     # TODO: Add data and platform arguments in here, this is where they actually belong.
