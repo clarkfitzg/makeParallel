@@ -10,3 +10,15 @@ setAs("DependGraph", "igraph", function(from)
         g
     } else stop("Install igraph to use this conversion.")
 })
+
+
+setAs("character", "expression", function(from)
+{
+    # This means that to do a single string literal we'll need to coerce it to a string literal.
+    # For example, as.expression("foo")
+    if(length(from) == 1){
+        parse(from)
+    } else {
+        stop("Expected a single file name.")
+    }
+})
