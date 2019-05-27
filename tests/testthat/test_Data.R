@@ -22,6 +22,12 @@ test_that("simple case of chunked input data descriptions", {
 
     xdescription = dataSource(expr = chunk_load_code)
 
+# Mon May 27 16:10:48 PDT 2019
+    # The issue I'm having now is that I want to use the list signature for expandData.
+    # This API below also uses the list signature.
+    # In this API each element of the list is a data source.
+    # I could dispatch on the class of the elements of the list.
+    # But that seems excessive, because I only need it when I read in a bunch of data in the first place.
     out = makeParallel(incode
                        , scheduler = scheduleTaskList
                        , data = list(x = xdescription)

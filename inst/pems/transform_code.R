@@ -1,5 +1,4 @@
 library(makeParallel)
-
 d = dataFiles(dir = "stationID"
     , format = "text"
     , Rclass = "data.frame"
@@ -18,7 +17,6 @@ d = dataFiles(dir = "stationID"
 		, flow8 = "integer", occupancy8 = "numeric", speed8 = "numeric"
 	)
 )
-
 p = platform(OS.type = "unix", workers = 10L)
 
 # The named list for the data argument means that the symbol 'pems' in the code corresponds to the data in 'pems_ds'.

@@ -72,14 +72,27 @@ UnixPlatform = setClass("UnixPlatform",
 # Data Descriptions
 ############################################################
 
-#' Description of a Chunked Data Source
+
+#' Base Class for Data Descriptions
+#'
+#' Subclasses describe data
+#'
+#' @export
+#' @slot varname character variable name in the original code
+DataSource = setClass("DataSource"
+    , slots = c(varname = "character")
+    )
+
+
+#' Chunked Data Source defined by R expressions
 #'
 #' Contains information necessary to load chunks of data into an R session.
 #'
 #' @export
 #' @slot expr expression such that evaluating \code{expr[[i]]} produces the ith chunk of data
-ChunkDataSource = setClass("ChunkDataSource",
-    slots = c(expr = "expression")
+ExprChunkData = setClass("ExprChunkData",
+    , slots = c(expr = "expression")
+    , contains = "DataSource"
     )
 
 
@@ -108,13 +121,11 @@ ChunkDataSource = setClass("ChunkDataSource",
 #'
 #' @export
 #' @slot files absolute paths to all the files
-#' @slot varname expected variable name in the code
 #' @slot details list of details to help efficiently and correctly read in the data
-TextTableFiles = setClass("TextTableFiles",
-    slots = c(files = "character"
-              , varname = "character"
-              , details = "list"
-    ))
+TextTableFiles = setClass("TextTableFiles"
+    , slots = c(files = "character", details = "list")
+    , contains = "DataSource"
+)
  
 
 # Schedules

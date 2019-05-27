@@ -263,7 +263,7 @@ setMethod("expandData", signature(code = "expression", data = "TextTableFiles", 
 function(code, data, platform, ...)
 {
     used = columnsUsed(code, data@varname)
-    all_columns = data[["details"]][["colNames"]]
+    all_columns = data@details[["colNames"]]
     
     if( !is.null(all_columns) && length(used) < length(all_columns) ){
         return(prepend_data_load(code, data, platform, ...))
@@ -273,17 +273,27 @@ function(code, data, platform, ...)
 
     message("Generating pipe('cut ...') calls to perform column selection before loading to R.")
 
-    delimiter = data@detail[["delimiter"]]
+    delimiter = data@details[["delimiter"]]
     if(is.null(delimiter)) stop("Specify delimiter in data description details.")
 
-    # TODO: Check if this name mangling scheme is valid.
-    data_names = paste(data@varname, tools::file_path_sans_ext(data@files), sep = "_")
 
-    read_code = map(gen_pipe_cut_cmd, data@files, data_names, delimiter = delimiter, used_col = used)
+    # TODO: Check if this name mangling scheme is valid.
+    #data_names = paste(data@varname, tools::file_path_sans_ext(data@files), sep = "_")
+
+    #read_code = Map(gen_pipe_cut_cmd, data@files, data_names, delimiter = delimiter, used_col = used)
 
     # When we call expandData with a list, then the names of the list are the variable names, and the values are what to replace them with.
-    data_names = list(data_names)
-    names(data_names) = data@varname
+    #data_names = list(data_names)
+    #names(data_names) = data@varname
+
+
+    # Construct the expressions needed to create the objects
+
+    used_col_string = paste(used, sep = ",")
+    cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
+    ds = dataSource(
+
+
 
     c(as.expression(read_code), expandData(code, data_names, platform))
 })
@@ -294,5 +304,5 @@ gen_pipe_cut_cmd = function(fname, varname, delimiter, used_col)
     used_col_string = paste(used_col, sep = ",")
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, fname)
     rhs = call("pipe", cmd)
-    call("=", as.name(varname), rhs)
+    #call("=", as.name(varname), rhs)
 }

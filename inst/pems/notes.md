@@ -128,11 +128,7 @@ We can call `expandData` recursively, and I think this may lead to a more elegan
 `expandData` is our general purpose function that takes (code, data, platform), and produces new code.
 The scheduler takes this new code and arranges it in an efficient way on the workers.
 
-If this is the case then `expandData` should accept the first part of the code which has already been expanded.
-All it needs to do is prepend the code with whatever it expands later.
-
-I wonder if we could get the S4 to pass a default argument without dispatching on it.
-It seems like I tried this before.
+If this is the case then `expandData` needs to keep track of where it is in the code, when and where to insert new statements.
 
 
 ## Scratch
@@ -142,5 +138,9 @@ But isn't it the same as expanding data?
 I would like to dispatch on the characteristics of the platform.
 This suggests that I have classes for all the different platforms I want to use.
 This will also be useful later for generating code.
+
+
+I wonder if we could get the S4 to pass a default argument without dispatching on it.
+It seems like I tried this before.
 
 
