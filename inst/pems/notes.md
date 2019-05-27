@@ -108,17 +108,31 @@ Let's try and describe this a little more precisely.
 
 _Did I write all this somewhere else also? It seems familiar_
 
-We have a named list, where the names correspond to variable names, and the values are the mangled names.
-For simplicity at the moment let's just suppose everything is chunked in the same way.
+Start with a named list, where the names correspond to variable names, and the values are the mangled names.
+The data description identifies the variable names, so it can populate the list.
+For simplicity at the moment, let's just suppose everything is chunked in the same way.
 We walk over the code, one statement at a time.
 If that statement uses any variable in a vectorized function call, then we expand it.
 If it assigns the result to a new variable then that new variable is now expanded.
 If that statement uses the variable in a general function call, then we collapse it.
 If that statement uses the variable in a reducible function call, then we insert the reduce code to gather up one of the reduced objects.
-I have all of this in the original `expandData` code.
+I've implemented everything except the reduce in the original `expandData` code.
 
 I'm tempted to switch back to analyzing the `tapply` or `by`, but I shouldn't do this, because the `split` followed by `lapply` is more general, since it allows multiple operations on the split data.
-That is, it's better to convert the `tapply` or `by` into a `split` then `lapply`.
+That is, we can easily convert all `tapply` or `by` calls into a `split` followed by `lapply`, and this is more like the code that we'll generate anyways.
+
+-----------------------------------------------------------------
+
+How will the object oriented structure be set up?
+We can call `expandData` recursively, and I think this may lead to a more elegant design.
+`expandData` is our general purpose function that takes (code, data, platform), and produces new code.
+The scheduler takes this new code and arranges it in an efficient way on the workers.
+
+If this is the case then `expandData` should accept the first part of the code which has already been expanded.
+All it needs to do is prepend the code with whatever it expands later.
+
+I wonder if we could get the S4 to pass a default argument without dispatching on it.
+It seems like I tried this before.
 
 
 ## Scratch

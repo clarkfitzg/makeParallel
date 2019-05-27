@@ -265,7 +265,7 @@ function(code, data, platform, ...)
     used = columnsUsed(code, data@varname)
     all_columns = data[["details"]][["colNames"]]
     
-    if(!is.null(all_columns) && length(used) < length(all_columns)){
+    if( !is.null(all_columns) && length(used) < length(all_columns) ){
         return(prepend_data_load(code, data, platform, ...))
     }
 
@@ -273,5 +273,23 @@ function(code, data, platform, ...)
 
     message("Generating pipe('cut ...') calls to perform column selection before loading to R.")
 
+    delimiter = data@detail[["delimiter"]]
+    if(is.null(delimiter)) stop("Specify delimiter in data description details.")
 
+    read_code = lapply(data@files, gen_pipe_cut_cmd, delimiter = delimiter, used_col = used)
+
+    data_names = list(tools::file_path_sans_ext(data@files))
+
+    names(data_names) = data@varname
+    # When we call expandData with a list, then the names of the list are the variable names, and the values are what to replace them with.
+
+    c(read_code, expandData(code, data_names, platform))
 })
+
+
+gen_pipe_cut_cmd = function(fname, delimiter, used_col)
+{
+    used_col_string = paste(used_col, sep = ",")
+    cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, fname)
+    call("pipe", cmd)
+}
