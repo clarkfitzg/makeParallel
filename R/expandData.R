@@ -276,20 +276,23 @@ function(code, data, platform, ...)
     delimiter = data@detail[["delimiter"]]
     if(is.null(delimiter)) stop("Specify delimiter in data description details.")
 
-    read_code = lapply(data@files, gen_pipe_cut_cmd, delimiter = delimiter, used_col = used)
+    # TODO: Check if this name mangling scheme is valid.
+    data_names = paste(data@varname, tools::file_path_sans_ext(data@files), sep = "_")
 
-    data_names = list(tools::file_path_sans_ext(data@files))
+    read_code = map(gen_pipe_cut_cmd, data@files, data_names, delimiter = delimiter, used_col = used)
 
-    names(data_names) = data@varname
     # When we call expandData with a list, then the names of the list are the variable names, and the values are what to replace them with.
+    data_names = list(data_names)
+    names(data_names) = data@varname
 
-    c(read_code, expandData(code, data_names, platform))
+    c(as.expression(read_code), expandData(code, data_names, platform))
 })
 
 
-gen_pipe_cut_cmd = function(fname, delimiter, used_col)
+gen_pipe_cut_cmd = function(fname, varname, delimiter, used_col)
 {
     used_col_string = paste(used_col, sep = ",")
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, fname)
-    call("pipe", cmd)
+    rhs = call("pipe", cmd)
+    call("=", as.name(varname), rhs)
 }
