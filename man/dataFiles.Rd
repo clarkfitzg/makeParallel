@@ -19,7 +19,7 @@ TODO: infer this using the files themselves}
 
 \item{files}{absolute paths to all the files}
 
-\item{details}{list of details to help efficiently and correctly read in the data}
+\item{...}{further details to help efficiently and correctly read in the data}
 }
 \value{
 \linkS4class{DataFiles}

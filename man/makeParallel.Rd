@@ -18,6 +18,8 @@ makeParallel(code, data = NULL, platform = inferPlatform(),
 
 \item{platform}{\linkS4class{Platform} to target for where the generated code will run}
 
+\item{fullCode}{the exact code to perform inference on}
+
 \item{graph}{object of class \linkS4class{DependGraph}}
 
 \item{run}{logical, evaluate the code once to gather timings?}

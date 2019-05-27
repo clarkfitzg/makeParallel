@@ -11,7 +11,9 @@ dataSource(expr, args, ...)
 \S4method{dataSource}{expression,missing}(expr, args, ...)
 }
 \arguments{
-\item{expr}{code to load chunks of the data}
+\item{expr}{code or function to load chunks of the data}
+
+\item{args}{list of arguments to function}
 
 \item{...}{additional arguments to methods}
 }

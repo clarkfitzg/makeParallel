@@ -1,6 +1,6 @@
 library(makeParallel)
 
-pems_ds = dataFiles(dir = "stationID"
+d = dataFiles(dir = "stationID"
     , format = "text"
     , Rclass = "data.frame"
     , varname = "pems"
@@ -19,8 +19,10 @@ pems_ds = dataFiles(dir = "stationID"
 	)
 )
 
+p = platform(OS.type = "unix", workers = 10L)
+
 # The named list for the data argument means that the symbol 'pems' in the code corresponds to the data in 'pems_ds'.
 # makeParallel("pems.R", data = list(pems = pems_ds), scheduler = scheduleTaskList, workers = 10L)
 
 # It's more convenient at the moment for me to use the varname in the object.
-makeParallel("pems.R", data = pems_ds, scheduler = scheduleTaskList, workers = 10L)
+makeParallel("pems.R", data = d, platform = p, scheduler = scheduleTaskList)
