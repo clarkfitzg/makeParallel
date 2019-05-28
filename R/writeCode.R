@@ -35,14 +35,22 @@ setMethod("writeCode", c("GeneratedCode", "character"),
 })
 
 
-writeHelper = function(code, fname, overWrite)
+#' @export
+#' @rdname writeCode
+setMethod("writeCode", c("expression", "character"),
+    function(code, file, overWrite = FALSE, ...)
+{
+    writeHelper(fname = file, overWrite = overWrite, content = as.character(code))
+})
+
+
+writeHelper = function(code, fname, overWrite, content = as.character(code@code))
 {
     if(file.exists(fname) && !overWrite){
         e = simpleError(sprintf("The file %s already exists. Pass overWrite = TRUE to replace %s with a new version.", fname, fname))
         class(e) = c("FileExistsError", class(e))
         stop(e)
     }
-    content = as.character(code@code)
     writeLines(content, fname)
     message(sprintf("generated parallel code is in %s", fname))
     fname

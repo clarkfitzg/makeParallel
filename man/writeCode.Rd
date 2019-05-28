@@ -6,6 +6,7 @@
 \alias{writeCode,GeneratedCode,logical-method}
 \alias{writeCode,GeneratedCode,missing-method}
 \alias{writeCode,GeneratedCode,character-method}
+\alias{writeCode,expression,character-method}
 \title{Write Generated Code}
 \usage{
 writeCode(code, file, ...)
@@ -17,6 +18,9 @@ writeCode(code, file, ...)
 
 \S4method{writeCode}{GeneratedCode,character}(code, file,
   overWrite = FALSE, ...)
+
+\S4method{writeCode}{expression,character}(code, file, overWrite = FALSE,
+  ...)
 }
 \arguments{
 \item{code}{object of class \linkS4class{GeneratedCode}}

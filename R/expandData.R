@@ -1,3 +1,11 @@
+# TODO:
+# - Make user extensible
+# - Identify which arguments they are vectorized in
+# I'm using this variable as a list of all known vectorized functions.
+# It would be better to infer these.
+vectorfuncs = c("*", "lapply", "[")
+
+
 #' Expand Data Description
 #'
 #' Insert the chunked data loading calls directly into the code, expand vectorized function calls,
@@ -235,12 +243,6 @@ expandExpr(e, vars_to_expand)
     collectOneVariable("x", c("x_1", "x_2", "x_3"))
 
 }
-
-
-# TODO:
-# - Make user extensible
-# - Identify which arguments they are vectorized in
-vectorfuncs = c("*")
 
 # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Substitutions
 # http://adv-r.had.co.nz/Computing-on-the-language.html#substitute
