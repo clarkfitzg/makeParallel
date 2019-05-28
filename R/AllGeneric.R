@@ -86,15 +86,6 @@ setGeneric("dataSource", function(expr, args, ...)
            standardGeneric("dataSource"))
 
 
-#' @export
-#' @rdname dataSource
-setMethod("dataSource", signature(expr = "expression", args = "missing"),
-function(expr, args, ...)
-{
-    ChunkDataSource(expr = expr, ...)
-})
-
-
 #' Expand Data
 #'
 #' Updates code to include code to load data
@@ -103,17 +94,6 @@ function(expr, args, ...)
 #' @inheritParams makeParallel
 setGeneric("expandData", function(code, data, platform, ...)
            standardGeneric("expandData"))
-
-
-# #' @export
-# #' @rdname dataSource
-# setMethod("dataSource", signature(expr = "character", args = "vector"),
-# function(expr, args, ...)
-# {
-#     # Here expr is the name of a function.
-#     # Build up the expressions to 
-#     ChunkDataSource(expr = expr, ...)
-# })
 
 
 #' Expression Run Time

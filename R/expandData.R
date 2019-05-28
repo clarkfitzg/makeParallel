@@ -15,9 +15,14 @@ function(code, data, platform, ...)
     # This particular method may still be useful though-
     # we need a class for a list of data objects that are chunked in the same way.
 
-    chunkLoadCode = lapply(dataLoadExpr, slot, "expr")
+    varnames = names(dataLoadExpr)
+    if(!is.null(varnames)){
+        message("Using list names as variable names.")
+        for(i in seq_along(varnames))
+            dataLoadExpr[[i]]@varname = varnames[i]
+    }
 
-    mangledNames = Map(appendNumber, names(chunkLoadCode), chunkLoadCode)
+    mangledNames = lapply(appendNumber, dataLoadExpr)
 
     initialAssignments = mapply(initialAssignmentCode, mangledNames, chunkLoadCode, USE.NAMES = FALSE)
 
@@ -291,18 +296,18 @@ function(code, data, platform, ...)
 
     used_col_string = paste(used, sep = ",")
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
-    ds = dataSource(
+    ds = dataSource("pipe", cmd, varname = data@varname)
 
-
-
-    c(as.expression(read_code), expandData(code, data_names, platform))
+    expandData(code, ds, platform)
 })
 
 
-gen_pipe_cut_cmd = function(fname, varname, delimiter, used_col)
-{
-    used_col_string = paste(used_col, sep = ",")
-    cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, fname)
-    rhs = call("pipe", cmd)
-    #call("=", as.name(varname), rhs)
-}
+#
+#
+#gen_pipe_cut_cmd = function(fname, varname, delimiter, used_col)
+#{
+#    used_col_string = paste(used_col, sep = ",")
+#    cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, fname)
+#    rhs = call("pipe", cmd)
+#    #call("=", as.name(varname), rhs)
+#}
