@@ -296,7 +296,7 @@ function(code, data, platform, ...)
 
     # Construct the expressions needed to create the objects
 
-    used_col_string = paste(used, sep = ",")
+    used_col_string = paste(used, collapse = ",")
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
     ds = dataSource("pipe", cmd, varname = data@varname)
 

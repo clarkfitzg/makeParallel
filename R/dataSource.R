@@ -15,7 +15,7 @@ function(expr, args, ...)
     func_name = expr
 
     # build up the calls to load every chunk
-    chunk_expr = lapply(args, function(args) do.call(call, func_name, args))
+    chunk_expr = lapply(args, function(args) do.call(call, list(func_name, args)))
 
     ExprChunkData(expr = as.expression(chunk_expr), ...)
 })
