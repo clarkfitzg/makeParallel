@@ -22,7 +22,7 @@ function(code, data, platform, ...)
             dataLoadExpr[[i]]@varname = varnames[i]
     }
 
-    mangledNames = lapply(appendNumber, dataLoadExpr)
+    mangledNames = lapply(dataLoadExpr, appendNumber)
 
     initialAssignments = mapply(initialAssignmentCode, mangledNames, chunkLoadCode, USE.NAMES = FALSE)
 
@@ -47,9 +47,10 @@ function(code, data, platform, ...)
 
 # TODO: check that this name mangling scheme is not problematic.
 # Also, could parameterize these functions.
-appendNumber = function(varname, obj, n = seq_along(obj), sep = "_")
+# @param data DataSource
+appendNumber = function(data, n = seq_along(data), sep = "_")
 {
-    paste0(varname, sep, n)
+    paste0(data@varname, sep, n)
 }
 
 

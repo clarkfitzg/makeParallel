@@ -13,8 +13,6 @@ Contains information necessary to generate a call to read in these data files
 \describe{
 \item{\code{files}}{absolute paths to all the files}
 
-\item{\code{varname}}{expected variable name in the code}
-
 \item{\code{details}}{list of details to help efficiently and correctly read in the data}
 }}
 

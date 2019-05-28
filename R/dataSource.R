@@ -3,7 +3,7 @@
 setMethod("dataSource", signature(expr = "expression", args = "missing"),
 function(expr, args, ...)
 {
-    ChunkDataSource(expr = expr, ...)
+    ExprChunkData(expr = expr, ...)
 })
 
 
@@ -17,5 +17,5 @@ function(expr, args, ...)
     # build up the calls to load every chunk
     chunk_expr = lapply(args, function(args) do.call(call, func_name, args))
 
-    ChunkDataSource(expr = as.expression(chunk_expr), ...)
+    ExprChunkData(expr = as.expression(chunk_expr), ...)
 })
