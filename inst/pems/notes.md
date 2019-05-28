@@ -190,10 +190,53 @@ Then the line in question would become:
 pems_1 = pems_1[, c("station", "flow2", "occupancy2")]
 pems_2 = pems_2[, c("station", "flow2", "occupancy2")]
 ```
-This is less efficient, because it appears to just make a gratuitous copy.
+This would appear to just make a gratuitous copy.
 But I just checked, it doesn't actually copy anything, so it's effectively a non-op.
 Thus we do not gain any efficiency by removing the line.
 Removing the line would decrease readability, and require more special logic, so this seems like a worse option.
+
+------------------------------------------------------------
+
+Next line:
+
+```{r}
+pems2 = split(pems, pems$station)
+```
+
+Above I wrote that the vectorized expansions keep track of which variables are chunked.
+This doesn't actually handle the splitting.
+We could augment it by keeping track of which variables are chunked and whether or not they are chunked with respect to a variable.
+
+Alternatively, we could leave the `split` in there and generate this code:
+
+```{r}
+pems2_1 = split(pems_1, pems_1$station)
+pems2_2 = split(pems_2, pems_2$station)
+
+results_1 = lapply(pems2_1, npbin)
+results_2 = lapply(pems2_2, npbin)
+```
+
+This approach seems to leave the code in a more complicated state than is necessary, but it has a number of benefits.
+It would handle a more general case when the only thing we know about the data is that all the elements for each group will appear in only one chunk, and one chunk may contain multiple groups.
+The generated code preserves the semantics, which will again help with understanding and debugging.
+It allows us to treat the following line `results = lapply(pems2, npbin)` as just a normal vectorized function; that is, we don't need to know anything special about the grouping structure.
+
+
+------------------------------------------------------------
+
+Final (difficult) line:
+
+```{r}
+results = lapply(pems2, npbin)
+```
+
+We cannot handle this `lapply` as we do other vectorized function calls, because the `lapply` is over the split elements.
+This is a special case that we will have to handle.
+Going into this function the code expander can know that `pems2` is split by a grouping variable.
+
+
+
 
 
 
