@@ -23,6 +23,7 @@ function(code, data, platform, ...)
     }
 
     mangledNames = lapply(dataLoadExpr, appendNumber)
+    chunkLoadCode = lapply(dataLoadExpr, slot, "expr")
 
     initialAssignments = mapply(initialAssignmentCode, mangledNames, chunkLoadCode, USE.NAMES = FALSE)
 
@@ -48,9 +49,9 @@ function(code, data, platform, ...)
 # TODO: check that this name mangling scheme is not problematic.
 # Also, could parameterize these functions.
 # @param data DataSource
-appendNumber = function(data, n = seq_along(data), sep = "_")
+appendNumber = function(data, basename = data@varname, n = seq_along(data@expr), sep = "_")
 {
-    paste0(data@varname, sep, n)
+    paste0(basename, sep, n)
 }
 
 
@@ -121,8 +122,8 @@ expandVector = function(expr, vars)
 
     # Record the lhs as now being an expanded variable
     # TODO: Check that the variables have the same number of chunks.
-    first_one_var_names =  vars$expanded[[names_to_expand[1]]]
-    vars$expanded[[lhs]] = appendNumber(lhs, first_one_var_names)
+    n = length(vars$expanded[[names_to_expand[1]]])
+    vars$expanded[[lhs]] = appendNumber(basename = lhs, n = n)
 
     names_to_expand = c(names_to_expand, lhs)
 
