@@ -24,7 +24,9 @@ function(code, data, platform, ...)
     # we need a class for a list of data objects that are chunked in the same way.
 
     varnames = names(dataLoadExpr)
-    if(!is.null(varnames)){
+    if(is.null(varnames)){
+        names(dataLoadExpr) = sapply(dataLoadExpr, slot, "varname")
+    } else {
         message("Using list names as variable names.")
         for(i in seq_along(varnames))
             dataLoadExpr[[i]]@varname = varnames[i]
@@ -37,6 +39,8 @@ function(code, data, platform, ...)
 
     vars = list(expanded = mangledNames
                 , collected = c())
+
+    #browser()
 
     newExpressions = vector(mode = "list", length = length(code))
 
@@ -92,6 +96,7 @@ expandCollect = function(expr, vars)
     # Yuck this is a mess.
     # Instead, I can start out just handling statements that look like:
     # y = f(x, z, ...)
+    # And preprocess the code to make it look like this.
 
 
     vars_in_expr = sapply(names(vars$expanded), function(var){
@@ -100,7 +105,7 @@ expandCollect = function(expr, vars)
     })
     
     if(0 < length(vars_in_expr)){
-        if(isSimpleAssignFunc(expr)){
+        if(isSimpleAssignCall(expr)){
             expandVector(expr, vars)
         } else {
             # Variable appears in the expression, but the expression is not a simple assign,
@@ -205,7 +210,7 @@ collectOneVariable = function(vname, chunked_varnames)
 
 # Verify that expr has the form
 # y = f(x1, x2, ..., xn)
-isSimpleAssignFunc = function(expr)
+isSimpleAssignCall = function(expr)
 {
     result = FALSE
     if(expr[[1]] == "="){

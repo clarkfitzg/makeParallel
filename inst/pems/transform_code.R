@@ -27,5 +27,4 @@ out = makeParallel("pems.R", data = d, platform = p, scheduler = scheduleTaskLis
 
 # Could use a more convenient way to extract this code
 tcode = schedule(out)@graph@code
-
-writeCode(tcode[-c(3,4)], "intermediate_transformed_code.R")
+writeCode(tcode[-c(3,4)], "intermediate_transformed_code.R", overWrite = TRUE)
