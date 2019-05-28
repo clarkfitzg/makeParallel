@@ -7,7 +7,18 @@ One exception is the data reading code, since we'll generate that.
 The first priority is to get the version working that handles data that's already split in the files.
 
 - handle `split(data, data$column)` as a special case when `data` is a chunked object that is split by column.
-- add `[`, `lapply` to list of vectorized functions.
+- Transform the code 
+```{r}
+# Before:
+pems = pems[, c("station", "flow2", "occupancy2")]
+
+# After
+tmp1 = c("station", "flow2", "occupancy2")
+pems = pems[, tmp1]
+```
+This will make the call to `[` simple.
+_Ah, but what's this going to break with how I did the column use inference?_
+- X add `[`, `lapply` to list of vectorized functions.
 - X expand the code into one statement per group based on the data description.
 - X generate calls that read in the data and do column selection at the source.
 - X determine which columns in a data frame are used (code analysis).
