@@ -6,10 +6,10 @@ One exception is the data reading code, since we'll generate that.
 
 The first priority is to get the version working that handles data that's already split in the files.
 
-- detect GROUP BY pattern in source code (code analysis).
-    This is really just looking for a `by`, or a `split`, particularly for the case when the data starts out split by that same variable.
-- expand the code into one statement per group based on the data description.
-- generate calls that read in the data and do column selection at the source.
+- handle `split(data, data$column)` as a special case when `data` is a chunked object that is split by column.
+- add `[`, `lapply` to list of vectorized functions.
+- X expand the code into one statement per group based on the data description.
+- X generate calls that read in the data and do column selection at the source.
 - X determine which columns in a data frame are used (code analysis).
 - X implement data description.
     This should include the values of the column to GROUP BY, along with counts.
@@ -221,6 +221,13 @@ This approach seems to leave the code in a more complicated state than is necess
 It would handle a more general case when the only thing we know about the data is that all the elements for each group will appear in only one chunk, and one chunk may contain multiple groups.
 The generated code preserves the semantics, which will again help with understanding and debugging.
 It allows us to treat the following line `results = lapply(pems2, npbin)` as just a normal vectorized function; that is, we don't need to know anything special about the grouping structure.
+
+What logic will allow us to do this?
+This is the same as treating `split` as a vectorized function.
+We know `pems` is chunked on the column `station`.
+When we see `split(pems, pems$station)`, we can treat `split` as being vectorized.
+That is essentially it.
+
 
 
 ------------------------------------------------------------
