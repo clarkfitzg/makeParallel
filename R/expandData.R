@@ -47,7 +47,7 @@ function(code, data, platform, ...)
         newExpressions[[i]] = tmp$expr
     }
 
-    newCode = as(newExpressions, "expression")
+    newCode = do.call("c", newExpressions, quote = TRUE)
 
     completeCode = c(initialAssignments, newCode)
     completeCode
