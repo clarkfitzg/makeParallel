@@ -144,14 +144,57 @@ out = makeParallel("pems.R", data = d, platform = p, scheduler = scheduleTaskLis
 tcode = schedule(out)@graph@code
 
 > tcode[-c(3,4)]
-expression(pems_1 = pipe("cut -d , -f station,flow2,occupancy2 stationID/313368.csv"),
-    pems_2 = pipe("cut -d , -f station,flow2,occupancy2 stationID/313369.csv"),
-    pems = pems[, c("station", "flow2", "occupancy2")], pems2 = split(pems,
-        pems$station), results = lapply(pems2, npbin), results = do.call(rbind,
-        results), write.csv(results, "results.csv")) 
+# It generated this code:
+
+pems_1 = pipe("cut -d , -f station,flow2,occupancy2 stationID/313368.csv")
+pems_2 = pipe("cut -d , -f station,flow2,occupancy2 stationID/313369.csv")
+pems = pems[, c("station", "flow2", "occupancy2")]
+pems2 = split(pems, pems$station)
+results = lapply(pems2, npbin)
+results = do.call(rbind, results)
+write.csv(results, "results.csv"))
 ```
 
-What else are we missing?
+Our focus is on these lines:
+
+```{r}
+pems = pems[, c("station", "flow2", "occupancy2")]
+pems2 = split(pems, pems$station)
+results = lapply(pems2, npbin)
+```
+
+They should become:
+
+```{r}
+results_313368 = npbin(pems_313368)
+results_313369 = npbin(pems_313369)
+ 
+results = list(results_313368, results_313369)
+```
+
+What logic needs to be in place for this to happen?
+
+This line can be dropped when we check `columnsUsed`.
+```{r}
+pems = pems[, c("station", "flow2", "occupancy2")]
+```
+Why?
+When is it valid to drop such a line?
+The case we're in here is that it's the first line to use the `pems` variable of interest, and it redefines `pems` based on the column selection, so we can leave it out if we do the column selection at the source.
+This seems a little specific.
+To generalize it we would have to use the concept of _column selection at source_ in more places.
+
+Alternatively, we could consider `[` to be a vectorized function, since it is.
+Then the line in question would become:
+```{r}
+pems_1 = pems_1[, c("station", "flow2", "occupancy2")]
+pems_2 = pems_2[, c("station", "flow2", "occupancy2")]
+```
+This is less efficient, because it appears to just make a gratuitous copy.
+But I just checked, it doesn't actually copy anything, so it's effectively a non-op.
+Thus we do not gain any efficiency by removing the line.
+Removing the line would decrease readability, and require more special logic, so this seems like a worse option.
+
 
 
 
