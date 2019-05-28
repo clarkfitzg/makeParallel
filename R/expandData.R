@@ -49,9 +49,9 @@ function(code, data, platform, ...)
 # TODO: check that this name mangling scheme is not problematic.
 # Also, could parameterize these functions.
 # @param data DataSource
-appendNumber = function(data, basename = data@varname, n = seq_along(data@expr), sep = "_")
+appendNumber = function(data, basename = data@varname, n = length(data@expr), sep = "_")
 {
-    paste0(basename, sep, n)
+    paste0(basename, sep, seq(n))
 }
 
 
