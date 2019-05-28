@@ -131,6 +131,30 @@ The scheduler takes this new code and arranges it in an efficient way on the wor
 If this is the case then `expandData` needs to keep track of where it is in the code, when and where to insert new statements.
 
 
+## Progress
+
+Here's where I'm at.
+The data loading calls are there.
+
+```{r}
+# It's more convenient at the moment for me to use the varname in the object.
+out = makeParallel("pems.R", data = d, platform = p, scheduler = scheduleTaskList)
+
+# Could use a more convenient way to extract this code
+tcode = schedule(out)@graph@code
+
+> tcode[-c(3,4)]
+expression(pems_1 = pipe("cut -d , -f station,flow2,occupancy2 stationID/313368.csv"),
+    pems_2 = pipe("cut -d , -f station,flow2,occupancy2 stationID/313369.csv"),
+    pems = pems[, c("station", "flow2", "occupancy2")], pems2 = split(pems,
+        pems$station), results = lapply(pems2, npbin), results = do.call(rbind,
+        results), write.csv(results, "results.csv")) 
+```
+
+What else are we missing?
+
+
+
 ## Scratch
 
 Injecting the data loading code could definitely benefit from method dispatch.

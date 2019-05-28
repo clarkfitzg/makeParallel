@@ -23,4 +23,11 @@ p = platform(OS.type = "unix", workers = 10L)
 # makeParallel("pems.R", data = list(pems = pems_ds), scheduler = scheduleTaskList, workers = 10L)
 
 # It's more convenient at the moment for me to use the varname in the object.
-makeParallel("pems.R", data = d, platform = p, scheduler = scheduleTaskList)
+out = makeParallel("pems.R", data = d, platform = p, scheduler = scheduleTaskList)
+
+# Could use a more convenient way to extract this code
+tcode = schedule(out)@graph@code
+
+tcode[-c(3,4)]
+
+writeCode(out)

@@ -39,7 +39,7 @@ function(code, data, platform, ...)
         newExpressions[[i]] = tmp$expr
     }
 
-    newCode = do.call(c, newExpressions)
+    newCode = as(newExpressions, "expression")
 
     completeCode = c(initialAssignments, newCode)
     completeCode
@@ -265,6 +265,13 @@ function(code, data, platform, ...)
 })
 
 
+setMethod("expandData", signature(code = "ANY", data = "ExprChunkData", platform = "ANY"),
+function(code, data, platform, ...)
+{
+    callGeneric(as(code, "expression"), list(data), platform, ...)
+})
+
+
 # The interesting case.
 setMethod("expandData", signature(code = "expression", data = "TextTableFiles", platform = "UnixPlatform"),
 function(code, data, platform, ...)
@@ -300,7 +307,7 @@ function(code, data, platform, ...)
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
     ds = dataSource("pipe", cmd, varname = data@varname)
 
-    expandData(code, ds, platform)
+    callGeneric(code, ds, platform)
 })
 
 
