@@ -1,3 +1,35 @@
+## Summary
+
+For meeting Duncan and Nick.
+
+- what are the key ideas / abstractions?
+- what design decisions am I making / questioning?
+- where am I stuck?
+
+Since we last met two weeks ago I've been working on getting the software (makeParallel) to the point where the PEMS example runs completely.
+This means I can just call `makeParallel("pems.R", data = d, platform = p)`, where `d` and `p` are the data and platform descriptions provided by the user.
+
+I've made progress in adding `data` and `platform` into the model.
+Before I was only dealing with the code.
+
+Right now I'm doing a series of actual code transformations, from R code to R code.
+This is nice because we can always run it.
+
+The approach I have in mind is to implement whatever analysis I want to do for one 'canonical' representation of the code, and then transform the code into that canonical form if possible.
+For example, I'm interested in detecting splits based on one column of a data frame.
+All of the following will produce the same split:
+```{r}
+s1 = split(data, data$column)
+s2 = split(data, data[, "column"])
+s3 = split(data, data[["column"]])
+dc = data[, "column"]
+s4 = split(data, dc)
+```
+For my approach I would convert everything to whichever form I found most convenient, and then write the analysis to handle that particular form.
+
+
+## Tasks
+
 Goal: get the PEMS example fully working.
 This means to the point where I can just call `makeParallel("pems.R", data = dd, workers = 10L)`, where `dd` is a data description written by the user.
 
