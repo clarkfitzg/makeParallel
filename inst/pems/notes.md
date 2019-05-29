@@ -1,39 +1,17 @@
 ## Summary
 
-For meeting Duncan and Nick.
-
-- what are the key ideas / abstractions?
-- what design decisions am I making / questioning?
-- where am I stuck?
+For meeting Duncan and Nick on 30 May.
 
 Since we last met two weeks ago I've been working on getting the software (makeParallel) to the point where the PEMS example runs completely.
-This means I can just call `makeParallel("pems.R", data = d, platform = p)`, where `d` and `p` are the data and platform descriptions provided by the user.
-
+This means I can just call `makeParallel("pems.R", data = d, platform = p)`, where `pems.R` is a file with R code, and `d` and `p` are the data and platform descriptions provided by the user.
 I've made progress in adding `data` and `platform` into the model.
 Before I was only dealing with the code.
 
 Right now I'm doing a series of actual code transformations, from R code to R code.
-This is nice because we can always run it.
+It's nice to stay with R expressions, because then we can always run it.
+The approach is to implement whatever analysis or transformation I want to do for one 'standard' representation of the code.
+If the code is not written in that standard way then I'll try to transform it so that it is.
 
-How did I handle this case before when I detected column usage in CodeAnalysis?
-I just evaluated the arguments corresponding that would go in the place of a column name.
-I'm not sure if I handle the case when they're logicals.
-The version I have here is much more conservative.
-I coded a way to detect this particular column selection `data[, c("col1", "col2", ..., "colk")]` by looking for exactly this pattern of subsetting a chunked object `data`, where the column selection is a call to `c` with string literals.
-
-This is a problem because it requires a bunch of code to deal with special cases - everything is a special case.
-
-Later, when I go to expand `[` as a vectorized function, it would be better if this was instead two calls:
-```{r}
-tmp1 = c("col1", "col2", ..., "colk")
-data[, tmp1]
-```
-This is better because it simplifies the logic required to expand vectorized functions.
-It also exposes more parallelism.
-
-
-
-The approach I have in mind is to implement whatever analysis I want to do for one 'canonical' representation of the code, and then transform the code into that canonical form if possible.
 For example, I'm interested in detecting splits based on one column of a data frame.
 All of the following will produce the same split, and are detectable with static analysis:
 ```{r}
@@ -46,11 +24,32 @@ s3 = split(data, data[["column"]])
 dc = data[, "column"]
 s4 = split(data, dc)
 ```
-For my approach I would convert everything to whichever form I found most convenient, and then write the analysis to handle that particular form.
-It's not necessarily straightforward how to do this, because these forms may span multiple lines, as in the last one.
+For this approach I would convert all of these to whichever form I found most convenient, and then call that the "standard form" and write the analysis to handle that particular form.
+It's not necessarily straightforward how to transform all of these into the same form, because these they may span multiple lines, as in the last example.
 
 Ideally this form is the same for all code analysis.
 But it could happen that different forms work better for different purposes.
+
+
+### Challenges
+
+Nested subexpressions are becoming a problem because they require a bunch of code to deal with special cases - everything is a special case.
+For example, to detect which columns in a data frame `data` are used I looked for a call of the form: `data[, c("col1", "col2", ..., "colk")]`, that is, subsetting `data` where the column selection is a call to `c` with string literals.
+
+Later, when I go to expand `[` as a vectorized function, it would be better if this was instead two calls:
+```{r}
+tmp1 = c("col1", "col2", ..., "colk")
+data[, tmp1]
+```
+This is better because it simplifies the logic required to expand vectorized functions.
+It also exposes more parallelism.
+
+
+How did I handle this case before when I detected column usage in CodeAnalysis?
+I just evaluated the arguments corresponding that would go in the place of a column name.
+I'm not sure if I handled the case when they're logicals.
+The version I have here is much more conservative.
+
 
 
 
