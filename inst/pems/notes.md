@@ -35,6 +35,10 @@ But it could happen that different forms work better for different purposes.
 
 Nested subexpressions are becoming a problem because they require a bunch of code to deal with special cases - everything is a special case.
 For example, to detect which columns in a data frame `data` are used I looked for a call of the form: `data[, c("col1", "col2", ..., "colk")]`, that is, subsetting `data` where the column selection is a call to `c` with string literals.
+How did I handle this case before when I detected column usage in CodeAnalysis?
+I just evaluated the arguments that would go in the place of a column name.
+I'm not sure if I handled the case when they're logicals.
+The version I have here is much more conservative.
 
 Later, when I go to expand `[` as a vectorized function, it would be better if this was instead two calls:
 ```{r}
@@ -44,11 +48,13 @@ data[, tmp1]
 This is better because it simplifies the logic required to expand vectorized functions.
 It also exposes more parallelism.
 
-
-How did I handle this case before when I detected column usage in CodeAnalysis?
-I just evaluated the arguments corresponding that would go in the place of a column name.
-I'm not sure if I handled the case when they're logicals.
-The version I have here is much more conservative.
+Here's the issue: there are two things going on here- expanding vectorized statements, and using the task graph to rewrite the code for eager evaluation of subexpressions.
+Handling both of them simultaneously is complicated, when instead they could be handled separately.
+If we rewrite the code for eager evaluation, then we make new but equivalent R code that includes the variable names which we will actually need if we generate task parallel code on sub expressions.
+It's still R code, it's just simpler.
+The task graph becomes simpler too, because all R objects that are nodes will have a symbol associated with them- there won't be any more anonymous ones representing nested subexpressions.
+If we can't unnest a subexpression because of lazy evaluation, then it becomes part of its parent expression anyways.
+Maybe the intermediate forms that we put the code into are an implementation detail, but they are important ones.
 
 
 
