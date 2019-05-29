@@ -15,8 +15,14 @@ Before I was only dealing with the code.
 Right now I'm doing a series of actual code transformations, from R code to R code.
 This is nice because we can always run it.
 
-A problem I'm currently recognizing in the implementation is that I have too much code to deal with special cases.
-I coded a way to detect this particular column selection `data[, c("col1", "col2", ..., "colk")]` by looking for exactly this pattern of a call to `c`.
+How did I handle this case before when I detected column usage in CodeAnalysis?
+I just evaluated the arguments corresponding that would go in the place of a column name.
+I'm not sure if I handle the case when they're logicals.
+The version I have here is much more conservative.
+I coded a way to detect this particular column selection `data[, c("col1", "col2", ..., "colk")]` by looking for exactly this pattern of subsetting a chunked object `data`, where the column selection is a call to `c` with string literals.
+
+This is a problem because it requires a bunch of code to deal with special cases - everything is a special case.
+
 Later, when I go to expand `[` as a vectorized function, it would be better if this was instead two calls:
 ```{r}
 tmp1 = c("col1", "col2", ..., "colk")
@@ -24,6 +30,7 @@ data[, tmp1]
 ```
 This is better because it simplifies the logic required to expand vectorized functions.
 It also exposes more parallelism.
+
 
 
 The approach I have in mind is to implement whatever analysis I want to do for one 'canonical' representation of the code, and then transform the code into that canonical form if possible.
@@ -41,6 +48,9 @@ s4 = split(data, dc)
 ```
 For my approach I would convert everything to whichever form I found most convenient, and then write the analysis to handle that particular form.
 It's not necessarily straightforward how to do this, because these forms may span multiple lines, as in the last one.
+
+Ideally this form is the same for all code analysis.
+But it could happen that different forms work better for different purposes.
 
 
 
@@ -188,6 +198,11 @@ We can call `expandData` recursively, and I think this may lead to a more elegan
 The scheduler takes this new code and arranges it in an efficient way on the workers.
 
 If this is the case then `expandData` needs to keep track of where it is in the code, when and where to insert new statements.
+
+-----------------------------------------------------------------
+
+I'm struggling with nested expressions as I go to implement this.
+We need to go 
 
 
 ## Progress
