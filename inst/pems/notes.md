@@ -15,17 +15,33 @@ Before I was only dealing with the code.
 Right now I'm doing a series of actual code transformations, from R code to R code.
 This is nice because we can always run it.
 
+A problem I'm currently recognizing in the implementation is that I have too much code to deal with special cases.
+I coded a way to detect this particular column selection `data[, c("col1", "col2", ..., "colk")]` by looking for exactly this pattern of a call to `c`.
+Later, when I go to expand `[` as a vectorized function, it would be better if this was instead two calls:
+```{r}
+tmp1 = c("col1", "col2", ..., "colk")
+data[, tmp1]
+```
+This is better because it simplifies the logic required to expand vectorized functions.
+It also exposes more parallelism.
+
+
 The approach I have in mind is to implement whatever analysis I want to do for one 'canonical' representation of the code, and then transform the code into that canonical form if possible.
 For example, I'm interested in detecting splits based on one column of a data frame.
-All of the following will produce the same split:
+All of the following will produce the same split, and are detectable with static analysis:
 ```{r}
 s1 = split(data, data$column)
+
 s2 = split(data, data[, "column"])
+
 s3 = split(data, data[["column"]])
+
 dc = data[, "column"]
 s4 = split(data, dc)
 ```
 For my approach I would convert everything to whichever form I found most convenient, and then write the analysis to handle that particular form.
+It's not necessarily straightforward how to do this, because these forms may span multiple lines, as in the last one.
+
 
 
 ## Tasks
@@ -284,7 +300,6 @@ results = lapply(pems2, npbin)
 We cannot handle this `lapply` as we do other vectorized function calls, because the `lapply` is over the split elements.
 This is a special case that we will have to handle.
 Going into this function the code expander can know that `pems2` is split by a grouping variable.
-
 
 
 
