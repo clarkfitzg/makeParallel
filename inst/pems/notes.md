@@ -325,13 +325,13 @@ Going into this function the code expander can know that `pems2` is split by a g
 ## Two ways to implement vectorized statement expansion
 
 I have two options in mind, and I'm not sure which one is better.
-One way is to create temporary variables, and the other way is to recursively traverse the code.
+One way is to create temporary variables, and the other way is to traverse the task graph.
 
 The core logic of searching for vectorized calls that can be parallel will be the same for both.
 Being chunked or not becomes a property of an R object, a resource.
 
-After writing this I'm seeing that choosing one over the other amounts to analyzing and transforming the code, or the task graph.
-I think it's better to stick closer to analyzing and transforming code, because then it doesn't require that people really understand the task graph.
+Choosing one over the other amounts to analyzing and transforming the code, or the task graph.
+I think it's better to stick closer to the code, because then it doesn't require that a user to really understand the task graph.
 If the graph inference is robust we can always get the graph from the code whenever we like.
 
 
@@ -371,16 +371,17 @@ Cons:
     This isn't too much of an issue, becaue we were going to do this anyways.
 
 
-#### Option 2 - recursion
+#### Option 2 - traversing task graph
 
 The second way is to work our way through the task graph, where nested subexpressions are tasks.
 
 How would we actually implement this?
 First of all it requires the task graph to actually contain the nested subexpressions.
-Mark every node as eligible for expansion or not.
+The problem that I ran into when I tried to implement this was that I didn't actually use the task graph; I used the subexpressions.
+This requires recursion and is pretty clumsy.
 
 The difficult thing is when we actually go to expand the code, we have to keep in mind our position in the graph, where in the graph to insert the nodes, and which edges to update based on these changes.
-With the other way we can simply insert the collects directly in front of the statement we are currently looking at, and then infer the graph again later after we generate the code.
+With the other approach we can simply insert the collects directly in front of the statement we are currently looking at, and then infer the graph again later after we generate the code.
 
 Pros:
 
@@ -389,6 +390,23 @@ Pros:
 Cons:
 
 - Relatively difficult to implement.
+
+
+## Identifying semantically meaningful objects
+
+I've settled on rewriting the code.
+Now I need to detect these two patterns in a more robust way:
+
+```{r}
+tmp1 = pems[, "station"]
+s = split(pems, tmp1)
+
+tmp2 = c("station", "flow2", "occupancy2")
+pems = pems[, tmp2]
+```
+
+A more robust way will assign semantic meaning to each object.
+In the examples above, we start knowing that `pems` is a large, chunked data frame.
 
 
 ## Scratch
