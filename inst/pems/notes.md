@@ -327,6 +327,13 @@ Going into this function the code expander can know that `pems2` is split by a g
 I have two options in mind, and I'm not sure which one is better.
 One way is to create temporary variables, and the other way is to recursively traverse the code.
 
+The core logic of searching for vectorized calls that can be parallel will be the same for both.
+Being chunked or not becomes a property of an R object, a resource.
+
+After writing this I'm seeing that choosing one over the other amounts to analyzing and transforming the code, or the task graph.
+I think it's better to stick closer to analyzing and transforming code, because then it doesn't require that people really understand the task graph.
+If the graph inference is robust we can always get the graph from the code whenever we like.
+
 
 #### Option 1 - creation of temporary variables
 
@@ -336,19 +343,23 @@ For example, for large chunked objects `x` and `y`:
 # Original
 z = 10*x + y
 
-# Create temporary variables
+# Step 1 - Create temporary variables
 tmp = 10*x
 z = tmp + y
 
-# Expand vectorized `*` and `+`
+# Step 2 - Expand vectorized `*` and `+`
 tmp1 = 10*x1
 tmp2 = 10*x2
 z1 = tmp1 + y1
 z2 = tmp2 + y2
 ```
 
+Expanding vectorized statements in this literal sense for `k` chunks of data ties us tightly to having only `k` parallel workers.
+For data that can be split arbitrarily it may be better to mark the statements after Step 1 as those which are vectorized, and save the actual expansion for later, or possibly never even expand.
+
 Pros:
 
+- Works better with everything I already have.
 - Allows us to use relatively simple logic for expanding vectorized function calls.
 - Simplifies the task graph conceptually, because nodes have a one to one correspondence with top level statements in the script after this transformation.
 - Creating temporary variables is necessary to generate code that uses parallelism in subexpressions.
@@ -362,8 +373,22 @@ Cons:
 
 #### Option 2 - recursion
 
-The second way is 
+The second way is to work our way through the task graph, where nested subexpressions are tasks.
 
+How would we actually implement this?
+First of all it requires the task graph to actually contain the nested subexpressions.
+Mark every node as eligible for expansion or not.
+
+The difficult thing is when we actually go to expand the code, we have to keep in mind our position in the graph, where in the graph to insert the nodes, and which edges to update based on these changes.
+With the other way we can simply insert the collects directly in front of the statement we are currently looking at, and then infer the graph again later after we generate the code.
+
+Pros:
+
+- Better suited to a series of task graph transformations.
+
+Cons:
+
+- Relatively difficult to implement.
 
 
 ## Scratch
