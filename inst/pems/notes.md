@@ -52,8 +52,8 @@ Here's the issue: there are two things going on here- expanding vectorized state
 Handling both of them simultaneously is complicated, when instead they could be handled separately.
 If we rewrite the code for eager evaluation, then we make new but equivalent R code that includes the variable names which we will actually need if we generate task parallel code on sub expressions.
 It's still R code, it's just simpler.
-The task graph becomes simpler too, because all R objects that are nodes will have a symbol associated with them- there won't be any more anonymous ones representing nested subexpressions.
-If we can't unnest a subexpression because of lazy evaluation, then it becomes part of its parent expression anyways.
+The task graph becomes simpler too, because all R objects that are nodes and are subexpressions will have a symbol associated with them- there won't be any more anonymous nodes representing nested subexpressions.
+If we can't unnest a subexpression because of lazy evaluation, then it becomes part of its parent expression.
 Maybe the intermediate forms that we put the code into are an implementation detail, but they are important ones.
 
 
@@ -180,7 +180,7 @@ Thinking about doing this as a series of steps now- the next step is to split ap
 This is again the same concept as `expandData`, which suggests an approach where I have a list of expanded variables with the same chunking scheme, and walk over the code, expanding each variable as I go.
 Let's try and describe this a little more precisely.
 
-_Did I write all this somewhere else also? It seems familiar_
+_The following summarizes what I have in `tex/expand_vectorized.tex` in my dissertation repository._
 
 Start with a named list, where the names correspond to variable names, and the values are the mangled names.
 The data description identifies the variable names, so it can populate the list.
@@ -322,7 +322,47 @@ This is a special case that we will have to handle.
 Going into this function the code expander can know that `pems2` is split by a grouping variable.
 
 
+## Two ways to implement vectorized statement expansion
 
+I have two options in mind, and I'm not sure which one is better.
+One way is to create temporary variables, and the other way is to recursively traverse the code.
+
+
+#### Option 1 - creation of temporary variables
+
+The first way is to preprocess the code to take out the nested subexpressions, and insert them as temporary variables.
+For example, for large chunked objects `x` and `y`:
+```{r}
+# Original
+z = 10*x + y
+
+# Create temporary variables
+tmp = 10*x
+z = tmp + y
+
+# Expand vectorized `*` and `+`
+tmp1 = 10*x1
+tmp2 = 10*x2
+z1 = tmp1 + y1
+z2 = tmp2 + y2
+```
+
+Pros:
+
+- Allows us to use relatively simple logic for expanding vectorized function calls.
+- Simplifies the task graph conceptually, because nodes have a one to one correspondence with top level statements in the script after this transformation.
+- Creating temporary variables is necessary to generate code that uses parallelism in subexpressions.
+    That is, we'll have to do something very much like this transformation anyways, so we may as well derive as much benefit from it as we can.
+
+Cons:
+
+- We'll need to insert code to remove the temporary variables.
+    This isn't too much of an issue, becaue we were going to do this anyways.
+
+
+#### Option 2 - recursion
+
+The second way is 
 
 
 
