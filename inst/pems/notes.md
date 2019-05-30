@@ -381,6 +381,7 @@ The problem that I ran into when I tried to implement this was that I didn't act
 This requires recursion and is pretty clumsy.
 
 The difficult thing is when we actually go to expand the code, we have to keep in mind our position in the graph, where in the graph to insert the nodes, and which edges to update based on these changes.
+Thus we need to keep the overall structure of the task graph in mind, and this makes things difficult.
 With the other approach we can simply insert the collects directly in front of the statement we are currently looking at, and then infer the graph again later after we generate the code.
 
 Pros:
@@ -389,7 +390,7 @@ Pros:
 
 Cons:
 
-- Relatively difficult to implement.
+- Complicated, difficult to implement.
 
 
 ## Identifying semantically meaningful objects
@@ -398,15 +399,30 @@ I've settled on rewriting the code.
 Now I need to detect these two patterns in a more robust way:
 
 ```{r}
-tmp1 = pems[, "station"]
-s = split(pems, tmp1)
+tmp1 = c("station", "flow2", "occupancy2")
+pems = pems[, tmp1]
 
-tmp2 = c("station", "flow2", "occupancy2")
-pems = pems[, tmp2]
+tmp2 = pems[, "station"]
+s = split(pems, tmp2)
 ```
 
-A more robust way will assign semantic meaning to each object.
-In the examples above, we start knowing that `pems` is a large, chunked data frame.
+A more robust way to detect the pattern should assign semantic meaning to each object.
+We can infer the semantics much in the same way as we evaluate code.
+If it's going to be extensible then it should allow the user to add more rules, and apply these rules.
+
+In the examples above, the analysis begins knowing that `pems` is a large, chunked data frame.
+Starting with the first line, it recognizes the pattern of `c("station", "flow2", "occupancy2")` as a call to `c` with only literal arguments.
+To do the column selection we need to know the actual value of this object.
+The code analyzer could infer the value, or it could just evaluate it.
+It's generally safe to evaluate a call to `c` with only literal arguments.
+Specifying when evaluation is safe is simpler than specifying the semantics of every single function that we might evaluate, which is what the analyzer would have to do with inference.
+The inference approach would require rules to infer the result every possible combination of literal arguments, for example `c("a", 1)`.
+
+Indeed, the most straightforward and complete way to understand an object is to evaluate the code.
+This makes me think that an analysis based on partial evaluation has some merit.
+
+The analysis now knows the value of `tmp1`, and can proceed to the next call, `pems[, tmp1]`.
+
 
 
 ## Scratch
