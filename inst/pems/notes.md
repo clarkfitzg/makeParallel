@@ -410,19 +410,36 @@ A more robust way to detect the pattern should assign semantic meaning to each o
 We can infer the semantics much in the same way as we evaluate code.
 If it's going to be extensible then it should allow the user to add more rules, and apply these rules.
 
-In the examples above, the analysis begins knowing that `pems` is a large, chunked data frame.
+In the examples above, the analysis begins knowing that `pems` is a large, chunked data frame, because the users provided this information.
 Starting with the first line, it recognizes the pattern of `c("station", "flow2", "occupancy2")` as a call to `c` with only literal arguments.
-To do the column selection we need to know the actual value of this object.
+To infer which columns are used we need to know the actual value of this object.
 The code analyzer could infer the value, or it could just evaluate it.
 It's generally safe to evaluate a call to `c` with only literal arguments.
-Specifying when evaluation is safe is simpler than specifying the semantics of every single function that we might evaluate, which is what the analyzer would have to do with inference.
-The inference approach would require rules to infer the result every possible combination of literal arguments, for example `c("a", 1)`.
+Specifying when evaluation is safe is simpler than specifying the semantics of every single function that we might evaluate.
+In the inference approach we would be specifying the semantics, i.e. rules to infer the result every possible combination of literal arguments, for example `c("a", 1)`.
+This is essentially just (re) implementing a simple evaluator.
 
 Indeed, the most straightforward and complete way to understand an object is to evaluate the code.
 This makes me think that an analysis based on partial evaluation has some merit.
 
-The analysis now knows the value of `tmp1`, and can proceed to the next call, `pems[, tmp1]`.
+The analysis now knows the value of `tmp1`, and can proceed to the next call, `pems = pems[, tmp1]`.
+This is a column selection of the `pems` data object, for known values of the columns.
+We cannot evaluate this call directly, because `pems` is huge.
+All we do is update the columns used.
+It reassigns `pems`, which becomes a new chunked data object with the same name as the old one.
 
+The next line is `tmp2 = pems[, "station"]`.
+This again takes a subset of the pems columns.
+Since the chunks are by rows, `tmp2` will also be a large chunked object with the same chunking scheme as `pems`.
+
+The last line is `s = split(pems, tmp2)`.
+The analysis knows that `pems` and `tmp2` are large chunked objects with the same chunking scheme.
+The data description told the analysis that the chunks of data are already separated by the `station` column of `pems`.
+The argument for the splitting factor is `tmp2`.
+The analysis needs to know that `station` is one of the columns in `tmp2`.
+A natural way to record this seems to propagate the values of the original columns in `pems` through every column selection operation.
+
+We don't have to distinguish between single column splits and multiple column splits, because `split` in R allows a list of factors.
 
 
 ## Scratch
