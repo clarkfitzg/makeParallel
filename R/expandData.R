@@ -38,7 +38,9 @@ function(code, data, platform, ...)
     initialAssignments = mapply(initialAssignmentCode, mangledNames, chunkLoadCode, USE.NAMES = FALSE)
 
     vars = list(expanded = mangledNames
-                , collected = c())
+                , collected = c()
+                , known = c()
+                )
 
     #browser()
 
@@ -104,18 +106,38 @@ expandCollect = function(expr, vars)
         if(0 < length(finds)) var else NULL
     })
     
-    if(0 < length(vars_in_expr)){
-        if(isSimpleAssignCall(expr)){
-            expandVector(expr, vars)
-        } else {
-            # Variable appears in the expression, but the expression is not a simple assign,
-            # so we treat it as a general function call.
-            collectVector(expr, vars)
-        }
+    has_vars = 0 < length(vars_in_expr)
+    simple_assign = isSimpleAssignCall(expr)
+
+    if(has_vars && simple_assign){
+        # Main case of interest when an expression should expanded
+        expandVector(expr, vars)
+    } else if(!has_vars && simple_assign){
+        # Check if it's simple enough to actually evaluate
+        tryLimitedEval(expr, vars)
+    } else if(has_vars && !simple_assign){
+        # Variable appears in the expression, but the expression is not a simple assign,
+        # so we treat it as a general function call.
+        collectVector(expr, vars)
     } else {
-        # No chunked variables appear, don't change it.
+        # Leave it be
         list(vars = vars, expr = expr)
     }
+}
+
+
+tryLimitedEval = function(expr, vars)
+{
+    # it's a simple assignment of the form v = ...
+    rhs = expr[[3L]]
+    # Intentionally keeping this limited for the moment, until we get a more coherent way to do this.
+    if(c_with_literals(rhs)){
+        lhs = expr[[2L]]
+        rhs_value = eval(rhs)
+        # Use the symbol in lhs as a string. Weird, but seems to work.
+        vars[["known"]][[lhs]] = rhs_value
+    }
+    list(vars = vars, expr = expr)
 }
 
 
@@ -309,8 +331,8 @@ function(code, data, platform, ...)
 
 
     # Construct the expressions needed to create the objects
-
-    used_col_string = paste(used, collapse = ",")
+    used_indices = which(used %in% all_columns)
+    used_col_string = paste(used_indices, collapse = ",")
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
     ds = dataSource("pipe", cmd, varname = data@varname)
 

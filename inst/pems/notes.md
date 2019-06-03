@@ -454,14 +454,34 @@ The chunk expansion already propagates the names of the variables that have the 
 The code analysis should be able to attach any other information it likes on top of this.
 The current implementation uses a named list where the element name is the variable name and the value is the names of all the expanded variables.
 We could make this more general and extensible by making the values be lists that contain the names of the columns.
+Then we can add `columns` as a field.
 
 But if we're going to all this trouble then we may as well do the whole 'limited evaluation' approach at this time as well.
 
 
 ## Limited Evaluation
 
-Go through the code and expand the objects that we can.
-Variables that are assigned can be `ChunkedDataVariable`s, simple literals, or unknown.
+Go through the code and expand the objects that can be expanded.
+What exactly happens?
+For every expression the code analyzer starts out with state, a set of variable names that are known.
+The values associated with these variable names can be chunked data objects, simple values (such as `c("a", "b")`), or other things that we don't know about.
+To work for the PEMS use case the code analyzer should look at the expression and determine which columns of the original large data set it uses.
+
+Suppose the code analyzer has the following symbols defined. `x` is a large chunked data object, and `ab = c("a", "b")` is a known simple value.
+Then the line
+```{r}
+y = x[, ab]
+```
+will create a new chunked object `y` which uses columns `a` and `b` from the large chunked object `x`.
+
+
+Inference could happen at this pass also- we can collect the set of all columns that are used.
+Will this lead to a coherent model?
+I'm not sure.
+
+Could I plug into `CodeDepends` for any of this?
+Possibly.
+I need something like the function handlers to keep track of what is used.
 
 
 ## Scratch
