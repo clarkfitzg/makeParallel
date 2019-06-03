@@ -69,7 +69,7 @@ One exception is the data reading code, since we'll generate that.
 
 The first priority is to get the version working that handles data that's already split in the files.
 
-- handle `split(data, data_column)` as a special case when `data` is a chunked object that starts out split by `data_column`.
+- handle `split(data, data_column)` as a special case when `data` is a chunked object that is split based on the values of `data_column`.
     This means we must capture and propagate the semantics of `data_column = data[, "column"]`.
 - partial evaluation mechanism for string literals of the form `tmp1 = c("station", "flow2", "occupancy2")`.
 - X add `[`, `lapply` to list of vectorized functions.
@@ -444,9 +444,24 @@ The analysis knows that `pems` and `tmp2` are large chunked objects with the sam
 The data description told the analysis that the chunks of data are already separated by the `station` column of `pems`.
 The argument for the splitting factor is `tmp2`.
 The analysis needs to know that `station` is one of the columns in `tmp2`.
-A natural way to record this seems to propagate the values of the original columns in `pems` through every column selection operation.
+Thus it needs to know semantically what `tmp2` actually contains.
 
+Side note:
 We don't have to distinguish between single column splits and multiple column splits, because `split` in R allows a list of factors.
+
+How will the analysis propagate the semantics of which columns a chunked object contains?
+The chunk expansion already propagates the names of the variables that have the same chunking scheme.
+The code analysis should be able to attach any other information it likes on top of this.
+The current implementation uses a named list where the element name is the variable name and the value is the names of all the expanded variables.
+We could make this more general and extensible by making the values be lists that contain the names of the columns.
+
+But if we're going to all this trouble then we may as well do the whole 'limited evaluation' approach at this time as well.
+
+
+## Limited Evaluation
+
+Go through the code and expand the objects that we can.
+Variables that are assigned can be `ChunkedDataVariable`s, simple literals, or unknown.
 
 
 ## Scratch
