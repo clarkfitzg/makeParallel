@@ -69,18 +69,9 @@ One exception is the data reading code, since we'll generate that.
 
 The first priority is to get the version working that handles data that's already split in the files.
 
-- handle `split(data, data$column)` as a special case when `data` is a chunked object that is split by column.
-- Transform the code 
-```{r}
-# Before:
-pems = pems[, c("station", "flow2", "occupancy2")]
-
-# After
-tmp1 = c("station", "flow2", "occupancy2")
-pems = pems[, tmp1]
-```
-This will make the call to `[` simple.
-_Ah, but what's this going to break with how I did the column use inference?_
+- handle `split(data, data_column)` as a special case when `data` is a chunked object that starts out split by `data_column`.
+    This means we must capture and propagate the semantics of `data_column = data[, "column"]`.
+- partial evaluation mechanism for string literals of the form `tmp1 = c("station", "flow2", "occupancy2")`.
 - X add `[`, `lapply` to list of vectorized functions.
 - X expand the code into one statement per group based on the data description.
 - X generate calls that read in the data and do column selection at the source.
@@ -93,6 +84,17 @@ Second priorities:
 - recursively detect function calls that are used, so we can ship all the necessary functions to the workers (code analysis)
 - implement re-grouping operation, aka shuffle.
 - remove variables after we are done using them.
+- Transform the code 
+```{r}
+# Before:
+pems = pems[, c("station", "flow2", "occupancy2")]
+
+# After
+tmp1 = c("station", "flow2", "occupancy2")
+pems = pems[, tmp1]
+```
+This will make the call to `[` simple.
+
 
 
 ## Data Description 1
@@ -383,7 +385,9 @@ The task graph must actually contain the nested subexpressions.
 The current version of the task graph does not contain nested subexpressions, so I used recursion into the subexpressions.
 This was clumsy at best.
 
-The difficult thing is when we actually go to expand the code, we have to keep in mind our position in the graph, where in the graph to insert the nodes, and which edges to update based on these changes.
+The difficult thing is when we actually go to expand the code, we have to keep in mind our position in the graph, where in the graph to insert the nodes, and which edges in the graph to update based on these changes.
+I've written more about all this in `clarkfitzthesis/tex/expand_vectorized.tex`.
+
 Thus we need to keep the overall structure of the task graph in mind, and this makes things difficult.
 With the other approach we can simply insert the collects directly in front of the statement we are currently looking at, and then infer the graph again later after we generate the code.
 
