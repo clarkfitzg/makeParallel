@@ -294,6 +294,8 @@ pems2_2 = split(pems_2, pems_2$station)
 
 results_1 = lapply(pems2_1, npbin)
 results_2 = lapply(pems2_2, npbin)
+
+results = c(results_1, results_2)
 ```
 
 This approach seems to leave the code in a more complicated state than is necessary, but it has a number of benefits.
@@ -363,7 +365,8 @@ Pros:
 - Allows us to use relatively simple logic for expanding vectorized function calls.
 - Simplifies the task graph conceptually, because nodes have a one to one correspondence with top level statements in the script after this transformation.
 - Creating temporary variables is necessary to generate code that uses parallelism in subexpressions.
-    That is, we'll have to do something very much like this transformation anyways, so we may as well derive as much benefit from it as we can.
+    An example is sending one intermediate result from one worker to two other workers.
+    If we'll have to do something very much like this transformation anyways, then we may as well derive as much benefit from it as we can.
 
 Cons:
 
@@ -373,12 +376,12 @@ Cons:
 
 #### Option 2 - traversing task graph
 
-The second way is to work our way through the task graph, where nested subexpressions are tasks.
+The second way to expand vectorized statements is to work our way through the task graph, where nested subexpressions are tasks.
 
 How would we actually implement this?
-First of all it requires the task graph to actually contain the nested subexpressions.
-The problem that I ran into when I tried to implement this was that I didn't actually use the task graph; I used the subexpressions.
-This requires recursion and is pretty clumsy.
+The task graph must actually contain the nested subexpressions.
+The current version of the task graph does not contain nested subexpressions, so I used recursion into the subexpressions.
+This was clumsy at best.
 
 The difficult thing is when we actually go to expand the code, we have to keep in mind our position in the graph, where in the graph to insert the nodes, and which edges to update based on these changes.
 Thus we need to keep the overall structure of the task graph in mind, and this makes things difficult.
