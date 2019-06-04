@@ -483,6 +483,19 @@ Could I plug into `CodeDepends` for any of this?
 Possibly.
 I need something like the function handlers to keep track of what is used.
 
+------------------------------------------------------------
+
+A current problem with the implementation is that I'm representing the data description in several forms.
+I care about which columns the data contain at each step in the code, and whether the data is split based on one of these columns.
+Sometimes it's a slot in a class, sometimes it's in a list, and now sometimes it's tacked on as an attribute.
+I need to consolidate these into one representation, so I can use the model of limited evaluation.
+We may as well use the S4 class representation, to stick to one.
+
+In the limited evaluation model we have variables that we know things about, and we have a single expression.
+The variables can be chunked data objects, known simple values, or they can be things we know nothing about.
+We can use the same `expandData` generic, just add a signature for a `call` and `list` argument.
+The `call` is simply one statement, and the `list` is a list of current variables that we know about.
+
 
 ## Scratch
 
