@@ -3,7 +3,9 @@
 setMethod("dataSource", signature(expr = "expression", args = "missing"),
 function(expr, args, ...)
 {
-    ExprChunkData(expr = expr, ...)
+    splitColumn = list(...)[["splitColumn"]]
+    if(is.null(splitColumn)) splitColumn = as.character(NA)
+    ExprChunkData(expr = expr, splitColumn = splitColumn, ...)
 })
 
 
@@ -17,5 +19,5 @@ function(expr, args, ...)
     # build up the calls to load every chunk
     chunk_expr = lapply(args, function(args) do.call(call, list(func_name, args)))
 
-    ExprChunkData(expr = as.expression(chunk_expr), ...)
+    CallGeneric(expr = as.expression(chunk_expr), ...)
 })

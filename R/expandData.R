@@ -7,7 +7,7 @@
 # - Identify which arguments they are vectorized in
 # I'm using this variable as a list of all known vectorized functions.
 # It would be better to infer these.
-vectorfuncs = c("*", "lapply", "[")
+vectorfuncs = c("*", "lapply", "[", "split")
 
 
 
@@ -173,10 +173,11 @@ expandVector = function(expr, vars)
             # A single string literal
             col_arg
         } else if(is.symbol(col_arg)){
-            # Relying on the NULL to come through if it's not here.
+            # List will return NULL if it isn't here.
             vars$known[[col_arg]]
         }
     }
+    # tack this and the split by column on as attributes.
     attr(vars$expanded[[lhs]], "columns") = col_attr
 
     names_to_expand = c(names_to_expand, lhs)
@@ -353,7 +354,7 @@ function(code, data, platform, ...)
     used_indices = which(used %in% all_columns)
     used_col_string = paste(used_indices, collapse = ",")
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
-    ds = dataSource("pipe", cmd, varname = data@varname)
+    ds = dataSource("pipe", cmd, varname = data@varname, splitColumn = data@splitColumn)
 
     callGeneric(code, ds, platform)
 })

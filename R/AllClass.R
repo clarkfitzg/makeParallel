@@ -72,6 +72,7 @@ UnixPlatform = setClass("UnixPlatform",
 # Data Descriptions
 ############################################################
 
+# TODO: Make this into a table data source
 
 #' Base Class for Data Descriptions
 #'
@@ -80,7 +81,7 @@ UnixPlatform = setClass("UnixPlatform",
 #' @export
 #' @slot varname character variable name in the original code
 DataSource = setClass("DataSource"
-    , slots = c(varname = "character")
+    , slots = c(varname = "character", splitColumn = "character")
     )
 
 
@@ -94,6 +95,7 @@ ExprChunkData = setClass("ExprChunkData",
     , slots = c(expr = "expression")
     , contains = "DataSource"
     )
+
 
 
 # #' Description of Data Files
