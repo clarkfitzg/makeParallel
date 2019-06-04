@@ -22,18 +22,9 @@ function(code, data, platform, ...)
 {
     # This is the method that actually walks the code and expands every statement.
     # data is a named list. The names are the names of the variables we expect to see in the code.
-    # The values are either inherit from DataSource or they are known simple values.
+    # The values either inherit from DataSource or they are known simple values.
 
     if(length(data) == 0) return(code)
-
-    varnames = names(dataLoadExpr)
-    if(is.null(varnames)){
-        names(dataLoadExpr) = sapply(dataLoadExpr, slot, "varname")
-    } else {
-        message("Using list names as variable names.")
-        for(i in seq_along(varnames))
-            dataLoadExpr[[i]]@varname = varnames[i]
-    }
 
     mangledNames = lapply(dataLoadExpr, appendNumber)
     chunkLoadCode = lapply(dataLoadExpr, slot, "expr")
