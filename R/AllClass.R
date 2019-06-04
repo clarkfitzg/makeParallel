@@ -94,8 +94,17 @@ DataSource = setClass("DataSource"
 #' @slot columns names of the columns
 #' @slot splitColumn name of the columns by which the data is split.
 #'      \code{NA} means no split.
+#' @slot mangledNames names of each chunk of data
+#' @slot collector name of a function to call to collect all the chunks into one object
+#' @slot expanded for internal use with \code{expandData}
 TableChunkData = setClass("TableChunkData",
-    , slots = c(expr = "expression", columns = "character", splitColumn = "character")
+    , slots = c(expr = "expression"
+                , columns = "character"
+                , splitColumn = "character"
+                , mangledNames = "character"
+                , collector = "character"
+                , expanded = "logical"
+                )
     , contains = "DataSource"
     )
 

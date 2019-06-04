@@ -10,7 +10,6 @@
 vectorfuncs = c("*", "lapply", "[", "split")
 
 
-
 #' Expand Data Description
 #'
 #' Insert the chunked data loading calls directly into the code, expand vectorized function calls,
@@ -21,36 +20,20 @@ setMethod("expandData", signature(code = "expression", data = "list", platform =
 function(code, data, platform, ...)
 {
     # This is the method that actually walks the code and expands every statement.
+    # Thus this is where the 'partial evaluation' happens.
     # data is a named list. The names are the names of the variables we expect to see in the code.
     # The values either inherit from DataSource or they are known simple values.
 
     if(length(data) == 0) return(code)
 
-    mangledNames = lapply(dataLoadExpr, appendNumber)
-    chunkLoadCode = lapply(dataLoadExpr, slot, "expr")
+    out = expression()
 
-    initialAssignments = mapply(initialAssignmentCode, mangledNames, chunkLoadCode, USE.NAMES = FALSE)
-
-    vars = list(expanded = mangledNames
-                , collected = c()
-                , known = c()
-                )
-
-    #browser()
-
-    newExpressions = vector(mode = "list", length = length(code))
-
-    for(i in seq_along(code)){
-        expr = code[[i]]
-        tmp = expandCollect(expr, vars)
-        vars = tmp$vars
-        newExpressions[[i]] = tmp$expr
+    for(statement in code){
+        newCode = expandData(code, data, platform, ...)
+        data = expandVars(statement, data)
+        out = c(out, newCode)
     }
-
-    newCode = do.call("c", newExpressions, quote = TRUE)
-
-    completeCode = c(initialAssignments, newCode)
-    completeCode
+    out
 })
 
 

@@ -489,12 +489,13 @@ A current problem with the implementation is that I'm representing the data desc
 I care about which columns the data contain at each step in the code, and whether the data is split based on one of these columns.
 Sometimes it's a slot in a class, sometimes it's in a list, and now sometimes it's tacked on as an attribute.
 I need to consolidate these into one representation, so I can use the model of limited evaluation.
-We may as well use the S4 class representation, to stick to one.
+We may as well stick with the S4 class representation, as most of the rest of the package uses S4.
 
-In the limited evaluation model we have variables that we know things about, and we have a single expression.
+In the limited evaluation model we analyze one expression at a time, given variables that we know things about.
 The variables can be chunked data objects, known simple values, or they can be things we know nothing about.
 We can use the same `expandData` generic, just add a signature for a `call` and `list` argument.
 The `call` is simply one statement, and the `list` is a list of current variables that we know about.
+
 
 
 ## Scratch
