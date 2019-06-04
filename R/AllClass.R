@@ -72,7 +72,6 @@ UnixPlatform = setClass("UnixPlatform",
 # Data Descriptions
 ############################################################
 
-# TODO: Make this into a table data source
 
 #' Base Class for Data Descriptions
 #'
@@ -81,7 +80,7 @@ UnixPlatform = setClass("UnixPlatform",
 #' @export
 #' @slot varname character variable name in the original code
 DataSource = setClass("DataSource"
-    , slots = c(varname = "character", splitColumn = "character")
+    , slots = c(varname = "character")
     )
 
 
@@ -90,32 +89,16 @@ DataSource = setClass("DataSource"
 #' Contains information necessary to load chunks of data into an R session.
 #'
 #' @export
-#' @slot expr expression such that evaluating \code{expr[[i]]} produces the ith chunk of data
-ExprChunkData = setClass("ExprChunkData",
-    , slots = c(expr = "expression")
+#' @slot expr expression such that evaluating \code{expr[[i]]} produces the ith chunk of data.
+#'      Requires evaluating parent expressions first.
+#' @slot columns names of the columns
+#' @slot splitColumn name of the columns by which the data is split.
+#'      \code{NA} means no split.
+TableChunkData = setClass("TableChunkData",
+    , slots = c(expr = "expression", columns = "character", splitColumn = "character")
     , contains = "DataSource"
     )
 
-
-
-# #' Description of Data Files
-# #'
-# #' Contains information necessary to generate a call to read in these data files
-# #'
-# #' @export
-# #' @slot files absolute paths to all the files
-# #' @slot format format of the input files
-# #' @slot Rclass class of the data object in R, for example, \code{"data.frame"}
-# #' @slot varname expected variable name in the code
-# #' @slot details list of details to help efficiently and correctly read in the data
-# DataFiles = setClass("DataFiles",
-#     slots = c(files = "character"
-#               , format = "character"
-#               , Rclass = "character"
-#               , varname = "character"
-#               , details = "list"
-#     ))
-# 
 
 #' Description of Data Files
 #'
@@ -123,10 +106,10 @@ ExprChunkData = setClass("ExprChunkData",
 #'
 #' @export
 #' @slot files absolute paths to all the files
-#' @slot details list of details to help efficiently and correctly read in the data
-TextTableFiles = setClass("TextTableFiles"
-    , slots = c(files = "character", details = "list")
-    , contains = "DataSource"
+#' @slot readDetails list of details to help efficiently and correctly read in the data
+TextTableFiles = setClass("TableChunkData"
+    , slots = c(files = "character", readDetails = "list")
+    , contains = "TableChunkData"
 )
  
 

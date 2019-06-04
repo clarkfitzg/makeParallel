@@ -20,13 +20,11 @@ vectorfuncs = c("*", "lapply", "[", "split")
 setMethod("expandData", signature(code = "expression", data = "list", platform = "ANY"),
 function(code, data, platform, ...)
 {
-    dataLoadExpr = data
-    if(length(dataLoadExpr) == 0) return(code)
+    # This is the method that actually walks the code and expands every statement.
+    # data is a named list. The names are the names of the variables we expect to see in the code.
+    # The values are either inherit from DataSource or they are known simple values.
 
-    # TODO: It probably makes more sense to loop and dispatch on every one of these arguments,
-    # rather than assuming it is a list of chunkedData objects.
-    # This particular method may still be useful though-
-    # we need a class for a list of data objects that are chunked in the same way.
+    if(length(data) == 0) return(code)
 
     varnames = names(dataLoadExpr)
     if(is.null(varnames)){
