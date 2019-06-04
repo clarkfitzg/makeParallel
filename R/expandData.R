@@ -1,9 +1,14 @@
 # TODO:
+# This code doesn't robustly handle reassignments into the same variable.
+
+
+# TODO:
 # - Make user extensible
 # - Identify which arguments they are vectorized in
 # I'm using this variable as a list of all known vectorized functions.
 # It would be better to infer these.
 vectorfuncs = c("*", "lapply", "[")
+
 
 
 #' Expand Data Description
@@ -150,6 +155,7 @@ expandVector = function(expr, vars)
         return(collectVector(expr, vars))
     }
 
+    # TODO: Check which arguments it's actually vectorized in.
     function_args = as.character(rhs[-1])
     names_to_expand = intersect(names(vars$expanded), function_args)
 
@@ -159,6 +165,19 @@ expandVector = function(expr, vars)
     # TODO: Check that the variables have the same number of chunks.
     n = length(vars$expanded[[names_to_expand[1]]])
     vars$expanded[[lhs]] = appendNumber(basename = lhs, n = n)
+
+    # Hardcoding `[` as a special case, but it would be better to generalize this as in CodeDepends function handlers.
+    col_attr = if(function_name == "["){
+        col_arg = rhs[[4L]]
+        if(is.character(col_arg)){
+            # A single string literal
+            col_arg
+        } else if(is.symbol(col_arg)){
+            # Relying on the NULL to come through if it's not here.
+            vars$known[[col_arg]]
+        }
+    }
+    attr(vars$expanded[[lhs]], "columns") = col_attr
 
     names_to_expand = c(names_to_expand, lhs)
 
