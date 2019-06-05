@@ -1,11 +1,11 @@
 # Description of what's happening here is currently in inst/pems/notes.md under heading "implementation"
 
 
+# I'm using this variable as a list of all known vectorized functions.
+# It would be better to infer these.
 # TODO:
 # - Make user extensible
 # - Identify which arguments they are vectorized in
-# I'm using this variable as a list of all known vectorized functions.
-# It would be better to infer these.
 vectorfuncs = c("*", "lapply", "[", "split")
 
 
@@ -40,12 +40,31 @@ function(code, data, platform, ...)
 })
 
 
-setMethod("expandData", signature(code = "AssignmentOneFunction", data = "list", platform = "ANY"),
+setMethod("expandData", signature(code = "AssignmentOneVectorFunction", data = "list", platform = "ANY"),
 function(code, data, platform, ...)
 {
+    globals = data
+    new_code = 
+    list(code = new_code, globals = globals)
 }
 
 
+setMethod("expandData", signature(code = "KnownAssignment", data = "list", platform = "ANY"),
+function(code, data, platform, ...)
+{
+    globals = data
+    new_code = 
+    list(code = new_code, globals = globals)
+}
+
+
+setMethod("expandData", signature(code = "Statement", data = "list", platform = "ANY"),
+function(code, data, platform, ...)
+{
+    globals = data
+    new_code = 
+    list(code = new_code, globals = globals)
+}
 
 
 # This produces one of the following:

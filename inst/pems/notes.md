@@ -521,7 +521,7 @@ How does all the expansion based on the data work?
       - the names of the columns that this table contains
       - whether the object has already been collected
 - globals: named list representing the objects in the global environment that we care about during partial evaluation, which is a subset of all globals the script defines.
-      Values are either TableChunkData or actual simple literal values.
+      Values have class either `TableChunkData` or `KnownStatement`.
 
 
 #### Algorithm
@@ -537,7 +537,7 @@ This first implementation handles each statement in one of three possible ways:
       The algorithm collects any expanded variables that appear in the statement, and marks them in the globals as collected.
       It's natural to do both of these tasks in the same step.
 
-In every case the algorithm produces new code and updates the globals.
+In every case the algorithm may potentially update the globals.
 The new code gets appended to the existing code.
 
 

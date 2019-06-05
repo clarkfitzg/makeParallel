@@ -226,24 +226,40 @@ GeneratedCode = function(schedule, code)
 #'
 #' Scripts consist of many such statements
 #'
-#' @slot statement the language object that is the statement
+#' @slot statement language object that is the statement
 Statement = setClass("Statement", slots = c(statement = "language"))
 
 
-#' A 
-KnownStatement = setClass("KnownStatement", slots = c(value = "ANY")
+#' Assignment
+#'
+#' @slot lhs name of the variable to be assigned
+Assignment = setClass("Assignment", slots = c(lhs = "character")
     , contains = "Statement"
 )
 
-# It would be more elegant to have coercion methods between this class and individual statements,
-# but I'd rather not build such tools here.
+
+#' Simple Statement With Known Value
+#'
+#' @slot value the value that the lhs will be bound to
+KnownAssignment = setClass("KnownAssignment", slots = c(value = "ANY")
+    , contains = "Assignment"
+)
+
+
+#' Assignment From Single Vectorized Function
+#'
+#' @slot functionName name of the function that's called
+#' @slot args arguments to the function
 AssignmentOneVectorFunction = setClass("AssignmentOneVectorFunction",
-    slots = c(lhs = "character"
-              , functionName = "character"
+    slots = c(functionName = "character"
               , args = "list"
               )
-    , contains = "Statement"
+    , contains = "Assignment"
 )
+
+
+# It would be more elegant to have coercion methods between this class and individual statements,
+# but I'd rather not build such tools here.
 
 
 setAs("Statement", "expression", function(from) as.expression(from@statement))
