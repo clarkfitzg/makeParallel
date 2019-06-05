@@ -1,31 +1,4 @@
-# How does all the expansion based on the data work?
-#
-# Objects 
-#
-# - TableChunkData: Contain all the information about the data chunks, in particular:
-#       - variable name from the original code
-#       - expanded variable names, that is, the names of every chunk after name mangling
-#       - the names of the columns that this table contains
-#       - whether the object has already been collected
-# - globals: named list representing the objects in the global environment that we care about during partial evaluation, which is a subset of all globals the script defines.
-#       Values are either TableChunkData or actual simple literal values.
-#
-#
-# Algorithm
-#
-# The expansion algorithm can be thought of as partial evaluation.
-# It works one statement at a time, ignoring control flow and conditional statements for the moment.
-# This first implementation handles each statement in one of three possible ways:
-#
-# 1. If a statement is a call to a vectorized function, say `y = 2 * x`, and any of the vectorized arguments are chunked data objects, then the algorithm infers a new chunked data object from this statement, supplementing it with information from the globals.
-#       It inserts this object into the globals.
-# 2. If a statement is a simple literal call, say `ab = c("alpha", "bravo")`, then the algorithm evaluates it, and inserts the resulting object into the globals.
-# 3. Otherwise, the statement is unknown.
-#       The algorithm collects any expanded variables that appear in the statement, and marks them in the globals as collected.
-#       It's natural to do both of these tasks in the same step.
-#
-# In every case the algorithm produces new code and updates the globals.
-# The new code gets appended to the existing code.
+# Description of what's happening here is currently in inst/pems/notes.md under heading "implementation"
 
 
 # TODO:
@@ -49,15 +22,30 @@ function(code, data, platform, ...)
 
     out = expression()
 
-    # The statements are the elements of an expression.
+    # The statements start out as the elements of an expression.
     for(statement in code){
-        statement = tryInferStatementClass(statement)
-        newCode = callGeneric(statement, globals, platform, ...)
-        globals = updateGlobals(newCode, globals)
-        out = c(out, as(newCode, "expression"))
+
+        # Which of the three cases are we in?
+        statement = inferStatementClass(statement, globals)
+
+        # Dispatch to the appropriate case
+        code_with_globals = callGeneric(statement, globals, platform, ...)
+
+        # Record the updates
+        globals = var_updates[["globals"]]
+        new_code = as(code_with_globals[["code"]], "expression")
+        out = c(out, new_code)
     }
     out
 })
+
+
+setMethod("expandData", signature(code = "AssignmentOneFunction", data = "list", platform = "ANY"),
+function(code, data, platform, ...)
+{
+}
+
+
 
 
 # This produces one of the following:

@@ -221,20 +221,29 @@ GeneratedCode = function(schedule, code)
 ############################################################
 # I would prefer to get these from another package, i.e. CodeDepends or rstatic
 
+
+#' Single Top Level Statement
+#'
+#' Scripts consist of many such statements
+#'
+#' @slot statement the language object that is the statement
 Statement = setClass("Statement", slots = c(statement = "language"))
 
+
+#' A 
 KnownStatement = setClass("KnownStatement", slots = c(value = "ANY")
     , contains = "Statement"
 )
 
 # It would be more elegant to have coercion methods between this class and individual statements,
 # but I'd rather not build such tools here.
-AssignmentOneFunction = setClass("AssignmentOneFunction",
+AssignmentOneVectorFunction = setClass("AssignmentOneVectorFunction",
     slots = c(lhs = "character"
               , functionName = "character"
               , args = "list"
               )
     , contains = "Statement"
 )
+
 
 setAs("Statement", "expression", function(from) as.expression(from@statement))

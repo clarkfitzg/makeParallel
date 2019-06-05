@@ -509,6 +509,38 @@ What's fouling me up?
 I'm trying to be too clever forcing everything to dispatch on this `expandData` method and using `callGeneric`.
 
 
+## Implementation
+
+How does all the expansion based on the data work?
+
+#### Objects 
+
+- TableChunkData: Contain all the information about the data chunks, in particular:
+      - variable name from the original code
+      - expanded variable names, that is, the names of every chunk after name mangling
+      - the names of the columns that this table contains
+      - whether the object has already been collected
+- globals: named list representing the objects in the global environment that we care about during partial evaluation, which is a subset of all globals the script defines.
+      Values are either TableChunkData or actual simple literal values.
+
+
+#### Algorithm
+
+The expansion algorithm can be thought of as partial evaluation.
+It works one statement at a time, ignoring control flow and conditional statements for the moment.
+This first implementation handles each statement in one of three possible ways:
+
+1. If a statement is a call to a vectorized function, say `y = 2 * x`, and any of the vectorized arguments are chunked data objects, then the algorithm infers a new chunked data object from this statement, supplementing it with information from the globals.
+      It inserts this object into the globals.
+2. If a statement is a simple literal call, say `ab = c("alpha", "bravo")`, then the algorithm evaluates it, and inserts the resulting object into the globals.
+3. Otherwise, the statement is unknown.
+      The algorithm collects any expanded variables that appear in the statement, and marks them in the globals as collected.
+      It's natural to do both of these tasks in the same step.
+
+In every case the algorithm produces new code and updates the globals.
+The new code gets appended to the existing code.
+
+
 ## Scratch
 
 Injecting the data loading code could definitely benefit from method dispatch.
