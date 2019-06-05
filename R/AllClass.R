@@ -216,3 +216,14 @@ GeneratedCode = function(schedule, code)
     new("GeneratedCode", schedule = schedule, code = code
         , file = as.character(NA))
 }
+
+
+# Helpers
+############################################################
+# I would prefer to get these from another package, i.e. rstatic
+
+AssignmentOneFunction = setClass("AssignmentOneFunction",
+    slots = c(lhs = "character"
+              , function = "character"
+              , args = "list"
+))

@@ -23,6 +23,7 @@ function(code, data, platform, ...)
     out = expression()
 
     for(statement in code){
+        statement = tryInferStatementClass(statement)
         newCode = callGeneric(statement, data, platform, ...)
         data = expandVars(statement, data)
         out = c(out, newCode)
@@ -31,13 +32,11 @@ function(code, data, platform, ...)
 })
 
 
-# I may want to use a class here for simpleAssignment, meaning no nested function calls.
-setMethod("expandData", signature(code = "=", data = "list", platform = "ANY"),
+setMethod("expandData", signature(code = "AssignmentOneFunction", data = "list", platform = "ANY"),
 function(code, data, platform, ...)
 {
     # Insert the chunked data loading calls directly into the code, expand vectorized function calls,
     # and collect variables before calling non vectorized function calls.
-    info = CodeDepends::getInputs(expr)
 
 }
 
@@ -240,6 +239,21 @@ isSimpleAssignCall = function(expr)
         }
     }
     result
+}
+
+
+# Attempt to turn a single statement into a more formal class
+tryInferStatementClass = function(statement)
+{
+    # TODO: Expand this to handle more cases.
+    if(isSimpleAssignCall(statement)){
+        AssignmentOneFunction(lhs = as.character(statement[[2]])
+                , function = as.character(statement[[c(3, 1)]])
+                , args = as.list(statement[[3]][-1])
+                )
+    } else {
+        statement
+    }
 }
 
 
