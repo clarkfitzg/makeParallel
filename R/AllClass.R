@@ -224,7 +224,9 @@ GeneratedCode = function(schedule, code)
 
 #' Single Top Level Statement
 #'
-#' Scripts consist of many such statements
+#' Scripts consist of many such statements.
+#' This class is necessary to help out with method dispatch in \code{expandData}.
+#' We would use expression, but there's already a method for that.
 #'
 #' @slot statement language object that is the statement
 Statement = setClass("Statement", slots = c(statement = "language"))

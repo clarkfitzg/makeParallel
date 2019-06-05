@@ -6,7 +6,7 @@
 # TODO:
 # - Make user extensible
 # - Identify which arguments they are vectorized in
-vectorfuncs = c("*", "lapply", "[", "split")
+.vectorFuncs = c("*", "lapply", "[", "split")
 
 
 setMethod("expandData", signature(code = "expression", data = "list", platform = "ANY"),
@@ -18,15 +18,19 @@ function(code, data, platform, ...)
     # data is a named list. The names are the names of the variables we expect to see in the code.
     # The values either inherit from DataSource or they are known simple values.
 
+    # There's no external chunked data objects, so nothing to do.
     if(length(globals) == 0) return(code)
 
-    out = expression()
+    # The initial expressions in the generated code will be the data loading calls.
+    # At this point all the data values are TableChunkData objects
+    out = lapply(globals, slot, "expr")
+    out = do.call(c, out)
 
-    # The statements start out as the elements of an expression.
+    # Iterate over the actual data analysis code.
     for(statement in code){
 
         # Which of the three cases are we in?
-        statement = inferStatementClass(statement, globals)
+        statement = toStatementClass(statement, globals)
 
         # Dispatch to the appropriate case
         code_with_globals = callGeneric(statement, globals, platform, ...)
@@ -38,6 +42,54 @@ function(code, data, platform, ...)
     }
     out
 })
+
+
+# Convert a statement into a formal class
+toStatementClass = function(statement, globals)
+{
+    # TODO: Expand this to handle more cases.
+
+    # No particular reason for checking in this order
+    if(canConvertKnownAssignment(statement, globals)) {
+        rhs = statement[[3L]]
+        KnownAssignment(
+            statement = statement
+            , lhs = as.character(statement[[2]])
+            , value = eval(rhs, envir = globals)
+            )
+    } else if(canConvertAssignmentOneVectorFunction(statement, globals)) {
+        convertAssignmentOneVectorFunction(statement, globals)
+    } else {
+        Statement(statement = statement)
+    }
+}
+
+
+canConvertKnownAssignment = function(statement, globals) {
+    if(!isSimpleAssignCall(statement)) return(FALSE)
+
+    # TODO: Handle symbols that are known values in globals.
+    # Intentionally keeping this limited for the moment, until we get a more coherent way to do this.
+    rhs = statement[[3L]]
+    if(c_with_literals(rhs)) TRUE else FALSE
+}
+
+
+canConvertAssignmentOneVectorFunction(statement, globals, vectorFuncs = .vectorFuncs){
+    if(!isSimpleAssignCall(statement)) return(FALSE)
+
+    rhs = statement[[3L]]
+    fname = as.character(statement[[1L]])
+    if(!(fname %in% vectorFuncs)) return(FALSE)
+
+    args = rhs[-1L]
+    symbols = sapply(args, is.symbol)
+    symbols = as.character(args[symbols])
+
+    ds = sapply(globals, is, "DataSource")
+    ds_names = names(globals[ds])
+    if(any(symbols) %in% ds_names) TRUE else FALSE
+}
 
 
 setMethod("expandData", signature(code = "AssignmentOneVectorFunction", data = "list", platform = "ANY"),
@@ -302,20 +354,6 @@ isSimpleAssignCall = function(expr)
 }
 
 
-# Attempt to turn a single statement into a more formal class
-tryInferStatementClass = function(statement)
-{
-    # TODO: Expand this to handle more cases.
-    if(isSimpleAssignCall(statement)){
-        AssignmentOneFunction(lhs = as.character(statement[[2]])
-                , function = as.character(statement[[c(3, 1)]])
-                , args = as.list(statement[[3]][-1])
-                , statement = statement
-                )
-    } else {
-        statement
-    }
-}
 
 
 if(FALSE){
