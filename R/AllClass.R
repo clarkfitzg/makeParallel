@@ -7,7 +7,6 @@
 # setOldClass("expression")
 
 setOldClass("igraph")
-setOldClass("=")
 
 
 
@@ -222,8 +221,11 @@ GeneratedCode = function(schedule, code)
 ############################################################
 # I would prefer to get these from another package, i.e. rstatic
 
+# It would be more elegant to have coercion methods between this class and individual statements,
+# but I'd rather not build such tools here.
 AssignmentOneFunction = setClass("AssignmentOneFunction",
     slots = c(lhs = "character"
-              , function = "character"
+              , functionName = "character"
               , args = "list"
+              , statement = "language"
 ))

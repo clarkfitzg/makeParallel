@@ -22,10 +22,11 @@ function(code, data, platform, ...)
 
     out = expression()
 
+    # The statements are the elements of an expression.
     for(statement in code){
         statement = tryInferStatementClass(statement)
         newCode = callGeneric(statement, data, platform, ...)
-        data = expandVars(statement, data)
+        data = updateDataList(statement, data)
         out = c(out, newCode)
     }
     out
@@ -37,7 +38,59 @@ function(code, data, platform, ...)
 {
     # Insert the chunked data loading calls directly into the code, expand vectorized function calls,
     # and collect variables before calling non vectorized function calls.
+    functionName = code@functionName
 
+    if(!functionName %in% vectorfuncs){
+        return(collectVector(code@statement, data))
+    }
+
+    # TODO: Check which arguments it's actually vectorized in.
+    function_args = as.character(rhs[-1])
+    names_to_expand = intersect(names(vars$expanded), function_args)
+
+
+
+}
+
+# Take a single vectorized call and expand it into many calls.
+expandVector = function(expr, vars)
+{
+    rhs = expr[[3]]
+    functionName = as.character(rhs[[1]])
+
+    lhs = as.character(expr[[2]])
+
+    # Record the lhs as now being an expanded variable
+    # TODO: Check that the variables have the same number of chunks.
+    n = length(vars$expanded[[names_to_expand[1]]])
+    vars$expanded[[lhs]] = appendNumber(basename = lhs, n = n)
+
+    # Hardcoding `[` as a special case, but it would be better to generalize this as in CodeDepends function handlers.
+    col_attr = if(functionName == "["){
+        col_arg = rhs[[4L]]
+        if(is.character(col_arg)){
+            # A single string literal
+            col_arg
+        } else if(is.symbol(col_arg)){
+            # List will return NULL if it isn't here.
+            vars$known[[col_arg]]
+        }
+    }
+    # tack this and the split by column on as attributes.
+    attr(vars$expanded[[lhs]], "columns") = col_attr
+
+    names_to_expand = c(names_to_expand, lhs)
+
+    newexpr = expandExpr(expr, vars$expanded[names_to_expand])
+
+    list(vars = vars, expr = newexpr)
+}
+
+
+
+# Update the data list by including any new chunked data objects that were defined inside statement
+updateDataList = function(statement, data)
+{
 }
 
 
@@ -119,48 +172,6 @@ tryLimitedEval = function(expr, vars)
         vars[["known"]][[lhs]] = rhs_value
     }
     list(vars = vars, expr = expr)
-}
-
-
-# Take a single vectorized call and expand it into many calls.
-expandVector = function(expr, vars)
-{
-    rhs = expr[[3]]
-    function_name = as.character(rhs[[1]])
-    if(!function_name %in% vectorfuncs){
-        return(collectVector(expr, vars))
-    }
-
-    # TODO: Check which arguments it's actually vectorized in.
-    function_args = as.character(rhs[-1])
-    names_to_expand = intersect(names(vars$expanded), function_args)
-
-    lhs = as.character(expr[[2]])
-
-    # Record the lhs as now being an expanded variable
-    # TODO: Check that the variables have the same number of chunks.
-    n = length(vars$expanded[[names_to_expand[1]]])
-    vars$expanded[[lhs]] = appendNumber(basename = lhs, n = n)
-
-    # Hardcoding `[` as a special case, but it would be better to generalize this as in CodeDepends function handlers.
-    col_attr = if(function_name == "["){
-        col_arg = rhs[[4L]]
-        if(is.character(col_arg)){
-            # A single string literal
-            col_arg
-        } else if(is.symbol(col_arg)){
-            # List will return NULL if it isn't here.
-            vars$known[[col_arg]]
-        }
-    }
-    # tack this and the split by column on as attributes.
-    attr(vars$expanded[[lhs]], "columns") = col_attr
-
-    names_to_expand = c(names_to_expand, lhs)
-
-    newexpr = expandExpr(expr, vars$expanded[names_to_expand])
-
-    list(vars = vars, expr = newexpr)
 }
 
 
@@ -250,6 +261,7 @@ tryInferStatementClass = function(statement)
         AssignmentOneFunction(lhs = as.character(statement[[2]])
                 , function = as.character(statement[[c(3, 1)]])
                 , args = as.list(statement[[3]][-1])
+                , statement = statement
                 )
     } else {
         statement
