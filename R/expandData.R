@@ -10,16 +10,10 @@
 vectorfuncs = c("*", "lapply", "[", "split")
 
 
-#' Expand Data Description
-#'
-#' Insert the chunked data loading calls directly into the code, expand vectorized function calls,
-#' and collect variables before calling non vectorized function calls.
-#'
-#' @export
 setMethod("expandData", signature(code = "expression", data = "list", platform = "ANY"),
 function(code, data, platform, ...)
 {
-    # This is the method that actually walks the code and expands every statement.
+    # This method actually walks the code and expands every statement.
     # Thus this is where the 'partial evaluation' happens.
     # data is a named list. The names are the names of the variables we expect to see in the code.
     # The values either inherit from DataSource or they are known simple values.
@@ -29,12 +23,23 @@ function(code, data, platform, ...)
     out = expression()
 
     for(statement in code){
-        newCode = expandData(code, data, platform, ...)
+        newCode = callGeneric(statement, data, platform, ...)
         data = expandVars(statement, data)
         out = c(out, newCode)
     }
     out
 })
+
+
+# I may want to use a class here for simpleAssignment, meaning no nested function calls.
+setMethod("expandData", signature(code = "=", data = "list", platform = "ANY"),
+function(code, data, platform, ...)
+{
+    # Insert the chunked data loading calls directly into the code, expand vectorized function calls,
+    # and collect variables before calling non vectorized function calls.
+    info = CodeDepends::getInputs(expr)
+
+}
 
 
 # TODO: check that this name mangling scheme is not problematic.
@@ -328,7 +333,7 @@ function(code, data, platform, ...)
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
     ds = dataSource("pipe", cmd, varname = data@varname, splitColumn = data@splitColumn)
 
-    callGeneric(code, ds, platform)
+    callGeneric(code, ds, platform, ...)
 })
 
 

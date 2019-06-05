@@ -6,6 +6,12 @@
 # Not necessary, comes from methods package?
 # setOldClass("expression")
 
+setOldClass("igraph")
+setOldClass("=")
+
+
+
+
 # Basically I use a data frame with specific columns to represent
 # several objects:
 #
@@ -210,6 +216,3 @@ GeneratedCode = function(schedule, code)
     new("GeneratedCode", schedule = schedule, code = code
         , file = as.character(NA))
 }
-
-
-setOldClass("igraph")
