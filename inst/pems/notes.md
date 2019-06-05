@@ -496,7 +496,7 @@ The variables can be chunked data objects, known simple values, or they can be t
 We can use the same `expandData` generic, just add a signature for a `call` and `list` argument.
 The `call` is simply one statement, and the `list` is a list of current variables that we know about.
 
-I'm discovering that I need to dispatch on classes for the code.
+I'm discovering that I need to dispatch on classes for the code, and thus I need something like the classes in rstatic.
 
 
 ## Scratch

@@ -101,14 +101,14 @@ DataSource = setClass("DataSource"
 #'      \code{NA} means no split.
 #' @slot mangledNames names of each chunk of data
 #' @slot collector name of a function to call to collect all the chunks into one object
-#' @slot expanded for internal use with \code{expandData}
+#' @slot collected for internal use with \code{expandData}
 TableChunkData = setClass("TableChunkData",
     , slots = c(expr = "expression"
                 , columns = "character"
                 , splitColumn = "character"
                 , mangledNames = "character"
                 , collector = "character"
-                , expanded = "logical"
+                , collected = "logical"
                 )
     , contains = "DataSource"
     )
@@ -217,9 +217,15 @@ GeneratedCode = function(schedule, code)
 }
 
 
-# Helpers
+# Language objects
 ############################################################
-# I would prefer to get these from another package, i.e. rstatic
+# I would prefer to get these from another package, i.e. CodeDepends or rstatic
+
+Statement = setClass("Statement", slots = c(statement = "language"))
+
+KnownStatement = setClass("KnownStatement", slots = c(value = "ANY")
+    , contains = "Statement"
+)
 
 # It would be more elegant to have coercion methods between this class and individual statements,
 # but I'd rather not build such tools here.
@@ -227,5 +233,6 @@ AssignmentOneFunction = setClass("AssignmentOneFunction",
     slots = c(lhs = "character"
               , functionName = "character"
               , args = "list"
-              , statement = "language"
-))
+              )
+    , contains = "Statement"
+)

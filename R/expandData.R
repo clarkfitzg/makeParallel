@@ -26,8 +26,8 @@ function(code, data, platform, ...)
     for(statement in code){
         statement = tryInferStatementClass(statement)
         newCode = callGeneric(statement, data, platform, ...)
-        data = updateDataList(statement, data)
-        out = c(out, newCode)
+        data = updateDataList(newCode, data)
+        out = c(out, newCode@statement)
     }
     out
 })
@@ -38,19 +38,30 @@ function(code, data, platform, ...)
 {
     # Insert the chunked data loading calls directly into the code, expand vectorized function calls,
     # and collect variables before calling non vectorized function calls.
-    functionName = code@functionName
 
-    if(!functionName %in% vectorfuncs){
-        return(collectVector(code@statement, data))
-    }
+    symbols = sapply(code@args, is.symbol)
+    vars_used = as.character(code@args[symbols])
+    
+    chunked_objects = sapply(data, is, "DataSource")
+    chunked_objects = data[chunked_objects]
 
     # TODO: Check which arguments it's actually vectorized in.
-    function_args = as.character(rhs[-1])
-    names_to_expand = intersect(names(vars$expanded), function_args)
+    to_expand = intersect(vars_used, names(chunked_objects))
 
+    functionName = code@functionName
+    if(!functionName %in% vectorfuncs){
+        return(collect(code@statement, data[to_expand]))
+    }
 
 
 }
+
+
+# Create the actual chunked data object
+updateDataList = function(statement, data)
+{
+}
+
 
 # Take a single vectorized call and expand it into many calls.
 expandVector = function(expr, vars)
