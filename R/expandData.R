@@ -1,4 +1,4 @@
-# How does all this expansion stuff work?
+# How does all the expansion based on the data work?
 #
 # Objects 
 #
@@ -18,15 +18,14 @@
 # This first implementation handles each statement in one of three possible ways:
 #
 # 1. If a statement is a call to a vectorized function, say `y = 2 * x`, and any of the vectorized arguments are chunked data objects, then the algorithm infers a new chunked data object from this statement, supplementing it with information from the globals.
-#   It inserts this object into the globals.
+#       It inserts this object into the globals.
 # 2. If a statement is a simple literal call, say `ab = c("alpha", "bravo")`, then the algorithm evaluates it, and inserts the resulting object into the globals.
 # 3. Otherwise, the statement is unknown.
-#       The algorithm collects any expanded variables that appear in the statement.
+#       The algorithm collects any expanded variables that appear in the statement, and marks them in the globals as collected.
+#       It's natural to do both of these tasks in the same step.
 #
-
-
-# TODO:
-# This code doesn't robustly handle reassignments into the same variable.
+# In every case the algorithm produces new code and updates the globals.
+# The new code gets appended to the existing code.
 
 
 # TODO:

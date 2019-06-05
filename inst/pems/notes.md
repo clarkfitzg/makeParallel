@@ -503,6 +503,11 @@ I'm discovering that I need to dispatch on classes for the code, and thus I need
 How do we propagate the literal values through?
 Right now I'm having trouble because the known literal values are in a list mixed with the ChunkedData objects.
 
+------------------------------------------------------------
+
+What's fouling me up?
+I'm trying to be too clever forcing everything to dispatch on this `expandData` method and using `callGeneric`.
+
 
 ## Scratch
 
