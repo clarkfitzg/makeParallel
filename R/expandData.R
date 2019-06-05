@@ -27,12 +27,16 @@ function(code, data, platform, ...)
         statement = tryInferStatementClass(statement)
         newCode = callGeneric(statement, data, platform, ...)
         data = updateDataList(newCode, data)
-        out = c(out, newCode@statement)
+        out = c(out, as(newCode, "expression"))
     }
     out
 })
 
 
+# This produces one of the following:
+# - a DataSource, if the result will be chunked
+# - a KnownStatement, if the result is a simple value
+# - an expression, otherwise
 setMethod("expandData", signature(code = "AssignmentOneFunction", data = "list", platform = "ANY"),
 function(code, data, platform, ...)
 {
@@ -47,13 +51,14 @@ function(code, data, platform, ...)
 
     # TODO: Check which arguments it's actually vectorized in.
     to_expand = intersect(vars_used, names(chunked_objects))
+    to_expand = data[to_expand]
 
     functionName = code@functionName
     if(!functionName %in% vectorfuncs){
-        return(collect(code@statement, data[to_expand]))
+        return(collect(code@statement, to_expand))
     }
 
-
+    expansionWork(code, data[to_expand])
 }
 
 
@@ -198,7 +203,6 @@ tryLimitedEval = function(expr, vars)
 #
 expandExpr = function(expr, vars_to_expand)
 {
-
     iterator = seq_along(vars_to_expand[[1]])
 
     # Initialize

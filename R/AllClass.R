@@ -236,3 +236,5 @@ AssignmentOneFunction = setClass("AssignmentOneFunction",
               )
     , contains = "Statement"
 )
+
+setAs("Statement", "expression", function(from) as.expression(from@statement))

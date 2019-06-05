@@ -498,6 +498,11 @@ The `call` is simply one statement, and the `list` is a list of current variable
 
 I'm discovering that I need to dispatch on classes for the code, and thus I need something like the classes in rstatic.
 
+------------------------------------------------------------
+
+How do we propagate the literal values through?
+Right now I'm having trouble because the known literal values are in a list mixed with the ChunkedData objects.
+
 
 ## Scratch
 
