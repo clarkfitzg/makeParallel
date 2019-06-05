@@ -1,3 +1,30 @@
+# How does all this expansion stuff work?
+#
+# Objects 
+#
+# - TableChunkData: Contain all the information about the data chunks, in particular:
+#       - variable name from the original code
+#       - expanded variable names, that is, the names of every chunk after name mangling
+#       - the names of the columns that this table contains
+#       - whether the object has already been collected
+# - globals: named list representing the objects in the global environment that we care about during partial evaluation, which is a subset of all globals the script defines.
+#       Values are either TableChunkData or actual simple literal values.
+#
+#
+# Algorithm
+#
+# The expansion algorithm can be thought of as partial evaluation.
+# It works one statement at a time, ignoring control flow and conditional statements for the moment.
+# This first implementation handles each statement in one of three possible ways:
+#
+# 1. If a statement is a call to a vectorized function, say `y = 2 * x`, and any of the vectorized arguments are chunked data objects, then the algorithm infers a new chunked data object from this statement, supplementing it with information from the globals.
+#   It inserts this object into the globals.
+# 2. If a statement is a simple literal call, say `ab = c("alpha", "bravo")`, then the algorithm evaluates it, and inserts the resulting object into the globals.
+# 3. Otherwise, the statement is unknown.
+#       The algorithm collects any expanded variables that appear in the statement.
+#
+
+
 # TODO:
 # This code doesn't robustly handle reassignments into the same variable.
 
@@ -13,20 +40,21 @@ vectorfuncs = c("*", "lapply", "[", "split")
 setMethod("expandData", signature(code = "expression", data = "list", platform = "ANY"),
 function(code, data, platform, ...)
 {
+    globals = data
     # This method actually walks the code and expands every statement.
     # Thus this is where the 'partial evaluation' happens.
     # data is a named list. The names are the names of the variables we expect to see in the code.
     # The values either inherit from DataSource or they are known simple values.
 
-    if(length(data) == 0) return(code)
+    if(length(globals) == 0) return(code)
 
     out = expression()
 
     # The statements are the elements of an expression.
     for(statement in code){
         statement = tryInferStatementClass(statement)
-        newCode = callGeneric(statement, data, platform, ...)
-        data = updateDataList(newCode, data)
+        newCode = callGeneric(statement, globals, platform, ...)
+        globals = updateGlobals(newCode, globals)
         out = c(out, as(newCode, "expression"))
     }
     out
@@ -63,7 +91,7 @@ function(code, data, platform, ...)
 
 
 # Create the actual chunked data object
-updateDataList = function(statement, data)
+updateGlobals = function(statement, data)
 {
 }
 
@@ -105,7 +133,7 @@ expandVector = function(expr, vars)
 
 
 # Update the data list by including any new chunked data objects that were defined inside statement
-updateDataList = function(statement, data)
+updateGlobals = function(statement, globals)
 {
 }
 
