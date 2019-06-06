@@ -119,6 +119,7 @@ function(code, data, platform, ...)
     new_obj = TableChunkData(varname = code@lhs
                 , expr = expanded
                 , columns = columns
+            # TODO: This assumes there's only one split possible, and that everything is split on the same column
                 , splitColumn = chunked_objects[[1]]@splitColumn
                 , mangledNames = mangledNames
                 , collector = "rbind"
@@ -204,106 +205,6 @@ getColumns = function(code, globals)
 }
 
 
-# Not using code after this I think.
-############################################################
-
-# collect vectorized variables that expr uses and are not already collected.
-#
-# Before:
-# f(x)
-#
-# After:
-# x = c(x1, x2, ..., xk)  # <-- this is what collect means
-# f(x)
-#
-collectVector = function(expr, vars)
-{
-    vars_used = CodeDepends::getInputs(expr)@inputs
-    vars_to_collect = intersect(vars_used, names(vars$expanded))
-
-    # If the variable has already been collected, then we don't need to do it again.
-    vars_to_collect = setdiff(vars_to_collect, vars$collected)
-
-    collect_code = Map(collectOneVariable, vars_to_collect, vars$expanded[vars_to_collect])
-
-    collect_code_all_vars = do.call(c, unname(collect_code))
-
-    vars$collected = c(vars$collected, vars_to_collect)
-
-    list(vars = vars, expr = c(collect_code_all_vars, expr))
-}
-
-
-
-# This produces one of the following:
-# - a DataSource, if the result will be chunked
-# - a KnownStatement, if the result is a simple value
-# - an expression, otherwise
-setMethod("expandData", signature(code = "AssignmentOneFunction", data = "list", platform = "ANY"),
-function(code, data, platform, ...)
-{
-    # Insert the chunked data loading calls directly into the code, expand vectorized function calls,
-    # and collect variables before calling non vectorized function calls.
-
-    symbols = sapply(code@args, is.symbol)
-    vars_used = as.character(code@args[symbols])
-    
-    chunked_objects = sapply(data, is, "DataSource")
-    chunked_objects = data[chunked_objects]
-
-    # TODO: Check which arguments it's actually vectorized in.
-    to_expand = intersect(vars_used, names(chunked_objects))
-    to_expand = data[to_expand]
-
-    functionName = code@functionName
-    if(!functionName %in% vectorfuncs){
-        return(collect(code@statement, to_expand))
-    }
-
-    expansionWork(code, data[to_expand])
-}
-
-
-# Create the actual chunked data object
-updateGlobals = function(statement, data)
-{
-}
-
-
-# Take a single vectorized call and expand it into many calls.
-expandVector = function(expr, vars)
-{
-    rhs = expr[[3]]
-    functionName = as.character(rhs[[1]])
-
-    lhs = as.character(expr[[2]])
-
-    # Record the lhs as now being an expanded variable
-    # TODO: Check that the variables have the same number of chunks.
-    n = length(vars$expanded[[names_to_expand[1]]])
-    vars$expanded[[lhs]] = appendNumber(basename = lhs, n = n)
-
-    # Hardcoding `[` as a special case, but it would be better to generalize this as in CodeDepends function handlers.
-    col_attr = if(functionName == "["){
-        col_arg = rhs[[4L]]
-        if(is.character(col_arg)){
-            # A single string literal
-            col_arg
-        } else if(is.symbol(col_arg)){
-            # List will return NULL if it isn't here.
-            vars$known[[col_arg]]
-        }
-    }
-    # tack this and the split by column on as attributes.
-    attr(vars$expanded[[lhs]], "columns") = col_attr
-
-    names_to_expand = c(names_to_expand, lhs)
-
-    newexpr = expandExpr(expr, vars$expanded[names_to_expand])
-
-    list(vars = vars, expr = newexpr)
-}
-
 
 # TODO: check that this name mangling scheme is not problematic.
 # Also, could parameterize these functions.
@@ -313,77 +214,6 @@ appendNumber = function(data, basename = data@varname, n = length(data@expr), se
     paste0(basename, sep, seq(n))
 }
 
-
-# Generate code to do the initial assignment
-initialAssignmentCode = function(varname, code)
-{
-    nm = lapply(varname, as.symbol)
-    out = mapply(call, '=', nm, code, USE.NAMES = FALSE)
-    as.expression(out)
-}
-
-
-# returns updated versions of vars and expr in a list
-# expr is an expression rather than a single call, because this function will turn a single call into many.
-expandCollect = function(expr, vars)
-{
-#    for(v in names(vars$expanded)){
-#        found = find_var(expr, v)
-#        for(loc in found){
-#            usage = expr[[loc[-length(loc)]]]
-#            if(is.call(usage) 
-#               && as.character(usage[[1]]) %in% vectorfuncs 
-#               ){
-#                expandVector(expr, v)
-#            } else {
-#                collectVector(expr, v)
-#            }
-#        }
-#    }
-    # Yuck this is a mess.
-    # Instead, I can start out just handling statements that look like:
-    # y = f(x, z, ...)
-    # And preprocess the code to make it look like this.
-
-
-    vars_in_expr = sapply(names(vars$expanded), function(var){
-        finds = find_var(expr, var)
-        if(0 < length(finds)) var else NULL
-    })
-    
-    has_vars = 0 < length(vars_in_expr)
-    simple_assign = isSimpleAssignCall(expr)
-
-    if(has_vars && simple_assign){
-        # Main case of interest when an expression should expanded
-        expandVector(expr, vars)
-    } else if(!has_vars && simple_assign){
-        # Check if it's simple enough to actually evaluate
-        tryLimitedEval(expr, vars)
-    } else if(has_vars && !simple_assign){
-        # Variable appears in the expression, but the expression is not a simple assign,
-        # so we treat it as a general function call.
-        collectVector(expr, vars)
-    } else {
-        # Leave it be
-        list(vars = vars, expr = expr)
-    }
-}
-
-
-tryLimitedEval = function(expr, vars)
-{
-    # it's a simple assignment of the form v = ...
-    rhs = expr[[3L]]
-    # Intentionally keeping this limited for the moment, until we get a more coherent way to do this.
-    if(c_with_literals(rhs)){
-        lhs = expr[[2L]]
-        rhs_value = eval(rhs)
-        # Use the symbol in lhs as a string. Weird, but seems to work.
-        vars[["known"]][[lhs]] = rhs_value
-    }
-    list(vars = vars, expr = expr)
-}
 
 
 # vars_to_expand is a list like list(a = c("a1", "a2"), b = c("b1", "b2"))
@@ -428,32 +258,6 @@ isSimpleAssignCall = function(expr)
 }
 
 
-
-
-if(FALSE){
-    # developing, may move these to tests eventually
-
-    dataLoadExpr = list(x = makeParallel:::ChunkDataSource(expr=parse(text = "1 + 2
-              3 + 4")))
-
-    expr = parse(text = "y = x + 2")[[1]]
-
-    find_var = makeParallel:::find_var
-
-    vars = list(a = "alpha", b = "bravo")
-    vars = lapply(vars, as.symbol)
-    e = quote(a + b)
-    substitute_q(e, vars)
-
-vars_to_expand = list(a = c("a1", "a2"), b = c("b1", "b2"))
-
-expandExpr(e, vars_to_expand)
-
-    CodeDepends::getInputs(expr)@inputs
-
-    collectOneVariable("x", c("x_1", "x_2", "x_3"))
-
-}
 
 # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Substitutions
 # http://adv-r.had.co.nz/Computing-on-the-language.html#substitute
@@ -522,14 +326,3 @@ function(code, data, platform, ...)
 
     callGeneric(code, ds, platform, ...)
 })
-
-
-#
-#
-#gen_pipe_cut_cmd = function(fname, varname, delimiter, used_col)
-#{
-#    used_col_string = paste(used_col, sep = ",")
-#    cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, fname)
-#    rhs = call("pipe", cmd)
-#    #call("=", as.name(varname), rhs)
-#}
