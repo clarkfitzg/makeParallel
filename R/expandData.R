@@ -24,8 +24,7 @@ function(code, data, platform, ...)
     # The initial expressions in the generated code will be the data loading calls.
     # At this point all the data values are TableChunkData objects
     out = lapply(globals, slot, "expr")
-    #out = lapply(out, as, "expression")
-    out = do.call(c, out)
+    out = do.call(c, unname(out))
 
     # Iterate over the actual data analysis code.
     for(statement in code){
@@ -108,6 +107,7 @@ function(code, data, platform, ...)
     varname = code@lhs
 
     chunked_objects = data[sapply(data, is, "DataSource")]
+    example_obj = chunked_objects[[1]]
 
     vars_to_expand = lapply(chunked_objects, slot, "mangledNames")
     mangledNames = appendNumber(basename = varname, n = length(vars_to_expand[[1]]))
@@ -124,9 +124,11 @@ function(code, data, platform, ...)
                 , expr = expanded
                 , columns = columns
             # TODO: This assumes there's only one split possible, and that everything is split on the same column
-                , splitColumn = chunked_objects[[1]]@splitColumn
+                , splitColumn = example_obj@splitColumn
                 , mangledNames = mangledNames
-                , collector = "rbind"
+            # TODO: This just uses the same collector object over and over.
+            # It could well go from "rbind" to "c"
+                , collector = example_obj@collector
                 , collected = FALSE
                 )
 
@@ -237,11 +239,14 @@ expandExpr = function(expr, vars_to_expand)
     iterator = seq_along(vars_to_expand[[1]])
 
     # Initialize
-    newexpr = lapply(iterator, function(...) expr)
+    newexpr = lapply(iterator, function(...) NULL)
+
+    if(1 < length(expr)) stop("Expected a single statement.")
+    statement = expr[[1]]
 
     for(i in iterator){
         varname_lookup = lapply(vars_to_expand, function(var) as.symbol(var[i]))
-        newexpr[[i]] = substitute_q(expr, varname_lookup)
+        newexpr[[i]] = substitute_q(statement, varname_lookup)
     }
     as(newexpr, "expression")
 }
@@ -262,7 +267,6 @@ isSimpleAssignCall = function(expr)
     }
     result
 }
-
 
 
 # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Substitutions

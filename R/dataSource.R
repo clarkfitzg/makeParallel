@@ -44,8 +44,13 @@ tableChunkData = function(expr
         , mangledNames = appendNumber(basename = varname, n = length(expr))
         , collected = FALSE
         , collector = "rbind"
+        , addAssignments = TRUE
 ){
-TableChunkData(expr = expr
+    if(addAssignments){
+        expr = initialAssignmentCode(mangledNames, expr)
+    }
+
+    TableChunkData(expr = expr
         , varname = varname
         , columns = columns
         , splitColumn = splitColumn
@@ -53,4 +58,13 @@ TableChunkData(expr = expr
         , collected = collected
         , collector = collector
         )
+}
+
+
+# Generate code to do the initial assignment
+initialAssignmentCode = function(mangledNames, code)
+{
+    nm = lapply(mangledNames, as.symbol)
+    out = mapply(call, '=', nm, code, USE.NAMES = FALSE)
+    as.expression(out)
 }

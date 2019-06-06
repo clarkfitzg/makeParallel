@@ -191,12 +191,4 @@ tryLimitedEval = function(expr, vars)
     list(vars = vars, expr = expr)
 }
 
-# Generate code to do the initial assignment
-initialAssignmentCode = function(varname, code)
-{
-    nm = lapply(varname, as.symbol)
-    out = mapply(call, '=', nm, code, USE.NAMES = FALSE)
-    as.expression(out)
-}
-
 
