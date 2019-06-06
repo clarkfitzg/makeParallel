@@ -53,19 +53,18 @@ toStatementClass = function(statement, globals)
     # TODO: It would be better to use Nick's tools here.
     class(statement) = "language"
 
-    # No particular reason for checking in this order.
-    # This could be made cleaner.
-    if(canConvertKnownAssignment(statement, globals)) {
+    # Order matters
+    if(canConvertAssignmentOneVectorFunction(statement, globals)) {
+        AssignmentOneVectorFunction(
+            statement = statement
+            , lhs = as.character(statement[[2]])
+            )
+    } else if(canConvertKnownAssignment(statement, globals)) {
         rhs = statement[[3L]]
         KnownAssignment(
             statement = statement
             , lhs = as.character(statement[[2]])
             , value = eval(rhs, envir = globals)
-            )
-    } else if(canConvertAssignmentOneVectorFunction(statement, globals)) {
-        AssignmentOneVectorFunction(
-            statement = statement
-            , lhs = as.character(statement[[2]])
             )
     } else {
         Statement(statement = statement)
@@ -87,7 +86,7 @@ canConvertAssignmentOneVectorFunction = function(statement, globals, vectorFuncs
     if(!isSimpleAssignCall(statement)) return(FALSE)
 
     rhs = statement[[3L]]
-    fname = as.character(statement[[1L]])
+    fname = as.character(rhs[[1L]])
     if(!(fname %in% vectorFuncs)) return(FALSE)
 
     args = rhs[-1L]
@@ -96,7 +95,7 @@ canConvertAssignmentOneVectorFunction = function(statement, globals, vectorFuncs
 
     ds = sapply(globals, is, "DataSource")
     ds_names = names(globals[ds])
-    if(any(symbols) %in% ds_names) TRUE else FALSE
+    if(any(symbols %in% ds_names)) TRUE else FALSE
 }
 
 
