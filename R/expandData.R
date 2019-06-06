@@ -123,7 +123,25 @@ function(code, data, platform, ...)
     # Any variables that appear in the code and are chunked data objects should be collected,
     # because this is the general case where we don't know anything about what the code will do with them.
     globals = data
-    new_code = 
+
+    expr = as.expression(code)
+    vars_used = CodeDepends::getInputs(expr)@inputs
+
+    chunked_objects = data[sapply(data, is, "DataSource")]
+    uncollected = chunked_objects[!sapply(chunked_objects, slot, "collected")]
+
+    vars_to_collect = intersect(vars_used, names(uncollected))
+
+    # Collect the variables that are used, and then append the new expression
+    new_code = lapply(globals[uncollected], collectCode)
+    new_code = as.expression(new_code)
+    new_code = c(new_code, expr)
+
+    # record them as collected
+    for(v in vars_to_collect){
+        globals[[v]]@collected = TRUE
+    }
+
     list(code = new_code, globals = globals)
 }
 
