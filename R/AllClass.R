@@ -102,7 +102,7 @@ DataSource = setClass("DataSource"
 #' @slot mangledNames names of each chunk of data
 #' @slot collector name of a function to call to collect all the chunks into one object
 #' @slot collected for internal use with \code{expandData}
-TableChunkData = setClass("TableChunkData",
+TableChunkData = setClass("TableChunkData"
     , slots = c(expr = "expression"
                 , columns = "character"
                 , splitColumn = "character"
@@ -121,7 +121,7 @@ TableChunkData = setClass("TableChunkData",
 #' @export
 #' @slot files absolute paths to all the files
 #' @slot readDetails list of details to help efficiently and correctly read in the data
-TextTableFiles = setClass("TableChunkData"
+TextTableFiles = setClass("TextTableFiles"
     , slots = c(files = "character", readDetails = "list")
     , contains = "TableChunkData"
 )

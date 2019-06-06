@@ -79,7 +79,7 @@ canConvertKnownAssignment = function(statement, globals) {
 }
 
 
-canConvertAssignmentOneVectorFunction(statement, globals, vectorFuncs = .vectorFuncs){
+canConvertAssignmentOneVectorFunction = function(statement, globals, vectorFuncs = .vectorFuncs){
     if(!isSimpleAssignCall(statement)) return(FALSE)
 
     rhs = statement[[3L]]
@@ -128,7 +128,7 @@ function(code, data, platform, ...)
 
     globals[[new_obj@varname]] = new_obj
     list(code = new_obj@expr, globals = globals)
-}
+})
 
 
 setMethod("expandData", signature(code = "KnownAssignment", data = "list", platform = "ANY"),
@@ -140,7 +140,7 @@ function(code, data, platform, ...)
 
     globals[[known_assign@lhs]] = known_assign
     list(code = as(known_assign, "expression"), globals = globals)
-}
+})
 
 
 setMethod("expandData", signature(code = "Statement", data = "list", platform = "ANY"),
@@ -169,7 +169,7 @@ function(code, data, platform, ...)
     }
 
     list(code = new_code, globals = globals)
-}
+})
 
 
 # Generate the code to collect a chunked object
