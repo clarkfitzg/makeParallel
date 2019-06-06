@@ -80,9 +80,10 @@ setMethod("schedule", "GeneratedCode", function(graph, ...)
 #' @export
 #' @param expr code or function to load chunks of the data
 #' @param args list of arguments to function
+#' @param varname name of the variable in the source code
 #' @rdname dataSource
 #' @param ... additional arguments to methods
-setGeneric("dataSource", function(expr, args, ...)
+setGeneric("dataSource", function(expr, args, varname, ...)
            standardGeneric("dataSource"))
 
 

@@ -1,23 +1,35 @@
 #' @export
 #' @rdname dataSource
-setMethod("dataSource", signature(expr = "expression", args = "missing"),
-function(expr, args, ...)
+setMethod("dataSource", signature(expr = "expression", args = "missing", varname = "ANY"),
+function(expr, args, varname, ...)
 {
-    splitColumn = list(...)[["splitColumn"]]
-    if(is.null(splitColumn)) splitColumn = as.character(NA)
-    ExprChunkData(expr = expr, splitColumn = splitColumn, ...)
+#    splitColumn = list(...)[["splitColumn"]]
+#    if(is.null(splitColumn)) splitColumn = as.character(NA)
+
+    collector = list(...)[["collector"]]
+    if(is.null(collector)) collector = "c"
+
+    varname = as.character(varname)
+
+    ExprChunkData(expr = expr
+#                  , splitColumn = splitColumn
+                  , varname = varname
+                  , mangledNames = appendNumber(basename = varname, n = length(expr))
+                  , collector = collector
+                  , collected = FALSE
+                  , ...)
 })
 
 
 #' @export
 #' @rdname dataSource
-setMethod("dataSource", signature(expr = "character", args = "vector"),
-function(expr, args, ...)
+setMethod("dataSource", signature(expr = "character", args = "vector", varname = "ANY"),
+function(expr, args, varname, ...)
 {
     func_name = expr
 
     # build up the calls to load every chunk
     chunk_expr = lapply(args, function(args) do.call(call, list(func_name, args)))
 
-    CallGeneric(expr = as.expression(chunk_expr), ...)
+    CallGeneric(expr = as.expression(chunk_expr), varname = varname, ...)
 })

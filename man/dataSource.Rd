@@ -7,16 +7,18 @@
 \alias{dataSource,character,vector-method}
 \title{Describe Data Source}
 \usage{
-dataSource(expr, args, ...)
+dataSource(expr, args, varname, ...)
 
-\S4method{dataSource}{expression,missing}(expr, args, ...)
+\S4method{dataSource}{expression,missing}(expr, args, varname, ...)
 
-\S4method{dataSource}{character,vector}(expr, args, ...)
+\S4method{dataSource}{character,vector}(expr, args, varname, ...)
 }
 \arguments{
 \item{expr}{code or function to load chunks of the data}
 
 \item{args}{list of arguments to function}
+
+\item{varname}{name of the variable in the source code}
 
 \item{...}{additional arguments to methods}
 }

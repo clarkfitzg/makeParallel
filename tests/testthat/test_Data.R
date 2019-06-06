@@ -20,7 +20,7 @@ test_that("simple case of chunked input data descriptions", {
         substitute(readRDS(xfile2), e)
     ))
 
-    xdescription = dataSource(expr = chunk_load_code)
+    xdescription = dataSource(expr = chunk_load_code, varname = "x")
 
     # Mon May 27 16:10:48 PDT 2019
     # The issue I'm having now is that I want to use the list signature for expandData.

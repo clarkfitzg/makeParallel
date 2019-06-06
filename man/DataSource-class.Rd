@@ -4,13 +4,7 @@
 \name{DataSource-class}
 \alias{DataSource-class}
 \alias{DataSource}
-\title{Base Class for Data Descriptions}
+\title{Abstract Base Class For Data Descriptions}
 \description{
-Subclasses describe data
+Abstract Base Class For Data Descriptions
 }
-\section{Slots}{
-
-\describe{
-\item{\code{varname}}{character variable name in the original code}
-}}
-

@@ -77,16 +77,10 @@ UnixPlatform = setClass("UnixPlatform",
 # Data Descriptions
 ############################################################
 
-
-#' Base Class for Data Descriptions
-#'
-#' Subclasses describe data
+#' Abstract Base Class For Data Descriptions
 #'
 #' @export
-#' @slot varname character variable name in the original code
-DataSource = setClass("DataSource"
-    , slots = c(varname = "character")
-    )
+DataSource = setClass("DataSource")
 
 
 #' Chunked Data Source defined by R expressions
@@ -95,22 +89,33 @@ DataSource = setClass("DataSource"
 #'
 #' @export
 #' @slot expr expression such that evaluating \code{expr[[i]]} produces the ith chunk of data.
-#'      Requires evaluating parent expressions first.
-#' @slot columns names of the columns
-#' @slot splitColumn name of the columns by which the data is split.
-#'      \code{NA} means no split.
+#'      May requires evaluating parent expressions first.
+#' @slot varname character variable name in the original code
 #' @slot mangledNames names of each chunk of data
 #' @slot collector name of a function to call to collect all the chunks into one object
 #' @slot collected for internal use with \code{expandData}
-TableChunkData = setClass("TableChunkData"
+ExprChunkData = setClass("ExprChunkData"
     , slots = c(expr = "expression"
-                , columns = "character"
-                , splitColumn = "character"
+                , varname = "character"
                 , mangledNames = "character"
                 , collector = "character"
                 , collected = "logical"
                 )
     , contains = "DataSource"
+    )
+
+
+#' Chunked Tables
+#'
+#' @export
+#' @slot columns names of the columns
+#' @slot splitColumn name of the columns by which the data is split.
+#'      \code{NA} means no split.
+TableChunkData = setClass("TableChunkData"
+    , slots = c(columns = "character"
+                , splitColumn = "character"
+                )
+    , contains = "ExprChunkData"
     )
 
 
