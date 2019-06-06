@@ -34,3 +34,23 @@ function(expr, args, varname, ...)
 
     CallGeneric(expr = as.expression(chunk_expr), varname = varname, ...)
 })
+
+
+#' @export
+tableChunkData = function(expr
+        , varname = "x"
+        , columns = character()
+        , splitColumn = character()
+        , mangledNames = appendNumber(basename = varname, n = length(expr))
+        , collected = FALSE
+        , collector = "rbind"
+){
+TableChunkData(expr = expr
+        , varname = varname
+        , columns = columns
+        , splitColumn = splitColumn
+        , mangledNames = mangledNames
+        , collected = collected
+        , collector = collector
+        )
+}

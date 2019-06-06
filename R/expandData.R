@@ -107,10 +107,11 @@ function(code, data, platform, ...)
     globals = data
     varname = code@lhs
 
-    mangledNames = appendNumber(varname)
-
     chunked_objects = data[sapply(data, is, "DataSource")]
+
     vars_to_expand = lapply(chunked_objects, slot, "mangledNames")
+    mangledNames = appendNumber(basename = varname, n = length(vars_to_expand[[1]]))
+
     # TODO: I don't think this allows for different name mangling schemes in the case of reassignment, x = foo(x)
     vars_to_expand[[varname]] = mangledNames
     expanded = expandExpr(expr, vars_to_expand)
@@ -192,6 +193,7 @@ collectCode = function(chunk)
 getColumns = function(code, globals)
 {
     if(!is(code, "AssignmentOneVectorFunction")) stop("expected an object of class AssignmentOneVectorFunction")
+    expr = as(code, "expression")[[1]]
     rhs = expr[[3]]
     functionName = as.character(rhs[[1]])
 
