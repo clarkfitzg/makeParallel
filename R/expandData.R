@@ -24,6 +24,7 @@ function(code, data, platform, ...)
     # The initial expressions in the generated code will be the data loading calls.
     # At this point all the data values are TableChunkData objects
     out = lapply(globals, slot, "expr")
+    #out = lapply(out, as, "expression")
     out = do.call(c, out)
 
     # Iterate over the actual data analysis code.
@@ -162,9 +163,10 @@ function(code, data, platform, ...)
     vars_to_collect = intersect(vars_used, names(uncollected))
 
     # Collect the variables that are used, and then append the new expression
-    new_code = lapply(uncollected[vars_to_collect], collectCode)
-    new_code = as(new_code, "expression")
-    new_code = c(new_code, expr)
+    collected_code = lapply(uncollected[vars_to_collect], collectCode)
+    # unname important to avoid crazy behavior: x = x = ...
+    collected_code = do.call(c, unname(collected_code))
+    new_code = c(collected_code, expr)
 
     # record them as collected
     for(v in vars_to_collect){
