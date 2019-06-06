@@ -36,7 +36,7 @@ function(code, data, platform, ...)
         code_with_globals = callGeneric(statement, globals, platform, ...)
 
         # Record the updates
-        globals = var_updates[["globals"]]
+        globals = code_with_globals[["globals"]]
         new_code = as(code_with_globals[["code"]], "expression")
         out = c(out, new_code)
     }
@@ -99,9 +99,27 @@ canConvertAssignmentOneVectorFunction(statement, globals, vectorFuncs = .vectorF
 setMethod("expandData", signature(code = "AssignmentOneVectorFunction", data = "list", platform = "ANY"),
 function(code, data, platform, ...)
 {
+    # The expression defines a new chunked data object that we add to the globals.
+    expr = as(code, "expression")
     globals = data
-    new_code = 
-    list(code = new_code, globals = globals)
+
+    mangledNames = appendNumber(code@lhs)
+
+    columns = getColumns(code, globals)
+    if(is.null(columns)
+
+    # TODO: Generalize this to handle vectors, not just tables.
+    new_obj = TableChunkData(varname = code@lhs
+                , expr = 
+                , columns = columns
+                , splitColumn =
+                , mangledNames = mangledNames
+                , collector = "rbind"
+                , collected = FALSE
+                )
+
+    globals[[new_obj@varname]] = new_obj
+    list(code = new_obj@expr, globals = globals)
 }
 
 
@@ -146,6 +164,42 @@ function(code, data, platform, ...)
 }
 
 
+# Generate the code to collect a chunked object
+collectCode = function(chunk)
+{
+    # Easier to build the call from the strings.
+    args = paste(chunk@mangledNames, collapse = ", ")
+    expr = paste(chunk@varname, " = ", chunk@collector, "(", args, ")")
+    parse(text = expr)
+}
+
+
+# Determine which columns are used in expr
+# Currently this only handles `[`.
+# TODO: It needs to propagate through the columns used, as in arithmetic.
+getColumns = function(code, globals)
+{
+    if(!is(code, "AssignmentOneVectorFunction")) stop("expected an object of class AssignmentOneVectorFunction")
+    rhs = expr[[3]]
+    functionName = as.character(rhs[[1]])
+
+    # Hardcoding `[` as a special case, but it would be better to generalize this as in CodeDepends function handlers.
+    if(functionName == "["){
+        col_arg = rhs[[4L]]
+        if(is.character(col_arg)){
+            # A single string literal
+            col_arg
+        } else if(is.symbol(col_arg) %% is(globals[[col_arg]], "KnownAssignment")){
+            globals[[col_arg]]@value
+        }
+    }
+    # Let the NULL come out of this function if these conditions don't hold.
+}
+
+
+# Not using code after this I think.
+############################################################
+
 # collect vectorized variables that expr uses and are not already collected.
 #
 # Before:
@@ -172,14 +226,6 @@ collectVector = function(expr, vars)
     list(vars = vars, expr = c(collect_code_all_vars, expr))
 }
 
-
-collectOneVariable = function(vname, chunked_varnames)
-{
-    # Easier to build it from the strings.
-    args = paste(chunked_varnames, collapse = ", ")
-    expr = paste(vname, "= c(", args, ")")
-    parse(text = expr)
-}
 
 
 # This produces one of the following:
@@ -249,13 +295,6 @@ expandVector = function(expr, vars)
     newexpr = expandExpr(expr, vars$expanded[names_to_expand])
 
     list(vars = vars, expr = newexpr)
-}
-
-
-
-# Update the data list by including any new chunked data objects that were defined inside statement
-updateGlobals = function(statement, globals)
-{
 }
 
 
