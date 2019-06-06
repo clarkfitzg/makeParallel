@@ -49,7 +49,8 @@ toStatementClass = function(statement, globals)
 {
     # TODO: Expand this to handle more cases.
 
-    # No particular reason for checking in this order
+    # No particular reason for checking in this order.
+    # This could be made cleaner.
     if(canConvertKnownAssignment(statement, globals)) {
         rhs = statement[[3L]]
         KnownAssignment(
@@ -58,7 +59,10 @@ toStatementClass = function(statement, globals)
             , value = eval(rhs, envir = globals)
             )
     } else if(canConvertAssignmentOneVectorFunction(statement, globals)) {
-        convertAssignmentOneVectorFunction(statement, globals)
+        AssignmentOneVectorFunction(
+            statement = statement
+            , lhs = as.character(statement[[2]])
+            )
     } else {
         Statement(statement = statement)
     }
@@ -104,18 +108,59 @@ function(code, data, platform, ...)
 setMethod("expandData", signature(code = "KnownAssignment", data = "list", platform = "ANY"),
 function(code, data, platform, ...)
 {
+    # These names clarify what these objects actually are in this method
     globals = data
-    new_code = 
-    list(code = new_code, globals = globals)
+    known_assign = code
+
+    globals[[known_assign@lhs]] = known_assign
+    list(code = as(known_assign, "expression"), globals = globals)
 }
 
 
 setMethod("expandData", signature(code = "Statement", data = "list", platform = "ANY"),
 function(code, data, platform, ...)
 {
+    # Any variables that appear in the code and are chunked data objects should be collected,
+    # because this is the general case where we don't know anything about what the code will do with them.
     globals = data
     new_code = 
     list(code = new_code, globals = globals)
+}
+
+
+# collect vectorized variables that expr uses and are not already collected.
+#
+# Before:
+# f(x)
+#
+# After:
+# x = c(x1, x2, ..., xk)  # <-- this is what collect means
+# f(x)
+#
+collectVector = function(expr, vars)
+{
+    vars_used = CodeDepends::getInputs(expr)@inputs
+    vars_to_collect = intersect(vars_used, names(vars$expanded))
+
+    # If the variable has already been collected, then we don't need to do it again.
+    vars_to_collect = setdiff(vars_to_collect, vars$collected)
+
+    collect_code = Map(collectOneVariable, vars_to_collect, vars$expanded[vars_to_collect])
+
+    collect_code_all_vars = do.call(c, unname(collect_code))
+
+    vars$collected = c(vars$collected, vars_to_collect)
+
+    list(vars = vars, expr = c(collect_code_all_vars, expr))
+}
+
+
+collectOneVariable = function(vname, chunked_varnames)
+{
+    # Easier to build it from the strings.
+    args = paste(chunked_varnames, collapse = ", ")
+    expr = paste(vname, "= c(", args, ")")
+    parse(text = expr)
 }
 
 
@@ -301,41 +346,6 @@ expandExpr = function(expr, vars_to_expand)
     as.expression(newexpr)
 }
 
-
-# collect vectorized variables that expr uses and are not already collected.
-#
-# Before:
-# f(x)
-#
-# After:
-# x = c(x1, x2, ..., xk)  # <-- this is what collect means
-# f(x)
-#
-collectVector = function(expr, vars)
-{
-    vars_used = CodeDepends::getInputs(expr)@inputs
-    vars_to_collect = intersect(vars_used, names(vars$expanded))
-
-    # If the variable has already been collected, then we don't need to do it again.
-    vars_to_collect = setdiff(vars_to_collect, vars$collected)
-
-    collect_code = Map(collectOneVariable, vars_to_collect, vars$expanded[vars_to_collect])
-
-    collect_code_all_vars = do.call(c, unname(collect_code))
-
-    vars$collected = c(vars$collected, vars_to_collect)
-
-    list(vars = vars, expr = c(collect_code_all_vars, expr))
-}
-
-
-collectOneVariable = function(vname, chunked_varnames)
-{
-    # Easier to build it from the strings.
-    args = paste(chunked_varnames, collapse = ", ")
-    expr = paste(vname, "= c(", args, ")")
-    parse(text = expr)
-}
 
 
 # Verify that expr has the form

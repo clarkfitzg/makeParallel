@@ -252,10 +252,10 @@ KnownAssignment = setClass("KnownAssignment", slots = c(value = "ANY")
 #'
 #' @slot functionName name of the function that's called
 #' @slot args arguments to the function
-AssignmentOneVectorFunction = setClass("AssignmentOneVectorFunction",
-    slots = c(functionName = "character"
-              , args = "list"
-              )
+AssignmentOneVectorFunction = setClass("AssignmentOneVectorFunction"
+#    , slots = c(functionName = "character"
+#              , args = "list"
+#              )
     , contains = "Assignment"
 )
 
