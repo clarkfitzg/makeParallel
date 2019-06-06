@@ -102,17 +102,24 @@ function(code, data, platform, ...)
     # The expression defines a new chunked data object that we add to the globals.
     expr = as(code, "expression")
     globals = data
+    varname = code@lhs
 
-    mangledNames = appendNumber(code@lhs)
+    mangledNames = appendNumber(varname)
+
+    chunked_objects = data[sapply(data, is, "DataSource")]
+    vars_to_expand = lapply(chunked_objects, slot, "mangledNames")
+    # TODO: I don't think this allows for different name mangling schemes in the case of reassignment, x = foo(x)
+    vars_to_expand[[varname]] = mangledNames
+    expanded = expandExpr(expr, vars_to_expand)
 
     columns = getColumns(code, globals)
-    if(is.null(columns)
+    if(is.null(columns)) columns = character()
 
     # TODO: Generalize this to handle vectors, not just tables.
     new_obj = TableChunkData(varname = code@lhs
-                , expr = 
+                , expr = expanded
                 , columns = columns
-                , splitColumn =
+                , splitColumn = chunked_objects[[1]]@splitColumn
                 , mangledNames = mangledNames
                 , collector = "rbind"
                 , collected = FALSE
