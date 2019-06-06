@@ -226,6 +226,8 @@ GeneratedCode = function(schedule, code)
 ############################################################
 # I would prefer to get these from another package, i.e. CodeDepends or rstatic
 
+#setOldClass("=")
+
 
 #' Single Top Level Statement
 #'

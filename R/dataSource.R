@@ -3,10 +3,11 @@
 setMethod("dataSource", signature(expr = "expression", args = "missing", varname = "ANY"),
 function(expr, args, varname, ...)
 {
-#    splitColumn = list(...)[["splitColumn"]]
+    dots = list(...)
+#    splitColumn = dots[["splitColumn"]]
 #    if(is.null(splitColumn)) splitColumn = as.character(NA)
 
-    collector = list(...)[["collector"]]
+    collector = dots[["collector"]]
     if(is.null(collector)) collector = "c"
 
     varname = as.character(varname)

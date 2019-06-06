@@ -49,6 +49,9 @@ toStatementClass = function(statement, globals)
 {
     # TODO: Expand this to handle more cases.
 
+    # TODO: It would be better to use Nick's tools here.
+    class(statement) = "language"
+
     # No particular reason for checking in this order.
     # This could be made cleaner.
     if(canConvertKnownAssignment(statement, globals)) {
@@ -150,7 +153,7 @@ function(code, data, platform, ...)
     # because this is the general case where we don't know anything about what the code will do with them.
     globals = data
 
-    expr = as.expression(code)
+    expr = as(code, "expression")
     vars_used = CodeDepends::getInputs(expr)@inputs
 
     chunked_objects = data[sapply(data, is, "DataSource")]
@@ -159,8 +162,8 @@ function(code, data, platform, ...)
     vars_to_collect = intersect(vars_used, names(uncollected))
 
     # Collect the variables that are used, and then append the new expression
-    new_code = lapply(globals[uncollected], collectCode)
-    new_code = as.expression(new_code)
+    new_code = lapply(uncollected[vars_to_collect], collectCode)
+    new_code = as(new_code, "expression")
     new_code = c(new_code, expr)
 
     # record them as collected
@@ -237,7 +240,7 @@ expandExpr = function(expr, vars_to_expand)
         varname_lookup = lapply(vars_to_expand, function(var) as.symbol(var[i]))
         newexpr[[i]] = substitute_q(expr, varname_lookup)
     }
-    as.expression(newexpr)
+    as(newexpr, "expression")
 }
 
 
