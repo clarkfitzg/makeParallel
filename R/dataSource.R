@@ -32,7 +32,7 @@ function(expr, args, varname, ...)
     # build up the calls to load every chunk
     chunk_expr = lapply(args, function(args) do.call(call, list(func_name, args)))
 
-    CallGeneric(expr = as.expression(chunk_expr), varname = varname, ...)
+    callGeneric(expr = as.expression(chunk_expr), varname = varname, ...)
 })
 
 
@@ -67,4 +67,32 @@ initialAssignmentCode = function(mangledNames, code)
     nm = lapply(mangledNames, as.symbol)
     out = mapply(call, '=', nm, code, USE.NAMES = FALSE)
     as.expression(out)
+}
+
+
+#' Description of Data Files
+#'
+#' Contains information necessary to generate a call to read in these data files
+#'
+#' @export
+#' @param dir directory filled exclusively with data files
+#' @param files absolute paths to all the files
+#' @param varname expected name of the object in code
+#' @param ... further details to help efficiently and correctly read in the data
+#' @return \linkS4class{DataFiles}
+dataFiles = function(dir, varname, columns, splitColumn = character()
+    , files = list.files(dir, full.names = TRUE)
+    , readFuncName = "read.csv", ...
+    )
+{
+    ds = dataSource(expr = readFuncName, args = files, varname = varname)
+
+    ds@expr = initialAssignmentCode(ds@mangledNames, ds@expr)
+
+    TextTableFiles(ds
+        , files = files
+        , columns = columns
+        , splitColumn = splitColumn
+        , readDetails = list(...)
+        )
 }

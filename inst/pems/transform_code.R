@@ -1,7 +1,5 @@
 library(makeParallel)
 d = dataFiles(dir = "stationID"
-    , format = "text"
-    , Rclass = "data.frame"
     , varname = "pems"
     , delimiter = ","
     , splitColumn = "station"
