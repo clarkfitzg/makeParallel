@@ -21,26 +21,32 @@ function(code, data, platform, ...)
     # There's no external chunked data objects, so nothing to do.
     if(length(globals) == 0) return(code)
 
-    # The initial expressions in the generated code will be the data loading calls.
-    # At this point all the data values are TableChunkData objects
-    out = lapply(globals, slot, "expr")
-    out = do.call(c, unname(out))
+    out = expression()
+    columns = NULL
 
-    # Iterate over the actual data analysis code.
+    # Iterate over the actual data analysis code to build up the expression.
     for(statement in code){
 
         # Which of the three cases are we in?
         statement = toStatementClass(statement, globals)
 
         # Dispatch to the appropriate case
-        code_with_globals = callGeneric(statement, globals, platform, ...)
+        info = callGeneric(statement, globals, platform, ...)
 
         # Record the updates
-        globals = code_with_globals[["globals"]]
-        new_code = as(code_with_globals[["code"]], "expression")
+        globals = info[["globals"]]
+        new_code = as(info[["code"]], "expression")
         out = c(out, new_code)
+        columns = c(columns, info[["columns"]])
     }
-    out
+
+    # The first expressions in the generated code will be the data loading calls.
+    if(1 < length(data)) stop("Haven't yet implemented handling multiple initial data sets.")
+    data_desc = data[[1]]
+
+    load_code = callGeneric(data = data_desc, platform = platform, columns = info[["columns"]])
+
+    c(load_code, out)
 })
 
 
@@ -117,7 +123,6 @@ function(code, data, platform, ...)
     expanded = expandExpr(expr, vars_to_expand)
 
     columns = getColumns(code, globals)
-    if(is.null(columns)) columns = character()
 
     # TODO: Generalize this to handle vectors, not just tables.
     new_obj = TableChunkData(varname = code@lhs
@@ -133,7 +138,7 @@ function(code, data, platform, ...)
                 )
 
     globals[[new_obj@varname]] = new_obj
-    list(code = new_obj@expr, globals = globals)
+    list(code = new_obj@expr, globals = globals, columns = columns)
 })
 
 
@@ -300,11 +305,11 @@ function(code, data, platform, ...)
 
 
 # The interesting case.
-# columns = "" is a sentinel value signaling that all columns are used.
-setMethod("expandData", signature(code = "expression", data = "TextTableFiles", platform = "UnixPlatform"),
-function(code, data, platform, columns = "", ...)
+# NULL columns is a sentinel value signaling that all columns are used.
+setMethod("expandData", signature(code = "missing", data = "TextTableFiles", platform = "UnixPlatform"),
+function(code, data, platform, columns = NULL, ...)
 {
-    if(columns == ""){
+    if(is.null(columns)){
         stop("Not yet implemented. Need to read in all the columns.")
     }
 
@@ -320,7 +325,8 @@ function(code, data, platform, columns = "", ...)
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
 
     ds = dataSource("pipe", cmd, varname = data@varname)
-    ds = TableChunkData(ds, columns = used, splitColumn = data@splitColumn)
 
-    callGeneric(code, ds, platform, ...)
+    #ds = TableChunkData(ds, columns = used, splitColumn = data@splitColumn)
+    #callGeneric(code, ds, platform, ...)
+    ds@expr
 })
