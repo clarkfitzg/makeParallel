@@ -57,10 +57,12 @@ npbin = function(x)
 # How do we know for sure?
 # Because it writes over the pems variable.
 # I wrote code to do this in the CodeAnalysis package.
-pems = pems[, c("station", "flow2", "occupancy2")]
+cols = c("station", "flow2", "occupancy2")
+pems = pems[, cols]
  
 # The data description will tell us if the data starts grouped by the "station" column
-pems2 = split(pems, pems$station)
+station = pems[, "station"]
+pems2 = split(pems, station)
 
 results = lapply(pems2, npbin)
 

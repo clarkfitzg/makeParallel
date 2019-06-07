@@ -541,6 +541,24 @@ In every case the algorithm may potentially update the globals.
 The new code gets appended to the existing code.
 
 
+## Order
+
+To infer which columns are used we need to walk over the whole code, and look at every subset `[` operation on the chunked data objects.
+This is the same time that we'll need to partially evaluate things.
+For example, in the code below we need to know the value of `cols` before we can infer which columns `pems` will use.
+```{r}
+cols = c("a", "b")
+pems[, cols]
+```
+Only once we know all the columns that are used can we go back and generate the correct calls to read in the data.
+
+Currently I'm generating the calls in the same pass as when I partially evaluate it.
+This approach cannot work for generating the intial data loading call, because we don't yet know which columns will be loaded.
+
+However, we can prepend the data loading code later after we've generated all the rest of the code and we know which columns are used.
+
+
+
 ## Scratch
 
 Injecting the data loading code could definitely benefit from method dispatch.
