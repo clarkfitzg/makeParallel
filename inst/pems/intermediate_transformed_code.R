@@ -1,10 +1,7 @@
-pems_1 = pipe("cut -d , -f station,flow2,occupancy2 stationID/313368.csv")
-pems_2 = pipe("cut -d , -f station,flow2,occupancy2 stationID/313369.csv")
-pems = c(pems_1, pems_2)
+pipe("cut -d , -f  stationID/313368.csv")
+pipe("cut -d , -f  stationID/313369.csv")
 pems = pems[, c("station", "flow2", "occupancy2")]
 pems2 = split(pems, pems$station)
-results_1 = lapply(pems2, npbin)
-results_0 = lapply(pems2, npbin)
-results = c(results_1, results_0)
+results = lapply(pems2, npbin)
 results = do.call(rbind, results)
 write.csv(results, "results.csv")

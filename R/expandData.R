@@ -304,17 +304,17 @@ setMethod("expandData", signature(code = "expression", data = "TextTableFiles", 
 function(code, data, platform, ...)
 {
     used = columnsUsed(code, data@varname)
-    all_columns = data@details[["colNames"]]
+    all_columns = data@columns
     
-    if( !is.null(all_columns) && length(used) < length(all_columns) ){
-        return(prepend_data_load(code, data, platform, ...))
+    if(length(used) == length(all_columns)){
+        stop("Not yet implemented. Need to read in all the columns.")
     }
 
     # TODO: Make this more robust by checking that it's not possible for the delimiter to interfere with the behavior of cut.
 
     message("Generating pipe('cut ...') calls to perform column selection before loading to R.")
 
-    delimiter = data@details[["delimiter"]]
+    delimiter = data@readDetails[["delimiter"]]
     if(is.null(delimiter)) stop("Specify delimiter in data description details.")
 
 
@@ -332,7 +332,9 @@ function(code, data, platform, ...)
     used_indices = which(used %in% all_columns)
     used_col_string = paste(used_indices, collapse = ",")
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
-    ds = dataSource("pipe", cmd, varname = data@varname, splitColumn = data@splitColumn)
+
+    ds = dataSource("pipe", cmd, varname = data@varname)
+    ds = TableChunkData(ds, columns = used, splitColumn = data@splitColumn)
 
     callGeneric(code, ds, platform, ...)
 })
