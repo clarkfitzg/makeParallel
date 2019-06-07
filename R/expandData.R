@@ -300,13 +300,11 @@ function(code, data, platform, ...)
 
 
 # The interesting case.
+# columns = "" is a sentinel value signaling that all columns are used.
 setMethod("expandData", signature(code = "expression", data = "TextTableFiles", platform = "UnixPlatform"),
-function(code, data, platform, ...)
+function(code, data, platform, columns = "", ...)
 {
-    used = columnsUsed(code, data@varname)
-    all_columns = data@columns
-    
-    if(length(used) == length(all_columns)){
+    if(columns == ""){
         stop("Not yet implemented. Need to read in all the columns.")
     }
 
@@ -317,20 +315,8 @@ function(code, data, platform, ...)
     delimiter = data@readDetails[["delimiter"]]
     if(is.null(delimiter)) stop("Specify delimiter in data description details.")
 
-
-    # TODO: Check if this name mangling scheme is valid.
-    #data_names = paste(data@varname, tools::file_path_sans_ext(data@files), sep = "_")
-
-    #read_code = Map(gen_pipe_cut_cmd, data@files, data_names, delimiter = delimiter, used_col = used)
-
-    # When we call expandData with a list, then the names of the list are the variable names, and the values are what to replace them with.
-    #data_names = list(data_names)
-    #names(data_names) = data@varname
-
-
     # Construct the expressions needed to create the objects
-    used_indices = which(used %in% all_columns)
-    used_col_string = paste(used_indices, collapse = ",")
+    used_col_string = paste(columns, collapse = ",")
     cmd = sprintf("cut -d %s -f %s %s", delimiter, used_col_string, data@files)
 
     ds = dataSource("pipe", cmd, varname = data@varname)
