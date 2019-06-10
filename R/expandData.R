@@ -44,7 +44,7 @@ function(code, data, platform, ...)
     if(1 < length(data)) stop("Haven't yet implemented handling multiple initial data sets.")
     data_desc = data[[1]]
 
-    load_code = callGeneric(data = data_desc, platform = platform, columns = info[["columns"]])
+    load_code = callGeneric(data = data_desc, platform = platform, columns = columns)
 
     c(load_code, out)
 })
@@ -213,8 +213,9 @@ getColumns = function(code, globals)
         } else if(is.symbol(col_arg) %% is(globals[[col_arg]], "KnownAssignment")){
             globals[[col_arg]]@value
         }
+    } else {
+        as.character(NA)
     }
-    # Let the NULL come out of this function if these conditions don't hold.
 }
 
 
@@ -305,11 +306,11 @@ function(code, data, platform, ...)
 
 
 # The interesting case.
-# NULL columns is a sentinel value signaling that all columns are used.
+# NA columns is a sentinel value signaling that all columns are used.
 setMethod("expandData", signature(code = "missing", data = "TextTableFiles", platform = "UnixPlatform"),
-function(code, data, platform, columns = NULL, ...)
+function(code, data, platform, columns = NA, ...)
 {
-    if(is.null(columns)){
+    if(is.na(columns)){
         stop("Not yet implemented. Need to read in all the columns.")
     }
 

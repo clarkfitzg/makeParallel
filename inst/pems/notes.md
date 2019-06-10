@@ -558,6 +558,19 @@ This approach cannot work for generating the intial data loading call, because w
 However, we can prepend the data loading code later after we've generated all the rest of the code and we know which columns are used.
 
 
+## Status
+
+Duncan commented that it looks like this approach does two things at once- inferring which columns are used, and which columns split the data at the same time that it expands the code.
+This isn't ideal- the inference about the code should be separate from the modification.
+Furthermore, we need a more general mechanism for understanding the semantics of the functions, something like the CodeDepends function handlers that can potentially do something different for every function.
+As it stands now I've hardcoded in the logic for `[` and `split`.
+
+I think the problem is that I leapt too quickly into the implementation without precisely thinking through what needed to happen.
+That is, I was thinking about the minimum required to get the PEMS example running, but not how it can generalize.
+As the major flaws manifested themselves I kept reworking it to be more general.
+Now this implementation has gotten away from me a little bit, and I realize that it's never going to be ideal.
+This seems like a good time to go back and ask what features I really need an implementation to provide.
+
 
 ## Scratch
 
@@ -569,6 +582,8 @@ This will also be useful later for generating code.
 
 
 I wonder if we could get the S4 to pass a default argument without dispatching on it.
-It seems like I tried this before.
+It seems like I tried this before, and I think it's possible.
 
 
+Data splitting- suppose we have a vectorized computation with `w` workers, and `w + 1` evenly sized groups.
+Then we would want to split one group among all the workers to balance the loads, or one worker will have to do 2 units of work, while all the others do 1.
