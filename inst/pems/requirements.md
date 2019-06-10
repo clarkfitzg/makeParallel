@@ -1,12 +1,11 @@
 # Requirements
 
-What are the requirements to fully generate the code to do the PEMS example?
+What does the code analysis step need to infer before the PEMS example will work?
 
 ## Mandatory
 
 These must happen before the example will work.
 
-#### Describe Data
 
 #### Infer Column Usage
 
@@ -16,6 +15,6 @@ These must happen before the example will work.
 
 ## Optional
 
-We can
+We can save these for later.
 
 #### Standardize Code
