@@ -2,6 +2,8 @@ library(makeParallel)
 
 test_that("simple case of chunked input data descriptions", {
 
+    skip("Dropping data expansion idea for the moment")
+
     incode = parse(text = "
         y = 2L * x
         m_y = median(y)

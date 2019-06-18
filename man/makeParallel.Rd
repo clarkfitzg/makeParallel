@@ -5,11 +5,9 @@
 \title{Make Parallel Code From Serial}
 \usage{
 makeParallel(code, data = NULL, platform = inferPlatform(),
-  fullCode = expandData(as(code, "expression"), data, platform =
-  platform), graph = inferGraph(fullCode), run = FALSE,
-  scheduler = schedule, ..., generator = generate,
-  generatorArgs = list(), file = FALSE, prefix = "gen_",
-  overWrite = FALSE)
+  graph = inferGraph(code), run = FALSE, scheduler = schedule, ...,
+  generator = generate, generatorArgs = list(), file = FALSE,
+  prefix = "gen_", overWrite = FALSE)
 }
 \arguments{
 \item{code}{file name or expression from \code{\link[base]{parse}}}
@@ -17,8 +15,6 @@ makeParallel(code, data = NULL, platform = inferPlatform(),
 \item{data}{list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}}
 
 \item{platform}{\linkS4class{Platform} to target for where the generated code will run}
-
-\item{fullCode}{the exact code to perform inference on}
 
 \item{graph}{object of class \linkS4class{DependGraph}}
 

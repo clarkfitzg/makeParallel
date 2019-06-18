@@ -601,3 +601,5 @@ Duncan would rather infer this data description given the code, but we can alway
 I would prefer not to do this, because data that is actually challenging to handle, i.e. files that won't fit in memory, require specialized code to load it in.
 I feel that this specialized code will be difficult to handle generally.
 For example, we don't want to try to analyze a bash command called from R such as `pipe("unzip -p datafiles/* | cut ...)`, but we would be happy to generate code like this.
+
+
