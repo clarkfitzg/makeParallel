@@ -4,15 +4,13 @@
 \alias{makeParallel}
 \title{Make Parallel Code From Serial}
 \usage{
-makeParallel(code, data = NULL, platform = inferPlatform(),
+makeParallel(code, platform = inferPlatform(),
   graph = inferGraph(code), run = FALSE, scheduler = schedule, ...,
   generator = generate, generatorArgs = list(), file = FALSE,
   prefix = "gen_", overWrite = FALSE)
 }
 \arguments{
 \item{code}{file name or expression from \code{\link[base]{parse}}}
-
-\item{data}{list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}}
 
 \item{platform}{\linkS4class{Platform} to target for where the generated code will run}
 

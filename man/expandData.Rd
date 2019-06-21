@@ -9,8 +9,6 @@ expandData(code, data, platform, ...)
 \arguments{
 \item{code}{file name or expression from \code{\link[base]{parse}}}
 
-\item{data}{list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}}
-
 \item{platform}{\linkS4class{Platform} to target for where the generated code will run}
 
 \item{...}{additional arguments to scheduler}

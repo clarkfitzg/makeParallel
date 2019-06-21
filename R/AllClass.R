@@ -215,10 +215,10 @@ setClass("GeneratedCode",
 ))
 
 
-GeneratedCode = function(schedule, code)
+#' @export
+GeneratedCode = function(schedule, code, file = as.character(NA))
 {
-    new("GeneratedCode", schedule = schedule, code = code
-        , file = as.character(NA))
+    new("GeneratedCode", schedule = schedule, code = code, file = file)
 }
 
 

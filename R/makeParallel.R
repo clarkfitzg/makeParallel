@@ -1,3 +1,6 @@
+
+# @param data list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}
+
 #' Make Parallel Code From Serial
 #'
 #' \code{makeParallel} is a high level function that performs all the steps
@@ -14,7 +17,6 @@
 #'
 #' @export
 #' @param code file name or expression from \code{\link[base]{parse}}
-#' @param data list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}
 #' @param platform \linkS4class{Platform} to target for where the generated code will run
 #' @param graph object of class \linkS4class{DependGraph}
 #' @param run logical, evaluate the code once to gather timings?
@@ -57,7 +59,7 @@
 #' # Some schedules have plotting methods
 #' plot(schedule(pcode))
 makeParallel = function(code
-    , data = NULL
+    #, data = NULL
     , platform = inferPlatform()
     #, fullCode = expandData(as(code, "expression"), data, platform = platform)
     , graph = inferGraph(code)
