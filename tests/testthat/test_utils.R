@@ -100,7 +100,7 @@ test_that("symbol replacement", {
         f(g(FOO2))
         ", keep.source = FALSE)
 
-    actual = substitute_q(e, list(FOO = quote(foo_new), FOO2 = quote(foo_new_2)))
+    actual = substitute_language(e, list(FOO = quote(foo_new), FOO2 = quote(foo_new_2)))
 
     expected = parse(text = "
         bar = foo_new

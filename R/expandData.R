@@ -252,7 +252,7 @@ expandExpr = function(expr, vars_to_expand)
 
     for(i in iterator){
         varname_lookup = lapply(vars_to_expand, function(var) as.symbol(var[i]))
-        newexpr[[i]] = substitute_q(statement, varname_lookup)
+        newexpr[[i]] = substitute_language(statement, varname_lookup)
     }
     as(newexpr, "expression")
 }
@@ -272,14 +272,6 @@ isSimpleAssignCall = function(expr)
         }
     }
     result
-}
-
-
-# https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Substitutions
-# http://adv-r.had.co.nz/Computing-on-the-language.html#substitute
-substitute_q <- function(x, env) {
-    call <- substitute(substitute(y, env), list(y = x))
-    eval(call)
 }
 
 

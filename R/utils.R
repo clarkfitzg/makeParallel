@@ -144,3 +144,16 @@ by0 = function(x, ...){
         by(x, ...)
 }
 
+
+# https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Substitutions
+# http://adv-r.had.co.nz/Computing-on-the-language.html#substitute
+substitute_language = function(expr, env)
+{
+    if(is(expr, "expression")){
+        out = lapply(expr, substitute_language, env)
+        as.expression(out)
+    } else {
+        call <- substitute(substitute(y, env), list(y = expr))
+        eval(call)
+    }
+}
