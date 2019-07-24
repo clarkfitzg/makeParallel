@@ -123,7 +123,7 @@ code_to_char = function(code) paste(as.character(code), collapse = "\n")
 #' @export
 setMethod("generate", "VectorSchedule", function(schedule, ...){
 
-    template = readLines("vector_template.R")
+    template = readLines(system.file("templates/vector.R", package = "makeParallel"))
     assign_string = deparse(schedule@assignment_list)
     data = schedule@data
 
