@@ -3,9 +3,9 @@
 
 library(makeParallel)
 
-fnames = list.files(pattern = "x*.rds")
+fnames = list.files(pattern = "x[1-4]\\.rds")
 
-d = ChunkLoadFunc(read_func = "readRDS", file_names = fnames, varname = "x", combine_func = "rbind")
+d = ChunkLoadFunc(read_func_name = "readRDS", file_names = fnames, varname = "x", combine_func_name = "rbind")
 
 code = parse(text = '
     y = x[, "y"]

@@ -131,8 +131,8 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
     code = schedule@graph@code
     v = schedule@vector_indices
 
-    newcode = substitute_language(template, list(`_GEN_TIME` = Sys.time()
-        , `_VERSION` = packageVersion("makeParallel")
+    newcode = substitute_language(template, list(
+        `_MESSAGE` = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
         , `_NWORKERS` = schedule@nworkers
         , `_ASSIGNMENT_LIST` = schedule@assignment_list
         , `_FILE_NAMES` = data@file_names
@@ -140,7 +140,8 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
         , `_DATA_VARNAME` = as.symbol(data@varname)
         , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)
         , `_VECTOR_BODY` = code[v]
-        , `_SAVE_VAR` = schedule@save_var
+        , `_SAVE_VAR` = as.symbol(schedule@save_var)
+        , `_SAVE_VAR_NAME` = schedule@save_var
         , `_REMAINDER` = code[-v]
     ))
 

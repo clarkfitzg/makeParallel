@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-message(sprintf("This code was generated from R by makeParallel version %s at %s", `_VERSION`, `_GEN_TIME`))
+message(`_MESSAGE`)
 
 library(parallel)
 
@@ -20,7 +20,7 @@ clusterEvalQ(cls, {
 
     `_VECTOR_BODY`
 
-    fname = paste0(as.character(quote(`_SAVE_VAR`)), "_", workerID, ".rds")
+    fname = paste0(`_SAVE_VAR_NAME`, "_", workerID, ".rds")
 
     # Could parameterize this saving function
     saveRDS(`_SAVE_VAR`, file = fname)
