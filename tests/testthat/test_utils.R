@@ -97,14 +97,14 @@ test_that("symbol replacement", {
 
     e = parse(text = "
         bar = FOO
-        f(g(FOO2))
+        BAZ
         ", keep.source = FALSE)
 
-    actual = substitute_language(e, list(FOO = quote(foo_new), FOO2 = quote(foo_new_2)))
+    actual = substitute_language(e, list(FOO = quote(foo_new), BAZ = quote(f(g(foo_new)))))
 
     expected = parse(text = "
         bar = foo_new
-        f(g(foo_new_2))
+        f(g(foo_new))
         ", keep.source = FALSE)
 
     expect_equal(actual, expected)

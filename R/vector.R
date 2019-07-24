@@ -63,8 +63,12 @@ findBigVectorBlock = function(gdf, chunk_obj)
 
 #' @export ChunkLoadFunc
 #' @exportClass ChunkLoadFunc
+#' @slot read_func_name for example, "read.csv".
+#'      Using a character means that the function must be available, which in practice probably means it ships with R.
+#'      We should generalize this to allow functions from packages and user defined functions.
 ChunkLoadFunc = setClass("ChunkLoadFunc", contains = "DataSource",
-         slots = c(read_func = "character", file_names = "character", varname = "character", combine_func = "character"))
+         slots = c(read_func_name = "character", file_names = "character", varname = "character", combine_func_name = "character"))
+
 
 #' @export
 VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
@@ -118,36 +122,27 @@ scheduleVector = function(graph, data, save_var, nworkers = 2L, vector_funcs = c
 }
 
 
-code_to_char = function(code) paste(as.character(code), collapse = "\n")
-
-
 #' @export
-setMethod("generate", "VectorSchedule", function(schedule, ...){
-
-    template = readLines(system.file("templates/vector.R", package = "makeParallel"))
-    assign_string = deparse(schedule@assignment_list)
+setMethod("generate", "VectorSchedule",
+function(schedule, template = parse(system.file("templates/vector.R", package = "makeParallel")), ...)
+{
     data = schedule@data
 
     code = schedule@graph@code
     v = schedule@vector_indices
-    vector_body = code_to_char(code[v])
-    remainder = code_to_char(code[-v])
-    fnames = deparse(data@file_names)
 
-    output_code = whisker::whisker.render(template, list(
-        gen_time = Sys.time()
-        , file_names = fnames
-        , nworkers = schedule@nworkers
-        , assignment_list = assign_string
-        , read_func = data@read_func
-        , data_varname = data@varname
-        , combine_func = data@combine_func
-        , vector_body = vector_body
-        , save_var = schedule@save_var
-        , remainder = remainder
+    newcode = substitute_language(template, list(`_GEN_TIME` = Sys.time()
+        , `_VERSION` = packageVersion("makeParallel")
+        , `_NWORKERS` = schedule@nworkers
+        , `_ASSIGNMENT_LIST` = schedule@assignment_list
+        , `_FILE_NAMES` = data@file_names
+        , `_READ_FUNC` = as.symbol(data@read_func_name)
+        , `_DATA_VARNAME` = as.symbol(data@varname)
+        , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)
+        , `_VECTOR_BODY` = code[v]
+        , `_SAVE_VAR` = schedule@save_var
+        , `_REMAINDER` = code[-v]
     ))
-
-    newcode = parse(text = output_code)
 
     GeneratedCode(schedule = schedule, code = newcode)
 })
