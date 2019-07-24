@@ -61,7 +61,8 @@ findBigVectorBlock = function(gdf, chunk_obj)
 
 
 
-#' @export
+#' @export ChunkLoadFunc
+#' @exportClass ChunkLoadFunc
 ChunkLoadFunc = setClass("ChunkLoadFunc", contains = "DataSource",
          slots = c(read_func = "character", file_names = "character", varname = "character", combine_func = "character"))
 
@@ -96,7 +97,7 @@ scheduleVector = function(graph, data, save_var, nworkers = 2L, vector_funcs = c
     name_resource[[data@varname]] = data_id
     resources[[data_id]] = list(chunked_object = TRUE)
 
-    ast = to_ast(graph@code)
+    ast = rstatic::to_ast(graph@code)
 
     # Mark everything with whether it's a chunked object or not.
     propagate(ast, name_resource, resources, namer, vector_funcs = vector_funcs)

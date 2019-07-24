@@ -1,20 +1,9 @@
 # The code to do the actual transformation
+# That is, what we expect the user of makeParallel to write.
 
-source("vector.R")
+library(makeParallel)
 
-# Set up some toy data
-gen_one = function(i, fname)
-{
-    d = data.frame(y = i, z = 0)
-    saveRDS(d, file = fname)
-}
-nchunks = 4L
-fnames = paste0("x", seq(nchunks), ".rds")
-Map(gen_one, seq(nchunks), fnames)
-
-
-# What follows is what we expect the user of makeParallel to write.
-############################################################
+fnames = list.files(pattern = "x*.rds")
 
 d = ChunkLoadFunc(read_func = "readRDS", file_names = fnames, varname = "x", combine_func = "rbind")
 

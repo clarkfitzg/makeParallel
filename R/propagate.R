@@ -20,7 +20,7 @@
 # Returns the name of the added resource
 new_named_resource = function(node, resources, namer, chunked_object = FALSE, ...) 
 {
-    new_name = rstatic::namer()
+    new_name = namer()
     r = list(chunked_object = chunked_object, ...)
 
     # All based on side effects
@@ -118,8 +118,8 @@ update_resource.Call = function(node, name_resource, resources, namer, vector_fu
 
 
 namer_factory = function(basename = "r"){
-    cnt = Counter$new()
-    function() next_name(cnt, basename)
+    cnt = rstatic::Counter$new()
+    function() rstatic::next_name(cnt, basename)
 }
 
 
