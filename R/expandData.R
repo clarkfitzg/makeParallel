@@ -278,8 +278,8 @@ isSimpleAssignCall = function(expr)
 # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Substitutions
 # http://adv-r.had.co.nz/Computing-on-the-language.html#substitute
 substitute_q <- function(x, env) {
-      call <- substitute(substitute(y, env), list(y = x))
-  eval(call)
+    call <- substitute(substitute(y, env), list(y = x))
+    eval(call)
 }
 
 
