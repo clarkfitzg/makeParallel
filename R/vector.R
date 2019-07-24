@@ -10,15 +10,9 @@
 # 4. Multiple vectorized blocks, where we keep the data loaded on each worker, and return to it.
 
 
-# Developing stuff that should make its way into makeParallel
-library(makeParallel)
-
-source("propagate.R")
 
 
-setOldClass("Brace")
-
-
+#' @export
 setMethod("inferGraph", signature(code = "Brace", time = "missing"),
     function(code, time, ...){
         expr = lapply(code$contents, as_language)
@@ -67,9 +61,11 @@ findBigVectorBlock = function(gdf, chunk_obj)
 
 
 
+#' @export
 ChunkLoadFunc = setClass("ChunkLoadFunc", contains = "DataSource",
          slots = c(read_func = "character", file_names = "character", varname = "character", combine_func = "character"))
 
+#' @export
 VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
          slots = c(assignment_list = "list"
                    , nworkers = "integer"
@@ -78,10 +74,9 @@ VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
                    , vector_indices = "integer"
                    ))
 
-#
-#
-#
-# @param save_var character, name of the variable to save
+
+#' @param save_var character, name of the variable to save
+#' @export
 scheduleVector = function(graph, data, save_var, nworkers = 2L, vector_funcs = c("exp", "+", "*"), ...)
 {
     if(!is(data, "ChunkLoadFunc")) 
@@ -125,6 +120,7 @@ scheduleVector = function(graph, data, save_var, nworkers = 2L, vector_funcs = c
 code_to_char = function(code) paste(as.character(code), collapse = "\n")
 
 
+#' @export
 setMethod("generate", "VectorSchedule", function(schedule, ...){
 
     template = readLines("vector_template.R")
@@ -154,36 +150,3 @@ setMethod("generate", "VectorSchedule", function(schedule, ...){
 
     GeneratedCode(schedule = schedule, code = newcode)
 })
-
-
-
-
-
-if(FALSE){
-# Code for development
-name_resource = new.env()
-resources = new.env()
-namer = namer_factory()
-
-x_id = namer()
-name_resource[["x"]] = x_id
-resources[[x_id]] = list(chunked_object = TRUE)
-
-ast = to_ast(quote({
-    y = x[, "y"]
-    y2 = 2 * y
-    2 * 3
-}))
-
-# Mark everything with whether it's a chunked object or not.
-propagate(ast, name_resource, resources, namer, vector_funcs = c("exp", "+", "*"))
-
-# Should be a chunked object
-get_resource(ast[[2]], resources)
-
-g = inferGraph(ast)
-gdf = g@graph
-
-bl = findBigVectorBlock(gdf, chunk_obj)
-
-}

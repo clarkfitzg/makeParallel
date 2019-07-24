@@ -15,14 +15,12 @@
 # - name_resource is an environment where the keys are variable names in the code and the values are resource ID's.
 # - resources is an environment where the keys are resource ID's and the values are 
 
-library(rstatic)
-
 
 # Modifies the node and resources.
 # Returns the name of the added resource
 new_named_resource = function(node, resources, namer, chunked_object = FALSE, ...) 
 {
-    new_name = namer()
+    new_name = rstatic::namer()
     r = list(chunked_object = chunked_object, ...)
 
     # All based on side effects
@@ -50,7 +48,7 @@ propagate = function(node, name_resource, resources, namer, ...)
     # To simulate evaluation we need to walk up from the leaf nodes of the tree.
     # This is different from the conventional DFS / BFS.
     # We can implement this by making sure all the children have their resource_id's set
-    for(child in children(node)){
+    for(child in rstatic::children(node)){
         Recall(child, name_resource, resources, namer, ...)
     }
     # This guarantees the children all have resources, so we can proceed to this node.

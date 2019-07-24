@@ -15,6 +15,7 @@ Imports:
     parallel,
     codetools,
     CodeDepends,
+    rstatic,
     whisker
 Suggests: 
     igraph,

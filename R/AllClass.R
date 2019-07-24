@@ -8,6 +8,7 @@
 
 setOldClass("igraph")
 
+setOldClass("Brace")
 
 
 
