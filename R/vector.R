@@ -66,20 +66,24 @@ findBigVectorBlock = function(gdf, chunk_obj)
 #' @slot read_func_name for example, "read.csv".
 #'      Using a character means that the function must be available, which in practice probably means it ships with R.
 #'      We should generalize this to allow functions from packages and user defined functions.
+#' @slot read_args arguments to read the function, probably the names of files.
+#'      It could accept a general vector, but I'll need to think more carefully about how to generate code with an object that's not a character.
+#'      One way is to serialize the object right into the script.
+#'      Another way is to deparse and parse.
 ChunkLoadFunc = setClass("ChunkLoadFunc", contains = "DataSource",
-         slots = c(read_func_name = "character", file_names = "character", varname = "character", combine_func_name = "character"))
+         slots = c(read_func_name = "character", read_args = "character", varname = "character", combine_func_name = "character"))
 
 
 setValidity("ChunkLoadFunc", function(object)
 {
-    if(length(file_names) == 0) "No files specified" 
+    if(length(object@read_args) == 0) "No files specified" 
     else TRUE
 })
 
 
 #' @export
 VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
-         slots = c(assignment_list = "list"
+         slots = c(assignment_indices = "list"
                    , nworkers = "integer"
                    , data = "ChunkLoadFunc"
                    , save_var = "character"
@@ -94,7 +98,7 @@ scheduleVector = function(graph, data, save_var, nworkers = 2L, vector_funcs = c
     if(!is(data, "ChunkLoadFunc")) 
         stop("This function is currently only implemented for data of class ChunkLoadFunc.")
 
-    nchunks = length(data@file_names)
+    nchunks = length(data@read_args)
 
     # This is where the logic for splitting the chunks will go.
     # Fall back to even splitting if we don't know how big the chunks are.
@@ -120,7 +124,7 @@ scheduleVector = function(graph, data, save_var, nworkers = 2L, vector_funcs = c
     # TODO: Check that save_var is actually produced in the vector block
 
     VectorSchedule(graph = graph
-                   , assignment_list = assignments
+                   , assignment_indices = assignments
                    , nworkers = as.integer(nworkers)
                    , save_var = save_var
                    , vector_indices = vector_indices
@@ -141,8 +145,8 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
     newcode = substitute_language(template, list(
         `_MESSAGE` = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
         , `_NWORKERS` = schedule@nworkers
-        , `_ASSIGNMENT_LIST` = schedule@assignment_list
-        , `_FILE_NAMES` = data@file_names
+        , `_ASSIGNMENT_INDICES` = convert_object_to_language(schedule@assignment_indices)
+        , `_READ_ARGS` = data@read_args
         , `_READ_FUNC` = as.symbol(data@read_func_name)
         , `_DATA_VARNAME` = as.symbol(data@varname)
         , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)

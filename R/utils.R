@@ -187,5 +187,12 @@ substitute_language2 = function(expr, env, ast = rstatic::to_ast(expr))
     as.expression(ast)
 }
 
+
 substitute_language = substitute_language2
 
+
+# TODO: Is there a better way to do this?
+convert_object_to_language = function(x)
+{
+    parse(text = deparse(x))[[1L]]
+}
