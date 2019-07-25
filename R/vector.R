@@ -70,6 +70,13 @@ ChunkLoadFunc = setClass("ChunkLoadFunc", contains = "DataSource",
          slots = c(read_func_name = "character", file_names = "character", varname = "character", combine_func_name = "character"))
 
 
+setValidity("ChunkLoadFunc", function(object)
+{
+    if(length(file_names) == 0) "No files specified" 
+    else TRUE
+})
+
+
 #' @export
 VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
          slots = c(assignment_list = "list"

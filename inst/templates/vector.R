@@ -7,7 +7,7 @@ message(`_MESSAGE`)
 library(parallel)
 
 nworkers = `_NWORKERS`
-assignments = `_ASSIGNMENT_LIST` # TODO:
+assignments = `_ASSIGNMENT_LIST`
 file_names = `_FILE_NAMES`
 
 cls = makeCluster(nworkers)
