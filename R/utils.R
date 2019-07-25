@@ -161,37 +161,22 @@ substitute_language1 = function(expr, env)
 }
 
 
-replace_one = function(allcode, pattern, replacement)
+as.expression.Brace = function(x)
 {
-    matches = rstatic::find_nodes(allcode, `==`, pattern)
-    for(idx in matches){
-        allcode[[idx]] = replacement
-    }
-    allcode
+    statements = lapply(x$contents, rstatic::as_language)
+    as.expression(statements)
 }
 
-if(FALSE){
 
-    library(rstatic)
-
-    x = quote_ast({
-        foo(1)
-        BAR
-        1 + 4
-        BAR
-    })
-    bar = quote_ast({
-        bar1()
-        bar2()
-    })
-replace_one(x, Symbol$new("BAR"), bar)
-
-
+as.expression.ASTNode = function(x)
+{
+    as.expression(rstatic::as_language(x))
 }
+
 
 substitute_language2 = function(expr, env, ast = rstatic::to_ast(expr))
 {
-    replacer = function(node, env = env){
+    replacer = function(node){
         if(is(node, "Symbol") && node$value %in% names(env)){
             rstatic::to_ast(env[[node$value]])
         } else {
@@ -199,7 +184,7 @@ substitute_language2 = function(expr, env, ast = rstatic::to_ast(expr))
         }
     }
     rstatic::replace_nodes(ast, replacer, in_place = TRUE)
-    as_language(ast)
+    as.expression(ast)
 }
 
 substitute_language = substitute_language2
