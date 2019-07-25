@@ -1,11 +1,13 @@
 #!/usr/bin/env Rscript
+# Using nonsyntactic names with backticks should avoid most name collisions.
+# To be really safe we could test for name collisions, and then modify them, but I'll wait until it becomes an issue.
 
 message(`_MESSAGE`)
 
 library(parallel)
 
 nworkers = `_NWORKERS`
-assignments = `_ASSIGNMENT_LIST`
+assignments = `_ASSIGNMENT_LIST` # TODO:
 file_names = `_FILE_NAMES`
 
 cls = makeCluster(nworkers)
