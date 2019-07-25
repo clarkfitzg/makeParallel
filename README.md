@@ -21,5 +21,7 @@ Concepts:
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/makeParallel)](https://cran.r-project.org/package=makeParallel)
 -->
 
+<!--
 [![Build
 Status](https://travis-ci.org/clarkfitzg/makeParallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/makeParallel)
+-->
