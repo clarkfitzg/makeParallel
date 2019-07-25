@@ -149,7 +149,7 @@ by0 = function(x, ...){
 # http://adv-r.had.co.nz/Computing-on-the-language.html#substitute
 # Currently this doesn't allow injecting actual expressions in, i.e. blocks of code.
 # I could hack around this using c() on expressions, or with braces, but I think I'll take the rstatic route instead.
-substitute_language = function(expr, env)
+substitute_language1 = function(expr, env)
 {
     if(is(expr, "expression")){
         out = lapply(expr, substitute_language, env)
@@ -191,5 +191,16 @@ replace_one(x, Symbol$new("BAR"), bar)
 
 substitute_language2 = function(expr, env, ast = rstatic::to_ast(expr))
 {
-
+    replacer = function(node, env = env){
+        if(is(node, "Symbol") && node$value %in% names(env)){
+            rstatic::to_ast(env[[node$value]])
+        } else {
+            node
+        }
+    }
+    rstatic::replace_nodes(ast, replacer, in_place = TRUE)
+    as_language(ast)
 }
+
+substitute_language = substitute_language2
+
