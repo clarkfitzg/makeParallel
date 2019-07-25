@@ -109,4 +109,19 @@ test_that("symbol replacement", {
 
     expect_equal(actual, expected)
 
+    e2 = parse(text = "
+        `_BODY`
+        foo(bar)
+        ")
+
+    actual = substitute_language(e2, list(`_BODY` = e))
+
+    expected = parse(text = "
+        bar = FOO
+        BAZ
+        foo(bar)
+        ")
+
+    expect_equal(actual, expected)
+
 })

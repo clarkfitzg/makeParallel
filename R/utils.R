@@ -147,6 +147,8 @@ by0 = function(x, ...){
 
 # https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Substitutions
 # http://adv-r.had.co.nz/Computing-on-the-language.html#substitute
+# Currently this doesn't allow injecting actual expressions in, i.e. blocks of code.
+# I could hack around this using c() on expressions, or with braces, but I think I'll take the rstatic route instead.
 substitute_language = function(expr, env)
 {
     if(is(expr, "expression")){
@@ -156,4 +158,38 @@ substitute_language = function(expr, env)
         call <- substitute(substitute(y, env), list(y = expr))
         eval(call)
     }
+}
+
+
+replace_one = function(allcode, pattern, replacement)
+{
+    matches = rstatic::find_nodes(allcode, `==`, pattern)
+    for(idx in matches){
+        allcode[[idx]] = replacement
+    }
+    allcode
+}
+
+if(FALSE){
+
+    library(rstatic)
+
+    x = quote_ast({
+        foo(1)
+        BAR
+        1 + 4
+        BAR
+    })
+    bar = quote_ast({
+        bar1()
+        bar2()
+    })
+replace_one(x, Symbol$new("BAR"), bar)
+
+
+}
+
+substitute_language2 = function(expr, env, ast = rstatic::to_ast(expr))
+{
+
 }
