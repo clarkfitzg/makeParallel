@@ -94,3 +94,13 @@ test_that("whole workflow on files", {
     expect_equal(fn, file(out))
 
 })
+
+
+test_that("string as input", {
+
+    out = makeParallel("
+        x = 1:10
+        y = 2 * x
+    ")
+
+})

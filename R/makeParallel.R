@@ -16,7 +16,9 @@
 #' For more details see \code{vignette("makeParallel-concepts")}.
 #'
 #' @export
-#' @param code file name or expression from \code{\link[base]{parse}}
+#' @param code file name or a string containing code to be parsed
+#' @param isFile logical, is the code a file name?
+#' @param expr expression, for example from \code{\link[base]{parse}}
 #' @param platform \linkS4class{Platform} to target for where the generated code will run
 #' @param graph object of class \linkS4class{DependGraph}
 #' @param run logical, evaluate the code once to gather timings?
@@ -46,29 +48,31 @@
 #' unlink(newfile)
 #'
 #' # Pass in code directly
-#' d <- makeParallel(parse(text = "lapply(mtcars, mean)"))
+#' d <- makeParallel(expr = parse(text = "lapply(mtcars, mean)"))
 #'
-#' # Now we can examine generated code
+#' # Examine generated code
 #' writeCode(d)
 #'
 #' # Specify a different scheduler
-#' pcode <- makeParallel(parse(text = "x <- 1:100
+#' pcode <- makeParallel("x <- 1:100
 #' y <- rep(1, 100)
-#' z <- x + y"), scheduler = scheduleTaskList)
+#' z <- x + y", scheduler = scheduleTaskList)
 #' 
 #' # Some schedules have plotting methods
 #' plot(schedule(pcode))
 makeParallel = function(code
+    , isFile = file.exists(code)
+    , expr = if(isFile) parse(code) else parse(text = code)
     #, data = NULL
     , platform = inferPlatform()
     #, fullCode = expandData(as(code, "expression"), data, platform = platform)
-    , graph = inferGraph(code)
+    , graph = inferGraph(expr)
     , run = FALSE
     , scheduler = schedule
     , ...
     , generator = generate
     , generatorArgs = list()
-    , file = FALSE
+    , outFile = FALSE
     , prefix = "gen_"
     , overWrite = FALSE
     )

@@ -2,8 +2,9 @@
 # I can get this working incrementally by starting with the simplest things possible.
 # The simplest thing is a completely vectorized program.
 
-# I plan to add the following features to the software in this order:
+# I plan to add the following features to the software:
 #
+# 1. GROUP BY pattern detection in code and field in the data description
 # 1. column selection at source, using the 'pipe cut' trick
 # 2. force a 'collect', say with median
 # 3. 'reduce' functions, as in the z score example. 

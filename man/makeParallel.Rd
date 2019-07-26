@@ -4,13 +4,18 @@
 \alias{makeParallel}
 \title{Make Parallel Code From Serial}
 \usage{
-makeParallel(code, platform = inferPlatform(),
-  graph = inferGraph(code), run = FALSE, scheduler = schedule, ...,
-  generator = generate, generatorArgs = list(), file = FALSE,
+makeParallel(code, isFile = file.exists(code), expr = if (isFile)
+  parse(code) else parse(text = code), platform = inferPlatform(),
+  graph = inferGraph(expr), run = FALSE, scheduler = schedule, ...,
+  generator = generate, generatorArgs = list(), outFile = FALSE,
   prefix = "gen_", overWrite = FALSE)
 }
 \arguments{
-\item{code}{file name or expression from \code{\link[base]{parse}}}
+\item{code}{file name or a string containing code to be parsed}
+
+\item{isFile}{logical, is the code a file name?}
+
+\item{expr}{expression, for example from \code{\link[base]{parse}}}
 
 \item{platform}{\linkS4class{Platform} to target for where the generated code will run}
 
@@ -28,14 +33,14 @@ from a \linkS4class{DependGraph}.}
 \item{generatorArgs}{list of named arguments to use with
 \code{generator}}
 
+\item{prefix}{character added to front of file name}
+
+\item{overWrite}{logical write over existing generated file}
+
 \item{file}{character name of the file to write the generated script. 
 If FALSE then don't write anything to disk.
 If TRUE and code comes from a file then use \code{prefix} to make a new
 name and write a script.}
-
-\item{prefix}{character added to front of file name}
-
-\item{overWrite}{logical write over existing generated file}
 }
 \value{
 code object of class \linkS4class{GeneratedCode}
@@ -67,15 +72,15 @@ makeParallel(script, file = newfile)
 unlink(newfile)
 
 # Pass in code directly
-d <- makeParallel(parse(text = "lapply(mtcars, mean)"))
+d <- makeParallel(expr = parse(text = "lapply(mtcars, mean)"))
 
-# Now we can examine generated code
+# Examine generated code
 writeCode(d)
 
 # Specify a different scheduler
-pcode <- makeParallel(parse(text = "x <- 1:100
+pcode <- makeParallel("x <- 1:100
 y <- rep(1, 100)
-z <- x + y"), scheduler = scheduleTaskList)
+z <- x + y", scheduler = scheduleTaskList)
 
 # Some schedules have plotting methods
 plot(schedule(pcode))

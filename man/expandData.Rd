@@ -7,7 +7,7 @@
 expandData(code, data, platform, ...)
 }
 \arguments{
-\item{code}{file name or expression from \code{\link[base]{parse}}}
+\item{code}{file name or a string containing code to be parsed}
 
 \item{platform}{\linkS4class{Platform} to target for where the generated code will run}
 

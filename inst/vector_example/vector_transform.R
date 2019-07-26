@@ -1,5 +1,5 @@
 # The code to do the actual transformation
-# That is, what we expect the user of makeParallel to write.
+# The user of makeParallel must write something like the following:
 
 library(makeParallel)
 
@@ -7,12 +7,10 @@ fnames = list.files(pattern = "x[1-4]\\.rds")
 
 d = ChunkLoadFunc(read_func_name = "readRDS", read_args = fnames, varname = "x", combine_func_name = "rbind")
 
-code = parse(text = '
+out = makeParallel('
     y = x[, "y"]
     y2 = 2 * y
     2 * 3
-')
-
-out = makeParallel(code, scheduler = scheduleVector, data = d, save_var = "y2")
+', scheduler = scheduleVector, data = d, save_var = "y2")
 
 writeCode(out, "vector_actual_generated.R", overWrite = TRUE)
