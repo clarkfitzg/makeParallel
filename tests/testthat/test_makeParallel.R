@@ -43,7 +43,7 @@ test_that("Multiple assignment in single expression", {
         f(x, y, z, a, b, c)
     ", keep.source = FALSE)
 
-    out = makeParallel(code, scheduler = scheduleTaskList)
+    out = makeParallel(expr = code, scheduler = scheduleTaskList)
 
     # This test is specific to the implementation, and may need to change.
     # The first two lines will be assigned to different processors, so
@@ -63,7 +63,7 @@ test_that("whole workflow on files", {
     file.copy(from = oldscript, to = exfile)
     genfile = file.path(dirname(exfile), paste0("gen_", basename(exfile)))
 
-    out = makeParallel(exfile, file = TRUE, scheduler = scheduleTaskList, maxWorker = 3)
+    out = makeParallel(exfile, outFile = TRUE, scheduler = scheduleTaskList, maxWorker = 3)
 
     expect_s4_class(out, "GeneratedCode")
 
@@ -74,21 +74,21 @@ test_that("whole workflow on files", {
     expect_true(file.exists(genfile))
 
     # 'Catching different types of errors' - This would make a nice blog post.
-    e = tryCatch(makeParallel(exfile, file = genfile), error = identity)
+    e = tryCatch(makeParallel(exfile, outFile = genfile), error = identity)
     expect_true(is(e, "FileExistsError"))
 
-    makeParallel(exfile, file = TRUE, overWrite = TRUE)
+    makeParallel(exfile, outFile = TRUE, overWrite = TRUE)
 
     unlink(genfile)
-    makeParallel(exfile, file = FALSE)
+    makeParallel(exfile, outFile = FALSE)
     expect_false(file.exists(genfile))
 
     fname = tempfile()
-    out = makeParallel(exfile, scheduler = scheduleTaskList, file = fname)
+    out = makeParallel(exfile, scheduler = scheduleTaskList, outFile = fname)
     expect_true(file.exists(fname))
     expect_equal(fname, file(out))
 
-    out = makeParallel(exfile, file = TRUE, scheduler = scheduleTaskList, prefix = "GEN")
+    out = makeParallel(exfile, outFile = TRUE, scheduler = scheduleTaskList, prefix = "GEN")
     fn = file.path(dirname(exfile), paste0("GEN", basename(exfile)))
     expect_true(file.exists(fn))
     expect_equal(fn, file(out))

@@ -33,14 +33,14 @@ from a \linkS4class{DependGraph}.}
 \item{generatorArgs}{list of named arguments to use with
 \code{generator}}
 
-\item{prefix}{character added to front of file name}
-
-\item{overWrite}{logical write over existing generated file}
-
-\item{file}{character name of the file to write the generated script. 
+\item{outFile}{character name of the file to write the generated script. 
 If FALSE then don't write anything to disk.
 If TRUE and code comes from a file then use \code{prefix} to make a new
 name and write a script.}
+
+\item{prefix}{character added to front of file name}
+
+\item{overWrite}{logical write over existing generated file}
 }
 \value{
 code object of class \linkS4class{GeneratedCode}

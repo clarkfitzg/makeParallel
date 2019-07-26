@@ -3,7 +3,7 @@ generated_code_matches = function(input, expected)
 {
     expr = substitute(input)
     desired_expr = as.expression(substitute(expected))
-    actual = makeParallel(expr)@code
+    actual = makeParallel(expr = expr)@code
     expect_equal(actual, desired_expr)
 }
 

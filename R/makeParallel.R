@@ -28,7 +28,7 @@
 #' @param generator function to produce \linkS4class{GeneratedCode} from a \linkS4class{Schedule}
 #' @param generatorArgs list of named arguments to use with
 #'  \code{generator}
-#' @param file character name of the file to write the generated script. 
+#' @param outFile character name of the file to write the generated script. 
 #'  If FALSE then don't write anything to disk.
 #'  If TRUE and code comes from a file then use \code{prefix} to make a new
 #'  name and write a script.
@@ -65,7 +65,6 @@ makeParallel = function(code
     , expr = if(isFile) parse(code) else parse(text = code)
     #, data = NULL
     , platform = inferPlatform()
-    #, fullCode = expandData(as(code, "expression"), data, platform = platform)
     , graph = inferGraph(expr)
     , run = FALSE
     , scheduler = schedule

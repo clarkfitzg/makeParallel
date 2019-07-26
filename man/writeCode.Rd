@@ -25,11 +25,6 @@ writeCode(code, file, ...)
 \arguments{
 \item{code}{object of class \linkS4class{GeneratedCode}}
 
-\item{file}{character name of the file to write the generated script. 
-If FALSE then don't write anything to disk.
-If TRUE and code comes from a file then use \code{prefix} to make a new
-name and write a script.}
-
 \item{...}{additional arguments to methods}
 
 \item{overWrite}{logical write over existing file}
