@@ -25,3 +25,9 @@ Concepts:
 [![Build
 Status](https://travis-ci.org/clarkfitzg/makeParallel.svg?branch=master)](https://travis-ci.org/clarkfitzg/makeParallel)
 -->
+
+### TODO
+
+- Revise concepts vignette per Duncan's feedback
+
+### Done

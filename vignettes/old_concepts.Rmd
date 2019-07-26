@@ -1,0 +1,99 @@
+## Customizability
+
+`makeParallel` allows us to pass in functions that customize the behavior.
+For example, we may want the generated code to explicitly set the number of parallel workers to `N` as specified by the option `mc.cores` in the parallel package.
+The following function prepends the expression `options(mc.cores = N)` to the generated code.
+
+```{r}
+coresGenerate <- function(schedule, mc.cores = 2L, ...)
+{
+    # Rely on the method dispatch for the actual work.
+    out <- generate(schedule, ...)
+
+    # Construct an expression containing the desired code.
+    setCores <- substitute(options(mc.cores = MC_CORES)
+                          , list(MC_CORES = mc.cores))
+
+    # Combine the newly constructed expression with what would have been
+    # generated otherwise.
+    out@code <- c(setCores, writeCode(out))
+    out
+}
+```
+
+We can use this function as follows:
+
+```{r}
+lapplyCode <- parse(text = "
+    x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
+    m1 <- lapply(x, mean)
+")
+
+transformed <- makeParallel(lapplyCode, generator = coresGenerate,
+                            generatorArgs = list(mc.cores = 3L))
+```
+
+When we extract the code from this object with `writeCode` we see that it sets `options(mc.cores = 3L)` as the first line.
+
+```{r}
+writeCode(transformed)
+```
+
+```{r, echo = FALSE, results = "hide"}
+# Testing, make sure the docs do what they say!
+stopifnot(writeCode(transformed)[[1]] == quote(options(mc.cores = 3L)))
+```
+
+
+## Extensibility
+
+Some schedulers must be tied to their code generators.
+`inferGraph, schedule`, and `generate` are all generic functions, so we can allow user defined classes to extend the system through R's S4 object oriented programming system.
+
+Building on the example above, we can define a class `WorkerMapSchedule` containing `MapSchedule` that adds a slot for `mc.cores`.
+
+```{r}
+setClass("WorkerMapSchedule", slots = c(mc.cores = "integer"), contains = "MapSchedule")
+```
+
+Here's a helper constructor function:
+
+```{r}
+workerMapSchedule = function(graph, mc.cores = 2L, ...)
+{
+    message(sprintf("User defined scheduler, mc.cores = %s", mc.cores))
+    out = mapSchedule(graph, ...)
+    new("WorkerMapSchedule", out, mc.cores = mc.cores)
+}
+```
+
+Now we need to associate a code generator with `WorkerMapSchedule`.
+We can use an existing one or we can define our own.
+Since we've already defined `coresGenerate` above we'll just wrap that.
+
+```{r}
+setMethod("generate", "WorkerMapSchedule", function(schedule, ...)
+    coresGenerate(as(schedule, "MapSchedule"), mc.cores = schedule@mc.cores, ...)
+)
+```
+
+Finally, we can use the code as follows:
+
+```{r}
+transformed <- makeParallel(code, scheduler = workerMapSchedule, mc.cores = 3L)
+
+writeCode(transformed)
+```
+
+```{r, echo = FALSE, results = "hide"}
+# Testing, make sure the docs do what they say!
+stopifnot(writeCode(transformed)[[1]] == quote(options(mc.cores = 3L)))
+```
+
+
+In this section we went beyond the basic customization in the previous section in two ways.
+First, we extended the existing class hierarchy by defining our own scheduler.
+Second, we defined methods and relied on method dispatch to control some aspects of the code generation process.
+We did not have to touch the dependency graph computations.
+
+

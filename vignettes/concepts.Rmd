@@ -135,7 +135,7 @@ Task parallelism means two or more workers execute two or more different blocks 
 The only way to get a speedup from task parallelism is if the dependency graph _allows_ two or more long running parts of the program to run simultaneously.
 This could happen when reading two large files, for example.
 `scheduleTaskList` implements a standard list scheduling algorithm.
-The algorithm needs the execution time for each expression to work properly so we pass it in explicitly below.
+The algorithm needs estimates of the execution time for each expression to work properly so we pass it in explicitly below.
 
 ```{r echo=FALSE, eval=FALSE, results='hide',message=FALSE}
 
@@ -148,6 +148,8 @@ The algorithm needs the execution time for each expression to work properly so w
     write.csv(data.frame(y = rnorm(n)), yfile, row.names = FALSE)
 
 ```
+
+Here is how to use the default task scheduler:
 
 ```{r, fig.width = 8, fig.height = 6, results = "hide"}
 library(makeParallel)
@@ -172,11 +174,13 @@ This plot is a useful diagnostic- if all cores are mostly busy that's a good sig
 If only one core does almost all the work then either 1) the code can't be improved through task parallelism, or 2) the default scheduling algorithm chose a poor schedule.
 The task scheduling problem is a very rich problem with many published algorithms, so we leave hooks in for users to supply their own scheduling algorithm.
 
-The generated code is a beastly thing that no sane person would ever write by hand.
+The generated code is an ugly thing that no sane person would ever write by hand.
 But it does have a few virtues:
 
 - It runs
 - It does the same thing as the serial version while being faster
+
+This is the actual generated code:
 
 ```{r}
 writeCode(pcode)
@@ -185,49 +189,10 @@ writeCode(pcode)
 
 ## Customizability
 
-`makeParallel` allows us to pass in functions that customize the behavior.
-For example, we may want the generated code to explicitly set the number of parallel workers to `N` as specified by the option `mc.cores` in the parallel package.
-The following function prepends the expression `options(mc.cores = N)` to the generated code.
+`makeParallel` allows us to pass in functions for scheduling and code generation that customize the behavior.
 
-```{r}
-coresGenerate <- function(schedule, mc.cores = 2L, ...)
-{
-    # Rely on the method dispatch for the actual work.
-    out <- generate(schedule, ...)
-
-    # Construct an expression containing the desired code.
-    setCores <- substitute(options(mc.cores = MC_CORES)
-                          , list(MC_CORES = mc.cores))
-
-    # Combine the newly constructed expression with what would have been
-    # generated otherwise.
-    out@code <- c(setCores, writeCode(out))
-    out
-}
-```
-
-We can use this function as follows:
-
-```{r}
-lapplyCode <- parse(text = "
-    x <- list(a = 1:10, beta = exp(-3:3), logic = c(TRUE,FALSE,FALSE,TRUE))
-    m1 <- lapply(x, mean)
-")
-
-transformed <- makeParallel(lapplyCode, generator = coresGenerate,
-                            generatorArgs = list(mc.cores = 3L))
-```
-
-When we extract the code from this object with `writeCode` we see that it sets `options(mc.cores = 3L)` as the first line.
-
-```{r}
-writeCode(transformed)
-```
-
-```{r, echo = FALSE, results = "hide"}
-# Testing, make sure the docs do what they say!
-stopifnot(writeCode(transformed)[[1]] == quote(options(mc.cores = 3L)))
-```
+TODO: Come up with improved example.
+Perhaps task parallelism with bottom level sorting.
 
 
 ## Extensibility
@@ -235,46 +200,7 @@ stopifnot(writeCode(transformed)[[1]] == quote(options(mc.cores = 3L)))
 Some schedulers must be tied to their code generators.
 `inferGraph, schedule`, and `generate` are all generic functions, so we can allow user defined classes to extend the system through R's S4 object oriented programming system.
 
-Building on the example above, we can define a class `WorkerMapSchedule` containing `MapSchedule` that adds a slot for `mc.cores`.
-
-```{r}
-setClass("WorkerMapSchedule", slots = c(mc.cores = "integer"), contains = "MapSchedule")
-```
-
-Here's a helper constructor function:
-
-```{r}
-workerMapSchedule = function(graph, mc.cores = 2L, ...)
-{
-    message(sprintf("User defined scheduler, mc.cores = %s", mc.cores))
-    out = mapSchedule(graph, ...)
-    new("WorkerMapSchedule", out, mc.cores = mc.cores)
-}
-```
-
-Now we need to associate a code generator with `WorkerMapSchedule`.
-We can use an existing one or we can define our own.
-Since we've already defined `coresGenerate` above we'll just wrap that.
-
-```{r}
-setMethod("generate", "WorkerMapSchedule", function(schedule, ...)
-    coresGenerate(as(schedule, "MapSchedule"), mc.cores = schedule@mc.cores, ...)
-)
-```
-
-Finally, we can use the code as follows:
-
-```{r}
-transformed <- makeParallel(code, scheduler = workerMapSchedule, mc.cores = 3L)
-
-writeCode(transformed)
-```
-
-```{r, echo = FALSE, results = "hide"}
-# Testing, make sure the docs do what they say!
-stopifnot(writeCode(transformed)[[1]] == quote(options(mc.cores = 3L)))
-```
-
+TODO: Incorporate the example above into the makeParallel classes.
 
 In this section we went beyond the basic customization in the previous section in two ways.
 First, we extended the existing class hierarchy by defining our own scheduler.
