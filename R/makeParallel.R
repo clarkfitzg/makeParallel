@@ -62,7 +62,7 @@
 #' plot(schedule(pcode))
 makeParallel = function(code
     , isFile = file.exists(code)
-    , expr = if(isFile) parse(code) else parse(text = code)
+    , expr = if(isFile) parse(code, keep.source = TRUE) else parse(text = code, keep.source = TRUE)
     #, data = NULL
     , platform = inferPlatform()
     , graph = inferGraph(expr)
@@ -84,13 +84,13 @@ makeParallel = function(code
 
     originalFile = file(graph)
 
-    if(is.logical(file) && file && !is.na(originalFile)){
-        file = prefixFileName(originalFile, prefix)
+    if(is.logical(outFile) && outFile && !is.na(originalFile)){
+        outFile = prefixFileName(originalFile, prefix)
     }
 
-    if(is.character(file)){
-        file(out) = file
-        writeCode(out, file, overWrite = overWrite)
+    if(is.character(outFile)){
+        file(out) = outFile
+        writeCode(out, outFile, overWrite = overWrite)
     }
 
     out

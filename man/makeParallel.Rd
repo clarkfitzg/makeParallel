@@ -5,10 +5,11 @@
 \title{Make Parallel Code From Serial}
 \usage{
 makeParallel(code, isFile = file.exists(code), expr = if (isFile)
-  parse(code) else parse(text = code), platform = inferPlatform(),
-  graph = inferGraph(expr), run = FALSE, scheduler = schedule, ...,
-  generator = generate, generatorArgs = list(), outFile = FALSE,
-  prefix = "gen_", overWrite = FALSE)
+  parse(code, keep.source = TRUE) else parse(text = code, keep.source =
+  TRUE), platform = inferPlatform(), graph = inferGraph(expr),
+  run = FALSE, scheduler = schedule, ..., generator = generate,
+  generatorArgs = list(), outFile = FALSE, prefix = "gen_",
+  overWrite = FALSE)
 }
 \arguments{
 \item{code}{file name or a string containing code to be parsed}
