@@ -63,10 +63,10 @@
 #' plot(schedule(pcode))
 makeParallel = function(code
     , isFile = file.exists(code)
-    , expr = if(isFile) parse(code, keep.source = TRUE) else parse(text = code, keep.source = TRUE)
+    , expr = if(isFile) parse(code, keep.source = TRUE) else parse(text = code, keep.source = FALSE)
     , data = NULL
     , nWorkers = parallel::detectCores()
-    , platform = platform(nWorkers)
+    , platform = Platform(nWorkers)
     , graph = inferGraph(expr)
     , run = FALSE
     , scheduler = schedule

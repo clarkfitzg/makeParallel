@@ -7,9 +7,9 @@
 \alias{schedule,DependGraph,missing-method}
 \title{Schedule Dependency Graph}
 \usage{
-schedule(graph, data, maxWorker = 2L, ...)
+schedule(graph, data, platform, ...)
 
-\S4method{schedule}{GeneratedCode,ANY}(graph, data, maxWorker = 2L, ...)
+\S4method{schedule}{GeneratedCode,ANY}(graph, data, platform, ...)
 
 \S4method{schedule}{DependGraph,missing}(graph)
 }
@@ -20,7 +20,7 @@ schedule(graph, data, maxWorker = 2L, ...)
 Each element is a \linkS4class{DataSource}.
 The names of the list elements correspond to the variables in the code that these objects are bound to.}
 
-\item{maxWorker}{integer maximum number of parallel workers}
+\item{platform}{\linkS4class{Platform} describing resource to compute on}
 
 \item{...}{additional arguments to methods}
 }

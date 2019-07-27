@@ -6,7 +6,8 @@
 \usage{
 makeParallel(code, isFile = file.exists(code), expr = if (isFile)
   parse(code, keep.source = TRUE) else parse(text = code, keep.source =
-  TRUE), platform = inferPlatform(), graph = inferGraph(expr),
+  FALSE), data = NULL, nWorkers = parallel::detectCores(),
+  platform = Platform(nWorkers), graph = inferGraph(expr),
   run = FALSE, scheduler = schedule, ..., generator = generate,
   generatorArgs = list(), outFile = FALSE, prefix = "gen_",
   overWrite = FALSE)
@@ -17,6 +18,8 @@ makeParallel(code, isFile = file.exists(code), expr = if (isFile)
 \item{isFile}{logical, is the code a file name?}
 
 \item{expr}{expression, for example from \code{\link[base]{parse}}}
+
+\item{nWorkers}{integer, number of parallel workers}
 
 \item{platform}{\linkS4class{Platform} to target for where the generated code will run}
 

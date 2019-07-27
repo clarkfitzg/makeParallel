@@ -39,7 +39,7 @@ setGeneric("inferGraph", function(code, time, ...)
 # #' @param default_size numeric default size of the variables in bytes
 # # default_size = object.size(1L), 
 # #' @param epsilonTime numeric small positive number used to avoid
-# #'  difficulties which would arise 
+# #'  technical difficulties from having 0 time.
 
 
 #' Schedule Dependency Graph
@@ -69,7 +69,7 @@ setGeneric("schedule", function(graph, data, platform, ...)
 
 #' @export
 #' @rdname schedule
-setMethod("schedule", "GeneratedCode", function(graph, data, platform ...)
+setMethod("schedule", "GeneratedCode", function(graph, data, platform, ...)
 {
     graph@schedule
 })
