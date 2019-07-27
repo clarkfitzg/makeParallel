@@ -94,7 +94,7 @@ VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
 
 #' @param save_var character, name of the variable to save
 #' @export
-scheduleVector = function(graph, data, save_var, nworkers = 2L, vector_funcs = c("exp", "+", "*"), ...)
+scheduleVector = function(graph, data, save_var, nWorkers = 2L, vector_funcs = c("exp", "+", "*"), ...)
 {
     if(!is(data, "ChunkLoadFunc")) 
         stop("This function is currently only implemented for data of class ChunkLoadFunc.")

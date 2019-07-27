@@ -1,31 +1,16 @@
-#' Infer Current Platform
-#'
-#' When generating code in the absence of specific platform information we assume the code will run where it's generated.
-#'
-#' @export
-#' @return \linkS4class{Platform}
-inferPlatform = function()
-{
-    workers = parallel::detectCores()
-    os = .Platform[["OS.type"]] 
-    platform(os, workers)
-}
-
-
 #' Describe Platform
 #'
-#' Constructor for Platform classes
+#' Constructor for \linkS4class{Platform} classes, by default uses the current local platform.
 #'
 #' @export
 #' @param OS.type character, \code{"unix"} or \code{"windows"} 
-#' @param workers integer, number of parallel workers
+#' @param nWorkers integer, number of parallel workers
 #' @return \linkS4class{Platform}
-platform = function(OS.type, workers)
+platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::detectCores())
 {
-    workers = parallel::detectCores()
     if(OS.type == "unix"){
-        UnixPlatform(workers = workers)
+        UnixPlatform(nWorkers = nWorkers)
     } else {
-        Platform(workers = workers)
+        Platform(nWorkers = nWorkers)
     }
 }

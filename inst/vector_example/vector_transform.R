@@ -11,6 +11,6 @@ out = makeParallel('
     y = x[, "y"]
     y2 = 2 * y
     2 * 3
-', scheduler = scheduleVector, data = d, save_var = "y2")
+', scheduler = scheduleVector, data = d, nWorkers = 3L, save_var = "y2")
 
 writeCode(out, "vector_actual_generated.R", overWrite = TRUE)

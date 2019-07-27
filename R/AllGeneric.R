@@ -59,9 +59,9 @@ setGeneric("inferGraph", function(code, time, ...)
 #' @param data list of data descriptions. 
 #'      Each element is a \linkS4class{DataSource}.
 #'      The names of the list elements correspond to the variables in the code that these objects are bound to.
-#' @param maxWorker integer maximum number of parallel workers
+#' @param platform \linkS4class{Platform} describing resource to compute on
 #' @param ... additional arguments to methods
-setGeneric("schedule", function(graph, data, maxWorker = 2L, ...)
+setGeneric("schedule", function(graph, data, platform, ...)
            standardGeneric("schedule"))
 
 #method.skeleton("schedule", c("DependGraph", "missing"))
@@ -69,7 +69,7 @@ setGeneric("schedule", function(graph, data, maxWorker = 2L, ...)
 
 #' @export
 #' @rdname schedule
-setMethod("schedule", "GeneratedCode", function(graph, ...)
+setMethod("schedule", "GeneratedCode", function(graph, data, platform ...)
 {
     graph@schedule
 })

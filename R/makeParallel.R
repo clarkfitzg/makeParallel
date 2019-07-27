@@ -19,6 +19,7 @@
 #' @param code file name or a string containing code to be parsed
 #' @param isFile logical, is the code a file name?
 #' @param expr expression, for example from \code{\link[base]{parse}}
+#' @param nWorkers integer, number of parallel workers
 #' @param platform \linkS4class{Platform} to target for where the generated code will run
 #' @param graph object of class \linkS4class{DependGraph}
 #' @param run logical, evaluate the code once to gather timings?
@@ -63,8 +64,9 @@
 makeParallel = function(code
     , isFile = file.exists(code)
     , expr = if(isFile) parse(code, keep.source = TRUE) else parse(text = code, keep.source = TRUE)
-    #, data = NULL
-    , platform = inferPlatform()
+    , data = NULL
+    , nWorkers = parallel::detectCores()
+    , platform = platform(nWorkers)
     , graph = inferGraph(expr)
     , run = FALSE
     , scheduler = schedule
@@ -79,7 +81,7 @@ makeParallel = function(code
     if(run)
         graph = runMeasure(graph)
 
-    sc = scheduler(graph, ...)
+    sc = scheduler(graph, platform, data, ...)
     out = do.call(generator, c(list(sc), generatorArgs))
 
     originalFile = file(graph)
