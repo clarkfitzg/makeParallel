@@ -11,7 +11,7 @@ test_that("Defaults", {
 
     g = inferGraph(oldcode)
 
-    expect_warning(scheduleTaskList(g, platform = Platform()), "TimedDependGraph")
+    expect_warning(scheduleTaskList(g), "TimedDependGraph")
 
 })
 
@@ -29,5 +29,7 @@ test_that("Plotting", {
     g = inferGraph(code)
 
     s = scheduleTaskList(g)
+
+    plot(s)
 
 })

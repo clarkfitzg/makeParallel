@@ -3,15 +3,15 @@
 \docType{methods}
 \name{schedule}
 \alias{schedule}
-\alias{schedule,GeneratedCode,ANY-method}
-\alias{schedule,DependGraph,missing-method}
+\alias{schedule,GeneratedCode-method}
+\alias{schedule,DependGraph-method}
 \title{Schedule Dependency Graph}
 \usage{
 schedule(graph, data, platform, ...)
 
-\S4method{schedule}{GeneratedCode,ANY}(graph, data, platform, ...)
+\S4method{schedule}{GeneratedCode}(graph, data, platform, ...)
 
-\S4method{schedule}{DependGraph,missing}(graph)
+\S4method{schedule}{DependGraph}(graph)
 }
 \arguments{
 \item{graph}{\linkS4class{DependGraph}, code dependency graph}

@@ -4,8 +4,8 @@
 \alias{scheduleTaskList}
 \title{Minimize Expression Start Time}
 \usage{
-scheduleTaskList(graph, platform, data, orderFun = orderBottomLevel,
-  timeDefault = 1e-05,
+scheduleTaskList(graph, platform = Platform(), data = list(),
+  orderFun = orderBottomLevel, timeDefault = 1e-05,
   sizeDefault = as.numeric(utils::object.size(1L)), overhead = 8e-06,
   bandwidth = 1.5e+09)
 }

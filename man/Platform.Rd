@@ -26,6 +26,6 @@ Constructor for \linkS4class{Platform} classes, by default uses the current loca
 \section{Slots}{
 
 \describe{
-\item{\code{workers}}{number of parallel workers to use}
+\item{\code{nWorkers}}{number of parallel workers to use}
 }}
 

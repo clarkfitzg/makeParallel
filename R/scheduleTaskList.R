@@ -49,7 +49,7 @@
 #' g <- inferGraph(code)
 #' s <- scheduleTaskList(g)
 #' plot(s)
-scheduleTaskList = function(graph, platform, data
+scheduleTaskList = function(graph, platform = Platform(), data = list()
     , orderFun = orderBottomLevel
     , timeDefault = 10e-6
     , sizeDefault = as.numeric(utils::object.size(1L))

@@ -4,7 +4,7 @@
 #' @inheritParams scheduleTaskList
 #' @param overhead seconds required to initialize a fork
 #' @return schedule \linkS4class{ForkSchedule}
-scheduleFork = function(graph
+scheduleFork = function(graph, platform = Platform(), data = list()
     , overhead = 1e-3
     , bandwidth = 1.5e9
 ){
@@ -17,7 +17,7 @@ scheduleFork = function(graph
                  , sequence = sequence
                  , overhead = overhead
                  , transfer = data.frame() # TODO: actually put these in
-                 , maxWorker = max(evaluation[, "processor"])
+                 , nWorkers = max(evaluation[, "processor"])
                  , bandwidth = bandwidth
                  )
 }
