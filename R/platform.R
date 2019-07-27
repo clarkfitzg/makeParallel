@@ -10,7 +10,9 @@ Platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::dete
 {
     if(OS.type == "unix"){
         UnixPlatform(nWorkers = nWorkers)
-    } else {
+    } else if(OS.type == "windows"){
         Platform(nWorkers = nWorkers)
+    } else {
+        stop("Unknown operating system type: ", OS.type)
     }
 }

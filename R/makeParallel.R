@@ -66,7 +66,7 @@ makeParallel = function(code
     , expr = if(isFile) parse(code, keep.source = TRUE) else parse(text = code, keep.source = FALSE)
     , data = NULL
     , nWorkers = parallel::detectCores()
-    , platform = Platform(nWorkers)
+    , platform = Platform(nWorkers = nWorkers)
     , graph = inferGraph(expr)
     , run = FALSE
     , scheduler = schedule

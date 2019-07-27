@@ -1,7 +1,7 @@
-message("This code was generated from R by makeParallel version 0.2.0 at 2019-07-25 14:00:51")
+message("This code was generated from R by makeParallel version 0.2.0 at 2019-07-27 12:53:36")
 library(parallel)
-nworkers = 2
-assignments = list(1:2, 3:4)
+nworkers = 3
+assignments = list(1, 2:3, 4)
 read_args = c("x1.rds", "x2.rds", "x3.rds", "x4.rds")
 cls = makeCluster(nworkers)
 clusterExport(cls, c("assignments", "read_args"))

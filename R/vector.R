@@ -85,7 +85,7 @@ setValidity("ChunkLoadFunc", function(object)
 #' @export
 VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
          slots = c(assignment_indices = "list"
-                   , nworkers = "integer"
+                   , nWorkers = "integer"
                    , data = "ChunkLoadFunc"
                    , save_var = "character"
                    , vector_indices = "integer"
@@ -94,7 +94,8 @@ VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
 
 #' @param save_var character, name of the variable to save
 #' @export
-scheduleVector = function(graph, data, save_var, nWorkers = 2L, vector_funcs = c("exp", "+", "*"), ...)
+scheduleVector = function(graph, platform = Platform(), data = list()
+    , save_var = character(), nWorkers = platform@nWorkers, vector_funcs = c("exp", "+", "*"), ...)
 {
     if(!is(data, "ChunkLoadFunc")) 
         stop("This function is currently only implemented for data of class ChunkLoadFunc.")
@@ -103,7 +104,7 @@ scheduleVector = function(graph, data, save_var, nWorkers = 2L, vector_funcs = c
 
     # This is where the logic for splitting the chunks will go.
     # Fall back to even splitting if we don't know how big the chunks are.
-    assignments = parallel::splitIndices(nchunks, nworkers)
+    assignments = parallel::splitIndices(nchunks, nWorkers)
 
     name_resource = new.env()
     resources = new.env()
@@ -126,7 +127,7 @@ scheduleVector = function(graph, data, save_var, nWorkers = 2L, vector_funcs = c
 
     VectorSchedule(graph = graph
                    , assignment_indices = assignments
-                   , nworkers = as.integer(nworkers)
+                   , nWorkers = as.integer(nWorkers)
                    , save_var = save_var
                    , vector_indices = vector_indices
                    , data = data
@@ -145,7 +146,7 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
 
     newcode = substitute_language(template, list(
         `_MESSAGE` = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
-        , `_NWORKERS` = schedule@nworkers
+        , `_NWORKERS` = schedule@nWorkers
         , `_ASSIGNMENT_INDICES` = convert_object_to_language(schedule@assignment_indices)
         , `_READ_ARGS` = data@read_args
         , `_READ_FUNC` = as.symbol(data@read_func_name)
