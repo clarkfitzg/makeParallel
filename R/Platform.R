@@ -8,6 +8,7 @@
 #' @return \linkS4class{Platform}
 Platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::detectCores())
 {
+    nWorkers = as.integer(nWorkers)
     if(OS.type == "unix"){
         UnixPlatform(nWorkers = nWorkers)
     } else if(OS.type == "windows"){
