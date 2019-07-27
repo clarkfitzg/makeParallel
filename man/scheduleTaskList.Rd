@@ -4,15 +4,13 @@
 \alias{scheduleTaskList}
 \title{Minimize Expression Start Time}
 \usage{
-scheduleTaskList(graph, maxWorker = 2L, orderFun = orderBottomLevel,
+scheduleTaskList(graph, platform, data, orderFun = orderBottomLevel,
   timeDefault = 1e-05,
   sizeDefault = as.numeric(utils::object.size(1L)), overhead = 8e-06,
   bandwidth = 1.5e+09)
 }
 \arguments{
 \item{graph}{\linkS4class{DependGraph} as returned from \code{\link{inferGraph}}}
-
-\item{maxWorker}{integer maximum number of processors}
 
 \item{orderFun}{function that takes in a \code{graph} and
 returns a permutation of \code{1:length(graph@code)} that respects the
@@ -30,6 +28,8 @@ we can't find \code{time} from \code{graph}.}
 between processors in bytes per second. We don't take network
 contention into account. This will have to be extended to account for
 multiple machines.}
+
+\item{nWorkers}{integer maximum number of processors}
 }
 \value{
 schedule object of class \code{TaskSchedule}

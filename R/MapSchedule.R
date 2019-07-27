@@ -170,7 +170,7 @@ mapSchedule = function(graph)
 
 #' @export
 #' @rdname schedule
-setMethod("schedule", signature(graph = "DependGraph", data = "missing"), mapSchedule)
+setMethod("schedule", signature(graph = "DependGraph", data = "ANY", platform = "ANY"), mapSchedule)
 
 
 #' @export

@@ -63,7 +63,7 @@ test_that("whole workflow on files", {
     file.copy(from = oldscript, to = exfile)
     genfile = file.path(dirname(exfile), paste0("gen_", basename(exfile)))
 
-    out = makeParallel(exfile, outFile = TRUE, scheduler = scheduleTaskList, maxWorker = 3)
+    out = makeParallel(exfile, outFile = TRUE, scheduler = scheduleTaskList, nWorkers = 3)
 
     expect_s4_class(out, "GeneratedCode")
 

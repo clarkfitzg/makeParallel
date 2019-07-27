@@ -27,7 +27,7 @@
 #' @export
 #' @rdname scheduleTaskList
 #' @param graph \linkS4class{DependGraph} as returned from \code{\link{inferGraph}}
-#' @param maxWorker integer maximum number of processors
+#' @param nWorkers integer maximum number of processors
 #' @param orderFun function that takes in a \code{graph} and
 #'  returns a permutation of \code{1:length(graph@code)} that respects the
 #'  topological ordering of the graph.
@@ -49,8 +49,7 @@
 #' g <- inferGraph(code)
 #' s <- scheduleTaskList(g)
 #' plot(s)
-scheduleTaskList = function(graph
-    , maxWorker = 2L
+scheduleTaskList = function(graph, platform, data
     , orderFun = orderBottomLevel
     , timeDefault = 10e-6
     , sizeDefault = as.numeric(utils::object.size(1L))
@@ -58,10 +57,12 @@ scheduleTaskList = function(graph
     , bandwidth = 1.5e9
 ){
 
-    # TODO: Change this to handle the out of memory case.
-    if(maxWorker == 1L) return(SerialSchedule(graph = graph))
+    nWorkers = platform@nWorkers
 
-    procs = seq(maxWorker)
+    # TODO: Change this to handle the out of memory case.
+    if(nWorkers == 1L) return(SerialSchedule(graph = graph))
+
+    procs = seq(nWorkers)
     tg = graph@graph
 
     if(!is(graph, "TimedDependGraph")){
@@ -125,7 +126,7 @@ Defaulting to a value of %f seconds for every statement.", timeDefault))
     new("TaskSchedule", graph = graph
         , evaluation = schedule$eval
         , transfer = schedule$transfer
-        , maxWorker = as.integer(maxWorker)
+        , nWorkers = as.integer(nWorkers)
         , overhead = overhead
         , bandwidth = bandwidth
         )

@@ -64,9 +64,9 @@ MeasuredDependGraph = setClass("MeasuredDependGraph",
 #' Describes the physical and software infrastructure that we can use to generate parallel code.
 #'
 #' @export
-#' @slot workers number of parallel workers to use
+#' @slot nWorkers number of parallel workers to use
 Platform = setClass("Platform",
-    slots = c(workers = "integer"))
+    slots = c(nWorkers = "integer"))
 
 
 #' @export
@@ -166,7 +166,7 @@ SerialSchedule = setClass("SerialSchedule", contains = "Schedule")
 TaskSchedule = setClass("TaskSchedule"
     , slots = c(transfer = "data.frame"
               , evaluation = "data.frame"
-              , maxWorker = "integer"
+              , nWorkers = "integer"
               , overhead = "numeric"
               , bandwidth = "numeric"
     ), contains = "Schedule")
