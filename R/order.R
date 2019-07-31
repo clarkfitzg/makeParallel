@@ -1,4 +1,4 @@
-#setMethod(sort, "DependGraph", sortBottomLevel)
+#setMethod(sort, "TaskGraph", sortBottomLevel)
 
 
 #' Order Nodes By Bottom Level Order
@@ -17,7 +17,7 @@
 #' if this claim holds for general data analysis scripts.
 #'
 #' @export
-#' @param graph \linkS4class{TimedDependGraph}
+#' @param graph \linkS4class{TimedTaskGraph}
 #' @return integer vector to permute the expressions in \code{x@code}
 #' @examples
 #' graph <- inferGraph(code = parse(text = "x <- 1:100

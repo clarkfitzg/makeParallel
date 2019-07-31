@@ -17,7 +17,7 @@ NULL
 #'  to an expression.
 #' @param time time to run each expression
 #' @param ... additional arguments to methods
-#' @return object of class \linkS4class{DependGraph}
+#' @return object of class \linkS4class{TaskGraph}
 #' @examples
 #' g <- inferGraph(parse(text = "
 #'   a <- 1
@@ -55,7 +55,7 @@ setGeneric("inferGraph", function(code, time, ...)
 #' 
 #' @export
 #' @rdname schedule
-#' @param graph \linkS4class{DependGraph}, code dependency graph
+#' @param graph \linkS4class{TaskGraph}, code dependency graph
 #' @param data list of data descriptions. 
 #'      Each element is a \linkS4class{DataSource}.
 #'      The names of the list elements correspond to the variables in the code that these objects are bound to.
@@ -64,7 +64,7 @@ setGeneric("inferGraph", function(code, time, ...)
 setGeneric("schedule", function(graph, data, platform, ...)
            standardGeneric("schedule"))
 
-#method.skeleton("schedule", c("DependGraph", "missing"))
+#method.skeleton("schedule", c("TaskGraph", "missing"))
 
 
 #' @export
@@ -104,7 +104,7 @@ setGeneric("expandData", function(code, data, platform, ...)
 #' @export
 #' @rdname time
 #' @param x object containing expression run times
-setMethod("time", "TimedDependGraph", function(x)
+setMethod("time", "TimedTaskGraph", function(x)
 {
     x@time
 })

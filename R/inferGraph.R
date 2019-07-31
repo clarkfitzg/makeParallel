@@ -102,7 +102,7 @@ setMethod("inferGraph"
         tg = do.call(rbind, use_def_chains)
     }
 
-    new("DependGraph", code = expr, graph = tg)
+    new("TaskGraph", code = expr, graph = tg)
 })
 
 
@@ -113,5 +113,5 @@ setMethod("inferGraph"
           , function(code, time, ...)
 {
     g = callGeneric(code, ...)
-    TimedDependGraph(g, time = time)
+    TimedTaskGraph(g, time = time)
 })

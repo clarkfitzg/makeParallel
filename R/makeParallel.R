@@ -21,10 +21,10 @@
 #' @param expr expression, for example from \code{\link[base]{parse}}
 #' @param nWorkers integer, number of parallel workers
 #' @param platform \linkS4class{Platform} to target for where the generated code will run
-#' @param graph object of class \linkS4class{DependGraph}
+#' @param graph object of class \linkS4class{TaskGraph}
 #' @param run logical, evaluate the code once to gather timings?
 #' @param scheduler, function to produce a \linkS4class{Schedule}
-#'  from a \linkS4class{DependGraph}.
+#'  from a \linkS4class{TaskGraph}.
 #' @param ..., additional arguments to scheduler
 #' @param generator function to produce \linkS4class{GeneratedCode} from a \linkS4class{Schedule}
 #' @param generatorArgs list of named arguments to use with

@@ -72,7 +72,7 @@ prefixFileName = function(oldname, prefix)
 
 #' @export
 #' @rdname file
-setMethod("file", "DependGraph", function(description)
+setMethod("file", "TaskGraph", function(description)
 {
     srcfile = attr(description@code, "srcfile")
 

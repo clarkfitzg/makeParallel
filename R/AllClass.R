@@ -36,7 +36,7 @@ setOldClass("Brace")
 #' @slot code input code
 #' @slot graph data frame representing the graph with indices corresponding
 #'  to code
-DependGraph = setClass("DependGraph",
+TaskGraph = setClass("TaskGraph",
     slots = c(code = "expression", graph = "data.frame"))
 
 
@@ -44,16 +44,16 @@ DependGraph = setClass("DependGraph",
 #'
 #' @export
 #' @slot time time in seconds to run each expression
-TimedDependGraph = setClass("TimedDependGraph",
+TimedTaskGraph = setClass("TimedTaskGraph",
     slots = c(time = "numeric"),
-    contains = "DependGraph")
+    contains = "TaskGraph")
 
 
 #' Graph where the size of each variable that can be transferred is known
 #'
 #' @export
-MeasuredDependGraph = setClass("MeasuredDependGraph",
-    contains = "TimedDependGraph")
+MeasuredTaskGraph = setClass("MeasuredTaskGraph",
+    contains = "TimedTaskGraph")
 
 
 # Platforms
@@ -142,9 +142,9 @@ TextTableFiles = setClass("TextTableFiles"
 #' parallel using various models.
 #'
 #' @export
-#' @slot graph \linkS4class{DependGraph} used to create the schedule
+#' @slot graph \linkS4class{TaskGraph} used to create the schedule
 Schedule = setClass("Schedule", 
-    slots = c(graph = "DependGraph"
+    slots = c(graph = "TaskGraph"
         ))
 
 

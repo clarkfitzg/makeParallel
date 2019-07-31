@@ -127,7 +127,7 @@ replaceApply2 = function(expr, map = mclapplyNames)
 #' }
 #'
 #' @export
-#' @param graph \linkS4class{DependGraph}
+#' @param graph \linkS4class{TaskGraph}
 #' @examples
 #'
 #' # Each iteration of the for loop writes to a different file- good!
@@ -170,7 +170,7 @@ mapSchedule = function(graph)
 
 #' @export
 #' @rdname schedule
-setMethod("schedule", signature(graph = "DependGraph", data = "ANY", platform = "ANY"), mapSchedule)
+setMethod("schedule", signature(graph = "TaskGraph", data = "ANY", platform = "ANY"), mapSchedule)
 
 
 #' @export

@@ -6,7 +6,7 @@
 #'
 #' @export
 #' @inheritParams scheduleTaskList
-#' @param graph object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
+#' @param graph object of class \code{TaskGraph} as returned from \code{\link{inferGraph}}
 #'  expression.
 #' @return schedule object of class \code{ForkSchedule}
 scheduleFork_old = function(graph

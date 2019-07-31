@@ -26,7 +26,7 @@
 #'
 #' @export
 #' @rdname scheduleTaskList
-#' @param graph \linkS4class{DependGraph} as returned from \code{\link{inferGraph}}
+#' @param graph \linkS4class{TaskGraph} as returned from \code{\link{inferGraph}}
 #' @param nWorkers integer maximum number of processors
 #' @param orderFun function that takes in a \code{graph} and
 #'  returns a permutation of \code{1:length(graph@code)} that respects the
@@ -65,10 +65,10 @@ scheduleTaskList = function(graph, platform = Platform(), data = list()
     procs = seq(nWorkers)
     tg = graph@graph
 
-    if(!is(graph, "TimedDependGraph")){
-        warning(sprintf("Graph isn't a TimedDependGraph, so expression times are unknown.
+    if(!is(graph, "TimedTaskGraph")){
+        warning(sprintf("Graph isn't a TimedTaskGraph, so expression times are unknown.
 Defaulting to a value of %f seconds for every statement.", timeDefault))
-        graph = TimedDependGraph(graph
+        graph = TimedTaskGraph(graph
             , time = rep(timeDefault, length(graph@code)))
     }
 

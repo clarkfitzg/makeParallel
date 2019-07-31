@@ -275,7 +275,7 @@ isSimpleAssignCall = function(expr)
 }
 
 
-setMethod("expandData", signature(code = "DependGraph", data = "ANY", platform = "ANY"),
+setMethod("expandData", signature(code = "TaskGraph", data = "ANY", platform = "ANY"),
 function(code, data, platform, ...)
 {
     callGeneric(code@code, data, platform, ...)

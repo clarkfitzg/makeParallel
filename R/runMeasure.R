@@ -12,10 +12,10 @@
 #' least on the order of 1 second to run. 
 #'
 #' @param code to be passed into \code{\link{inferGraph}}
-#' @param graph object of class \code{DependGraph}
+#' @param graph object of class \code{TaskGraph}
 #' @param envir environment to evaluate the code in
 #' @param timer function that returns a timestamp.
-#' @return graph object of class \code{MeasuredDependGraph}
+#' @return graph object of class \code{MeasuredTaskGraph}
 runMeasure = function(code, graph = inferGraph(code), envir = globalenv(), timer = Sys.time)
 {
     expr = graph@code
@@ -45,5 +45,5 @@ runMeasure = function(code, graph = inferGraph(code), envir = globalenv(), timer
         }
     }
 
-    new("MeasuredDependGraph", code = expr, graph = tg, time = times)
+    new("MeasuredTaskGraph", code = expr, graph = tg, time = times)
 }
