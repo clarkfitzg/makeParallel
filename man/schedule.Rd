@@ -4,17 +4,17 @@
 \name{schedule}
 \alias{schedule}
 \alias{schedule,GeneratedCode-method}
-\alias{schedule,DependGraph-method}
+\alias{schedule,TaskGraph-method}
 \title{Schedule Dependency Graph}
 \usage{
 schedule(graph, data, platform, ...)
 
 \S4method{schedule}{GeneratedCode}(graph, data, platform, ...)
 
-\S4method{schedule}{DependGraph}(graph)
+\S4method{schedule}{TaskGraph}(graph)
 }
 \arguments{
-\item{graph}{\linkS4class{DependGraph}, code dependency graph}
+\item{graph}{\linkS4class{TaskGraph}, code dependency graph}
 
 \item{data}{list of data descriptions. 
 Each element is a \linkS4class{DataSource}.

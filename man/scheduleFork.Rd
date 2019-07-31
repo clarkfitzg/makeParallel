@@ -8,7 +8,7 @@ scheduleFork(graph, platform = Platform(), data = list(),
   overhead = 1e-03, bandwidth = 1.5e+09)
 }
 \arguments{
-\item{graph}{\linkS4class{DependGraph} as returned from \code{\link{inferGraph}}}
+\item{graph}{\linkS4class{TaskGraph} as returned from \code{\link{inferGraph}}}
 
 \item{overhead}{seconds required to initialize a fork}
 

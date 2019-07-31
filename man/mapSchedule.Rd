@@ -7,7 +7,7 @@
 mapSchedule(graph)
 }
 \arguments{
-\item{graph}{\linkS4class{DependGraph}}
+\item{graph}{\linkS4class{TaskGraph}}
 }
 \description{
 This function

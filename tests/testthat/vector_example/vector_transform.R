@@ -9,8 +9,8 @@ d = ChunkLoadFunc(read_func_name = "readRDS", read_args = fnames, varname = "x",
 
 out = makeParallel('
     y = x[, "y"]
-    y2 = 2 * y
+    y2 = 4 * y / 2
     2 * 3
-', scheduler = scheduleVector, data = d, nWorkers = 3L, save_var = "y2")
+', scheduler = scheduleVector, data = d, nWorkers = 3L, save_var = "y2", vector_funcs = "/")
 
 writeCode(out, "vector_actual_generated.R", overWrite = TRUE)

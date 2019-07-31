@@ -12,6 +12,6 @@ parallel using various models.
 \section{Slots}{
 
 \describe{
-\item{\code{graph}}{\linkS4class{DependGraph} used to create the schedule}
+\item{\code{graph}}{\linkS4class{TaskGraph} used to create the schedule}
 }}
 

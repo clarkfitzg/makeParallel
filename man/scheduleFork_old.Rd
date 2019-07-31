@@ -7,7 +7,7 @@
 scheduleFork_old(graph, overhead = 1000, bandwidth = 1.5e+09)
 }
 \arguments{
-\item{graph}{object of class \code{DependGraph} as returned from \code{\link{inferGraph}}
+\item{graph}{object of class \code{TaskGraph} as returned from \code{\link{inferGraph}}
 expression.}
 
 \item{overhead}{numeric seconds to send any object}

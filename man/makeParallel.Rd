@@ -23,12 +23,12 @@ makeParallel(code, isFile = file.exists(code), expr = if (isFile)
 
 \item{platform}{\linkS4class{Platform} to target for where the generated code will run}
 
-\item{graph}{object of class \linkS4class{DependGraph}}
+\item{graph}{object of class \linkS4class{TaskGraph}}
 
 \item{run}{logical, evaluate the code once to gather timings?}
 
 \item{scheduler, }{function to produce a \linkS4class{Schedule}
-from a \linkS4class{DependGraph}.}
+from a \linkS4class{TaskGraph}.}
 
 \item{..., }{additional arguments to scheduler}
 

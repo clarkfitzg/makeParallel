@@ -10,14 +10,14 @@ runMeasure(code, graph = inferGraph(code), envir = globalenv(),
 \arguments{
 \item{code}{to be passed into \code{\link{inferGraph}}}
 
-\item{graph}{object of class \code{DependGraph}}
+\item{graph}{object of class \code{TaskGraph}}
 
 \item{envir}{environment to evaluate the code in}
 
 \item{timer}{function that returns a timestamp.}
 }
 \value{
-graph object of class \code{MeasuredDependGraph}
+graph object of class \code{MeasuredTaskGraph}
 }
 \description{
 Will export this once I the full pipeline works.

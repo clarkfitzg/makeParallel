@@ -91,17 +91,29 @@ VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
                    , vector_indices = "integer"
                    ))
 
+
 #' Schedule Based On Vectorized Blocks
 #'
+#' This scheduler combines as many vectorized expressions as it can into one large block of vectorized expressions to run in parallel.
+#' The initial data chunks and intermediate objects stay on the workers and do not return to the manager, so you can think of it as "chunk fusion".
 #'
+#' TODO:
+#'
+#' 1. Populate `known_vector_funcs` based on code analysis.
+#' 1. Model non vectorized functions so that we can revisit the chunked data.
+#'      Currently it only allows for one chunked block.
+#' 2. Identify which parameters a function is vectorized in, and respect these by matching arguments.
+#'      See `update_resource.Call`.
+#' 3. Clarify behavior of subexpressions, handling cases such as `min(sin(large_object))`
 #'
 #' @inheritParams makeParallel
 #' @param save_var character, name of the variable to save
 #' @param known_vector_funcs character, the names of vectorized functions from recommended and base packages.
-#'      TODO: populate this based on code analysis
 #' @param vector_funcs character, names of additional vectorized functions known to the user.
 #' @param all_vector_funcs character, names of all vectorized functions to use in the analysis.
+#' @seealso [makeParallel], [schedule]
 #' @export
+#' @md
 scheduleVector = function(graph, platform = Platform(), data = list()
     , save_var = character()
     , nWorkers = platform@nWorkers

@@ -1,4 +1,4 @@
-message("This code was generated from R by makeParallel version 0.2.0 at 2019-07-27 13:06:59")
+message("This code was generated from R by makeParallel version 0.2.0 at 2019-07-31 10:35:44")
 library(parallel)
 nworkers = 3
 assignments = list(1, 2:3, 4)
@@ -12,7 +12,7 @@ clusterEvalQ(cls, {
     x = do.call(rbind, chunks)
     {
         y = x[, "y"]
-        y2 = 2 * y
+        y2 = 4 * y/2
     }
     fname = paste0("y2", "_", workerID, ".rds")
     saveRDS(y2, file = fname)

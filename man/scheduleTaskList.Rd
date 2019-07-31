@@ -10,7 +10,7 @@ scheduleTaskList(graph, platform = Platform(), data = list(),
   bandwidth = 1.5e+09)
 }
 \arguments{
-\item{graph}{\linkS4class{DependGraph} as returned from \code{\link{inferGraph}}}
+\item{graph}{\linkS4class{TaskGraph} as returned from \code{\link{inferGraph}}}
 
 \item{orderFun}{function that takes in a \code{graph} and
 returns a permutation of \code{1:length(graph@code)} that respects the

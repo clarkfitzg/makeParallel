@@ -28,7 +28,7 @@ to an expression.}
 \item{...}{additional arguments to methods}
 }
 \value{
-object of class \linkS4class{DependGraph}
+object of class \linkS4class{TaskGraph}
 }
 \description{
 Statically analyze code to determine implicit dependencies
