@@ -42,7 +42,6 @@ new_named_resource = function(node, resources, namer, chunked_object = FALSE, ..
 # @ value list containing updated ast and resource.
 #       ast is the original ast except that the nodes \code{x.data$resource_id} have values to look up the resources
 #       resources is the orginal resource plus any new distributed resources
-
 propagate = function(node, name_resource, resources, namer, ...)
 {
     # To simulate evaluation we need to walk up from the leaf nodes of the tree.
