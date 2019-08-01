@@ -60,7 +60,7 @@ setGeneric("inferGraph", function(code, time, ...)
 #'      Each element is a \linkS4class{DataSource}.
 #'      The names of the list elements correspond to the variables in the code that these objects are bound to.
 #' @param platform \linkS4class{Platform} describing resource to compute on
-#' @param ... additional arguments to methods
+#' @param ... additional arguments to schedule methods
 setGeneric("schedule", function(graph, data, platform, ...)
            standardGeneric("schedule"))
 

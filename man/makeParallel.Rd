@@ -19,18 +19,22 @@ makeParallel(code, isFile = file.exists(code), expr = if (isFile)
 
 \item{expr}{expression, for example from \code{\link[base]{parse}}}
 
+\item{data}{list of data descriptions. 
+Each element is a \linkS4class{DataSource}.
+The names of the list elements correspond to the variables in the code that these objects are bound to.}
+
 \item{nWorkers}{integer, number of parallel workers}
 
-\item{platform}{\linkS4class{Platform} to target for where the generated code will run}
+\item{platform}{\linkS4class{Platform} describing resource to compute on}
 
-\item{graph}{object of class \linkS4class{TaskGraph}}
+\item{graph}{\linkS4class{TaskGraph}, code dependency graph}
 
 \item{run}{logical, evaluate the code once to gather timings?}
 
 \item{scheduler, }{function to produce a \linkS4class{Schedule}
 from a \linkS4class{TaskGraph}.}
 
-\item{..., }{additional arguments to scheduler}
+\item{...}{additional arguments to schedule methods}
 
 \item{generator}{function to produce \linkS4class{GeneratedCode} from a \linkS4class{Schedule}}
 

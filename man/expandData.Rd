@@ -9,9 +9,13 @@ expandData(code, data, platform, ...)
 \arguments{
 \item{code}{file name or a string containing code to be parsed}
 
-\item{platform}{\linkS4class{Platform} to target for where the generated code will run}
+\item{data}{list of data descriptions. 
+Each element is a \linkS4class{DataSource}.
+The names of the list elements correspond to the variables in the code that these objects are bound to.}
 
-\item{...}{additional arguments to scheduler}
+\item{platform}{\linkS4class{Platform} describing resource to compute on}
+
+\item{...}{additional arguments to schedule methods}
 }
 \description{
 Updates code to include code to load data

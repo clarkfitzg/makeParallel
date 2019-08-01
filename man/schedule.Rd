@@ -22,7 +22,7 @@ The names of the list elements correspond to the variables in the code that thes
 
 \item{platform}{\linkS4class{Platform} describing resource to compute on}
 
-\item{...}{additional arguments to methods}
+\item{...}{additional arguments to schedule methods}
 }
 \description{
 Creates the schedule for a dependency graph. The schedule is the

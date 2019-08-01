@@ -106,7 +106,7 @@ VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
 #'      See `update_resource.Call`.
 #' 3. Clarify behavior of subexpressions, handling cases such as `min(sin(large_object))`
 #'
-#' @inheritParams makeParallel
+#' @inheritParams schedule
 #' @param save_var character, name of the variable to save
 #' @param known_vector_funcs character, the names of vectorized functions from recommended and base packages.
 #' @param vector_funcs character, names of additional vectorized functions known to the user.

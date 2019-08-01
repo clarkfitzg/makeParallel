@@ -10,13 +10,15 @@ scheduleVector(graph, platform = Platform(), data = list(),
   all_vector_funcs = c(known_vector_funcs, vector_funcs))
 }
 \arguments{
-\item{graph}{object of class \linkS4class{TaskGraph}}
+\item{graph}{\linkS4class{TaskGraph}, code dependency graph}
 
-\item{platform}{\linkS4class{Platform} to target for where the generated code will run}
+\item{platform}{\linkS4class{Platform} describing resource to compute on}
+
+\item{data}{list of data descriptions. 
+Each element is a \linkS4class{DataSource}.
+The names of the list elements correspond to the variables in the code that these objects are bound to.}
 
 \item{save_var}{character, name of the variable to save}
-
-\item{nWorkers}{integer, number of parallel workers}
 
 \item{known_vector_funcs}{character, the names of vectorized functions from recommended and base packages.}
 

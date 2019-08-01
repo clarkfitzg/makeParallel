@@ -1,10 +1,9 @@
-
-# @param data list with names corresponding to variables in the code and values instances of \linkS4class{ChunkDataSource}
-
 #' Make Parallel Code From Serial
 #'
 #' \code{makeParallel} is a high level function that performs all the steps
-#' to generate parallel code, namely:
+#' to generate parallel code.
+#'
+#' The following are the high level steps:
 #'
 #' \enumerate{
 #'  \item Infer the task graph
@@ -16,16 +15,14 @@
 #' For more details see \code{vignette("makeParallel-concepts")}.
 #'
 #' @export
+#' @inheritParams schedule
 #' @param code file name or a string containing code to be parsed
 #' @param isFile logical, is the code a file name?
 #' @param expr expression, for example from \code{\link[base]{parse}}
 #' @param nWorkers integer, number of parallel workers
-#' @param platform \linkS4class{Platform} to target for where the generated code will run
-#' @param graph object of class \linkS4class{TaskGraph}
 #' @param run logical, evaluate the code once to gather timings?
 #' @param scheduler, function to produce a \linkS4class{Schedule}
 #'  from a \linkS4class{TaskGraph}.
-#' @param ..., additional arguments to scheduler
 #' @param generator function to produce \linkS4class{GeneratedCode} from a \linkS4class{Schedule}
 #' @param generatorArgs list of named arguments to use with
 #'  \code{generator}
