@@ -152,7 +152,7 @@ by0 = function(x, ...){
 substitute_language1 = function(expr, env)
 {
     if(is(expr, "expression")){
-        out = lapply(expr, substitute_language, env)
+        out = lapply(expr, substitute_language1, env)
         as.expression(out)
     } else {
         call <- substitute(substitute(y, env), list(y = expr))
@@ -196,4 +196,44 @@ substitute_language = substitute_language2
 convert_object_to_language = function(x)
 {
     parse(text = deparse(x))[[1L]]
+}
+
+
+if(FALSE){
+
+
+    # Minimal example of what the code substition should support.
+    # BLOCK is an arbitrary block of code.
+    template = parse(text = "
+        VARNAME = VALUE
+        foo(VARNAME)
+        BLOCK
+    ")
+
+    v = as.symbol("x")
+    l = list(1:2, 3:4)
+    b = parse(text = "
+              bar(1)
+              1 + 2
+              ")
+
+    # Works, puts a brace { in, which isn't a big deal.
+    substitute_language2(template, list(VARNAME = v,
+        VALUE = convert_object_to_language(l),
+        BLOCK = b
+        ))
+
+    # Doesn't work with the BLOCK, gives nested expressions
+    substitute_language1(template, list(VARNAME = v,
+        VALUE = l,
+        BLOCK = b
+        ))
+
+    # Doesn't work because rstatic doesn't convert a list to an AST.
+    # rstatic's behavior here is reasonable.
+    substitute_language2(template, list(VARNAME = v,
+        VALUE = l,
+        BLOCK = b
+        ))
+
 }

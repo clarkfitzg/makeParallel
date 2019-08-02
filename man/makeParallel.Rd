@@ -55,9 +55,11 @@ code object of class \linkS4class{GeneratedCode}
 }
 \description{
 \code{makeParallel} is a high level function that performs all the steps
-to generate parallel code, namely:
+to generate parallel code.
 }
 \details{
+The following are the high level steps:
+
 \enumerate{
  \item Infer the task graph
  \item Schedule the statements

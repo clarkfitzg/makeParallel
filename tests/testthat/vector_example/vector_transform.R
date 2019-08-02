@@ -25,6 +25,6 @@ out = makeParallel('
     y2 = 4 * y / 2
     2 * 3
 # TODO: saveRDS(y2, "y2.rds")
-', scheduler = scheduleVector, data = d, nWorkers = 3L, save_var = "y2", vector_funcs = "/")
+', scheduler = scheduleVector, data = d, nWorkers = 3L, save_var = "y2", vector_funcs = c("foo", "/"))
 
 writeCode(out, "vector_actual_generated.R", overWrite = TRUE)
