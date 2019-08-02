@@ -11,7 +11,7 @@ test_that("Defaults", {
 
     g = inferGraph(oldcode)
 
-    expect_warning(scheduleTaskList(g), "TimedDependGraph")
+    expect_warning(scheduleTaskList(g), "TimedTaskGraph")
 
 })
 

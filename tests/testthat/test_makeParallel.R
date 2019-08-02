@@ -14,7 +14,7 @@ test_that("Defaults for generics used in parallelize.", {
     s = schedule(g)
     newcode = generate(s)
 
-    expect_s4_class(g, "DependGraph")
+    expect_s4_class(g, "TaskGraph")
     expect_s4_class(s, "Schedule")
     expect_s4_class(newcode, "GeneratedCode")
 
@@ -30,7 +30,7 @@ test_that("runMeasure", {
 
     g = runMeasure(oldcode)
 
-    expect_s4_class(g, "MeasuredDependGraph")
+    expect_s4_class(g, "MeasuredTaskGraph")
 
 })
 

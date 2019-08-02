@@ -20,8 +20,8 @@ d = ChunkLoadFunc(read_func_name = "readRDS", read_args = fnames, varname = "x",
 # x.csv (is chunked as) x1.csv = 200 rows, x2.csv = 300 rows, etc.
 
 out = makeParallel('
-#    x = readRDS("x1.rds")
-    y = foo(x[, "y"])
+# TODO:   x = readRDS("x1.rds")
+    y = x[, "y"]
     y2 = 4 * y / 2
     2 * 3
 # TODO: saveRDS(y2, "y2.rds")
