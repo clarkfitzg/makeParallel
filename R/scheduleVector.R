@@ -117,18 +117,18 @@ VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
 scheduleVector = function(graph, platform = Platform(), data = list()
     , save_var = character()
     , nWorkers = platform@nWorkers
-    , known_vector_funcs = c("exp", "+", "*")
+    , known_vector_funcs = c("exp", "+", "*", "sin")
     , vector_funcs = character()
     , all_vector_funcs = c(known_vector_funcs, vector_funcs)
     )
 {
-    if(!is(data, "ChunkLoadFunc")) 
-        stop("This function is currently only implemented for data of class ChunkLoadFunc.")
+    if(!is.list(data) || 1 < length(data) || is.null(names(data))) 
+        stop("Expected data to be of the form: `list(varname = data_description)`, where varname is a variable in the code.")
 
-    nchunks = length(data@read_args)
+    nchunks = length(data@files)
 
     # This is where the logic for splitting the chunks will go.
-    # Fall back to even splitting if we don't know how big the chunks are.
+    # Use heuristic for approximate even splitting
     assignments = parallel::splitIndices(nchunks, nWorkers)
 
     name_resource = new.env()
@@ -136,7 +136,7 @@ scheduleVector = function(graph, platform = Platform(), data = list()
     namer = namer_factory()
 
     data_id = namer()
-    name_resource[[data@varname]] = data_id
+    name_resource[[ names(data)[[1]] ]] = data_id
     resources[[data_id]] = list(chunked_object = TRUE)
 
     ast = rstatic::to_ast(graph@code)
