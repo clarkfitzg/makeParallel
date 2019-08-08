@@ -9,8 +9,14 @@ library(makeParallel)
 fnames = list.files(pattern = "x[1-4]\\.rds")
 
 # Description of the data
-# TODO: Add the number of rows or data sizes to motivate
-d = ChunkLoadFunc(read_func_name = "readRDS", read_args = fnames, varname = "x", combine_func_name = "rbind", split_column_name = "y", column_names = c(y = 1L, z = 2L))
+d = ChunkLoadFunc(read_func_name = "readRDS"
+                  , read_args = fnames
+                  , varname = "x"
+                  , combine_func_name = "rbind"
+                  , split_column_name = "y"
+                  , column_names = c(y = 1L, z = 2L)
+                  , sizes = c(10, 5, 5, 10)
+                  )
 
 
 # TODO: Grow the example by scheduling based on size of files

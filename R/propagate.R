@@ -142,6 +142,8 @@ get_resource = function(node, resources)
 is_chunked = function(node, resources) get_resource(node, resources)$chunked_object
 
 
+# TODO: split followed by lapply is more general, so maybe I should probably be working with that?
+
 # Returns the name of the column that the call splits by if it can find it, and FALSE otherwise
 splits_by_known_column = function(bycall, resources)
 {
