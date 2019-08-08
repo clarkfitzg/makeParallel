@@ -84,6 +84,21 @@ UnixPlatform = setClass("UnixPlatform",
 DataSource = setClass("DataSource")
 
 
+#' Many Files Representing One Object
+#'
+#' @export
+ChunkDataFiles = setClass("ChunkData"
+    , slots = c(files = "character"
+                , sizes = "numeric"
+                , readFuncName = "character"
+                )
+    , contains = "DataSource"
+    )
+
+
+# Thu Aug  8 14:50:39 PDT 2019
+# The data descriptions that follow seem to use the expanding expression idea, which I've now abandoned.
+
 #' Chunked Data Source defined by R expressions
 #'
 #' Contains information necessary to load chunks of data into an R session.

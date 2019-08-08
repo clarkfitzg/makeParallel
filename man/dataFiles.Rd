@@ -4,16 +4,16 @@
 \alias{dataFiles}
 \title{Description of Data Files}
 \usage{
-dataFiles(dir, varname, columns, splitColumn = character(),
-  files = list.files(dir, full.names = TRUE),
+dataFiles(dir, files = list.files(dir, full.names = TRUE),
+  sizes = sapply(files, function(f) file.info(f)$size),
   readFuncName = "read.csv", ...)
 }
 \arguments{
 \item{dir}{directory filled exclusively with data files}
 
-\item{varname}{expected name of the object in code}
-
 \item{files}{absolute paths to all the files}
+
+\item{sizes}{sizes of the objects in memory}
 
 \item{...}{further details to help efficiently and correctly read in the data}
 }

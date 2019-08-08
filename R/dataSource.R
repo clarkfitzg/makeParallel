@@ -77,22 +77,14 @@ initialAssignmentCode = function(mangledNames, code)
 #' @export
 #' @param dir directory filled exclusively with data files
 #' @param files absolute paths to all the files
-#' @param varname expected name of the object in code
+#' @param sizes sizes of the objects in memory
 #' @param ... further details to help efficiently and correctly read in the data
 #' @return \linkS4class{DataFiles}
-dataFiles = function(dir, varname, columns, splitColumn = character()
+dataFiles = function(dir
     , files = list.files(dir, full.names = TRUE)
+    , sizes = sapply(files, function(f) file.info(f)$size)
     , readFuncName = "read.csv", ...
     )
 {
-    ds = dataSource(expr = readFuncName, args = files, varname = varname)
-
-    ds@expr = initialAssignmentCode(ds@mangledNames, ds@expr)
-
-    TextTableFiles(ds
-        , files = files
-        , columns = columns
-        , splitColumn = splitColumn
-        , readDetails = list(...)
-        )
+    ChunkDataFiles(files = files, sizes = as.numeric(sizes), readFuncName = readFuncName)
 }

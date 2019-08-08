@@ -5,8 +5,9 @@
 
 library(makeParallel)
 
-fnames = list.files(pattern = "x[1-4]\\.rds")
-x_desc = dataFiles(fnames)
+x_desc = dataFiles(files = c("x1.rds", "x2.rds", "x3.rds")
+, sizes = c(100, 200, 300)
+, readFuncName = "readRDS")
 
 out = makeParallel('
 
@@ -15,6 +16,6 @@ out = makeParallel('
     saveRDS(result, "result.rds")
 '
 , data = list(x = x_desc)
-, nWorkers = 3L
+, nWorkers = 2L
 , outFile = "pmin.R"
 )
