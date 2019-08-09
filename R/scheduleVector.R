@@ -92,10 +92,26 @@ VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
                    ))
 
 
+# Standard greedy algorithm for assigning tasks of varied length to homogeneous workers such that we try to minimize the time that the last task is finished.
+greedy_assign = function(tasktimes, w)
+{
+    workertimes = rep(0, w)
+    assignments = rep(NA, length(tasktimes))
+    for(idx in seq_along(tasktimes)){
+        worker = which.min(workertimes)
+        workertimes[worker] = workertimes[worker] + tasktimes[idx]
+        assignments[idx] = worker
+    }
+    assignments
+}
+
+
 #' Schedule Based On Vectorized Blocks
 #'
 #' This scheduler combines as many vectorized expressions as it can into one large block of vectorized expressions to run in parallel.
 #' The initial data chunks and intermediate objects stay on the workers and do not return to the manager, so you can think of it as "chunk fusion".
+#'
+#' It balances the load of the data chunks among workers, assuming that loading and processing times are linear in the size of the data.
 #'
 #' TODO:
 #'
@@ -125,18 +141,18 @@ scheduleVector = function(graph, platform = Platform(), data = list()
     if(!is.list(data) || 1 < length(data) || is.null(names(data))) 
         stop("Expected data to be of the form: `list(varname = data_description)`, where varname is a variable in the code.")
 
-    nchunks = length(data@files)
+    data_desc = data[[1L]]
+    varname = names(data)
+    nchunks = length(data_desc@files)
 
-    # This is where the logic for splitting the chunks will go.
-    # Use heuristic for approximate even splitting
-    assignments = parallel::splitIndices(nchunks, nWorkers)
+    assignments = greedy_assign(data_desc@size, nWorkers)
 
     name_resource = new.env()
     resources = new.env()
     namer = namer_factory()
 
     data_id = namer()
-    name_resource[[ names(data)[[1]] ]] = data_id
+    name_resource[[varname]] = data_id
     resources[[data_id]] = list(chunked_object = TRUE)
 
     ast = rstatic::to_ast(graph@code)
@@ -155,7 +171,7 @@ scheduleVector = function(graph, platform = Platform(), data = list()
                    , nWorkers = as.integer(nWorkers)
                    , save_var = save_var
                    , vector_indices = vector_indices
-                   , data = data
+                   , data = data_desc
                    )
 }
 
@@ -166,6 +182,12 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
 {
     data = schedule@data
 
+    if(!is(data, "ChunkDataFiles"))
+        # I could generalize this template with S4 methods, something like the following:
+        # `_READ_ARGS` = chunkLoadArgs(data)
+        # But I'll wait until I have a reason to.
+        stop("Currently only implemented for data of class ChunkDataFiles.")
+
     code = schedule@graph@code
     v = schedule@vector_indices
 
@@ -174,8 +196,8 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
         , `_NWORKERS` = schedule@nWorkers
         #, `_ASSIGNMENT_INDICES` = schedule@assignment_indices
         , `_ASSIGNMENT_INDICES` = convert_object_to_language(schedule@assignment_indices)
-        , `_READ_ARGS` = data@read_args
-        , `_READ_FUNC` = as.symbol(data@read_func_name)
+        , `_READ_ARGS` = data@files
+        , `_READ_FUNC` = as.symbol(data@readFuncName)
         , `_DATA_VARNAME` = as.symbol(data@varname)
         , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)
         , `_VECTOR_BODY` = code[v]
