@@ -22,10 +22,6 @@ clusterEvalQ(cls, {
 
     `_VECTOR_BODY`
 
-    fname = paste0(`_SAVE_VAR_NAME`, "_", workerID, ".rds")
-
-    # Could parameterize this saving function
-    saveRDS(`_SAVE_VAR`, file = fname)
 })
 
 `_REMAINDER`

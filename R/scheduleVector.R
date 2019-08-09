@@ -87,7 +87,6 @@ VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
          slots = c(assignment_indices = "list"
                    , nWorkers = "integer"
                    , data = "ChunkLoadFunc"
-                   , save_var = "character"
                    , vector_indices = "integer"
                    ))
 
@@ -123,7 +122,6 @@ greedy_assign = function(tasktimes, w)
 #' 3. Clarify behavior of subexpressions, handling cases such as `min(sin(large_object))`
 #'
 #' @inheritParams schedule
-#' @param save_var character, name of the variable to save
 #' @param known_vector_funcs character, the names of vectorized functions from recommended and base packages.
 #' @param vector_funcs character, names of additional vectorized functions known to the user.
 #' @param all_vector_funcs character, names of all vectorized functions to use in the analysis.
@@ -131,7 +129,6 @@ greedy_assign = function(tasktimes, w)
 #' @export
 #' @md
 scheduleVector = function(graph, platform = Platform(), data = list()
-    , save_var = character()
     , nWorkers = platform@nWorkers
     , known_vector_funcs = c("exp", "+", "*", "sin")
     , vector_funcs = character()
@@ -164,12 +161,9 @@ scheduleVector = function(graph, platform = Platform(), data = list()
 
     vector_indices = findBigVectorBlock(graph@graph, chunk_obj)
 
-    # TODO: Check that save_var is actually produced in the vector block
-
     VectorSchedule(graph = graph
                    , assignment_indices = assignments
                    , nWorkers = as.integer(nWorkers)
-                   , save_var = save_var
                    , vector_indices = vector_indices
                    , data = data_desc
                    )
@@ -201,8 +195,6 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
         , `_DATA_VARNAME` = as.symbol(data@varname)
         , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)
         , `_VECTOR_BODY` = code[v]
-        , `_SAVE_VAR` = as.symbol(schedule@save_var)
-        , `_SAVE_VAR_NAME` = schedule@save_var
         , `_REMAINDER` = code[-v]
     ))
 
