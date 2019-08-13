@@ -67,8 +67,15 @@ findBigVectorBlock = function(gdf, chunk_obj)
 # Then we can get all the inputs to the non vector block.
 # We take the intersection of all these names and collect them back onto the manager.
 # It's not necessary to also take the chunked objects, because everything from the vector block will be a chunked object.
-find_objects_receive_from_workers = function(ast, vector_indices, chunk_obj)
+find_objects_receive_from_workers = function(code, vector_indices)
 {
+    vector_block = CodeDepends::getInputs(code[vector_indices])
+    non_vector_block = CodeDepends::getInputs(code[vector_indices])
+
+    defined = unique(vector_block@outputs, vector_block@updates)
+    used = non_vector_block@inputs
+
+    intersect(defined, used)
 }
 
 
@@ -180,7 +187,7 @@ scheduleVector = function(graph, platform = Platform(), data = list()
     vector_indices = findBigVectorBlock(graph@graph, chunk_obj)
 
     # All the chunked resources that are used later in the remainder of the code need to go from the workers to the manager.
-    objects_receive_from_workers = find_objects_receive_from_workers(graph@graph, vector_indices, chunk_obj)
+    objects_receive_from_workers = find_objects_receive_from_workers(graph@code, vector_indices)
 
     VectorSchedule(graph = graph
                    , assignment_indices = assignments
