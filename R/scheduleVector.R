@@ -55,6 +55,22 @@ findBigVectorBlock = function(gdf, chunk_obj)
 }
 
 
+# Before non vectorized code can run on the manager, all the necessary variables must be present.
+# This function finds those variables.
+#
+# I should be able to pick these objects out of the task graph.
+# Otherwise, I'm not really using the graph that I computed.
+#
+# I can probably hack around this for now, assuming that the vector block happens before the collects.
+# Here's the idea:
+#   If the vector block happens before the collects, then we can get all outputs and updates from the code in the vector block.
+# Then we can get all the inputs to the non vector block.
+# We take the intersection of all these names and collect them back onto the manager.
+# It's not necessary to also take the chunked objects, because everything from the vector block will be a chunked object.
+find_objects_receive_from_workers = function(ast, vector_indices, chunk_obj)
+{
+}
+
 
 # For the schedule, we just insert the vector block into something like an lapply, and the remaining program happens on the master.
 # We'll also need to insert the data loading calls before anything happens, and the saving call after.
@@ -88,6 +104,7 @@ VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
                    , nWorkers = "integer"
                    , data = "ChunkLoadFunc"
                    , vector_indices = "integer"
+                   , objects_receive_from_workers = "character"
                    ))
 
 
@@ -139,7 +156,8 @@ scheduleVector = function(graph, platform = Platform(), data = list()
         stop("Expected data to be of the form: `list(varname = data_description)`, where varname is a variable in the code.")
 
     data_desc = data[[1L]]
-    varname = names(data)
+    # TODO: Use varname if it's already there in the data description.
+    data_desc@varname = names(data)
     nchunks = length(data_desc@files)
 
     assignments = greedy_assign(data_desc@size, nWorkers)
@@ -161,11 +179,15 @@ scheduleVector = function(graph, platform = Platform(), data = list()
 
     vector_indices = findBigVectorBlock(graph@graph, chunk_obj)
 
+    # All the chunked resources that are used later in the remainder of the code need to go from the workers to the manager.
+    objects_receive_from_workers = find_objects_receive_from_workers(graph@graph, vector_indices, chunk_obj)
+
     VectorSchedule(graph = graph
                    , assignment_indices = assignments
                    , nWorkers = as.integer(nWorkers)
                    , vector_indices = vector_indices
                    , data = data_desc
+                   , objects_receive_from_workers = objects_receive_from_workers
                    )
 }
 

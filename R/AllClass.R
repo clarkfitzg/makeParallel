@@ -91,6 +91,7 @@ ChunkDataFiles = setClass("ChunkData"
     , slots = c(files = "character"
                 , sizes = "numeric"
                 , readFuncName = "character"
+                , varName = "character"
                 )
     , contains = "DataSource"
     )
