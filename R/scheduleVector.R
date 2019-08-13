@@ -199,6 +199,14 @@ scheduleVector = function(graph, platform = Platform(), data = list()
 }
 
 
+# Turns c("a", "b", "c") into this call:
+# list(a = a, b = b, c = c)
+char_to_symbol_list = function(x)
+{
+# TODO: Implement
+}
+
+
 #' @export
 setMethod("generate", "VectorSchedule",
 function(schedule, template = parse(system.file("templates/vector.R", package = "makeParallel")), ...)
@@ -224,6 +232,7 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
         , `_DATA_VARNAME` = as.symbol(data@varname)
         , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)
         , `_VECTOR_BODY` = code[v]
+        , `_OBJECTS_RECEIVE_FROM_WORKERS` = char_to_symbol_list(schedule@objects_receive_from_workers)
         , `_REMAINDER` = code[-v]
     ))
 
