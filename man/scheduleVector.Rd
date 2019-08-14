@@ -5,8 +5,8 @@
 \title{Schedule Based On Vectorized Blocks}
 \usage{
 scheduleVector(graph, platform = Platform(), data = list(),
-  save_var = character(), nWorkers = platform@nWorkers,
-  known_vector_funcs = c("exp", "+", "*"), vector_funcs = character(),
+  nWorkers = platform@nWorkers, known_vector_funcs = c("exp", "+", "*",
+  "sin"), vector_funcs = character(),
   all_vector_funcs = c(known_vector_funcs, vector_funcs))
 }
 \arguments{
@@ -17,8 +17,6 @@ scheduleVector(graph, platform = Platform(), data = list(),
 \item{data}{list of data descriptions. 
 Each element is a \linkS4class{DataSource}.
 The names of the list elements correspond to the variables in the code that these objects are bound to.}
-
-\item{save_var}{character, name of the variable to save}
 
 \item{known_vector_funcs}{character, the names of vectorized functions from recommended and base packages.}
 
@@ -31,6 +29,8 @@ This scheduler combines as many vectorized expressions as it can into one large 
 The initial data chunks and intermediate objects stay on the workers and do not return to the manager, so you can think of it as "chunk fusion".
 }
 \details{
+It balances the load of the data chunks among workers, assuming that loading and processing times are linear in the size of the data.
+
 TODO:
 \enumerate{
 \item Populate \code{known_vector_funcs} based on code analysis.

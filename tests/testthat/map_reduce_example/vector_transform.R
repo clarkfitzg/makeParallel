@@ -5,9 +5,10 @@
 
 library(makeParallel)
 
-x_desc = dataFiles(files = c("x1.rds", "x2.rds", "x3.rds")
-, sizes = c(100, 200, 300)
-, readFuncName = "readRDS")
+x_desc = ChunkLoadFunc(read_func_name = "readRDS"
+    , read_args = c("x1.rds", "x2.rds", "x3.rds")
+    , combine_func_name = "c"
+    )
 
 out = makeParallel("
 
@@ -18,5 +19,7 @@ out = makeParallel("
 , data = list(x = x_desc)
 , nWorkers = 2L
 , scheduler = scheduleVector
+, known_vector_funcs = "sin"
 , outFile = "pmin.R"
 )
+
