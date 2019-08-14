@@ -37,11 +37,3 @@ out = makeParallel("
 
 # Check that the load balancing happens.
 stopifnot(schedule(out)@assignmentIndices == c(1, 2, 1))
-
-rr = "result.rds"
-unlink(rr)
-source(outFile)
-
-result = readRDS(rr)
-
-stopifnot(result == 0)
