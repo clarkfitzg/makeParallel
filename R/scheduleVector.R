@@ -34,24 +34,29 @@ descendants = function(node, gdf)
 
 
 # Find the largest connected set of vector blocks possible
-# This will only pick up those nodes that are connected through dependencies- we could include siblings as well.
-# One way to do that is to have a node for the initial load of the large data object, and gather all of its descendants.
 findBigVectorBlock = function(gdf, chunk_obj)
 {
     not_chunked = which(!chunk_obj)
 
     # Drop nodes that are descendants of non chunked nodes.
-    d2 = lapply(not_chunked, descendants, gdf = gdf)
-    d2 = do.call(c, d2)
-    exclude = c(not_chunked, d2)
+    has_non_chunked_ancestor = lapply(not_chunked, descendants, gdf = gdf)
+    has_non_chunked_ancestor = do.call(c, has_non_chunked_ancestor)
+    exclude = c(not_chunked, has_non_chunked_ancestor)
 
-    # This graph contains only the ones we need
-    pruned = gdf[!(gdf$from %in% exclude) & !(gdf$to %in% exclude), ]
+    gdf_vector = gdf[!(gdf$from %in% exclude), ]
 
-    # Picking the smallest index is somewhat arbitrary.
-    d0 = min(pruned$from)
-    d = descendants(d0, pruned)
-    as.integer(c(d0, d))
+    if(nrow(gdf_vector) == 0)
+        stop("Cannot find a block of vectorized statements.")
+
+    d0 = min(gdf_vector$from)
+    # Picking the smallest index is arbitrary, since there could be several vectorized blocks, and we would like to get all of them, at least all of them that depend on the initial data.
+    # One way to do that is to add a node to the dependency graph for the initial load of the large data object, and gather all of its descendants.
+    # Even more sophisticated is to "revisit" the data- that doesn't happen yet.
+    # This implementation will get only _one_ vector block connected in the use-def graph.
+
+    d = descendants(d0, gdf_vector)
+    out = as.integer(c(d0, d))
+    setdiff(out, exclude)
 }
 
 
