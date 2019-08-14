@@ -1,4 +1,4 @@
-message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-13 18:16:23")
+message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-14 09:18:26")
 library(parallel)
 nworkers = 2
 assignments = c(1, 2, 1)
@@ -11,7 +11,7 @@ collected = clusterEvalQ(cls, {
     read_args = read_args[assignments]
     chunks = lapply(read_args, readRDS)
     x = do.call(c, chunks)
-    NULL
+    y = sin(x)
     list()
 })
 vars_to_collect = names(collected[[1]])
@@ -21,4 +21,7 @@ for (i in seq_along(vars_to_collect)) {
     value = do.call(c, chunks)
     assign(varname, value)
 }
-NULL
+{
+    result = min(y)
+    saveRDS(result, "result.rds")
+}

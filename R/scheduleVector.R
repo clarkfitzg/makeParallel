@@ -75,7 +75,7 @@ findBigVectorBlock = function(gdf, chunk_obj)
 find_objectsFromWorkers = function(code, vectorIndices)
 {
     vector_block = CodeDepends::getInputs(code[vectorIndices])
-    non_vector_block = CodeDepends::getInputs(code[vectorIndices])
+    non_vector_block = CodeDepends::getInputs(code[-vectorIndices])
 
     defined = unique(vector_block@outputs, vector_block@updates)
     used = non_vector_block@inputs

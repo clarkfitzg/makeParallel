@@ -27,5 +27,6 @@ out = makeParallel("
 , scheduler = scheduleVector
 , known_vector_funcs = "sin"
 , outFile = "pmin.R"
+, overWrite = TRUE
 )
 
