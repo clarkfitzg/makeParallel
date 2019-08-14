@@ -231,6 +231,16 @@ ForkSchedule = setClass("ForkSchedule"
     , contains = "TaskSchedule")
 
 
+#' @export
+VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
+         slots = c(assignmentIndices = "list"
+                   , nWorkers = "integer"
+                   , data = "DataSource"
+                   , vectorIndices = "integer"
+                   , objectsFromWorkers = "character"
+                   ))
+
+
 # Generated Code
 ############################################################
 

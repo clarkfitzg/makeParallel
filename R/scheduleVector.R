@@ -67,10 +67,10 @@ findBigVectorBlock = function(gdf, chunk_obj)
 # Then we can get all the inputs to the non vector block.
 # We take the intersection of all these names and collect them back onto the manager.
 # It's not necessary to also take the chunked objects, because everything from the vector block will be a chunked object.
-find_objects_receive_from_workers = function(code, vector_indices)
+find_objectsFromWorkers = function(code, vectorIndices)
 {
-    vector_block = CodeDepends::getInputs(code[vector_indices])
-    non_vector_block = CodeDepends::getInputs(code[vector_indices])
+    vector_block = CodeDepends::getInputs(code[vectorIndices])
+    non_vector_block = CodeDepends::getInputs(code[vectorIndices])
 
     defined = unique(vector_block@outputs, vector_block@updates)
     used = non_vector_block@inputs
@@ -84,15 +84,6 @@ find_objects_receive_from_workers = function(code, vector_indices)
 # We should be able to keep these independent of the actual program.
 
 
-
-#' @export
-VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
-         slots = c(assignment_indices = "list"
-                   , nWorkers = "integer"
-                   , data = "ChunkLoadFunc"
-                   , vector_indices = "integer"
-                   , objects_receive_from_workers = "character"
-                   ))
 
 
 # Standard greedy algorithm for assigning tasks of varied length to homogeneous workers such that we try to minimize the time that the last task is finished.
@@ -164,17 +155,17 @@ scheduleVector = function(graph, platform = Platform(), data = list()
 
     chunk_obj = sapply(ast$contents, is_chunked, resources = resources)
 
-    vector_indices = findBigVectorBlock(graph@graph, chunk_obj)
+    vectorIndices = findBigVectorBlock(graph@graph, chunk_obj)
 
     # All the chunked resources that are used later in the remainder of the code need to go from the workers to the manager.
-    objects_receive_from_workers = find_objects_receive_from_workers(graph@code, vector_indices)
+    objectsFromWorkers = find_objectsFromWorkers(graph@code, vectorIndices)
 
     VectorSchedule(graph = graph
-                   , assignment_indices = assignments
+                   , assignmentIndices = assignments
                    , nWorkers = as.integer(nWorkers)
-                   , vector_indices = vector_indices
+                   , vectorIndices = vectorIndices
                    , data = data_desc
-                   , objects_receive_from_workers = objects_receive_from_workers
+                   , objectsFromWorkers = objectsFromWorkers
                    )
 }
 
@@ -204,19 +195,19 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
         stop("Currently only implemented for data of class ChunkDataFiles.")
 
     code = schedule@graph@code
-    v = schedule@vector_indices
+    v = schedule@vectorIndices
 
     newcode = substitute_language(template, list(
         `_MESSAGE` = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
         , `_NWORKERS` = schedule@nWorkers
-        #, `_ASSIGNMENT_INDICES` = schedule@assignment_indices
-        , `_ASSIGNMENT_INDICES` = convert_object_to_language(schedule@assignment_indices)
+        #, `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
+        , `_ASSIGNMENT_INDICES` = convert_object_to_language(schedule@assignmentIndices)
         , `_READ_ARGS` = data@files
         , `_READ_FUNC` = as.symbol(data@readFuncName)
         , `_DATA_VARNAME` = as.symbol(data@varName)
         , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)
         , `_VECTOR_BODY` = code[v]
-        , `_OBJECTS_RECEIVE_FROM_WORKERS` = char_to_symbol_list(schedule@objects_receive_from_workers)
+        , `_OBJECTS_RECEIVE_FROM_WORKERS` = char_to_symbol_list(schedule@objectsFromWorkers)
         , `_REMAINDER` = code[-v]
     ))
 
