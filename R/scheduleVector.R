@@ -140,21 +140,21 @@ scheduleVector = function(graph, platform = Platform(), data = list()
     )
 {
     if(!is.list(data) || 1 < length(data) || is.null(names(data))) 
-        stop("Expected data to be of the form: `list(varname = data_description)`, where varname is a variable in the code.")
+        stop("Expected data to be of the form: `list(x = data_description)`, where x is a variable used later in the code.")
 
     data_desc = data[[1L]]
-    # TODO: Use varname if it's already there in the data description.
-    data_desc@varName = names(data)
+    # TODO: Use varName if it's already there in the data description.
+    varName = data_desc@varName = names(data)
     nchunks = length(data_desc@files)
 
-    assignments = greedy_assign(data_desc@size, nWorkers)
+    assignments = greedy_assign(data_desc@sizes, nWorkers)
 
     name_resource = new.env()
     resources = new.env()
     namer = namer_factory()
 
     data_id = namer()
-    name_resource[[varname]] = data_id
+    name_resource[[varName]] = data_id
     resources[[data_id]] = list(chunked_object = TRUE)
 
     ast = rstatic::to_ast(graph@code)
