@@ -85,26 +85,6 @@ find_objects_receive_from_workers = function(code, vector_indices)
 
 
 
-#' @export ChunkLoadFunc
-#' @exportClass ChunkLoadFunc
-#' @slot read_func_name for example, "read.csv".
-#'      Using a character means that the function must be available, which in practice probably means it ships with R.
-#'      We should generalize this to allow functions from packages and user defined functions.
-#' @slot read_args arguments to read the function, probably the names of files.
-#'      It could accept a general vector, but I'll need to think more carefully about how to generate code with an object that's not a character.
-#'      One way is to serialize the object right into the script.
-#'      Another way is to deparse and parse.
-ChunkLoadFunc = setClass("ChunkLoadFunc", contains = "DataSource",
-         slots = c(read_func_name = "character", read_args = "character", varname = "character", combine_func_name = "character"))
-
-
-setValidity("ChunkLoadFunc", function(object)
-{
-    if(length(object@read_args) == 0) "No files specified" 
-    else TRUE
-})
-
-
 #' @export
 VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
          slots = c(assignment_indices = "list"
@@ -164,8 +144,8 @@ scheduleVector = function(graph, platform = Platform(), data = list()
 
     data_desc = data[[1L]]
     # TODO: Use varname if it's already there in the data description.
-    data_desc@varname = names(data)
-    nchunks = length(data_desc@read_args)
+    data_desc@varName = names(data)
+    nchunks = length(data_desc@files)
 
     assignments = greedy_assign(data_desc@size, nWorkers)
 
@@ -231,9 +211,9 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
         , `_NWORKERS` = schedule@nWorkers
         #, `_ASSIGNMENT_INDICES` = schedule@assignment_indices
         , `_ASSIGNMENT_INDICES` = convert_object_to_language(schedule@assignment_indices)
-        , `_READ_ARGS` = data@read_args
+        , `_READ_ARGS` = data@files
         , `_READ_FUNC` = as.symbol(data@readFuncName)
-        , `_DATA_VARNAME` = as.symbol(data@varname)
+        , `_DATA_VARNAME` = as.symbol(data@varName)
         , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)
         , `_VECTOR_BODY` = code[v]
         , `_OBJECTS_RECEIVE_FROM_WORKERS` = char_to_symbol_list(schedule@objects_receive_from_workers)

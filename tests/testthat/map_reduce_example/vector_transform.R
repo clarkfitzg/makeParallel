@@ -6,11 +6,11 @@
 library(makeParallel)
 
 
-# Can surely do this more conveniently
 files = c("x1.rds", "x2.rds", "x3.rds")
-sizes = sapply(fnames, function(x) file.info(x)@size)
+# Can surely do this for the user
+sizes = file.info(files)[, "size"]
 
-x_desc = ChunkDataFiles(files = fnames
+x_desc = ChunkDataFiles(files = files
 	, sizes = sizes
 	, readFuncName = "readRDS"
     )

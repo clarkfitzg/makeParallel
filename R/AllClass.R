@@ -97,8 +97,30 @@ ChunkDataFiles = setClass("ChunkDataFiles"
     )
 
 
+# #' @export ChunkLoadFunc
+# #' @exportClass ChunkLoadFunc
+# #' @slot read_func_name for example, "read.csv".
+# #'      Using a character means that the function must be available, which in practice probably means it ships with R.
+# #'      We should generalize this to allow functions from packages and user defined functions.
+# #' @slot read_args arguments to read the function, probably the names of files.
+# #'      It could accept a general vector, but I'll need to think more carefully about how to generate code with an object that's not a character.
+# #'      One way is to serialize the object right into the script.
+# #'      Another way is to deparse and parse.
+# ChunkLoadFunc = setClass("ChunkLoadFunc", contains = "DataSource",
+#          slots = c(read_func_name = "character", read_args = "character", varname = "character", combine_func_name = "character"))
+# 
+# 
+# setValidity("ChunkLoadFunc", function(object)
+# {
+#     if(length(object@read_args) == 0) "No files specified" 
+#     else TRUE
+# })
+
+
+
 # Thu Aug  8 14:50:39 PDT 2019
 # The data descriptions that follow seem to use the expanding expression idea, which I've now abandoned.
+
 
 #' Chunked Data Source defined by R expressions
 #'
