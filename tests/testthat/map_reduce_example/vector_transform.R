@@ -5,10 +5,16 @@
 
 library(makeParallel)
 
-x_desc = ChunkLoadFunc(read_func_name = "readRDS"
-    , read_args = c("x1.rds", "x2.rds", "x3.rds")
-    , combine_func_name = "c"
+
+# Can surely do this more conveniently
+files = c("x1.rds", "x2.rds", "x3.rds")
+sizes = sapply(fnames, function(x) file.info(x)@size)
+
+x_desc = ChunkDataFiles(files = fnames
+	, sizes = sizes
+	, readFuncName = "readRDS"
     )
+
 
 out = makeParallel("
 

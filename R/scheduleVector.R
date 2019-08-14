@@ -165,7 +165,7 @@ scheduleVector = function(graph, platform = Platform(), data = list()
     data_desc = data[[1L]]
     # TODO: Use varname if it's already there in the data description.
     data_desc@varname = names(data)
-    nchunks = length(data_desc@files)
+    nchunks = length(data_desc@read_args)
 
     assignments = greedy_assign(data_desc@size, nWorkers)
 
@@ -231,7 +231,7 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
         , `_NWORKERS` = schedule@nWorkers
         #, `_ASSIGNMENT_INDICES` = schedule@assignment_indices
         , `_ASSIGNMENT_INDICES` = convert_object_to_language(schedule@assignment_indices)
-        , `_READ_ARGS` = data@files
+        , `_READ_ARGS` = data@read_args
         , `_READ_FUNC` = as.symbol(data@readFuncName)
         , `_DATA_VARNAME` = as.symbol(data@varname)
         , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)

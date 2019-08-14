@@ -83,11 +83,11 @@ UnixPlatform = setClass("UnixPlatform",
 #' @export
 DataSource = setClass("DataSource")
 
-
 #' Many Files Representing One Object
 #'
-#' @export
-ChunkDataFiles = setClass("ChunkData"
+#' @export ChunkDataFiles
+#' @exportClass ChunkDataFiles
+ChunkDataFiles = setClass("ChunkDataFiles"
     , slots = c(files = "character"
                 , sizes = "numeric"
                 , readFuncName = "character"
