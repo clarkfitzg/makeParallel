@@ -1,4 +1,4 @@
-message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-14 09:46:19")
+message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-14 09:57:24")
 library(parallel)
 nworkers = 2
 assignments = c(1, 2, 1)
