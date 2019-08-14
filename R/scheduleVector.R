@@ -204,7 +204,8 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
         , `_READ_ARGS` = data@files
         , `_READ_FUNC` = as.symbol(data@readFuncName)
         , `_DATA_VARNAME` = as.symbol(data@varName)
-        , `_COMBINE_FUNC` = as.symbol(data@combine_func_name)
+        # TODO: Use rbind if it's a data.frame:
+        , `_COMBINE_FUNC` = as.symbol("c")
         , `_VECTOR_BODY` = code[v]
         , `_OBJECTS_RECEIVE_FROM_WORKERS` = char_to_symbol_list(schedule@objectsFromWorkers)
         , `_REMAINDER` = code[-v]
