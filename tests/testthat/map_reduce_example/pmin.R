@@ -1,4 +1,4 @@
-message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-14 09:18:26")
+message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-14 09:20:02")
 library(parallel)
 nworkers = 2
 assignments = c(1, 2, 1)
@@ -12,7 +12,7 @@ collected = clusterEvalQ(cls, {
     chunks = lapply(read_args, readRDS)
     x = do.call(c, chunks)
     y = sin(x)
-    list()
+    list(y = y)
 })
 vars_to_collect = names(collected[[1]])
 for (i in seq_along(vars_to_collect)) {
