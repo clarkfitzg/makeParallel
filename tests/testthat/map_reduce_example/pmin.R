@@ -1,8 +1,8 @@
-message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-14 09:20:02")
+message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-14 09:46:19")
 library(parallel)
 nworkers = 2
 assignments = c(1, 2, 1)
-read_args = c("x1.rds", "x2.rds", "x3.rds")
+read_args = c("small1.rds", "big.rds", "small2.rds")
 cls = makeCluster(nworkers)
 clusterExport(cls, c("assignments", "read_args"))
 parLapply(cls, seq(nworkers), function(i) assign("workerID", i, globalenv()))

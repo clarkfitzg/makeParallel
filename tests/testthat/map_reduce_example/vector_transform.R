@@ -6,7 +6,7 @@
 library(makeParallel)
 
 
-files = c("x1.rds", "x2.rds", "x3.rds")
+files = c("small1.rds", "big.rds", "small2.rds")
 # Can surely do this for the user
 sizes = file.info(files)[, "size"]
 
@@ -15,6 +15,7 @@ x_desc = ChunkDataFiles(files = files
 	, readFuncName = "readRDS"
     )
 
+outFile = "pmin.R"
 
 out = makeParallel("
 
@@ -26,7 +27,21 @@ out = makeParallel("
 , nWorkers = 2L
 , scheduler = scheduleVector
 , known_vector_funcs = "sin"
-, outFile = "pmin.R"
+, outFile = outFile
 , overWrite = TRUE
 )
 
+
+# Testing
+############################################################
+
+# Check that the load balancing happens.
+stopifnot(schedule(out)@assignmentIndices == c(1, 2, 1))
+
+rr = "result.rds"
+unlink(rr)
+source(outFile)
+
+result = readRDS(rr)
+
+stopifnot(result == 0)
