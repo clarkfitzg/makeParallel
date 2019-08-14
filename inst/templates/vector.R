@@ -16,7 +16,8 @@ clusterExport(cls, c("assignments", "read_args"))
 parLapply(cls, seq(nworkers), function(i) assign("workerID", i, globalenv()))
 
 collected = clusterEvalQ(cls, {
-    read_args = read_args[assignments[[workerID]]]
+    assignments = which(assignments == workerID)
+    read_args = read_args[assignments]
     chunks = lapply(read_args, `_READ_FUNC`)
     # TODO: Generalize this to other combining functions besides c, rbind for data.frame
     # For this we need to know if value is a data.frame

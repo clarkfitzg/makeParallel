@@ -200,8 +200,7 @@ function(schedule, template = parse(system.file("templates/vector.R", package = 
     newcode = substitute_language(template, list(
         `_MESSAGE` = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
         , `_NWORKERS` = schedule@nWorkers
-        #, `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
-        , `_ASSIGNMENT_INDICES` = convert_object_to_language(schedule@assignmentIndices)
+        , `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
         , `_READ_ARGS` = data@files
         , `_READ_FUNC` = as.symbol(data@readFuncName)
         , `_DATA_VARNAME` = as.symbol(data@varName)

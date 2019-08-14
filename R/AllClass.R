@@ -232,8 +232,9 @@ ForkSchedule = setClass("ForkSchedule"
 
 
 #' @export
+#' @slot assignmentIndices assigns each data chunk to a worker. For example, c(2, 1, 1) assigns the 1st chunk to worker 2, and chunks 2 and 3 to worker 1.
 VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
-         slots = c(assignmentIndices = "list"
+         slots = c(assignmentIndices = "integer"
                    , nWorkers = "integer"
                    , data = "DataSource"
                    , vectorIndices = "integer"
