@@ -38,5 +38,6 @@ for(i in seq_along(vars_to_collect)){
     assign(varname, value)
 }
 
+stopCluster(cls)
 
 `_REMAINDER`
