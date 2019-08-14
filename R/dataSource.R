@@ -31,6 +31,7 @@ function(expr, args, varname, ...)
 
     # build up the calls to load every chunk
     chunk_expr = lapply(args, function(args) do.call(call, list(func_name, args)))
+    # You know when you write `do.call(call` that you're in metaprogramming land!
 
     callGeneric(expr = as.expression(chunk_expr), varname = varname, ...)
 })

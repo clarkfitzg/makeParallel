@@ -18,6 +18,8 @@ parLapply(cls, seq(nworkers), function(i) assign("workerID", i, globalenv()))
 collected = clusterEvalQ(cls, {
     read_args = read_args[assignments[[workerID]]]
     chunks = lapply(read_args, `_READ_FUNC`)
+    # TODO: Generalize this to other combining functions besides c, rbind for data.frame
+    # For this we need to know if value is a data.frame
     `_DATA_VARNAME` = do.call(`_COMBINE_FUNC`, chunks)
 
     `_VECTOR_BODY`
@@ -29,10 +31,9 @@ collected = clusterEvalQ(cls, {
 vars_to_collect = names(collected[[1]])
 for(i in seq_along(vars_to_collect)){
     varname = vars_to_collect[i]
-    value = lapply(collected, `[[`, i)
-    # TODO: Generalize this to other combining functions besides c, rbind for data.frame
-    # For this we need to know if value is a data.frame
-    value = do.call(c, value)
+    chunks = lapply(collected, `[[`, i)
+    # TODO: This assumes the same _COMBINE_FUNC will work, which is not necessarily true.
+    value = do.call(`_COMBINE_FUNC`, chunks)
     assign(varname, value)
 }
 

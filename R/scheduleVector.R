@@ -201,9 +201,13 @@ scheduleVector = function(graph, platform = Platform(), data = list()
 
 # Turns c("a", "b", "c") into this call:
 # list(a = a, b = b, c = c)
-char_to_symbol_list = function(x)
+char_to_symbol_list = function(vars)
 {
-# TODO: Implement
+    lc = call("list")
+    for(v in vars){
+        lc[[v]] = as.symbol(v)
+    }
+    lc
 }
 
 
