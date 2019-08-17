@@ -81,7 +81,8 @@ UnixPlatform = setClass("UnixPlatform",
 #' Abstract Base Class For Data Descriptions
 #'
 #' @export
-DataSource = setClass("DataSource")
+DataSource = setClass("DataSource", slots = c(varName = "character"))
+
 
 #' Many Files Representing One Object
 #'
@@ -91,7 +92,6 @@ ChunkDataFiles = setClass("ChunkDataFiles"
     , slots = c(files = "character"
                 , sizes = "numeric"
                 , readFuncName = "character"
-                , varName = "character"
                 )
     , contains = "DataSource"
     )

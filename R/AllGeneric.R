@@ -77,6 +77,8 @@ setMethod("schedule", "GeneratedCode", function(graph, data, platform, ...)
 
 #' Describe Data Source
 #'
+#' Creates and returns an object of class DataSource
+#'
 #' @export
 #' @param expr code or function to load chunks of the data
 #' @param args list of arguments to function

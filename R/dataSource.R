@@ -1,3 +1,24 @@
+# Sat Aug 17 08:06:35 PDT 2019
+# In CodeAnalysis/explorations/findReadDataCalls Duncan returns the rstatic node of the individual calls that read the data.
+
+# Given a single call that loads data, return a DataSource object.
+
+#' @export
+#' @rdname dataSource
+#setMethod("dataSource", signature(expr = "call", args = "missing", varname = "ANY"),
+#function(expr, args, varname, ...)
+#{
+#    fun_name = as.character(expr[[1]])
+#
+#    # TODO: Use switch() or method dispatch to get the right kind of object.
+#    if(fun_name == "read.fwf"){
+#    }
+#})
+
+
+# Old stuff below this line, I will probably rewrite.
+############################################################
+
 #' @export
 #' @rdname dataSource
 setMethod("dataSource", signature(expr = "expression", args = "missing", varname = "ANY"),

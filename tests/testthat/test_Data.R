@@ -1,5 +1,16 @@
 library(makeParallel)
 
+test_that("calls into DataSource classes", {
+
+    fwf_call = quote(read.fwf("foo.txt", widths = c(5, 5, 10)))
+
+    #actual = dataSource(fwf_call)
+
+    #expected = ChunkDataFiles(
+
+})
+
+
 test_that("simple case of chunked input data descriptions", {
 
     skip("Dropping data expansion idea for the moment")
