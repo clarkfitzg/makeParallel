@@ -27,8 +27,8 @@ out = makeParallel("
 "
 , data = list(x = x_desc)
 , nWorkers = 2L
-, scheduler = scheduleVector
-, known_vector_funcs = "sin"
+, scheduler = scheduleDataParallel
+, splittableFuncs = "sin"
 , outFile = outFile
 , overWrite = TRUE
 )
@@ -53,8 +53,8 @@ if(FALSE){
     "
     , data = list(x = x_desc)
     , nWorkers = 2L
-    , scheduler = scheduleVector
-    , known_vector_funcs = c("lapply", "sapply", "log", "+")
+    , scheduler = scheduleDataParallel
+    , splittableFuncs = c("lapply", "sapply", "log", "+")
     , outFile = "lapply_example.R"
     , overWrite = TRUE
     )

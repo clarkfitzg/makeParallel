@@ -29,6 +29,6 @@ out = makeParallel('
     }
     result = by(x, x[, "y"], f)
     saveRDS(result, "result.rds")
-', scheduler = scheduleVector, data = d, nWorkers = 3L)
+', scheduler = scheduleDataParallel, data = d, nWorkers = 3L)
 
 writeCode(out, "vector_actual_generated.R", overWrite = TRUE)
