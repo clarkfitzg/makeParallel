@@ -23,5 +23,5 @@ dataSource(expr, args, varname, ...)
 \item{...}{additional arguments to methods}
 }
 \description{
-Describe Data Source
+Creates and returns an object of class DataSource
 }

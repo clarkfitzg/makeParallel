@@ -1,4 +1,4 @@
-message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-20 11:29:10")
+message("This code was generated from R by makeParallel version 0.2.0 at 2019-08-27 16:35:05")
 library(parallel)
 nworkers = 2
 assignments = c(1, 2, 1)
@@ -21,6 +21,7 @@ for (i in seq_along(vars_to_collect)) {
     value = do.call(c, chunks)
     assign(varname, value)
 }
+stopCluster(cls)
 {
     result = min(y)
     saveRDS(result, "result.rds")
