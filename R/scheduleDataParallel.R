@@ -107,8 +107,8 @@ greedy_assign = function(tasktimes, w)
 
 #' Schedule Based On Data Parallelism
 #'
-#' If you're doing the same computation across a large data set, you should use this scheduler.
-#' This scheduler combines as many splittable expressions as it can into one large block of splittable expressions to run in parallel.
+#' If you're doing a series of computations over a large data set, then start with this scheduler.
+#' This scheduler combines as many splittable expressions as it can into large blocks of splittable expressions to run in parallel.
 #' The initial data chunks and intermediate objects stay on the workers and do not return to the manager, so you can think of it as "chunk fusion".
 #'
 #' It statically balances the load of the data chunks among workers, assuming that loading and processing times are linear in the size of the data.
