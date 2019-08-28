@@ -105,12 +105,13 @@ greedy_assign = function(tasktimes, w)
 }
 
 
-#' Schedule Based On splittable Blocks
+#' Schedule Based On Data Parallelism
 #'
+#' If you're doing the same computation across a large data set, you should use this scheduler.
 #' This scheduler combines as many splittable expressions as it can into one large block of splittable expressions to run in parallel.
 #' The initial data chunks and intermediate objects stay on the workers and do not return to the manager, so you can think of it as "chunk fusion".
 #'
-#' It balances the load of the data chunks among workers, assuming that loading and processing times are linear in the size of the data.
+#' It statically balances the load of the data chunks among workers, assuming that loading and processing times are linear in the size of the data.
 #'
 #' TODO:
 #'
@@ -165,7 +166,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     # All the chunked resources that are used later in the remainder of the code need to go from the workers to the manager.
     objectsFromWorkers = find_objectsFromWorkers(graph@code, vectorIndices)
 
-    VectorSchedule(graph = graph
+    DataParallelSchedule(graph = graph
                    , assignmentIndices = assignments
                    , nWorkers = as.integer(nWorkers)
                    , vectorIndices = vectorIndices
@@ -188,7 +189,7 @@ char_to_symbol_list = function(vars)
 
 
 #' @export
-setMethod("generate", "VectorSchedule",
+setMethod("generate", "DataParallelSchedule",
 function(schedule, template = parse(system.file("templates/vector.R", package = "makeParallel")), ...)
 {
     data = schedule@data

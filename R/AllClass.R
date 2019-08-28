@@ -231,14 +231,38 @@ ForkSchedule = setClass("ForkSchedule"
     , contains = "TaskSchedule")
 
 
-#' @export
+#' Slots are named from the perspective of the manager, in the order that they happen.
+#' Previous versions had the code slots as integers that referred to the original code, but we need expressions for generating and adding new code in.
+#'
+#' Any of these slots may be empty, signifying that we'll skip this step.
+#'
+#' @export 
+#' @slot before code to run on the manager
+#' @slot names of objects to export from manager to workers
+#' @slot parallelCode code to evaluate in parallel on the workers
+#' @slot collect names of objects to collect from the workers to the manager.
+#' @slot after code to run on the manager
+DataParallelBlock = setClass("DataParallelBlock",
+         slots = c(before = "expression"
+                   , export = "character"
+                   , parallelCode = "expression"
+                   , collect = "character"
+                   , after = "expression"
+                   ))
+
+# TODO: Add GROUP BY, reduce in here.
+# The data loading code, reduces, and GROUP BY's are all special, different from a 'normal' block that simply does computation.
+# How can we make these not special?
+# Design the DataParallelBlock to accomodate all of these use cases, or else just generate these blocks of code separately.
+
 #' @slot assignmentIndices assigns each data chunk to a worker. For example, c(2, 1, 1) assigns the 1st chunk to worker 2, and chunks 2 and 3 to worker 1.
-VectorSchedule = setClass("VectorSchedule", contains = "Schedule",
+#' @slot blocks list of DataParallelBlock
+#' @export
+DataParallelSchedule = setClass("DataParallelSchedule", contains = "Schedule",
          slots = c(assignmentIndices = "integer"
                    , nWorkers = "integer"
                    , data = "DataSource"
-                   , vectorIndices = "integer"
-                   , objectsFromWorkers = "character"
+                   , blocks = "list"
                    ))
 
 
