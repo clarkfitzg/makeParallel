@@ -231,32 +231,32 @@ ForkSchedule = setClass("ForkSchedule"
     , contains = "TaskSchedule")
 
 
-#' Slots are named from the perspective of the manager, in the order that they happen.
-#' Previous versions had the code slots as integers that referred to the original code, but we need expressions for generating and adding new code in.
-#'
-#' Any of these slots may be empty, signifying that we'll skip this step.
-#'
-#' @export 
-#' @slot before code to run on the manager
-#' @slot names of objects to export from manager to workers
-#' @slot parallelCode code to evaluate in parallel on the workers
 #' @slot collect names of objects to collect from the workers to the manager.
-#' @slot after code to run on the manager
-DataParallelBlock = setClass("DataParallelBlock",
-         slots = c(before = "expression"
-                   , export = "character"
-                   , parallelCode = "expression"
-                   , collect = "character"
-                   , after = "expression"
+#' @slot code to evaluate in serial on the manager.
+ManagerBlock = setClass("ManagerBlock",
+         slots = c(collect = "character"
+                   , code = "expression"
                    ))
 
-# TODO: Add GROUP BY, reduce in here.
-# The data loading code, reduces, and GROUP BY's are all special, different from a 'normal' block that simply does computation.
-# How can we make these not special?
-# Design the DataParallelBlock to accomodate all of these use cases, or else just generate these blocks of code separately.
+
+#' @slot export names of objects to export from manager to workers.
+#' @slot code to evaluate in parallel on the manager.
+WorkerBlock = setClass("WorkerBlock",
+         slots = c(export = "character"
+                   , code = "expression"
+                   ))
+
+
+#' @slot groupData names of chunked variables to split according to groupIndex
+#' @slot groupIndex names of chunked variables that define the split
+GroupByBlock = setClass("GroupByBlock", contains = "WorkerBlock",
+         slots = c(groupData = "character"
+                   , groupIndex = "character"
+                   ))
+
 
 #' @slot assignmentIndices assigns each data chunk to a worker. For example, c(2, 1, 1) assigns the 1st chunk to worker 2, and chunks 2 and 3 to worker 1.
-#' @slot blocks list of DataParallelBlock
+#' @slot blocks list with every object an instance of a ManagerBlock, WorkerBlock, GroupByBlock, etc.
 #' @export
 DataParallelSchedule = setClass("DataParallelSchedule", contains = "Schedule",
          slots = c(assignmentIndices = "integer"
