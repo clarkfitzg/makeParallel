@@ -110,8 +110,13 @@ greedy_assign = function(tasktimes, w)
 # Assumes that the names in resources are correct, which holds if we've used SSA.
 findChunkedVars = function(node, resources)
 {
-    chunked = find_nodes(node, is_chunked, resources)
+    chunked = rstatic::find_nodes(node, is_chunked, resources)
     out = sapply(chunked, function(idx) node[[idx]]$ssa_name)
+
+    if(length(out) == 0)
+        # No chunked variables in this node.
+        return(character())
+
     if(!is.character(out))
         stop("Current implementation assumes that all chunked objects are symbols, not subexpressions.")
     out
@@ -132,8 +137,8 @@ findChunkedVars = function(node, resources)
 #   - try to save memory by garbage collecting
 nodeToCodeBlock = function(node, resources)
 {
-    code = as.expression(as_language(node))
-    if(is_chunked(node, resource)){
+    code = as.expression(rstatic::as_language(node))
+    if(is_chunked(node, resources)){
         # TODO: populate export
         export = character()
         WorkerBlock(code = code, export = export)
