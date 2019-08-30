@@ -5,12 +5,16 @@ function(schedule, platform, ...)
 # Idea:
 # We can generate all the code independently for each block, and then just stick it all together to make the complete program.
 
-    newcode = lapply(schedule@blocks, generateBlock, platform = platform, ...)
-    newcode = do.call(c, c(firstBlock, newcode))
-    new
+    newcode = lapply(schedule@blocks, generate, platform = platform, ...)
     GeneratedCode(schedule = schedule, code = newcode)
 })
 
+
+setMethod("generate", "",
+function(schedule, platform, ...)
+{
+
+})
 
 
 # template = parse(system.file("templates/vector.R", package = "makeParallel")), 

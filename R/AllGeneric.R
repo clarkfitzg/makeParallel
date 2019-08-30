@@ -124,11 +124,11 @@ setMethod("time", "Schedule", function(x)
 # TODO:* Eliminate ... from all method signatures where the don't belong?
 
 
-#' Generate Code From A Schedule
+#' Generate Code
 #'
 #' @export
 #' @rdname generate
-#' @param schedule object of class \linkS4class{Schedule}
+#' @param schedule object to generate code from, typically an object of class \linkS4class{Schedule}
 #' @param platform object of class \linkS4class{Platform}
 #' @param ... additional arguments to methods
 #' @return x object of class \linkS4class{GeneratedCode}
@@ -172,12 +172,3 @@ setGeneric("writeCode", function(code, file, ...)
 #' @param value file name to associate with object
 setGeneric("file<-", function(description, value)
            standardGeneric("file<-"))
-
-
-#' Generate an expression for a parallel code block
-#'
-#' Used to implement the DataParallelSchedule code generator
-#'
-#' @param block \linkS4class{CodeBlock}
-setGeneric("generateBlock", function(block, platform, ...)
-           standardGeneric("generateBlock"))
