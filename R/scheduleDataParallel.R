@@ -155,6 +155,8 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     resources[[data_id]] = list(chunked_object = TRUE)
 
     ast = rstatic::to_ast(graph@code)
+    if(!is(ast, "Brace"))
+        stop("AST has unexpected form.")
 
     # Mark everything with whether it's a chunked object or not.
     propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkableFuncs)
@@ -163,7 +165,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     # It does not combine blocks (although it's not difficult to combine adjacent ones)
     # It does not rearrange statements.
     # It does not try to save memory by garbage collecting.
-    blocks = lapply(ast, nodeToCodeBlock, resources = resources)
+    blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources)
 
     DataParallelSchedule(assignmentIndices = assignmentIndices
                        , nWorkers = nWorkers

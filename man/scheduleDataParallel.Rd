@@ -2,12 +2,12 @@
 % Please edit documentation in R/scheduleDataParallel.R
 \name{scheduleDataParallel}
 \alias{scheduleDataParallel}
-\title{Schedule Based On splittable Blocks}
+\title{Schedule Based On Data Parallelism}
 \usage{
 scheduleDataParallel(graph, platform = Platform(), data = list(),
-  nWorkers = platform@nWorkers, KnownSplittableFuncs = c("exp", "+",
-  "*", "sin"), splittableFuncs = character(),
-  allSplittableFuncs = c(KnownSplittableFuncs, splittableFuncs))
+  nWorkers = platform@nWorkers, KnownChunkableFuncs = c("exp", "+",
+  "*", "sin"), chunkableFuncs = character(),
+  allChunkableFuncs = c(KnownChunkableFuncs, chunkableFuncs))
 }
 \arguments{
 \item{graph}{\linkS4class{TaskGraph}, code dependency graph}
@@ -18,25 +18,26 @@ scheduleDataParallel(graph, platform = Platform(), data = list(),
 Each element is a \linkS4class{DataSource}.
 The names of the list elements correspond to the variables in the code that these objects are bound to.}
 
-\item{splittableFuncs}{character, names of additional splittable functions known to the user.}
+\item{chunkableFuncs}{character, names of additional chunkable functions known to the user.}
 
-\item{allSplittableFuncs}{character, names of all splittable functions to use in the analysis.}
+\item{allChunkableFuncs}{character, names of all chunkable functions to use in the analysis.}
 
-\item{knownSplittableFuncs}{character, the names of splittable functions from recommended and base packages.}
+\item{knownChunkableFuncs}{character, the names of chunkable functions from recommended and base packages.}
 }
 \description{
-This scheduler combines as many splittable expressions as it can into one large block of splittable expressions to run in parallel.
+If you're doing a series of computations over a large data set, then start with this scheduler.
+This scheduler combines as many chunkable expressions as it can into large blocks of chunkable expressions to run in parallel.
 The initial data chunks and intermediate objects stay on the workers and do not return to the manager, so you can think of it as "chunk fusion".
 }
 \details{
-It balances the load of the data chunks among workers, assuming that loading and processing times are linear in the size of the data.
+It statically balances the load of the data chunks among workers, assuming that loading and processing times are linear in the size of the data.
 
 TODO:
 \enumerate{
-\item Populate \code{splittableFuncs} based on code analysis.
-\item Model non splittable functions so that we can revisit the chunked data.
+\item Populate \code{chunkableFuncs} based on code analysis.
+\item Model non chunkable functions so that we can revisit the chunked data.
 Currently it only allows for one chunked block.
-\item Identify which parameters a function is splittable in, and respect these by matching arguments.
+\item Identify which parameters a function is chunkable in, and respect these by matching arguments.
 See \code{update_resource.Call}.
 \item Clarify behavior of subexpressions, handling cases such as \code{min(sin(large_object))}
 }
