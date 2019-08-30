@@ -17,3 +17,8 @@ Platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::dete
         stop("Unknown operating system type: ", OS.type)
     }
 }
+
+
+#' @export
+parallelLocalCluster = function(name = "cls", nWorkers = 2L)
+    new("parallelLocalCluster", name = name, nWorkers = nWorkers)

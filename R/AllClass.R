@@ -69,6 +69,15 @@ Platform = setClass("Platform",
     slots = c(nWorkers = "integer"))
 
 
+#' Placeholder for \code{cluster} objects from the parallel package, for example, those produced by \code{parallel::makeCluster}.
+#'
+#' @export
+#' @slot name symbol to use for the cluster name when generating code
+parallelLocalCluster = setClass("parallelLocalCluster"
+    , slots = c(name = "character")
+    , contains = "Platform")
+
+
 #' @export
 UnixPlatform = setClass("UnixPlatform",
     contains = "Platform")
