@@ -1,5 +1,5 @@
 #' @export
-setMethod("generate", "DataParallelSchedule",
+setMethod("generate", signature(schedule = "DataParallelSchedule", platform = "ANY"),
 function(schedule, platform, ...)
 {
 # Idea:
@@ -10,11 +10,40 @@ function(schedule, platform, ...)
 })
 
 
-setMethod("generate", "",
+setMethod("generate", signature(schedule = "InitPlatformBlock", platform = "ParallelLocalCluster"),
 function(schedule, platform, ...)
 {
-
+    .NotYetImplemented()
 })
+
+
+setMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster"),
+function(schedule, platform, ...)
+{
+    .NotYetImplemented()
+})
+
+
+setMethod("generate", signature(schedule = "SerialBlock", platform = "ParallelLocalCluster"),
+function(schedule, platform, ...)
+{
+    .NotYetImplemented()
+})
+
+
+setMethod("generate", signature(schedule = "ParallelBlock", platform = "ParallelLocalCluster"),
+function(schedule, platform, ...)
+{
+    .NotYetImplemented()
+})
+
+
+setMethod("generate", signature(schedule = "GroupByBlock", platform = "ParallelLocalCluster"),
+function(schedule, platform, ...)
+{
+    .NotYetImplemented()
+})
+
 
 
 # template = parse(system.file("templates/vector.R", package = "makeParallel")), 

@@ -69,11 +69,11 @@ Platform = setClass("Platform",
     slots = c(nWorkers = "integer"))
 
 
-#' Placeholder for \code{cluster} objects from the parallel package, for example, those produced by \code{parallel::makeCluster}.
+#' Placeholder for local \code{cluster} objects from the parallel package, for example, those produced by \code{parallel::makeCluster}.
 #'
 #' @export
 #' @slot name symbol to use for the cluster name when generating code
-parallelLocalCluster = setClass("parallelLocalCluster"
+ParallelLocalCluster = setClass("ParallelLocalCluster"
     , slots = c(name = "character")
     , contains = "Platform")
 
@@ -254,7 +254,7 @@ CodeBlock = setClass("CodeBlock", slots = c(code = "expression"))
 
 
 #' Initialize the platform
-InitPlatformBlock = setClass("InitPlatformBlock")
+InitPlatformBlock = setClass("InitPlatformBlock", contains = "CodeBlock")
 
 
 #' Load Data
@@ -284,6 +284,9 @@ GroupByBlock = setClass("GroupByBlock", contains = "WorkerBlock",
          slots = c(groupData = "character"
                    , groupIndex = "character"
                    ))
+
+
+# TODO: ReduceBlock
 
 
 #' @slot assignmentIndices assigns each data chunk to a worker. For example, c(2, 1, 1) assigns the 1st chunk to worker 2, and chunks 2 and 3 to worker 1.
