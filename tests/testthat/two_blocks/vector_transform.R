@@ -29,7 +29,7 @@ z = (x - xbar) / sdx    # vector 2
 , data = list(x0 = x_desc)
 , nWorkers = 2L
 , scheduler = scheduleDataParallel
-, splittableFuncs = c("log", "-", "/")
+, chunkableFuncs = c("log", "-", "/")
 , outFile = outFile
 , overWrite = TRUE
 )

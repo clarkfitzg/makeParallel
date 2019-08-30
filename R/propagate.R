@@ -100,15 +100,15 @@ update_resource.Assign = function(node, name_resource, resources, namer, ...)
 }
 
 
-update_resource.Call = function(node, name_resource, resources, namer, splittableFuncs = character(), ...)
+update_resource.Call = function(node, name_resource, resources, namer, chunkableFuncs = character(), ...)
 {
     # First implementation will behave naively.
     # If the call is to a vectorized function, and any of the arguments to that function are chunked objects, then the result is a chunked object.
     # A more robust version will match on argument names, but for this we will need the argument list to be named.
 
-    has_splittable_args = sapply(node$args$contents, is_chunked, resources = resources)
+    has_chunkable_args = sapply(node$args$contents, is_chunked, resources = resources)
 
-    if(node$fn$value %in% splittableFuncs && any(has_splittable_args)){
+    if(node$fn$value %in% chunkableFuncs && any(has_chunkable_args)){
         new_named_resource(node, resources, namer, chunked_object = TRUE)
     } else {
         NextMethod()

@@ -159,20 +159,11 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     # Mark everything with whether it's a chunked object or not.
     propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkableFuncs)
 
-    chunk_obj = sapply(ast$contents, is_chunked, resources = resources)
-
-    vectorIndices = findBigVectorBlock(graph@graph, chunk_obj)
-
-    # All the chunked resources that are used later in the remainder of the code need to go from the workers to the manager.
-    objectsFromWorkers = find_objectsFromWorkers(graph@code, vectorIndices)
-
-    DataParallelSchedule(graph = graph
-                   , assignmentIndices = assignments
-                   , nWorkers = as.integer(nWorkers)
-                   , vectorIndices = vectorIndices
-                   , data = data_desc
-                   , objectsFromWorkers = objectsFromWorkers
-                   )
+    # This is the naive approach of iterating through each top level expression and making every single one of them a 
+    # It does not rearrange statements.
+    # It does not try to save memory by garbage collecting.
+    # It does not 
+    lapply(ast, 
 }
 
 

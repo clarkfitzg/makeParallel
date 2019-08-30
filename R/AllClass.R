@@ -231,9 +231,15 @@ ForkSchedule = setClass("ForkSchedule"
     , contains = "TaskSchedule")
 
 
+#' Abstract base class for blocks comprising a DataParallelSchedule
+#'
+#' These are NOT basic blocks in the sense of compilers, because they may contain control flow.
+CodeBlock = setClass("CodeBlock")
+
+
 #' @slot collect names of objects to collect from the workers to the manager.
 #' @slot code to evaluate in serial on the manager.
-ManagerBlock = setClass("ManagerBlock",
+ManagerBlock = setClass("ManagerBlock", contains = "CodeBlock",
          slots = c(collect = "character"
                    , code = "expression"
                    ))
@@ -241,7 +247,7 @@ ManagerBlock = setClass("ManagerBlock",
 
 #' @slot export names of objects to export from manager to workers.
 #' @slot code to evaluate in parallel on the manager.
-WorkerBlock = setClass("WorkerBlock",
+WorkerBlock = setClass("WorkerBlock", contains = "CodeBlock",
          slots = c(export = "character"
                    , code = "expression"
                    ))
