@@ -171,35 +171,3 @@ splits_by_known_column = function(bycall, resources)
     }
 }
 
-
-# Find the names of all chunked variables inside node, and return a character vector of their names.
-findChunkedVars = function(node, resources)
-{
-}
-
-
-# This is the naive approach of iterating through each top level expression and turning each one into a CodeBlock.
-# Below is the current state.
-#
-# What it does:
-#
-# What it does not do yet:
-#   - handle subexpressions
-#   - export non chunked objects from the manager to the workers
-#   - track which variables have been collected, and avoid collecting them multiple times.
-#   - combine blocks (although it's not difficult to combine adjacent ones)
-#   - rearrange statements
-#   - try to save memory by garbage collecting
-nodeToCodeBlock = function(node, resources)
-{
-    code = as.expression(as_language(node))
-    if(is_chunked(node, resource)){
-        # TODO: populate export
-        export = character()
-        WorkerBlock(code = code, export = export)
-    } else {
-        # Assumes everything chunked is a symbol, and that the names in resources are correct.
-        collect = findChunkedVars(node, resources)
-        ManagerBlock(code = code, collect = collect)
-    }
-}

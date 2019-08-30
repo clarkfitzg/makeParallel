@@ -33,3 +33,5 @@ z = (x - xbar) / sdx    # vector 2
 , outFile = outFile
 , overWrite = TRUE
 )
+
+# A good way to test this might be to check that z actually has mean 0, sd 1
