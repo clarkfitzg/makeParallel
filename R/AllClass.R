@@ -237,6 +237,11 @@ ForkSchedule = setClass("ForkSchedule"
 CodeBlock = setClass("CodeBlock")
 
 
+# A little silly for this class to only have this one slot, but it makes for a cleaner code generator.
+DataLoadBlock = setClass("DataLoadBlock", contains = "CodeBlock",
+         slots = c(dataSource = "DataSource"))
+
+
 #' @slot collect names of objects to collect from the workers to the manager.
 #' @slot code to evaluate in serial on the manager.
 ManagerBlock = setClass("ManagerBlock", contains = "CodeBlock",

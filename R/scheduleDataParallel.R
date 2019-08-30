@@ -205,7 +205,10 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     # Mark everything with whether it's a chunked object or not.
     propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkableFuncs)
 
+    # It may be better to put this data loading somewhere else in the schedule, but if we put it first, then the objects are guaranteed to be there when we need them later.
+    firstBlock = DataLoadBlock(dataSource = data_desc)
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources)
+    blocks = c(firstBlock, blocks)
 
     DataParallelSchedule(assignmentIndices = assignmentIndices
                        , nWorkers = nWorkers
