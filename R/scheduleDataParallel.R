@@ -1,6 +1,6 @@
 # Thu Jun 20 11:37:30 PDT 2019
 # I can get this working incrementally by starting with the simplest things possible.
-# The simplest thing is a completely splittable program.
+# The simplest thing is a completely chunkable program.
 
 # I plan to add the following features to the software:
 #
@@ -8,7 +8,7 @@
 # 1. column selection at source, using the 'pipe cut' trick
 # 2. force a 'collect', say with median
 # 3. 'reduce' functions, as in the z score example. 
-# 4. Multiple splittable blocks, where we keep the data loaded on each worker, and return to it.
+# 4. Multiple chunkable blocks, where we keep the data loaded on each worker, and return to it.
 
 
 
@@ -46,10 +46,10 @@ findBigVectorBlock = function(gdf, chunk_obj)
     gdf_vector = gdf[!(gdf$from %in% exclude), ]
 
     if(nrow(gdf_vector) == 0)
-        stop("Cannot find a block of splittable statements.")
+        stop("Cannot find a block of chunkable statements.")
 
     d0 = min(gdf_vector$from)
-    # Picking the smallest index is arbitrary, since there could be several splittable blocks, and we would like to get all of them, at least all of them that depend on the initial data.
+    # Picking the smallest index is arbitrary, since there could be several chunkable blocks, and we would like to get all of them, at least all of them that depend on the initial data.
     # One way to do that is to add a node to the dependency graph for the initial load of the large data object, and gather all of its descendants.
     # Even more sophisticated is to "revisit" the data- that doesn't happen yet.
     # This implementation will get only _one_ vector block connected in the use-def graph.
@@ -60,7 +60,7 @@ findBigVectorBlock = function(gdf, chunk_obj)
 }
 
 
-# Before non splittable code can run on the manager, all the necessary variables must be present.
+# Before non chunkable code can run on the manager, all the necessary variables must be present.
 # This function finds those variables.
 #
 # I should be able to pick these objects out of the task graph.
@@ -108,32 +108,32 @@ greedy_assign = function(tasktimes, w)
 #' Schedule Based On Data Parallelism
 #'
 #' If you're doing a series of computations over a large data set, then start with this scheduler.
-#' This scheduler combines as many splittable expressions as it can into large blocks of splittable expressions to run in parallel.
+#' This scheduler combines as many chunkable expressions as it can into large blocks of chunkable expressions to run in parallel.
 #' The initial data chunks and intermediate objects stay on the workers and do not return to the manager, so you can think of it as "chunk fusion".
 #'
 #' It statically balances the load of the data chunks among workers, assuming that loading and processing times are linear in the size of the data.
 #'
 #' TODO:
 #'
-#' 1. Populate `splittableFuncs` based on code analysis.
-#' 1. Model non splittable functions so that we can revisit the chunked data.
+#' 1. Populate `chunkableFuncs` based on code analysis.
+#' 1. Model non chunkable functions so that we can revisit the chunked data.
 #'      Currently it only allows for one chunked block.
-#' 2. Identify which parameters a function is splittable in, and respect these by matching arguments.
+#' 2. Identify which parameters a function is chunkable in, and respect these by matching arguments.
 #'      See `update_resource.Call`.
 #' 3. Clarify behavior of subexpressions, handling cases such as `min(sin(large_object))`
 #'
 #' @inheritParams schedule
-#' @param knownSplittableFuncs character, the names of splittable functions from recommended and base packages.
-#' @param splittableFuncs character, names of additional splittable functions known to the user.
-#' @param allSplittableFuncs character, names of all splittable functions to use in the analysis.
+#' @param knownChunkableFuncs character, the names of chunkable functions from recommended and base packages.
+#' @param chunkableFuncs character, names of additional chunkable functions known to the user.
+#' @param allChunkableFuncs character, names of all chunkable functions to use in the analysis.
 #' @seealso [makeParallel], [schedule]
 #' @export
 #' @md
 scheduleDataParallel = function(graph, platform = Platform(), data = list()
     , nWorkers = platform@nWorkers
-    , KnownSplittableFuncs = c("exp", "+", "*", "sin")
-    , splittableFuncs = character()
-    , allSplittableFuncs = c(KnownSplittableFuncs, splittableFuncs)
+    , KnownChunkableFuncs = c("exp", "+", "*", "sin")
+    , chunkableFuncs = character()
+    , allChunkableFuncs = c(KnownChunkableFuncs, chunkableFuncs)
     )
 {
     if(!is.list(data) || 1 < length(data) || is.null(names(data))) 
@@ -157,7 +157,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     ast = rstatic::to_ast(graph@code)
 
     # Mark everything with whether it's a chunked object or not.
-    propagate(ast, name_resource, resources, namer, splittableFuncs = allSplittableFuncs)
+    propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkableFuncs)
 
     chunk_obj = sapply(ast$contents, is_chunked, resources = resources)
 
