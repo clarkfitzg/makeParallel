@@ -161,10 +161,6 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     # Mark everything with whether it's a chunked object or not.
     propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkableFuncs)
 
-    # This is the naive approach of iterating through each top level expression and turning each one into a CodeBlock.
-    # It does not combine blocks (although it's not difficult to combine adjacent ones)
-    # It does not rearrange statements.
-    # It does not try to save memory by garbage collecting.
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources)
 
     DataParallelSchedule(assignmentIndices = assignmentIndices
