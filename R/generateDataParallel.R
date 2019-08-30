@@ -7,7 +7,6 @@ function(schedule, platform, ...)
 
     # TODO: Initialize, data loading code
 
-    firstBlock = 
     newcode = lapply(schedule@blocks, generateBlock, platform = platform, ...)
     newcode = do.call(c, c(firstBlock, newcode))
     new
