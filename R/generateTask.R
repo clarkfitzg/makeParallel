@@ -82,8 +82,9 @@ gen_snow_worker = function(processor, schedule)
 #'  1) / 2 subsequent ports if every pair of n workers must communicate.
 #' @param minTimeout timeout for socket connection will be at least this
 #'  many seconds.
-setMethod("generate", "TaskSchedule", function(schedule, portStart = 33000L, minTimeout = 600)
+setMethod("generate", "TaskSchedule", function(schedule, platform, portStart = 33000L, minTimeout = 600)
 {
+    # TODO: Use platform
     if(nrow(schedule@transfer) == 0){
         gen_socket_code_no_comm(schedule)
     } else {

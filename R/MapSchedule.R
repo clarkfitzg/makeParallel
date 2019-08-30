@@ -74,6 +74,8 @@ replaceApply2 = function(expr, map = mclapplyNames)
 
 #' Data Parallel Scheduler
 #'
+#' DEPRECATED. Use scheduleDataParallel instead.
+#'
 #' This function
 #' detects parallelism through the use of top level calls to R's
 #' apply family of functions and through analysis of \code{for} loops.
@@ -176,7 +178,7 @@ setMethod("schedule", signature(graph = "TaskGraph", data = "ANY", platform = "A
 #' @export
 #' @rdname generate
 setMethod("generate", signature(schedule = "MapSchedule"),
-function (schedule, ...) 
+function (schedule, platform, ...) 
 {
     pp_expr = preprocess(schedule@graph@code)
     pcode = lapply(pp_expr, replaceApply)
