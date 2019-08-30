@@ -137,14 +137,14 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     )
 {
     if(!is.list(data) || 1 < length(data) || is.null(names(data))) 
-        stop("Expected data to be of the form: `list(x = data_description)`, where x is a variable used later in the code.")
+        stop("Expected data to be of the form: `list(x = data_source)`, where x is a variable used later in the code, and data_source is an object of class DataSource.")
 
     data_desc = data[[1L]]
     # TODO: Use varName if it's already there in the data description.
     varName = data_desc@varName = names(data)
     nchunks = length(data_desc@files)
 
-    assignments = greedy_assign(data_desc@sizes, nWorkers)
+    assignmentIndices = greedy_assign(data_desc@sizes, nWorkers)
 
     name_resource = new.env()
     resources = new.env()
@@ -163,7 +163,13 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     # It does not combine blocks (although it's not difficult to combine adjacent ones)
     # It does not rearrange statements.
     # It does not try to save memory by garbage collecting.
-    lapply(ast, nodeToCodeBlock, resources = resources)
+    blocks = lapply(ast, nodeToCodeBlock, resources = resources)
+
+    DataParallelSchedule(assignmentIndices = assignmentIndices
+                       , nWorkers = nWorkers
+                       , data = data_desc
+                       , blocks = blocks
+                       )
 }
 
 
