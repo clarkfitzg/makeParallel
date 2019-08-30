@@ -171,3 +171,12 @@ setGeneric("writeCode", function(code, file, ...)
 #' @param value file name to associate with object
 setGeneric("file<-", function(description, value)
            standardGeneric("file<-"))
+
+
+#' Generate an expression for a parallel code block
+#'
+#' Used to implement the DataParallelSchedule code generator
+#'
+#' @param block \linkS4class{CodeBlock}
+setGeneric("generateBlock", function(block, platform, ...)
+           standardGeneric("generateBlock"))
