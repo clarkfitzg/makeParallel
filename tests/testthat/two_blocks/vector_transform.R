@@ -1,10 +1,3 @@
-# See clarkfitzthesis/tex/vectorize document to see more details for what's going on, what this is working towards.
-#
-
-
-# The code to do the actual transformation
-# The user of makeParallel must write something like the following:
-
 library(makeParallel)
 
 
@@ -20,18 +13,18 @@ x_desc = ChunkDataFiles(files = files
 outFile = "generated.R"
 
 out = makeParallel("
-b = 3                   # general 1
-x = log(x0, base = b)   # vector 1
-xbar = mean(x)          # reduce 1a
-sdx = sd(x)             # reduce 1b
-z = (x - xbar) / sdx    # vector 2
+x = sin(x0)             # chunkable 1
+mx = median(x)          # general 1
+x2 = x - mx             # chunkable 2
+result = max(x2)        # reduce 1
+saveRDS(result, 'result.rds') # general 2
 "
 , data = list(x0 = x_desc)
 , nWorkers = 2L
 , scheduler = scheduleDataParallel
-, chunkableFuncs = c("log", "-", "/")
+, chunkableFuncs = c("sin", "-")
 , outFile = outFile
 , overWrite = TRUE
 )
 
-# A good way to test this might be to check that z actually has mean 0, sd 1
+
