@@ -1,11 +1,12 @@
 #' @export
-setMethod("generate", signature(schedule = "DataParallelSchedule", platform = "ANY"),
+setMethod("generate", signature(schedule = "DataParallelSchedule", platform = "ParallelLocalCluster"),
 function(schedule, platform, ...)
 {
 # Idea:
 # We can generate all the code independently for each block, and then just stick it all together to make the complete program.
+# Assuming it's all R code, of course.
 
-    initBlock = generate(platform = platform)
+    initBlock = localInitBlock(schedule, platform)
     newcode = lapply(schedule@blocks, generate, platform = platform, ...)
     newcode = do.call(c, c(initBlock, newcode))
     GeneratedCode(schedule = schedule, code = newcode)
@@ -13,46 +14,31 @@ function(schedule, platform, ...)
 
 
 # The following methods for the platform = "ParallelLocalCluster" are designed to work together.
-# For example, initializing the platform with InitPlatformBlock will define and export the special variable `_ASSIGNMENT_INDICES`, and the code generator for DataLoadBlock will use this variable.
+# I'm not thinking about name collisions at all right now.
 
-# I need the assignments from the schedule to generate the initialization code.
-# Will I need the schedule anywhere else?
-
-setMethod("generate", signature(schedule = "InitPlatformBlock", platform = "ParallelLocalCluster"),
-function(schedule, platform
+localInitBlock = function(schedule, platform
          , message = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
-         , 
-
-         , template = parse(text = "
+         , template = parse(text = '
 message(`_MESSAGE`)
 
 library(parallel)
 
-nworkers = `_NWORKERS`
 assignments = `_ASSIGNMENT_INDICES`
-read_args = `_READ_ARGS`
 
-cls = makeCluster(nworkers)
+cls = makeCluster(`_NWORKERS`)
 
-clusterExport(cls, c("assignments", "read_args"))
+clusterExport(cls, "assignments")
 parLapply(cls, seq(nworkers), function(i) assign("workerID", i, globalenv()))
 
-collected = clusterEvalQ(cls, {
+clusterEvalQ(cls, {
     assignments = which(assignments == workerID)
-    read_args = read_args[assignments]
-    chunks = lapply(read_args, `_READ_FUNC`)
-    # TODO: Generalize this to other combining functions besides c, rbind for data.frame
-    # For this we need to know if value is a data.frame
-    `_DATA_VARNAME` = do.call(`_COMBINE_FUNC`, chunks)
-
-    `_VECTOR_BODY`
-
-    `_OBJECTS_RECEIVE_FROM_WORKERS`
+    NULL
 })
-
-
-", ...){
-    .NotYetImplemented()
+', ...){
+    substitute_language(template, list(`_MESSAGE` = message
+        , `_NWORKERS` = schedule@nWorkers
+        , `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
+        ))
 })
 
 
