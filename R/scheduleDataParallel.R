@@ -110,15 +110,15 @@ greedy_assign = function(tasktimes, w)
 # Assumes that the names in resources are correct, which holds if we've used SSA.
 findVarsToMove = function(node, resources, predicate = isChunked)
 {
-    chunked = rstatic::find_nodes(node, predicate, resources)
-    out = sapply(chunked, function(idx) node[[idx]]$ssa_name)
+    matches = rstatic::find_nodes(node, predicate, resources)
+    out = sapply(matches, function(idx) node[[idx]]$ssa_name)
 
     if(length(out) == 0)
         # No chunked variables in this node.
         return(character())
 
     if(!is.character(out))
-        stop("Current implementation assumes that all chunked objects are symbols, not subexpressions.")
+        stop("Current implementation cannot handle this case. Maybe subexpressions are the problem?")
     out
 }
 

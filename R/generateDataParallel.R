@@ -98,17 +98,30 @@ for(i in seq_along(vars_to_collect)){
 
 setMethod("generate", signature(schedule = "ParallelBlock", platform = "ParallelLocalCluster", data = "ANY"),
 function(schedule, platform
-         , template = parse(text = '
+         , export_template = parse(text = '
+clusterExport(`_CLUSTER_NAME`, `_EXPORT`)
+'
+         , run_template = parse(text = '
 clusterEvalQ(`_CLUSTER_NAME`, {
     `_BODY`
     NULL
 })
 '), ...){
-    # TODO: Add the exports in here later
-    #   , `_EXPORT` = schedule@export
-    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+    
+    part1 = if(0 == length(schedule@exports)){
+        expression()
+    } else {
+        substitute_language(export_template, list(
+            `_CLUSTER_NAME` = as.symbol(platform@name)
+            , `_EXPORT` = schedule@export
+            ))
+    }
+
+    part2 = substitute_language(template2, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         , `_BODY` = schedule@code
         ))
+
+    c(part1, part2)
 })
 
 
