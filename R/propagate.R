@@ -1,5 +1,9 @@
 # Propagate Resources
 #
+# This is pretty cool- it resembles R's evaluator.
+# Attaching the information to the nodes of the AST allows us to query the state at any point in the evaluation, versus seeing what happened after everything runs.
+
+
 # Thu Jun 13 08:55:57 PDT 2019
 #
 # This is a proof of concept to determine if the code calls `by`, where the argument to split the data on is known.
@@ -13,7 +17,14 @@
 #
 # - ast The propagation step assigns each node a resource ID.
 # - name_resource is an environment where the keys are variable names in the code and the values are resource ID's.
-# - resources is an environment where the keys are resource ID's and the values are 
+# - resources is an environment where the keys are resource ID's and the values are a list containing the state that we care about, such as chunked_object = TRUE or FALSE.
+
+
+# Sat Aug 31 15:34:24 PDT 2019
+#
+# Originally I set this up to make it easy to go from variable names to resources.
+# Now I would like to got the other way- I have the resources, and I want to know if it was assigned locally.
+# I can add such a field to the resources list.
 
 
 # Modifies the node and resources.
@@ -97,6 +108,7 @@ update_resource.Assign = function(node, name_resource, resources, namer, ...)
     resource_id(node$write) = r_id
     resource_id(node) = r_id
     name_resource[[node$write$value]] = r_id
+    resources[[r_id]][["assigned"]] = TRUE
 }
 
 
@@ -142,8 +154,12 @@ get_resource = function(node, resources)
 isChunked = function(node, resources) get_resource(node, resources)$chunked_object
 
 
-# Check if the resource associated with a node has been locally defined, and is not chunked
-isLocalNotChunked = function(node, resources) get_resource(node, resources)$chunked_object
+# Check if the resource associated with a node has been locally assigned, and is not chunked
+isLocalNotChunked = function(node, resources)
+{
+    r = get_resource(node, resources)
+    !is.null(r$assigned) && r$assigned && !r$chunked_object 
+}
 
 
 # TODO: split followed by lapply is more general, so maybe I should probably be working with that?
