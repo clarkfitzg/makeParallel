@@ -1,14 +1,15 @@
 #' @export
-setMethod("generate", signature(schedule = "DataParallelSchedule", platform = "ParallelLocalCluster"),
-function(schedule, platform, ...)
+setMethod("generate", signature(schedule = "DataParallelSchedule", platform = "ParallelLocalCluster", data = "ANY"),
+function(schedule, platform, data, ...)
 {
 # Idea:
 # We can generate all the code independently for each block, and then just stick it all together to make the complete program.
 # Assuming it's all R code, of course.
 
     # localInitBlock could be a method, and this would work more generally.
+    # Or we could dispatch generate on an InitBlock object, but then we'd have to do some contortions to avoid infinite recursion.
     initBlock = localInitBlock(schedule, platform)
-    newcode = lapply(schedule@blocks, generate, platform = platform, ...)
+    newcode = lapply(schedule@blocks, generate, platform = platform, data = data, ...)
     newcode = do.call(c, c(initBlock, newcode))
     GeneratedCode(schedule = schedule, code = newcode)
 })
@@ -45,9 +46,11 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 
 
 # TODO: Add data argument into generate signature.
-# We still need it.
-setMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster", data = ""),
+# We need it.
+# Actually, not sure. I put the data into the DataLoadBlock.
+setMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform,
+         , combine_func = as.symbol("c")
          , template = parse(text = '
 clusterEvalQ(`_CLUSTER_NAME`, {
     read_args = `_READ_ARGS`
@@ -60,7 +63,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
     substitute_language(template, list(
         , `_CLUSTER_NAME` = platform@name
         , `_READ_ARGS` = data@files
-        , `_COMBINE_FUNC` = as.symbol("c")
+        , `_COMBINE_FUNC` = combine_func
         ))
 })
 
