@@ -36,13 +36,20 @@ out = makeParallel("
 
 
 # Test code
+############################################################
 if(get0(TEST_FLAG, ifnotfound = FALSE)){
     library(testthat)
 
     # Check that the load balancing happens.
     expect_equal(schedule(out)@assignmentIndices, c(1, 2, 1))
 
+    rr = "result.rds"
+    unlink(rr)
+    source(outFile)
 
+    result = readRDS(rr)
+
+    expect_equal(result, 0)
 }
 
 
