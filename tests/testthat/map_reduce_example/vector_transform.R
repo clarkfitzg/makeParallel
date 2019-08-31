@@ -7,11 +7,6 @@
 
 library(makeParallel)
 
-if(FALSE){
-    setMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster", data = "ChunkDataFiles"), function(schedule, platform, data) stop("found it!"))
-    selectMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster", data = "ChunkDataFiles"))
-}
-
 
 files = c("small1.rds", "big.rds", "small2.rds")
 # Can surely do this for the user

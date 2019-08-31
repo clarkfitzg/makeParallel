@@ -45,7 +45,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 }
 
 
-setMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
+setMethod("generate", signature(schedule = "DataLoadBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform, data
          , combine_func = as.symbol("c") # TODO: Use rbind if it's a data.frame
          , template = parse(text = '
