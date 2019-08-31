@@ -1,16 +1,18 @@
-library(makeParallel)
+# TODO: Delete this file and fold everything into one folder. It's using the same data.
 
+library(makeParallel)
 
 files = c("small1.rds", "big.rds", "small2.rds")
 # Can surely do this for the user
 sizes = file.info(files)[, "size"]
 
-x_desc = ChunkDataFiles(files = files
+x_desc = ChunkDataFiles(varName = "x"
+    , files = files
 	, sizes = sizes
 	, readFuncName = "readRDS"
     )
 
-outFile = "generated.R"
+outFile = "pmin.R"
 
 out = makeParallel("
 x = sin(x0)             # chunkable 1
