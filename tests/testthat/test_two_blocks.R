@@ -5,7 +5,7 @@ files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE
 # Can surely do this for the user
 sizes = file.info(files)[, "size"]
 
-x_desc = ChunkDataFiles(varName = "x"
+x_desc = ChunkDataFiles(varName = "x0"
     , files = files
 	, sizes = sizes
 	, readFuncName = "readRDS"
@@ -32,5 +32,15 @@ saveRDS(result, 'gen/result_two_blocks.rds') # general 2
 # Test code
 ############################################################
 if(identical(Sys.getenv("TESTTHAT"), "true")){
-   
+
+    rr = "gen/result_two_blocks.rds"
+    unlink(rr)
+    source(outFile)
+
+    result = readRDS(rr)
+    # A cleaner way to test this would be to test that both the serial schedules and the parallel ones get the same result.
+    expected = readRDS("expected/result_two_blocks.rds")
+
+    expect_equal(result, expected)
+
 }
