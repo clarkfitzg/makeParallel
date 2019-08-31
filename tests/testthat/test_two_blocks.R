@@ -21,8 +21,8 @@ result = max(x2)        # reduce 1
 saveRDS(result, 'gen/result_two_blocks.rds') # general 2
 "
 , data = x_desc
-, nWorkers = 2L
 , scheduler = scheduleDataParallel
+, platform = parallelLocalCluster()
 , chunkableFuncs = c("sin", "-")
 , outFile = outFile
 , overWrite = TRUE
