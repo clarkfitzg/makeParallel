@@ -6,7 +6,8 @@
 
 library(makeParallel)
 
-files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE)
+# We need the files in this order to check the load balancing works.
+files = paste0("single_numeric_vector/", c("small1", "big", "small2"), ".rds")
 
 # Can surely do this for the user
 sizes = file.info(files)[, "size"]
