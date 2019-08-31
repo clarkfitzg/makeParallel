@@ -61,7 +61,7 @@
 makeParallel = function(code
     , isFile = file.exists(code)
     , expr = if(isFile) parse(code, keep.source = TRUE) else parse(text = code, keep.source = FALSE)
-    , data = NULL
+    , data = list()
     , nWorkers = parallel::detectCores()
     , platform = Platform(nWorkers = nWorkers)
     , graph = inferGraph(expr)
@@ -78,8 +78,10 @@ makeParallel = function(code
     if(run)
         graph = runMeasure(graph)
 
+    data = standardizeData(data)
+
     sc = scheduler(graph, platform, data, ...)
-    out = do.call(generator, c(list(sc), generatorArgs))
+    out = do.call(generator, c(list(schedule = sc, platform = platform, data = data), generatorArgs))
 
     originalFile = file(graph)
 

@@ -36,21 +36,18 @@ clusterEvalQ(`_CLUSTER_NAME`, {
     assignments = which(assignments == workerID)
     NULL
 })
-', ...){
+'), ...){
     substitute_language(template, list(`_MESSAGE` = message
         , `_NWORKERS` = schedule@nWorkers
         , `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
         , `_CLUSTER_NAME` = platform@name
         ))
-})
+}
 
 
-# TODO: Add data argument into generate signature.
-# We need it.
-# Actually, not sure. I put the data into the DataLoadBlock.
 setMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform,
-         , combine_func = as.symbol("c")
+         , combine_func = as.symbol("c") # TODO: Use rbind if it's a data.frame
          , template = parse(text = '
 clusterEvalQ(`_CLUSTER_NAME`, {
     read_args = `_READ_ARGS`
@@ -59,43 +56,62 @@ clusterEvalQ(`_CLUSTER_NAME`, {
     `_DATA_VARNAME` = do.call(`_COMBINE_FUNC`, chunks)
     NULL
 })
-', ...){
+'), ...){
     substitute_language(template, list(
         , `_CLUSTER_NAME` = platform@name
         , `_READ_ARGS` = data@files
+        , `_READ_FUNC` = data@readFuncName 
+        , `_DATA_VARNAME` = data@varName
         , `_COMBINE_FUNC` = combine_func
         ))
 })
 
-#        , `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
-#        , `_READ_FUNC` = as.symbol(data@readFuncName)
-#        , `_DATA_VARNAME` = as.symbol(data@varName)
-#        # TODO: Use rbind if it's a data.frame:
-#        , `_VECTOR_BODY` = code[v]
 
-setMethod("generate", signature(schedule = "SerialBlock", platform = "ParallelLocalCluster"),
-function(schedule, platform
+setMethod("generate", signature(schedule = "SerialBlock", platform = "ParallelLocalCluster", data = "ANY"),
+function(schedule, platform, data
+         , combine_func = as.symbol("c") # TODO: Use rbind if it's a data.frame
          , template = parse(text = '
-', ...){
-    substitute_language(template, list(
-        ))
+collected = clusterEvalQ(`_CLUSTER_NAME`, {
+    `_OBJECTS_RECEIVE_FROM_WORKERS`
 })
 
+# Unpack and assemble the objects
+vars_to_collect = names(collected[[1]])
+for(i in seq_along(vars_to_collect)){
+    varname = vars_to_collect[i]
+    chunks = lapply(collected, `[[`, i)
+    value = do.call(`_COMBINE_FUNC`, chunks)
+    assign(varname, value)
+'), ...){
+    if(1 <= length(schedule@collect)){
+        first = substitute_language(template, list(`_CLUSTER_NAME` = platform@name
+            , `_OBJECTS_RECEIVE_FROM_WORKERS` = char_to_symbol_list(schedule@collect)
+            , `_COMBINE_FUNC` = combine_func
+            ))
+    } else {
+        first = expression()
+    }
+    c(first, schedule@code)
+}
 
-setMethod("generate", signature(schedule = "ParallelBlock", platform = "ParallelLocalCluster"),
+
+setMethod("generate", signature(schedule = "ParallelBlock", platform = "ParallelLocalCluster", data = "ANY"),
 function(schedule, platform
          , template = parse(text = '
 clusterEvalQ(`_CLUSTER_NAME`, {
+    `_BODY`
     NULL
 })
 ', ...){
-    substitute_language(template, list(
-        , `_CLUSTER_NAME` = platform@name
+    # TODO: Add the exports in here later
+    #   , `_EXPORT` = schedule@export
+    substitute_language(template, list(`_CLUSTER_NAME` = platform@name
+        , `_BODY` = schedule@code
         ))
 })
 
 
-setMethod("generate", signature(schedule = "GroupByBlock", platform = "ParallelLocalCluster"),
+setMethod("generate", signature(schedule = "GroupByBlock", platform = "ParallelLocalCluster", data = "ANY"),
 function(schedule, platform
          , template = parse(text = '
 clusterEvalQ(`_CLUSTER_NAME`, {
@@ -103,8 +119,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 })
 ', ...){
 .NotYetImplemented()
-    substitute_language(template, list(
-        , `_CLUSTER_NAME` = platform@name
+    substitute_language(template, list(`_CLUSTER_NAME` = platform@name
         ))
 })
 

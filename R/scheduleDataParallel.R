@@ -173,29 +173,26 @@ nodeToCodeBlock = function(node, resources)
 #' @seealso [makeParallel], [schedule]
 #' @export
 #' @md
-scheduleDataParallel = function(graph, platform = Platform(), data = list()
+scheduleDataParallel = function(graph, platform = Platform(), data
     , nWorkers = platform@nWorkers
     , KnownChunkableFuncs = c("exp", "+", "*", "sin")
     , chunkableFuncs = character()
     , allChunkableFuncs = c(KnownChunkableFuncs, chunkableFuncs)
     )
 {
-    if(!is.list(data) || 1 < length(data) || is.null(names(data))) 
-        stop("Expected data to be of the form: `list(x = data_source)`, where x is a variable used later in the code, and data_source is an object of class DataSource.")
+    if(!is(data, "ChunkDataFiles")) 
+        stop("Currently only implemented for ChunkDataFiles.")
 
-    data_desc = data[[1L]]
-    # TODO: Use varName if it's already there in the data description.
-    varName = data_desc@varName = names(data)
-    nchunks = length(data_desc@files)
+    nchunks = length(data@files)
 
-    assignmentIndices = greedy_assign(data_desc@sizes, nWorkers)
+    assignmentIndices = greedy_assign(data@sizes, nWorkers)
 
     name_resource = new.env()
     resources = new.env()
     namer = namer_factory()
 
     data_id = namer()
-    name_resource[[varName]] = data_id
+    name_resource[[data@varName]] = data_id
     resources[[data_id]] = list(chunked_object = TRUE)
 
     ast = rstatic::to_ast(graph@code)
@@ -205,14 +202,13 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     # Mark everything with whether it's a chunked object or not.
     propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkableFuncs)
 
-    # It may be better to put these blocks somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
-    load_block = DataLoadBlock(dataSource = data_desc)
+    # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
+    load_block = DataLoadBlock()
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources)
     blocks = c(load_block, blocks)
 
     DataParallelSchedule(assignmentIndices = assignmentIndices
                        , nWorkers = nWorkers
-                       , data = data_desc
                        , blocks = blocks
                        )
 }

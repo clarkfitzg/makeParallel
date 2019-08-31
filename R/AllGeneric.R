@@ -130,19 +130,20 @@ setMethod("time", "Schedule", function(x)
 #' @rdname generate
 #' @param schedule object to generate code from, typically an object of class \linkS4class{Schedule}
 #' @param platform object of class \linkS4class{Platform}
+#' @param data object of class \linkS4class{DataSource}
 #' @param ... additional arguments to methods
 #' @return x object of class \linkS4class{GeneratedCode}
 #' @seealso \code{\link{schedule}} generic function to create
 #' \linkS4class{Schedule}, \code{\link{writeCode}} to write and extract the
 #' actual code, and
 #' \code{\link{makeParallel}} to do everything all at once.
-setGeneric("generate", function(schedule, platform, ...)
+setGeneric("generate", function(schedule, platform, data, ...)
            standardGeneric("generate"))
 
 
 #' @export
 #' @rdname generate
-setMethod("generate", "SerialSchedule", function(schedule, platform, ...)
+setMethod("generate", "SerialSchedule", function(schedule, platform, data, ...)
           GeneratedCode(schedule = schedule, code = schedule@graph@code)
           )
 

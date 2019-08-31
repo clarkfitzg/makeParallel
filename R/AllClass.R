@@ -258,8 +258,7 @@ InitPlatformBlock = setClass("InitPlatformBlock", contains = "CodeBlock")
 
 
 #' Load Data
-DataLoadBlock = setClass("DataLoadBlock", contains = "CodeBlock",
-         slots = c(dataSource = "DataSource"))
+DataLoadBlock = setClass("DataLoadBlock", contains = "CodeBlock")
 
 
 #' Code to run in serial
@@ -295,7 +294,6 @@ GroupByBlock = setClass("GroupByBlock", contains = "ParallelBlock",
 DataParallelSchedule = setClass("DataParallelSchedule", contains = "Schedule",
          slots = c(assignmentIndices = "integer"
                    , nWorkers = "integer"
-                   , data = "DataSource"
                    , blocks = "list"
                    ))
 

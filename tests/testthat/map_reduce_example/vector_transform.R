@@ -12,7 +12,8 @@ files = c("small1.rds", "big.rds", "small2.rds")
 # Can surely do this for the user
 sizes = file.info(files)[, "size"]
 
-x_desc = ChunkDataFiles(files = files
+x_desc = ChunkDataFiles(varName = "x"
+    , files = files
 	, sizes = sizes
 	, readFuncName = "readRDS"
     )
