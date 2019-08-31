@@ -4,7 +4,7 @@
 \alias{scheduleDataParallel}
 \title{Schedule Based On Data Parallelism}
 \usage{
-scheduleDataParallel(graph, platform = Platform(), data = list(),
+scheduleDataParallel(graph, platform = Platform(), data,
   nWorkers = platform@nWorkers, KnownChunkableFuncs = c("exp", "+",
   "*", "sin"), chunkableFuncs = character(),
   allChunkableFuncs = c(KnownChunkableFuncs, chunkableFuncs))

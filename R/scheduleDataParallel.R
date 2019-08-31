@@ -141,10 +141,10 @@ nodeToCodeBlock = function(node, resources)
     if(is_chunked(node, resources)){
         # TODO: populate export
         export = character()
-        WorkerBlock(code = code, export = export)
+        ParallelBlock(code = code, export = export)
     } else {
         collect = findChunkedVars(node, resources)
-        ManagerBlock(code = code, collect = collect)
+        SerialBlock(code = code, collect = collect)
     }
 }
 

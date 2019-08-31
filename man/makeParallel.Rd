@@ -6,7 +6,7 @@
 \usage{
 makeParallel(code, isFile = file.exists(code), expr = if (isFile)
   parse(code, keep.source = TRUE) else parse(text = code, keep.source =
-  FALSE), data = NULL, nWorkers = parallel::detectCores(),
+  FALSE), data = list(), nWorkers = parallel::detectCores(),
   platform = Platform(nWorkers = nWorkers), graph = inferGraph(expr),
   run = FALSE, scheduler = schedule, ..., generator = generate,
   generatorArgs = list(), outFile = FALSE, prefix = "gen_",

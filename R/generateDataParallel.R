@@ -46,7 +46,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 
 
 setMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
-function(schedule, platform,
+function(schedule, platform, data
          , combine_func = as.symbol("c") # TODO: Use rbind if it's a data.frame
          , template = parse(text = '
 clusterEvalQ(`_CLUSTER_NAME`, {
@@ -92,7 +92,7 @@ for(i in seq_along(vars_to_collect)){
         first = expression()
     }
     c(first, schedule@code)
-}
+})
 
 
 setMethod("generate", signature(schedule = "ParallelBlock", platform = "ParallelLocalCluster", data = "ANY"),
@@ -102,7 +102,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
     `_BODY`
     NULL
 })
-', ...){
+'), ...){
     # TODO: Add the exports in here later
     #   , `_EXPORT` = schedule@export
     substitute_language(template, list(`_CLUSTER_NAME` = platform@name
@@ -117,7 +117,7 @@ function(schedule, platform
 clusterEvalQ(`_CLUSTER_NAME`, {
     NULL
 })
-', ...){
+'), ...){
 .NotYetImplemented()
     substitute_language(template, list(`_CLUSTER_NAME` = platform@name
         ))

@@ -7,6 +7,11 @@
 
 library(makeParallel)
 
+if(FALSE){
+    setMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster", data = "ChunkDataFiles"), function(schedule, platform, data) stop("found it!"))
+    selectMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster", data = "ChunkDataFiles"))
+}
+
 
 files = c("small1.rds", "big.rds", "small2.rds")
 # Can surely do this for the user
@@ -21,12 +26,11 @@ x_desc = ChunkDataFiles(varName = "x"
 outFile = "pmin.R"
 
 out = makeParallel("
-
     y = sin(x)
     result = min(y)
     saveRDS(result, 'result.rds')
 "
-, data = list(x = x_desc)
+, data = x_desc
 , nWorkers = 2L
 , scheduler = scheduleDataParallel
 , platform = parallelLocalCluster()

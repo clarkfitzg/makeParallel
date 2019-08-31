@@ -3,24 +3,26 @@
 \docType{methods}
 \name{generate}
 \alias{generate}
-\alias{generate,SerialSchedule,ANY-method}
-\alias{generate,MapSchedule,ANY-method}
-\alias{generate,TaskSchedule,ANY-method}
+\alias{generate,SerialSchedule,ANY,ANY-method}
+\alias{generate,MapSchedule,ANY,ANY-method}
+\alias{generate,TaskSchedule,ANY,ANY-method}
 \title{Generate Code}
 \usage{
-generate(schedule, platform, ...)
+generate(schedule, platform, data, ...)
 
-\S4method{generate}{SerialSchedule,ANY}(schedule, platform, ...)
+\S4method{generate}{SerialSchedule,ANY,ANY}(schedule, platform, data, ...)
 
-\S4method{generate}{MapSchedule,ANY}(schedule, platform, ...)
+\S4method{generate}{MapSchedule,ANY,ANY}(schedule, platform, data, ...)
 
-\S4method{generate}{TaskSchedule,ANY}(schedule, platform,
+\S4method{generate}{TaskSchedule,ANY,ANY}(schedule, platform,
   portStart = 33000L, minTimeout = 600)
 }
 \arguments{
 \item{schedule}{object to generate code from, typically an object of class \linkS4class{Schedule}}
 
 \item{platform}{object of class \linkS4class{Platform}}
+
+\item{data}{object of class \linkS4class{DataSource}}
 
 \item{...}{additional arguments to methods}
 
