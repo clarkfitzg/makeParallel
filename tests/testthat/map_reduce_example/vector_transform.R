@@ -28,6 +28,7 @@ out = makeParallel("
 , data = list(x = x_desc)
 , nWorkers = 2L
 , scheduler = scheduleDataParallel
+, platform = parallelLocalCluster()
 , chunkableFuncs = "sin"
 , outFile = outFile
 , overWrite = TRUE

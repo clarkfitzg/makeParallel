@@ -10,6 +10,9 @@ mapSchedule(graph)
 \item{graph}{\linkS4class{TaskGraph}}
 }
 \description{
+DEPRECATED. Use scheduleDataParallel instead.
+}
+\details{
 This function
 detects parallelism through the use of top level calls to R's
 apply family of functions and through analysis of \code{for} loops.
@@ -17,8 +20,7 @@ Currently supported apply style functions include
 \code{\link[base]{lapply}} and \code{\link[base]{mapply}}. It doesn't
 parallelize all for loops that can be parallelized, but it does do the
 common ones listed in the example.
-}
-\details{
+
 Consider using this if:
 
 \itemize{

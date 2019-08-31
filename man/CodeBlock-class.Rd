@@ -8,3 +8,9 @@
 \description{
 These are NOT basic blocks in the sense of compilers, because they may contain control flow.
 }
+\section{Slots}{
+
+\describe{
+\item{\code{code}}{to evaluate in serial on the manager.}
+}}
+

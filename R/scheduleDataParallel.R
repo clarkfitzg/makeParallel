@@ -206,10 +206,9 @@ scheduleDataParallel = function(graph, platform = Platform(), data = list()
     propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkableFuncs)
 
     # It may be better to put these blocks somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
-    b1 = InitPlatformBlock()
-    b2 = DataLoadBlock(dataSource = data_desc)
+    load_block = DataLoadBlock(dataSource = data_desc)
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources)
-    blocks = c(b1, b2, blocks)
+    blocks = c(load_block, blocks)
 
     DataParallelSchedule(assignmentIndices = assignmentIndices
                        , nWorkers = nWorkers

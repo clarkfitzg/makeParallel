@@ -280,7 +280,7 @@ ParallelBlock = setClass("ParallelBlock", contains = "CodeBlock",
 #'
 #' @slot groupData names of chunked variables to split according to groupIndex
 #' @slot groupIndex names of chunked variables that define the split
-GroupByBlock = setClass("GroupByBlock", contains = "WorkerBlock",
+GroupByBlock = setClass("GroupByBlock", contains = "ParallelBlock",
          slots = c(groupData = "character"
                    , groupIndex = "character"
                    ))
