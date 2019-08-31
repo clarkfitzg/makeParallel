@@ -1,14 +1,13 @@
 # See clarkfitzthesis/tex/vectorize document to see more details for what's going on, what this is working towards.
 #
 
-
 # The code to do the actual transformation
 # The user of makeParallel must write something like the following:
 
 library(makeParallel)
 
+files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE)
 
-files = c("small1.rds", "big.rds", "small2.rds")
 # Can surely do this for the user
 sizes = file.info(files)[, "size"]
 
@@ -18,12 +17,12 @@ x_desc = ChunkDataFiles(varName = "x"
 	, readFuncName = "readRDS"
     )
 
-outFile = "pmin.R"
+outFile = "gen/map_reduce.R"
 
 out = makeParallel("
     y = sin(x)
     result = min(y)
-    saveRDS(result, 'result.rds')
+    saveRDS(result, 'gen/result_map_reduce.rds')
 "
 , data = x_desc
 , nWorkers = 2L
@@ -42,7 +41,7 @@ if(identical(Sys.getenv("TESTTHAT"), "true")){
     # Check that the load balancing happens.
     expect_equal(schedule(out)@assignmentIndices, c(1, 2, 1))
 
-    rr = "result.rds"
+    rr = "gen/result_map_reduce.rds"
     unlink(rr)
     source(outFile)
 
