@@ -1,6 +1,18 @@
 # Sat Aug 17 08:06:35 PDT 2019
 # In CodeAnalysis/explorations/findReadDataCalls Duncan returns the rstatic node of the individual calls that read the data.
 
+
+#' Infer Data Source Object From Code
+#'
+#' @param expr expression to find the data source in
+#' @value \linkS4class{DataSource} object 
+inferDataSource = function(expr)
+{
+    warning("Data source inference not yet implemented. Data source should be specified.")
+    NoDataSource()
+}
+
+
 # Given a single call that loads data, return a DataSource object.
 
 #' @export

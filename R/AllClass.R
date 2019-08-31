@@ -93,6 +93,10 @@ UnixPlatform = setClass("UnixPlatform",
 DataSource = setClass("DataSource", slots = c(varName = "character"))
 
 
+#' Data Unspecified
+NoDataSource = setClass("NoDataSource", contains = "DataSource")
+
+
 #' Many Files Representing One Object
 #'
 #' @export ChunkDataFiles
