@@ -43,32 +43,48 @@ clusterEvalQ(cls, {
 
 
 setMethod("generate", signature(schedule = "DataLoadBlock ", platform = "ParallelLocalCluster"),
-function(schedule, platform, ...)
-{
-    .NotYetImplemented()
+function(schedule, platform
+         , template = parse(text = '
+clusterEvalQ(cls, {
+    NULL
+})
+', ...){
+    substitute_language(template, list(
+        ))
 })
 
 
 setMethod("generate", signature(schedule = "SerialBlock", platform = "ParallelLocalCluster"),
-function(schedule, platform, ...)
-{
-    .NotYetImplemented()
+function(schedule, platform
+         , template = parse(text = '
+', ...){
+    substitute_language(template, list(
+        ))
 })
 
 
 setMethod("generate", signature(schedule = "ParallelBlock", platform = "ParallelLocalCluster"),
-function(schedule, platform, ...)
-{
-    .NotYetImplemented()
+function(schedule, platform
+         , template = parse(text = '
+clusterEvalQ(cls, {
+    NULL
+})
+', ...){
+    substitute_language(template, list(
+        ))
 })
 
 
 setMethod("generate", signature(schedule = "GroupByBlock", platform = "ParallelLocalCluster"),
-function(schedule, platform, ...)
-{
-    .NotYetImplemented()
+function(schedule, platform
+         , template = parse(text = '
+clusterEvalQ(cls, {
+    NULL
 })
-
+', ...){
+    substitute_language(template, list(
+        ))
+})
 
 
 # template = parse(system.file("templates/vector.R", package = "makeParallel")), 
