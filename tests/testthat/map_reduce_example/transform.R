@@ -35,20 +35,15 @@ out = makeParallel("
 )
 
 
-# Testing
-############################################################
+# Test code
+if(get0(TEST_FLAG, ifnotfound = FALSE)){
+    library(testthat)
 
-test_that("simple case of chunked input data descriptions", {
-
-    result = run_DataParallel("map_reduce_example")
-
-    expect_equal(result, 0)
-
-})
+    # Check that the load balancing happens.
+    expect_equal(schedule(out)@assignmentIndices, c(1, 2, 1))
 
 
-# Check that the load balancing happens.
-stopifnot(schedule(out)@assignmentIndices == c(1, 2, 1))
+}
 
 
 
