@@ -10,8 +10,8 @@ function(schedule, platform, data, ...)
     # Or we could dispatch generate on an InitBlock object, but then we'd have to do some contortions to avoid infinite recursion.
     initBlock = localInitBlock(schedule, platform)
     newcode = lapply(schedule@blocks, generate, platform = platform, data = data, ...)
-    newcode = do.call(c, c(initBlock, newcode))
-    GeneratedCode(schedule = schedule, code = newcode)
+    newcode = do.call(c, newcode)
+    GeneratedCode(schedule = schedule, code = c(initBlock, newcode))
 })
 
 
@@ -26,11 +26,12 @@ message(`_MESSAGE`)
 library(parallel)
 
 assignments = `_ASSIGNMENT_INDICES`
+nWorkers = `_NWORKERS`
 
-`_CLUSTER_NAME` = makeCluster(`_NWORKERS`)
+`_CLUSTER_NAME` = makeCluster(nWorkers)
 
 clusterExport(`_CLUSTER_NAME`, "assignments")
-parLapply(cls, seq(nworkers), function(i) assign("workerID", i, globalenv()))
+parLapply(cls, seq(nWorkers), function(i) assign("workerID", i, globalenv()))
 
 clusterEvalQ(`_CLUSTER_NAME`, {
     assignments = which(assignments == workerID)
@@ -40,7 +41,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
     substitute_language(template, list(`_MESSAGE` = message
         , `_NWORKERS` = schedule@nWorkers
         , `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
-        , `_CLUSTER_NAME` = platform@name
+        , `_CLUSTER_NAME` = as.symbol(platform@name)
         ))
 }
 
@@ -57,8 +58,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
     NULL
 })
 '), ...){
-    substitute_language(template, list(
-        , `_CLUSTER_NAME` = platform@name
+    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         , `_READ_ARGS` = data@files
         , `_READ_FUNC` = data@readFuncName 
         , `_DATA_VARNAME` = data@varName
@@ -82,9 +82,10 @@ for(i in seq_along(vars_to_collect)){
     chunks = lapply(collected, `[[`, i)
     value = do.call(`_COMBINE_FUNC`, chunks)
     assign(varname, value)
+}
 '), ...){
     if(1 <= length(schedule@collect)){
-        first = substitute_language(template, list(`_CLUSTER_NAME` = platform@name
+        first = substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
             , `_OBJECTS_RECEIVE_FROM_WORKERS` = char_to_symbol_list(schedule@collect)
             , `_COMBINE_FUNC` = combine_func
             ))
@@ -105,7 +106,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 '), ...){
     # TODO: Add the exports in here later
     #   , `_EXPORT` = schedule@export
-    substitute_language(template, list(`_CLUSTER_NAME` = platform@name
+    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         , `_BODY` = schedule@code
         ))
 })
@@ -119,7 +120,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 })
 '), ...){
 .NotYetImplemented()
-    substitute_language(template, list(`_CLUSTER_NAME` = platform@name
+    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         ))
 })
 
