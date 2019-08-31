@@ -105,12 +105,12 @@ greedy_assign = function(tasktimes, w)
 }
 
 
-# Find the names of all chunked variables inside node, and return a character vector of their names.
+# Find the names of all variables that need to move between the worker and the manager, either way, and return a character vector of their names.
 # Assumes everything chunked is a symbol, which holds if the code has been "expanded" into simple form.
 # Assumes that the names in resources are correct, which holds if we've used SSA.
-findChunkedVars = function(node, resources)
+findVarsToMove = function(node, resources, predicate = isChunked)
 {
-    chunked = rstatic::find_nodes(node, is_chunked, resources)
+    chunked = rstatic::find_nodes(node, predicate, resources)
     out = sapply(chunked, function(idx) node[[idx]]$ssa_name)
 
     if(length(out) == 0)
@@ -138,12 +138,11 @@ findChunkedVars = function(node, resources)
 nodeToCodeBlock = function(node, resources)
 {
     code = as.expression(rstatic::as_language(node))
-    if(is_chunked(node, resources)){
-        # TODO: populate export
-        export = character()
+    if(isChunked(node, resources)){
+        export = findVarsToMove(node, resources, predicate = isLocalNotChunked)
         ParallelBlock(code = code, export = export)
     } else {
-        collect = findChunkedVars(node, resources)
+        collect = findVarsToMove(node, resources)
         SerialBlock(code = code, collect = collect)
     }
 }

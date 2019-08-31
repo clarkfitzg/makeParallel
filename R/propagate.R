@@ -106,7 +106,7 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
     # If the call is to a vectorized function, and any of the arguments to that function are chunked objects, then the result is a chunked object.
     # A more robust version will match on argument names, but for this we will need the argument list to be named.
 
-    has_chunkable_args = sapply(node$args$contents, is_chunked, resources = resources)
+    has_chunkable_args = sapply(node$args$contents, isChunked, resources = resources)
 
     if(node$fn$value %in% chunkableFuncs && any(has_chunkable_args)){
         new_named_resource(node, resources, namer, chunked_object = TRUE)
@@ -139,7 +139,11 @@ get_resource = function(node, resources)
 
 
 # Check if the resource associated with a node is chunked or not
-is_chunked = function(node, resources) get_resource(node, resources)$chunked_object
+isChunked = function(node, resources) get_resource(node, resources)$chunked_object
+
+
+# Check if the resource associated with a node has been locally defined, and is not chunked
+isLocalNotChunked = function(node, resources) get_resource(node, resources)$chunked_object
 
 
 # TODO: split followed by lapply is more general, so maybe I should probably be working with that?
