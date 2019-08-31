@@ -3,10 +3,10 @@
 run_DataParallel = function(path){
     setwd(dirname(path))
     on.exit(setwd(".."))
-    source(path)
+    source(basename(path))
 }
 
 
-lapply(run_DataParallel, c("map_reduce_example/transform.R"
-                           , "two_blocks/transform.R"
-                           ))
+lapply(c("map_reduce_example/test.R"
+    , "two_blocks/test.R"
+), run_DataParallel)

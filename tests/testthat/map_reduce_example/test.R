@@ -37,8 +37,7 @@ out = makeParallel("
 
 # Test code
 ############################################################
-if(get0(TEST_FLAG, ifnotfound = FALSE)){
-    library(testthat)
+if(identical(Sys.getenv("TESTTHAT"), "true")){
 
     # Check that the load balancing happens.
     expect_equal(schedule(out)@assignmentIndices, c(1, 2, 1))
@@ -50,6 +49,7 @@ if(get0(TEST_FLAG, ifnotfound = FALSE)){
     result = readRDS(rr)
 
     expect_equal(result, 0)
+
 }
 
 

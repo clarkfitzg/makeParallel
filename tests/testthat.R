@@ -6,6 +6,4 @@ library(makeParallel)
 # Allows parse() to check equality between expressions
 #options(keep.source = FALSE)
 
-TEST_FLAG = TRUE
-
 test_check("makeParallel")

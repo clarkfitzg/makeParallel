@@ -29,8 +29,7 @@ saveRDS(result, 'result.rds') # general 2
 
 
 # Test code
-if(get0(TEST_FLAG, ifnotfound = FALSE)){
-    library(testthat)
-
-
+############################################################
+if(identical(Sys.getenv("TESTTHAT"), "true")){
+   
 }
