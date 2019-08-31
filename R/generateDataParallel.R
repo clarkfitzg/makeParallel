@@ -100,7 +100,7 @@ setMethod("generate", signature(schedule = "ParallelBlock", platform = "Parallel
 function(schedule, platform
          , export_template = parse(text = '
 clusterExport(`_CLUSTER_NAME`, `_EXPORT`)
-'
+')
          , run_template = parse(text = '
 clusterEvalQ(`_CLUSTER_NAME`, {
     `_BODY`
@@ -108,7 +108,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 })
 '), ...){
     
-    part1 = if(0 == length(schedule@exports)){
+    part1 = if(0 == length(schedule@export)){
         expression()
     } else {
         substitute_language(export_template, list(
@@ -117,7 +117,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
             ))
     }
 
-    part2 = substitute_language(template2, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+    part2 = substitute_language(run_template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         , `_BODY` = schedule@code
         ))
 
