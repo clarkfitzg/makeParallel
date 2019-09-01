@@ -167,7 +167,6 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
             ))
     }
 
-
     if(fname %in% chunkableFuncs && any(chunkableArgs)){
         new_named_resource(node, resources, namer, chunked = TRUE)
     } else {
