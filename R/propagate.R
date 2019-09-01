@@ -26,6 +26,10 @@
 # Now I would like to got the other way- I have the resources, and I want to know if it was assigned locally.
 # I can add such a field to the resources list.
 
+# Hmmm. There's potentially a many to many relationship between resources and name_resource.
+# That is, many names could refer to the same resource, and the same name could refer to many resources.
+# This makes things a little tricky.
+
 
 # Modifies the node and resources.
 # Returns the name of the added resource
@@ -132,19 +136,20 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
 
     if(fname == "split"){
 
+        #split_call = rstatic::match_call(node, split)
         # Call matching needs to happen in a preprocessing step, because it's useful in many places.
         # Assume that it has happened here.
-        #split_call = rstatic::match_call(node, split)
+        # If it didn't, then hopefully the following lines will break!
 
-        IDresourceToSplit = resource_id(node$args$contents$x)
-        IDsplitFactor = resource_id(node$args$contents$f)
+        IDsplit_x = resource_id(node$args$contents$x)
+        IDsplit_y = resource_id(node$args$contents$f)
 
         # TODO: Check for and handle mixing chunked and non chunked objects?
 
         return(new_named_resource(node, resources, namer
             , split = TRUE
-            , IDresourceToSplit = IDresourceToSplit
-            , IDsplitFactor = IDsplitFactor
+            , IDsplit_x = IDsplit_x
+            , IDsplit_y = IDsplit_y
             ))
     }
 

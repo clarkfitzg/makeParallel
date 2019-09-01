@@ -127,10 +127,10 @@ findVarsToMove = function(node, resources, predicate = isChunked)
 # Below is the current state.
 #
 # What it does:
+#   - export non chunked objects from the manager to the workers
 #
 # What it does not do yet:
 #   - handle subexpressions that are chunked
-#   - export non chunked objects from the manager to the workers
 #   - track which variables have been collected, and avoid collecting them multiple times.
 #   - combine blocks (although it's not difficult to combine adjacent ones)
 #   - rearrange statements
@@ -138,6 +138,17 @@ findVarsToMove = function(node, resources, predicate = isChunked)
 nodeToCodeBlock = function(node, resources)
 {
     code = as.expression(rstatic::as_language(node))
+
+    r = get_resource(node, resources)
+    
+    if(!is.null(r$split) && r$split){
+        # x, f are argument names in split:
+        x_nm = resources[[r[["IDsplit_x"]]]]$varName
+        f_nm = resources[[r[["IDsplit_f"]]]]$varName
+
+        return(SplitBlock(code = code, groupData = x_nm, groupIndex = f_nm))
+    }
+
     if(isChunked(node, resources)){
         export = findVarsToMove(node, resources, predicate = isLocalNotChunked)
         ParallelBlock(code = code, export = export)

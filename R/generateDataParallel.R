@@ -30,7 +30,7 @@ nWorkers = `_NWORKERS`
 
 `_CLUSTER_NAME` = makeCluster(nWorkers)
 
-# TODO: This is a hack until proper combining functions work:
+# TODO: This is a hack until we have a more robust way to specify and infer combining functions.
 c.data.frame = rbind
 # It will break code that tries to use the list method for c() on a data.frame
 
