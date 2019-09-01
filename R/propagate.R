@@ -136,15 +136,15 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
         # Assume that it has happened here.
         #split_call = rstatic::match_call(node, split)
 
-        resourceToSplit = get_resource(node$args$contents$x, resources)
-        splitFactor = get_resource(node$args$contents$f, resources)
+        IDresourceToSplit = resource_id(node$args$contents$x)
+        IDsplitFactor = resource_id(node$args$contents$f)
 
         # TODO: Check for and handle mixing chunked and non chunked objects?
 
         return(new_named_resource(node, resources, namer
             , split = TRUE
-            , resourceToSplit = resourceToSplit
-            , splitFactor = splitFactor
+            , IDresourceToSplit = resourceToSplit
+            , IDsplitFactor = splitFactor
             ))
     }
 
