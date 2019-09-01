@@ -9,7 +9,7 @@ x_desc = ChunkDataFiles(varName = "iris2"
     , files = files
 	, sizes = sizes
 	, readFuncName = "read.csv"
-    , chunkClass = "data.frame"
+    #, chunkClass = "data.frame"
     )
 
 outFile = "gen/group_by.R"

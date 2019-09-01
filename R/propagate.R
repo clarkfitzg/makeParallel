@@ -143,8 +143,8 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
 
         return(new_named_resource(node, resources, namer
             , split = TRUE
-            , IDresourceToSplit = resourceToSplit
-            , IDsplitFactor = splitFactor
+            , IDresourceToSplit = IDresourceToSplit
+            , IDsplitFactor = IDsplitFactor
             ))
     }
 
