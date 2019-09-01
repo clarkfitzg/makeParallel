@@ -40,4 +40,9 @@ if(identical(Sys.getenv("TESTTHAT"), "true")){
     expected = readRDS("expected/med_petal.rds")
     expect_equal(result, expected)
 
+    s = schedule(out)
+
+    block_class = sapply(s@blocks, class)
+    expect_true("SplitBlock" %in% block_class)
+
 }
