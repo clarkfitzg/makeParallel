@@ -199,7 +199,9 @@ group_counts = Reduce(add_table, group_counts_each_worker, init = table(logical(
 # TODO: inline or otherwise make available this greedy_assign function.
 split_assignments = makeParallel:::greedy_assign(group_counts, `_NWORKERS`)
 
-split_read_args = file.path(`_SCRATCH_DIR`, `_GROUP_DATA_STRING`, names(group_counts))
+group_names = names(group_counts)
+split_read_args = file.path(`_SCRATCH_DIR`, `_GROUP_DATA_STRING`, group_names)
+names(split_read_args) = group_names
 
 read_one_group = function(group_dir)
 {
@@ -213,11 +215,15 @@ clusterExport(`_CLUSTER_NAME`, c("split_assignments", "split_read_args", "read_o
 clusterEvalQ(`_CLUSTER_NAME`, {
 
     split_assignments = which(split_assignments == workerID)
+
+    # Write over the global variables to make them local.
     split_read_args = split_read_args[split_assignments]
 
     # This will hold the *unordered* result of the split
     # TODO: Think hard about the implications of this being unordered.
     `_SPLIT_LHS` = lapply(split_read_args, read_one_group)
+
+    # Add the names back
 
     NULL
 })

@@ -9,7 +9,6 @@ x_desc = ChunkDataFiles(varName = "iris2"
     , files = files
 	, sizes = sizes
 	, readFuncName = "read.csv"
-    #, chunkClass = "data.frame"
     )
 
 outFile = "gen/group_by.R"
@@ -39,7 +38,9 @@ if(identical(Sys.getenv("TESTTHAT"), "true")){
 
     result = readRDS(rr)
     expected = readRDS("expected/med_petal.rds")
-    expect_equal(result, expected)
+
+    # Equal up to ordering
+    expect_equal(result[names(expected)], expected)
 
     s = schedule(out)
 
