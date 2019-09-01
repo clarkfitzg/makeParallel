@@ -17,7 +17,7 @@
 #
 # - ast The propagation step assigns each node a resource ID.
 # - name_resource is an environment where the keys are variable names in the code and the values are resource ID's.
-# - resources is an environment where the keys are resource ID's and the values are a list containing the state that we care about, such as chunked_object = TRUE or FALSE.
+# - resources is an environment where the keys are resource ID's and the values are a list containing the state that we care about, such as chunked = TRUE or FALSE.
 
 
 # Sat Aug 31 15:34:24 PDT 2019
@@ -32,7 +32,7 @@
 
 # In scheduleDataParallel.R
 # I directly add the external data resource:
-#    resources[[data_id]] = list(chunked_object = TRUE, varName = data@varName)
+#    resources[[data_id]] = list(chunked = TRUE, varName = data@varName)
 #
 # There should be a clearer model for this, for example, all the values in the resource environment have a class inheriting from Resource.
 # Alternatively, I could nix the resource object completely and instead build off the AST, with another data structure only for resources that don't correspond to elements of the AST.
@@ -41,10 +41,10 @@
 
 # Modifies the node and resources.
 # Returns the name of the added resource
-new_named_resource = function(node, resources, namer, chunked_object = FALSE, ...) 
+new_named_resource = function(node, resources, namer, chunked = FALSE, ...) 
 {
     new_name = namer()
-    r = list(chunked_object = chunked_object, ...)
+    r = list(chunked = chunked, ...)
 
     # All based on side effects
     assign(new_name, value = r, pos = resources)
@@ -84,12 +84,12 @@ update_resource = function(node, name_resource, resources, namer, ...) UseMethod
 update_resource.Subset = function(node, name_resource, resources, namer, ...)
 {
     if(node$fn$value == "["
-       && resources[[resource_id(node$args[[1]])]]$chunked_object
+       && resources[[resource_id(node$args[[1]])]]$chunked
        && is(node$args[[2]], "EmptyArgument")
        && is(node$args[[3]], "Character")
     ){
         new_named_resource(node, resources, namer,
-            chunked_object = TRUE, column_subset = TRUE, column_names = node$args[[3]]$value)
+            chunked = TRUE, column_subset = TRUE, column_names = node$args[[3]]$value)
     } else {
         NextMethod()
     }
@@ -154,12 +154,14 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
         IDsplit_f = resource_id(node$args$contents$f)
 
         # TODO: Check for and handle mixing chunked and non chunked objects?
+        chunked = any(chunkableArgs)
 
         # Adding these resource IDs in here as values means that resources refers to itself.
         # It's getting to be a fairly complicated self referential data structure.
 
         return(new_named_resource(node, resources, namer
             , split = TRUE
+            , chunked = chunked
             , IDsplit_x = IDsplit_x
             , IDsplit_f = IDsplit_f
             ))
@@ -167,7 +169,7 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
 
 
     if(fname %in% chunkableFuncs && any(chunkableArgs)){
-        new_named_resource(node, resources, namer, chunked_object = TRUE)
+        new_named_resource(node, resources, namer, chunked = TRUE)
     } else {
         NextMethod()
     }
@@ -197,14 +199,14 @@ get_resource = function(node, resources)
 
 
 # Check if the resource associated with a node is chunked or not
-isChunked = function(node, resources) get_resource(node, resources)$chunked_object
+isChunked = function(node, resources) get_resource(node, resources)$chunked
 
 
 # Check if the resource associated with a node has been locally assigned, and is not chunked
 isLocalNotChunked = function(node, resources)
 {
     r = get_resource(node, resources)
-    !is.null(r$assigned) && r$assigned && !r$chunked_object 
+    !is.null(r$assigned) && r$assigned && !r$chunked 
 }
 
 
@@ -225,7 +227,7 @@ splits_by_known_column = function(bycall, resources)
     data_arg = get_resource(bycall$args$contents[[1]], resources)
     index_arg = get_resource(bycall$args$contents[[2]], resources)
 
-    if(!data_arg[["chunked_object"]]){
+    if(!data_arg[["chunked"]]){
         return(FALSE)
     }
 

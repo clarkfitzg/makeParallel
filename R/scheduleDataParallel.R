@@ -203,7 +203,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
 
     data_id = namer()
     name_resource[[data@varName]] = data_id
-    resources[[data_id]] = list(chunked_object = TRUE, varName = data@varName)
+    resources[[data_id]] = list(chunked = TRUE, varName = data@varName)
 
     ast = rstatic::to_ast(graph@code)
     if(!is(ast, "Brace"))
