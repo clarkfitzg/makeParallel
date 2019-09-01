@@ -15,7 +15,7 @@ x_desc = ChunkDataFiles(varName = "iris2"
 outFile = "gen/group_by.R"
 
 out = makeParallel("
-iris2split = split(iris2, iris2$Species)
+iris2split = split(x = iris2, f = iris2$Species)
 med_petal = sapply(iris2split, function(grp) median(grp$Petal.Length))
 saveRDS(med_petal, 'gen/med_petal.rds')
 "

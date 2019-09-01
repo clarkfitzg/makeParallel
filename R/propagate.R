@@ -104,10 +104,12 @@ update_resource.default = function(node, name_resource, resources, namer, ...)
 update_resource.Assign = function(node, name_resource, resources, namer, ...)
 {
     r_id = resource_id(node$read) 
+
     # This will write over an existing value for that symbol, which is what we want.
     resource_id(node$write) = r_id
     resource_id(node) = r_id
     name_resource[[node$write$value]] = r_id
+
     resources[[r_id]][["assigned"]] = TRUE
 }
 
@@ -118,9 +120,36 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
     # If the call is to a vectorized function, and any of the arguments to that function are chunked objects, then the result is a chunked object.
     # A more robust version will match on argument names, but for this we will need the argument list to be named.
 
-    has_chunkable_args = sapply(node$args$contents, isChunked, resources = resources)
+    fname = node$fn$value
+    chunkableArgs = sapply(node$args$contents, isChunked, resources = resources)
 
-    if(node$fn$value %in% chunkableFuncs && any(has_chunkable_args)){
+    # TODO:
+    # This treats split() as a special case.
+    # Do we want to create an extensible mechanism for users to specify the behavior of other special functions?
+    # Then it becomes pretty similar to function handlers in CodeDepends.
+    # This one is an implementation using the rstatic AST rather than R's AST.
+    # We'll need to carefully explain the resources for users to be able to extend it.
+
+    if(fname == "split"){
+
+        # Call matching needs to happen in a preprocessing step, because it's useful in many places.
+        # Assume that it has happened here.
+        #split_call = rstatic::match_call(node, split)
+
+        resourceToSplit = get_resource(node$args$contents$x, resources)
+        splitFactor = get_resource(node$args$contents$f, resources)
+
+        # TODO: Check for and handle mixing chunked and non chunked objects?
+
+        return(new_named_resource(node, resources, namer
+            , split = TRUE
+            , resourceToSplit = resourceToSplit
+            , splitFactor = splitFactor
+            ))
+    }
+
+
+    if(fname %in% chunkableFuncs && any(chunkableArgs)){
         new_named_resource(node, resources, namer, chunked_object = TRUE)
     } else {
         NextMethod()
