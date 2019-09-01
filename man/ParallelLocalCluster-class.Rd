@@ -12,5 +12,7 @@ Placeholder for local \code{cluster} objects from the parallel package, for exam
 
 \describe{
 \item{\code{name}}{symbol to use for the cluster name when generating code}
+
+\item{\code{scratchDir}}{place to write intermediate data files}
 }}
 

@@ -73,9 +73,11 @@ Platform = setClass("Platform",
 #'
 #' @export
 #' @slot name symbol to use for the cluster name when generating code
+#' @slot scratchDir place to write intermediate data files
 ParallelLocalCluster = setClass("ParallelLocalCluster"
-    , slots = c(name = "character")
-    , contains = "Platform")
+    , slots = c(name = "character", scratchDir = "character")
+    , contains = "Platform"
+    )
 
 
 #' @export

@@ -159,7 +159,7 @@ groupIndex = `_GROUP_INDEX`
 # Write a single group out for a single worker.
 write_one = function(grp, grp_name){
 
-    group_dir = file.path(`_GROUP_DATA_STRING`, grp_name)
+    group_dir = file.path(`_SCRATCH_DIR`, `_GROUP_DATA_STRING`, grp_name)
 
     # Directory creation is a non-op if the directory already exists.
     dir.create(group_dir, recursive = TRUE, showWarnings = FALSE)
@@ -199,7 +199,7 @@ group_counts = Reduce(add_table, group_counts_each_worker, init = table(logical(
 # TODO: inline or otherwise make available this greedy_assign function.
 split_assignments = makeParallel:::greedy_assign(group_counts, `_NWORKERS`)
 
-split_read_args = file.path(`_GROUP_DATA_STRING`, names(group_counts))
+split_read_args = file.path(`_SCRATCH_DIR`, `_GROUP_DATA_STRING`, names(group_counts))
 
 read_one_group = function(group_dir)
 {
@@ -227,6 +227,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
     # It would be a miracle if this did the right thing when groupIndex is a list.
 
     substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+        , `_SCRATCH_DIR` = platform@scratchDir
         , `_GROUP_DATA` = as.symbol(schedule@groupData)
         , `_GROUP_DATA_STRING` = schedule@groupData
         , `_GROUP_INDEX` = as.symbol(schedule@groupIndex)

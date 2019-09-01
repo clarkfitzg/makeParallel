@@ -22,7 +22,7 @@ saveRDS(med_petal, 'gen/med_petal.rds')
 "
 , data = x_desc
 , scheduler = scheduleDataParallel
-, platform = parallelLocalCluster()
+, platform = parallelLocalCluster(scratchDir = "gen")
 , chunkableFuncs = c("sapply", "$")
 , outFile = outFile
 , overWrite = TRUE

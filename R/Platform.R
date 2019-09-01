@@ -20,5 +20,5 @@ Platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::dete
 
 
 #' @export
-parallelLocalCluster = function(name = "cls", nWorkers = 2L)
-    new("ParallelLocalCluster", name = name, nWorkers = nWorkers)
+parallelLocalCluster = function(name = "cls", nWorkers = 2L, scratchDir = ".")
+    new("ParallelLocalCluster", name = name, nWorkers = nWorkers, scratchDir = scratchDir)
