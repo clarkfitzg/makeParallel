@@ -54,7 +54,7 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 })
 '), ...){
     substitute_language(template, list(`_MESSAGE` = message
-        , `_NWORKERS` = schedule@nWorkers
+        , `_NWORKERS` = platform@nWorkers
         , `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
         , `_CLUSTER_NAME` = as.symbol(platform@name)
         ))
@@ -165,6 +165,7 @@ write_one = function(grp, grp_name){
     dir.create(group_dir, recursive = TRUE, showWarnings = FALSE)
     path = file.path(group_dir, workerID)
 
+    # TODO: Check if this will write over files.
     `_INTERMEDIATE_SAVE_FUNC`(grp, file = path)
 }
 
@@ -195,11 +196,12 @@ group_counts = Reduce(add_table, group_counts_each_worker, init = table(logical(
 
 # Balance the load based on how large each group is.
 # This needs to happen on the manager, because it aggregates from all workers.
-assignments = makeParallel:::greedy_assign(group_counts, nworkers)
+# TODO: inline or otherwise make available this greedy_assign function.
+split_assignments = makeParallel:::greedy_assign(group_counts, `_NWORKERS`)
 
-split_read_args = names(group_counts)
+split_read_args = file.path(`_GROUP_DATA_STRING`, names(group_counts))
 
-read_one_group = function(group_name, group_dir = file.path(group_by_var, group_name))
+read_one_group = function(group_dir)
 {
     files = list.files(group_dir, full.names = TRUE)
     group_chunks = lapply(files, `_INTERMEDIATE_LOAD_FUNC`)
@@ -232,5 +234,6 @@ clusterEvalQ(`_CLUSTER_NAME`, {
         , `_INTERMEDIATE_SAVE_FUNC` = intermediate_save_func
         , `_INTERMEDIATE_LOAD_FUNC` = intermediate_load_func 
         , `_SPLIT_LHS` = schedule@lhs
+        , `_NWORKERS` = platform@nWorkers
         ))
 })
