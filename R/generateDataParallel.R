@@ -30,7 +30,11 @@ nWorkers = `_NWORKERS`
 
 `_CLUSTER_NAME` = makeCluster(nWorkers)
 
-clusterExport(`_CLUSTER_NAME`, "assignments")
+# TODO: This is a hack until proper combining functions work:
+c.data.frame = rbind
+# It will break code that tries to use the list method for c() on a data.frame
+
+clusterExport(`_CLUSTER_NAME`, c("assignments", "c.data.frame"))
 parLapply(cls, seq(nWorkers), function(i) assign("workerID", i, globalenv()))
 
 clusterEvalQ(`_CLUSTER_NAME`, {
