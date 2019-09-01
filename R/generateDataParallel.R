@@ -140,7 +140,7 @@ function(schedule, platform
 # Reminds me of the SerDe interface in Hive
 # https://cwiki.apache.org/confluence/display/Hive/DeveloperGuide#DeveloperGuide-HiveSerDe
 
-group_by_var = "station"
+group_by_var = `_GROUP_BY_VAR`
 
 write_one = function(grp
         , serializer = saveRDS
@@ -206,6 +206,12 @@ clusterEvalQ(cls, {
     d = do.call(COMBINER, chunks)
 })
 '), ...){
+
+    # Assumes there are not multiple variables to split by.
+    # Not sure what will happen if this is a list.
+    group_by_var
+    
     substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+        , `_GROUP_BY_VAR` = as.symbol(group_by_var)
         ))
 })
