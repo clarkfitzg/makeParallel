@@ -30,6 +30,14 @@
 # That is, many names could refer to the same resource, and the same name could refer to many resources.
 # This makes things a little tricky.
 
+# In scheduleDataParallel.R
+# I directly add the external data resource:
+#    resources[[data_id]] = list(chunked_object = TRUE, varName = data@varName)
+#
+# There should be a clearer model for this, for example, all the values in the resource environment have a class inheriting from Resource.
+# Alternatively, I could nix the resource object completely and instead build off the AST, with another data structure only for resources that don't correspond to elements of the AST.
+
+
 
 # Modifies the node and resources.
 # Returns the name of the added resource
@@ -115,6 +123,7 @@ update_resource.Assign = function(node, name_resource, resources, namer, ...)
     name_resource[[node$write$value]] = r_id
 
     resources[[r_id]][["assigned"]] = TRUE
+    resources[[r_id]][["varName"]] = node$write$ssa_name
 }
 
 
@@ -142,14 +151,17 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
         # If it didn't, then hopefully the following lines will break!
 
         IDsplit_x = resource_id(node$args$contents$x)
-        IDsplit_y = resource_id(node$args$contents$f)
+        IDsplit_f = resource_id(node$args$contents$f)
 
         # TODO: Check for and handle mixing chunked and non chunked objects?
+
+        # Adding these resource IDs in here as values means that resources refers to itself.
+        # It's getting to be a fairly complicated self referential data structure.
 
         return(new_named_resource(node, resources, namer
             , split = TRUE
             , IDsplit_x = IDsplit_x
-            , IDsplit_y = IDsplit_y
+            , IDsplit_f = IDsplit_f
             ))
     }
 
