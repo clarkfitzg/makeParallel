@@ -279,11 +279,13 @@ ParallelBlock = setClass("ParallelBlock", contains = "CodeBlock",
          slots = c(export = "character"))
 
 
-#' GROUP BY style code to run in parallel
+#' Split one chunked object using another as a factor
+#' 
+#' GROUP BY style code becomes a split followed by an lapply, and both are parallel blocks.
 #'
 #' @slot groupData names of chunked variables to split according to groupIndex
 #' @slot groupIndex names of chunked variables that define the split
-GroupByBlock = setClass("GroupByBlock", contains = "ParallelBlock",
+SplitBlock = setClass("SplitBlock", contains = "ParallelBlock",
          slots = c(groupData = "character"
                    , groupIndex = "character"
                    ))
