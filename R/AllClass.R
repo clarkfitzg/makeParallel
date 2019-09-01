@@ -286,9 +286,12 @@ ParallelBlock = setClass("ParallelBlock", contains = "CodeBlock",
 #'
 #' @slot groupData names of chunked variables to split according to groupIndex
 #' @slot groupIndex names of chunked variables that define the split
+#' @slot lhs name of the chunked variable that holds the result of the split.
+#'          This doesn't necessarily need to be here, but we use it to generate code.
 SplitBlock = setClass("SplitBlock", contains = "ParallelBlock",
          slots = c(groupData = "character"
                    , groupIndex = "character"
+                   , lhs = "character"
                    ))
 
 

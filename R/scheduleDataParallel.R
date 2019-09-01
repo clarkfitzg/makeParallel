@@ -146,7 +146,12 @@ nodeToCodeBlock = function(node, resources)
         x_nm = resources[[r[["IDsplit_x"]]]]$varName
         f_nm = resources[[r[["IDsplit_f"]]]]$varName
 
-        return(SplitBlock(code = code, groupData = x_nm, groupIndex = f_nm))
+        if(!is(node, "Assign") || node$read$fn$ssa_name != "split")
+            stop("expected a call of the form: s = split(x, y)")
+
+        lhs = node$write$ssa_name
+
+        return(SplitBlock(code = code, groupData = x_nm, groupIndex = f_nm, lhs = lhs))
     }
 
     if(isChunked(node, resources)){

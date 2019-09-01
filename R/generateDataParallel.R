@@ -131,12 +131,14 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 
 setMethod("generate", signature(schedule = "SplitBlock", platform = "ParallelLocalCluster", data = "ANY"),
 function(schedule, platform
+         , combine_func = as.symbol("c")
+         , intermediate_save_func = as.symbol("saveRDS")
+         , intermediate_load_func = as.symbol("readRDS")
          , template = parse(text = '
 # Copied and modified from ~/projects/clarkfitzthesis/Chap1Examples/range_date_by_station/date_range_par.R
 #
 # See shuffle section in clarkfitzthesis/scheduleVector for explanation and comparison of different approaches.
 # This is the naive version that writes everything out to disk.
-                            '
 
 clusterEvalQ(`_CLUSTER_NAME`, {
 
@@ -210,10 +212,15 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 '), ...){
 
     # Assumes there are not multiple variables to split by.
-    # Not sure what will happen if this is a list.
-    group_by_var
-    
+    # It would be a miracle if this did the right thing when groupIndex is a list.
+
     substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
-        , `_GROUP_BY_VAR` = as.symbol(group_by_var)
+        , `_GROUP_DATA` = as.symbol(schedule@groupData)
+        , `_GROUP_DATA_STRING` = schedule@groupData
+        , `_GROUP_INDEX` = as.symbol(schedule@groupIndex)
+        , `_COMBINE_FUNC` = combine_func
+        , `_INTERMEDIATE_SAVE_FUNC` = intermediate_save_func
+        , `_INTERMEDIATE_LOAD_FUNC` = intermediate_load_func 
+        , `_SPLIT_LHS` = schedule@lhs
         ))
 })
