@@ -1,3 +1,14 @@
+# Just thinking...
+# It would be cleaner to write these templates as functions, and then pull the bodies out and use them.
+# for example:
+#
+# template = function(`_CLUSTER_NAME`, `NWORKERS`){
+#   `_CLUSTER_NAME` = makeCluster(2L)  
+#   etc...
+#
+# Then R would parse them earlier than runtime.
+
+
 #' @export
 setMethod("generate", signature(schedule = "DataParallelSchedule", platform = "ParallelLocalCluster", data = "ANY"),
 function(schedule, platform, data, ...)
@@ -189,7 +200,6 @@ assignments = makeParallel:::greedy_assign(group_counts, nworkers)
 split_read_args = names(group_counts)
 
 read_one_group = function(group_name, group_dir = file.path(group_by_var, group_name))
-                    , deserializer = readRDS, combiner = COMBINER)
 {
     files = list.files(group_dir, full.names = TRUE)
     group_chunks = lapply(files, `_INTERMEDIATE_LOAD_FUNC`)

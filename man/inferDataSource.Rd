@@ -9,6 +9,9 @@ inferDataSource(expr)
 \arguments{
 \item{expr}{expression to find the data source in}
 }
+\value{
+\linkS4class{DataSource} object
+}
 \description{
 Infer Data Source Object From Code
 }

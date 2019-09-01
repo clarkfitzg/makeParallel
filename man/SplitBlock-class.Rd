@@ -7,6 +7,7 @@
 \title{Split one chunked object using another as a factor}
 \description{
 GROUP BY style code becomes a split followed by an lapply, and both are parallel blocks.
+The semantic meaning of this in a schedule is that the data will be grouped, ready for an lapply on the groups.
 }
 \section{Slots}{
 
@@ -14,5 +15,8 @@ GROUP BY style code becomes a split followed by an lapply, and both are parallel
 \item{\code{groupData}}{names of chunked variables to split according to groupIndex}
 
 \item{\code{groupIndex}}{names of chunked variables that define the split}
+
+\item{\code{lhs}}{name of the chunked variable that holds the result of the split.
+This doesn't necessarily need to be here, but we use it to generate code.}
 }}
 

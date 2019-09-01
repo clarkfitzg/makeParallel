@@ -5,7 +5,7 @@
 #' Infer Data Source Object From Code
 #'
 #' @param expr expression to find the data source in
-#' @value \linkS4class{DataSource} object 
+#' @return \linkS4class{DataSource} object 
 inferDataSource = function(expr)
 {
     warning("Data source inference not yet implemented. Data source should be specified.")
