@@ -282,6 +282,7 @@ ParallelBlock = setClass("ParallelBlock", contains = "CodeBlock",
 #' Split one chunked object using another as a factor
 #' 
 #' GROUP BY style code becomes a split followed by an lapply, and both are parallel blocks.
+#' The semantic meaning of this in a schedule is that the data will be grouped, ready for an lapply on the groups.
 #'
 #' @slot groupData names of chunked variables to split according to groupIndex
 #' @slot groupIndex names of chunked variables that define the split

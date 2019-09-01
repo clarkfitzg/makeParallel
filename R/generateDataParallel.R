@@ -132,11 +132,80 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 setMethod("generate", signature(schedule = "SplitBlock", platform = "ParallelLocalCluster", data = "ANY"),
 function(schedule, platform
          , template = parse(text = '
-clusterEvalQ(`_CLUSTER_NAME`, {
-    NULL
+# Copied from ~/projects/clarkfitzthesis/Chap1Examples/range_date_by_station/date_range_par.R
+#
+# See shuffle section in clarkfitzthesis/scheduleVector for explanation and comparison of different approaches.
+# This is the disk based, naive version that writes everything out to disk.
+
+# Reminds me of the SerDe interface in Hive
+# https://cwiki.apache.org/confluence/display/Hive/DeveloperGuide#DeveloperGuide-HiveSerDe
+
+group_by_var = "station"
+
+write_one = function(grp
+        , serializer = saveRDS
+        , group_by_var = group_by_var
+){
+    group_element = grp[1L, group_by_var]
+    group_dir = file.path(group_by_var, group_element)
+    # Directory creation is a non-op if the directory already exists.
+    dir.create(group_dir, recursive = TRUE, showWarnings = FALSE)
+    path = file.path(group_dir, workerID)
+
+    serializer(grp, file = path)
+}
+
+clusterExport(cls, c("write_one", "group_by_var"))
+
+# Write the groups out to disk and say how large each group is.
+group_counts_each_worker = clusterEvalQ(cls, {
+    group_col = d[, group_by_var]
+    by(d, group_col, write_one)
+    table(group_col)
+})
+
+# Combine all the tables together.
+add_table = function(x, y)
+{
+    # Assume not all values will appear in each table
+    levels = union(names(x), names(y))
+    out = rep(0L, length(levels))
+    out[levels %in% names(x)] = out[levels %in% names(x)] + x
+    out[levels %in% names(y)] = out[levels %in% names(y)] + y
+    names(out) = levels
+    as.table(out)
+}
+
+group_counts = Reduce(add_table, group_counts_each_worker, init = table(logical()))
+
+# Balance the load based on how large each group is.
+assignments = makeParallel:::greedy_assign(group_counts, nworkers)
+
+read_args = names(group_counts)
+
+COMBINER = rbind
+
+read_one_group = function(group_name, group_dir = file.path(group_by_var, group_name)
+                    , deserializer = readRDS, combiner = COMBINER)
+{
+    files = list.files(group_dir, full.names = TRUE)
+    group_chunks = lapply(files, deserializer)
+    group = do.call(combiner, group_chunks)
+}
+
+
+# We are re reusing these variable names, but that should be OK.
+clusterExport(cls, c("assignments", "read_args", "read_one_group", "COMBINER"))
+
+clusterEvalQ(cls, {
+
+    assignments = which(assignments == workerID)
+    read_args = read_args[assignments]
+
+    chunks = lapply(read_args, read_one_group)
+    d = do.call(COMBINER, chunks)
 })
 '), ...){
-.NotYetImplemented()
     substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         ))
 })
