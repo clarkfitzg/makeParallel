@@ -132,39 +132,41 @@ clusterEvalQ(`_CLUSTER_NAME`, {
 setMethod("generate", signature(schedule = "SplitBlock", platform = "ParallelLocalCluster", data = "ANY"),
 function(schedule, platform
          , template = parse(text = '
-# Copied from ~/projects/clarkfitzthesis/Chap1Examples/range_date_by_station/date_range_par.R
+# Copied and modified from ~/projects/clarkfitzthesis/Chap1Examples/range_date_by_station/date_range_par.R
 #
 # See shuffle section in clarkfitzthesis/scheduleVector for explanation and comparison of different approaches.
-# This is the disk based, naive version that writes everything out to disk.
+# This is the naive version that writes everything out to disk.
+                            '
 
-# Reminds me of the SerDe interface in Hive
-# https://cwiki.apache.org/confluence/display/Hive/DeveloperGuide#DeveloperGuide-HiveSerDe
+clusterEvalQ(`_CLUSTER_NAME`, {
 
-group_by_var = `_GROUP_BY_VAR`
+groupData = `_GROUP_DATA`
+groupIndex = `_GROUP_INDEX`
 
-write_one = function(grp
-        , serializer = saveRDS
-        , group_by_var = group_by_var
-){
-    group_element = grp[1L, group_by_var]
-    group_dir = file.path(group_by_var, group_element)
+# Write a single group out for a single worker.
+write_one = function(grp, grp_name){
+
+    group_dir = file.path(`_GROUP_DATA_STRING`, grp_name)
+
     # Directory creation is a non-op if the directory already exists.
     dir.create(group_dir, recursive = TRUE, showWarnings = FALSE)
     path = file.path(group_dir, workerID)
 
-    serializer(grp, file = path)
+    `_INTERMEDIATE_SAVE_FUNC`(grp, file = path)
 }
 
-clusterExport(cls, c("write_one", "group_by_var"))
+s = split(groupData, groupIndex)
 
-# Write the groups out to disk and say how large each group is.
-group_counts_each_worker = clusterEvalQ(cls, {
-    group_col = d[, group_by_var]
-    by(d, group_col, write_one)
-    table(group_col)
+Map(write_one, s, names(s))
+
+NULL
 })
 
-# Combine all the tables together.
+
+# Count the groups so we can balance the load
+group_counts_each_worker = clusterEvalQ(cls, table(`_GROUP_INDEX`))
+
+# Combine all the tables together
 add_table = function(x, y)
 {
     # Assume not all values will appear in each table
@@ -179,31 +181,31 @@ add_table = function(x, y)
 group_counts = Reduce(add_table, group_counts_each_worker, init = table(logical()))
 
 # Balance the load based on how large each group is.
+# This needs to happen on the manager, because it aggregates from all workers.
 assignments = makeParallel:::greedy_assign(group_counts, nworkers)
 
-read_args = names(group_counts)
+split_read_args = names(group_counts)
 
-COMBINER = rbind
-
-read_one_group = function(group_name, group_dir = file.path(group_by_var, group_name)
+read_one_group = function(group_name, group_dir = file.path(group_by_var, group_name))
                     , deserializer = readRDS, combiner = COMBINER)
 {
     files = list.files(group_dir, full.names = TRUE)
-    group_chunks = lapply(files, deserializer)
-    group = do.call(combiner, group_chunks)
+    group_chunks = lapply(files, `_INTERMEDIATE_LOAD_FUNC`)
+    group = do.call(`_COMBINE_FUNC`, group_chunks)
 }
 
+clusterExport(`_CLUSTER_NAME`, c("split_assignments", "split_read_args", "read_one_group"))
 
-# We are re reusing these variable names, but that should be OK.
-clusterExport(cls, c("assignments", "read_args", "read_one_group", "COMBINER"))
+clusterEvalQ(`_CLUSTER_NAME`, {
 
-clusterEvalQ(cls, {
+    split_assignments = which(split_assignments == workerID)
+    split_read_args = split_read_args[split_assignments]
 
-    assignments = which(assignments == workerID)
-    read_args = read_args[assignments]
+    # This will hold the *unordered* result of the split
+    # TODO: Think hard about the implications of this being unordered.
+    `_SPLIT_LHS` = lapply(split_read_args, read_one_group)
 
-    chunks = lapply(read_args, read_one_group)
-    d = do.call(COMBINER, chunks)
+    NULL
 })
 '), ...){
 
