@@ -1,3 +1,5 @@
+#' Construct ReduceFun Objects
+#'
 #' @export
 reduceFun = function(reduceFun, summaryFun = reduceFun, combineFun = "c", queryFun = summaryFun)
 {
@@ -9,5 +11,7 @@ reduceFun = function(reduceFun, summaryFun = reduceFun, combineFun = "c", queryF
         return(SimpleReduceFun(reduceFun = reduceFun, summaryFun = summaryFun
                                , combineFun = combineFun, queryFun = queryFun))
     }
-    
+
+    UserDefinedReduceFun(reduceFun = reduceFun, summaryFun = summaryFun
+                               , combineFun = combineFun, queryFun = queryFun)
 }
