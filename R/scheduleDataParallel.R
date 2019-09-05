@@ -133,13 +133,12 @@ getLHS = function(node, possibleFuncs)
 }
 
 
-
 # This is the naive approach of iterating through each top level expression and turning each one into a CodeBlock.
 # Below is the current state.
 #
 # What it does:
 #   - export non chunked objects from the manager to the workers
-#   - handle subexpressions that are chunked
+#   - handle subexpressions that are chunked. (Doubtful this is robust)
 #
 # What it does not do yet:
 #   - track which variables have been collected, and avoid collecting them multiple times.
@@ -169,7 +168,6 @@ nodeToCodeBlock = function(node, resources, reduceFuncs)
     if(!is.null(r$reduceFun)){
         lhs = getLHS(node, names(reduceFuncs))
         args = node$read$args$contents
-
 
         if(1 < length(args) || !is.symbol(args[[1]]))
             stop("This code assumes the reducible function call `foo` is of the form `foo(x)`. Other cases not yet implemented.")

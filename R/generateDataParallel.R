@@ -255,3 +255,30 @@ function(schedule, platform
         , `_NWORKERS` = platform@nWorkers
         ))
 })
+
+
+TEMPLATE_ParallelLocalCluster_ReduceBlock = function()
+{
+    `_TMP_VAR` = clusterEvalQ(`_CLUSTER_NAME`, `_SUMMARY_FUN`(`_OBJECT_TO_REDUCE`))
+    `_TMP_VAR` = `_COMBINE_FUN`(`_TMP_VAR`)
+    `_SAVE_OBJ` = `_QUERY_FUN`(`_TMP_VAR`)
+}
+
+
+setMethod("generate", signature(schedule = "ReduceBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
+function(schedule, platform, data
+         , template = as.expression(body(TEMPLATE_ParallelLocalCluster_ReduceBlock))
+         , ...){
+    rfun = schedule@reduceFun
+    if(!is(rfun, "SimpleReduceFun"))
+        stop("Not yet implemented.")
+
+    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+        , `_OBJECT_TO_REDUCE` = as.symbol(schedule@objectToReduce)
+        , `_SAVE_OBJ` = as.symbol(schedule@saveObj)
+        , `_TMP_VAR` = as.symbol("tmp")
+        , `_SUMMARY_FUN` = as.symbol(rfun@summaryFun)
+        , `_COMBINE_FUN` = as.symbol(rfun@combineFun)
+        , `_QUERY_FUN` = as.symbol(rfun@queryFun)
+    ))
+})
