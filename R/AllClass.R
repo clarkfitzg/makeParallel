@@ -299,8 +299,8 @@ SplitBlock = setClass("SplitBlock", contains = "ParallelBlock",
 
 #' Abstract base class for reducible function implementations
 #'
-#' @slot reducibleFunName name of a reducible function 
-ReduceFun = setClass("ReduceFun", slots = c(reducibleFunName = "character"))
+#' @slot funName name of a reducible function 
+ReduceFun = setClass("ReduceFun", slots = c(funName = "character"))
 
 
 #' Implementation for a reducible function using function names only

@@ -123,40 +123,62 @@ findVarsToMove = function(node, resources, predicate = isChunked)
 }
 
 
+# Check a call for a simple assignment and return the left hand side (variable that is being assigned to) as a string
+getLHS = function(node, possibleFuncs)
+{
+    if(!is(node, "Assign") || !(node$read$fn$ssa_name %in% possibleFuncs))
+        stop("expected a call of the form: s = split(x, y)")
+
+    node$write$ssa_name
+}
+
+
+
 # This is the naive approach of iterating through each top level expression and turning each one into a CodeBlock.
 # Below is the current state.
 #
 # What it does:
 #   - export non chunked objects from the manager to the workers
+#   - handle subexpressions that are chunked
 #
 # What it does not do yet:
-#   - handle subexpressions that are chunked
 #   - track which variables have been collected, and avoid collecting them multiple times.
-#   - combine blocks (although it's not difficult to combine adjacent ones)
 #   - rearrange statements
 #   - try to save memory by garbage collecting
-nodeToCodeBlock = function(node, resources)
+nodeToCodeBlock = function(node, resources, reduceFuncs)
 {
+    # TODO:
+    # This function is getting complicated.
+    # It might help to rewrite this to use method dispatch.
+    # Then again, that could make it even worse.
+ 
     code = as.expression(rstatic::as_language(node))
 
     r = get_resource(node, resources)
-    
+  
     if(!is.null(r$split) && r$split){
         # x, f are argument names in split:
         x_nm = resources[[r[["IDsplit_x"]]]]$varName
         f_nm = resources[[r[["IDsplit_f"]]]]$varName
 
-        if(!is(node, "Assign") || node$read$fn$ssa_name != "split")
-            stop("expected a call of the form: s = split(x, y)")
-
-        lhs = node$write$ssa_name
+        lhs = getLHS(node, "split")
 
         return(SplitBlock(code = code, groupData = x_nm, groupIndex = f_nm, lhs = lhs))
     }
 
-    if(isChunked(node, resources)){
+    if(!is.null(r$reduceFun)){
+        lhs = getLHS(node, names(reduceFuncs))
+        args = node$read$args$contents
+
+
+        if(1 < length(args) || !is.symbol(args[[1]]))
+            stop("This code assumes the reducible function call `foo` is of the form `foo(x)`. Other cases not yet implemented.")
+        ReduceBlock(argToReduceFun = args[[1]]$ssa_name, saveObj = lhs, reduceFun = reduceFuncs[[r$reduceFun]])
+
+    } else if(isChunked(node, resources)){
         export = findVarsToMove(node, resources, predicate = isLocalNotChunked)
         ParallelBlock(code = code, export = export)
+
     } else {
         collect = findVarsToMove(node, resources)
         SerialBlock(code = code, collect = collect)
@@ -214,12 +236,14 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     if(!is(ast, "Brace"))
         stop("AST has unexpected form.")
 
-    # Mark everything with whether it's a chunked object or not.
-    propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = reduceFuncs)
+    names(reduceFuncs) = sapply(reduceFuncs, slot, "funName")
+
+    # Run the code inference and store all the results in `resources`
+    propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = names(reduceFuncs))
 
     # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
     load_block = DataLoadBlock()
-    blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources)
+    blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources, reduceFuncs = reduceFuncs)
     blocks = c(load_block, blocks)
     blocks = collapseAdjacentBlocks(blocks)
 
