@@ -1,8 +1,8 @@
 library(makeParallel)
 
 # An example of a user provided custom reduce function.
-naiveMeanReduce = reduceFun(
-    summary = function(data) list(length = length(data), sum = sum(data))
+naiveMeanReduce = reduceFun("mean"
+    , summary = function(data) list(length = length(data), sum = sum(data))
     , combine = function(...)
     {
         args = list(...)

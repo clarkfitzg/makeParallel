@@ -1,6 +1,13 @@
-#' Construct ReduceFun Objects
 #' @export
-simpleReduceFun = function(reduceFun, summaryFun = reduceFun, combineFun = "c", queryFun = summaryFun)
+reduceFun = function(reduceFun, summaryFun = reduceFun, combineFun = "c", queryFun = summaryFun)
 {
-    SimpleReduceFun(reduceFun = reduceFun, summaryFun = summaryFun, combineFun = combineFun, queryFun = queryFun)
+    if(!is.character(reduceFun))
+        stop("Expected the name of a reducible function for reduceFun.")
+
+    funClasses = sapply(list(summaryFun, combineFun, queryFun), class)
+    if(all(funClasses == "character")){
+        return(SimpleReduceFun(reduceFun = reduceFun, summaryFun = summaryFun
+                               , combineFun = combineFun, queryFun = queryFun))
+    }
+    
 }

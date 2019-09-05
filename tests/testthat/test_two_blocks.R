@@ -1,6 +1,6 @@
 library(makeParallel)
 
-maxReduce = simpleReduceFun("max")
+maxReduce = reduceFun("max")
 
 files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE)
 
