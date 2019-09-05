@@ -1,6 +1,6 @@
 library(makeParallel)
 
-maxReduce = reduceFun("max")
+maxReduce = simpleReduceFun("max")
 
 files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE)
 
@@ -50,6 +50,9 @@ if(identical(Sys.getenv("TESTTHAT"), "true")){
 
     s = schedule(out)
     block_class = sapply(s@blocks, class)
+
     expect_equal(sum(block_class == "ParallelBlock"), 2L)
+
+    expect_true("ReduceBlock" %in% block_class)
 
 }

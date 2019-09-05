@@ -175,23 +175,23 @@ nodeToCodeBlock = function(node, resources)
 #' TODO:
 #'
 #' 1. Populate `chunkableFuncs` based on code analysis.
-#' 1. Model non chunkable functions so that we can revisit the chunked data.
-#'      Currently it only allows for one chunked block.
 #' 2. Identify which parameters a function is chunkable in, and respect these by matching arguments.
 #'      See `update_resource.Call`.
 #' 3. Clarify behavior of subexpressions, handling cases such as `min(sin(large_object))`
 #'
 #' @inheritParams schedule
-#' @param knownchunkFuncs character, the names of chunkable functions from recommended and base packages.
 #' @param chunkFuncs character, names of additional chunkable functions known to the user.
+#' @param reduceFuncs list of ReduceFun objects
+#' @param knownchunkFuncs character, the names of chunkable functions from recommended and base packages.
 #' @param allchunkFuncs character, names of all chunkable functions to use in the analysis.
 #' @seealso [makeParallel], [schedule]
 #' @export
 #' @md
 scheduleDataParallel = function(graph, platform = Platform(), data
     , nWorkers = platform@nWorkers
-    , knownChunkFuncs = c("exp", "+", "*", "sin")
     , chunkFuncs = character()
+    , reduceFuncs = list()
+    , knownChunkFuncs = c("exp", "+", "*", "sin")
     , allChunkFuncs = c(knownChunkFuncs, chunkFuncs)
     )
 {

@@ -5,9 +5,9 @@
 \title{Schedule Based On Data Parallelism}
 \usage{
 scheduleDataParallel(graph, platform = Platform(), data,
-  nWorkers = platform@nWorkers, KnownChunkableFuncs = c("exp", "+",
-  "*", "sin"), chunkableFuncs = character(),
-  allChunkableFuncs = c(KnownChunkableFuncs, chunkableFuncs))
+  nWorkers = platform@nWorkers, chunkFuncs = character(),
+  reduceFuncs = list(), knownChunkFuncs = c("exp", "+", "*", "sin"),
+  allChunkFuncs = c(knownChunkFuncs, chunkFuncs))
 }
 \arguments{
 \item{graph}{\linkS4class{TaskGraph}, code dependency graph}
@@ -18,11 +18,13 @@ scheduleDataParallel(graph, platform = Platform(), data,
 Each element is a \linkS4class{DataSource}.
 The names of the list elements correspond to the variables in the code that these objects are bound to.}
 
-\item{chunkableFuncs}{character, names of additional chunkable functions known to the user.}
+\item{chunkFuncs}{character, names of additional chunkable functions known to the user.}
 
-\item{allChunkableFuncs}{character, names of all chunkable functions to use in the analysis.}
+\item{reduceFuncs}{list of ReduceFun objects}
 
-\item{knownChunkableFuncs}{character, the names of chunkable functions from recommended and base packages.}
+\item{knownchunkFuncs}{character, the names of chunkable functions from recommended and base packages.}
+
+\item{allchunkFuncs}{character, names of all chunkable functions to use in the analysis.}
 }
 \description{
 If you're doing a series of computations over a large data set, then start with this scheduler.
@@ -35,8 +37,6 @@ It statically balances the load of the data chunks among workers, assuming that 
 TODO:
 \enumerate{
 \item Populate \code{chunkableFuncs} based on code analysis.
-\item Model non chunkable functions so that we can revisit the chunked data.
-Currently it only allows for one chunked block.
 \item Identify which parameters a function is chunkable in, and respect these by matching arguments.
 See \code{update_resource.Call}.
 \item Clarify behavior of subexpressions, handling cases such as \code{min(sin(large_object))}

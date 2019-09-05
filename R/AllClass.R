@@ -297,27 +297,30 @@ SplitBlock = setClass("SplitBlock", contains = "ParallelBlock",
                    ))
 
 
-#' Contains implementation for a reducible function
+#' Abstract base class for reducible function implementations
 #'
-#' This assumes that all of the summary, combine and query functions are defined and available in the R install.
+#' @slot reducibleFunName name of a reducible function 
+ReduceFun = setClass("ReduceFun", slots = c(reducibleFunName = "character"))
+
+
+#' Implementation for a reducible function using function names only
+#'
+#' This assumes that all of the summary, combine and query functions are defined and available in the R environment where it will run.
 #' See \linkS4class{UserDefinedReduceFun} to define and use your own functions.
 #'
-#' @slot original name of a reducible function 
 #' @slot summaryFun name of a function that each worker will call on their chunk of the data.
 #'		This produces an intermediate result.
 #' @slot combineFun name of a function to combine many intermediate results into a single intermediate results
 #' @slot queryFun name of a function to produce the actual final result from an intermediate result
-ReduceFun = setClass("ReduceFun",
-        slots = c(original = "character"
-                  , summaryFun = "character"
+SimpleReduceFun = setClass("SimpleReduceFun", contains = "ReduceFun",
+        slots = c(summaryFun = "character"
                   , combineFun = "character"
                   , queryFun = "character"
                   ))
 
 
 UserDefinedReduceFun = setClass("UserDefinedReduceFun", contains = "ReduceFun",
-        slots = c(original = "character"
-                  , summaryFun = "function"
+        slots = c(summaryFun = "function"
                   , combineFun = "function"
                   , queryFun = "function"
                   ))
