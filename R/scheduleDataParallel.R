@@ -255,9 +255,14 @@ collapseAdjacentBlocks = function(blocks)
 # output is either a collapsed block, or a list of two blocks.
 collapseTwoBlocks = function(b1, b2)
 {
-    if(is(b1, "SerialBlock") && is(b2, "SerialBlock")){
+    # Multiple dispatch DOES NOT work out so well here, because class inheritance SplitBlock extends ParallelBlock, and we don't want it to inherit a method.
+    # We could think harder and do something more general if necessary, but this implementation gets us what we're looking for at the moment.
+    c1 = class(b1)
+    c2 = class(b2)
+
+    if(c1 == "SerialBlock" && c2 == "SerialBlock"){
         SerialBlock(code = c(b1@code, b2@code), collect = c(b1@collect, b2@collect))
-    } else if(is(b1, "ParallelBlock") && is(b2, "ParallelBlock")){
+    } else if(c1 == "ParallelBlock" && c2 == "ParallelBlock"){
         ParallelBlock(code = c(b1@code, b2@code), export = c(b1@export, b2@export))
     } else {
         list(b1, b2)
