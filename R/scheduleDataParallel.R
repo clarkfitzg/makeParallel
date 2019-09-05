@@ -169,9 +169,9 @@ nodeToCodeBlock = function(node, resources, reduceFuncs)
         lhs = getLHS(node, names(reduceFuncs))
         args = node$read$args$contents
 
-        if(1 < length(args) || !is.symbol(args[[1]]))
+        if(1 < length(args) || !is(args[[1]], "Symbol"))
             stop("This code assumes the reducible function call `foo` is of the form `foo(x)`. Other cases not yet implemented.")
-        ReduceBlock(argToReduceFun = args[[1]]$ssa_name, saveObj = lhs, reduceFun = reduceFuncs[[r$reduceFun]])
+        ReduceBlock(objectToReduce = args[[1]]$ssa_name, resultName = lhs, reduceFun = reduceFuncs[[r$reduceFun]])
 
     } else if(isChunked(node, resources)){
         export = findVarsToMove(node, resources, predicate = isLocalNotChunked)
@@ -234,7 +234,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     if(!is(ast, "Brace"))
         stop("AST has unexpected form.")
 
-    names(reduceFuncs) = sapply(reduceFuncs, slot, "funName")
+    names(reduceFuncs) = sapply(reduceFuncs, slot, "reduceFun")
 
     # Run the code inference and store all the results in `resources`
     propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = names(reduceFuncs))

@@ -1,5 +1,6 @@
 #' Construct ReduceFun Objects
-simpleReduceFun = function(reducibleFunName, summaryFun = reducibleFunName, combineFun = "c", queryFun = summaryFun)
+#' @export
+simpleReduceFun = function(reduceFun, summaryFun = reduceFun, combineFun = "c", queryFun = summaryFun)
 {
-    SimpleReduceFun(reducibleFunName = reducibleFunName, summaryFun = summaryFun, combineFun = combineFun, queryFun = queryFun)
+    SimpleReduceFun(reduceFun = reduceFun, summaryFun = summaryFun, combineFun = combineFun, queryFun = queryFun)
 }

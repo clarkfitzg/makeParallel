@@ -4,8 +4,8 @@
 \alias{simpleReduceFun}
 \title{Construct ReduceFun Objects}
 \usage{
-simpleReduceFun(reducibleFunName, summaryFun = reducibleFunName,
-  combineFun = "c", queryFun = summaryFun)
+simpleReduceFun(reduceFun, summaryFun = reduceFun, combineFun = "c",
+  queryFun = summaryFun)
 }
 \description{
 Construct ReduceFun Objects

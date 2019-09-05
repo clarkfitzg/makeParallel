@@ -299,8 +299,8 @@ SplitBlock = setClass("SplitBlock", contains = "ParallelBlock",
 
 #' Abstract base class for reducible function implementations
 #'
-#' @slot funName name of a reducible function 
-ReduceFun = setClass("ReduceFun", slots = c(funName = "character"))
+#' @slot reduceFun name of a reducible function 
+ReduceFun = setClass("ReduceFun", slots = c(reduceFun = "character"))
 
 
 #' Implementation for a reducible function using function names only
@@ -329,11 +329,11 @@ UserDefinedReduceFun = setClass("UserDefinedReduceFun", contains = "ReduceFun",
 #' Reduce in parallel on the workers
 #'
 #' @slot objectToReduce name of the object to apply the reduce to
-#' @slot saveObj name of the object to save the result as
+#' @slot resultName name of the object to save the result as
 #' @slot reduceFun implementation of a reduce to use
 ReduceBlock = setClass("ReduceBlock", contains = "CodeBlock",
          slots = c(objectToReduce = "character"
-                   , saveObj = "character"
+                   , resultName = "character"
                    , reduceFun = "ReduceFun"
                    ))
 

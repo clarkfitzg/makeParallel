@@ -13,7 +13,7 @@ Reduce in parallel on the workers
 \describe{
 \item{\code{objectToReduce}}{name of the object to apply the reduce to}
 
-\item{\code{saveObj}}{name of the object to save the result as}
+\item{\code{resultName}}{name of the object to save the result as}
 
 \item{\code{reduceFun}}{implementation of a reduce to use}
 }}

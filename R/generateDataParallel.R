@@ -260,8 +260,8 @@ function(schedule, platform
 TEMPLATE_ParallelLocalCluster_ReduceBlock = function()
 {
     `_TMP_VAR` = clusterEvalQ(`_CLUSTER_NAME`, `_SUMMARY_FUN`(`_OBJECT_TO_REDUCE`))
-    `_TMP_VAR` = `_COMBINE_FUN`(`_TMP_VAR`)
-    `_SAVE_OBJ` = `_QUERY_FUN`(`_TMP_VAR`)
+    `_TMP_VAR` = do.call(`_COMBINE_FUN`, `_TMP_VAR`)
+    `_RESULT` = `_QUERY_FUN`(`_TMP_VAR`)
 }
 
 
@@ -275,10 +275,10 @@ function(schedule, platform, data
 
     substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         , `_OBJECT_TO_REDUCE` = as.symbol(schedule@objectToReduce)
-        , `_SAVE_OBJ` = as.symbol(schedule@saveObj)
         , `_TMP_VAR` = as.symbol("tmp")
         , `_SUMMARY_FUN` = as.symbol(rfun@summaryFun)
         , `_COMBINE_FUN` = as.symbol(rfun@combineFun)
         , `_QUERY_FUN` = as.symbol(rfun@queryFun)
+        , `_RESULT` = as.symbol(schedule@resultName)
     ))
 })
