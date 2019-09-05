@@ -239,12 +239,12 @@ collapseAdjacentBlocks = function(blocks)
     out = list()
     lastblock = blocks[[1]]
     for(b in blocks[-1]){
-        one_or_two = collapseTwoBlocks(lastblock, b)
-        if(length(one_or_two) == 1){
-            lastblock = one_or_two[[1]]
+        tmp = collapseTwoBlocks(lastblock, b)
+        if(is(tmp, "CodeBlock")){
+            lastblock = tmp
         } else {
-            out = c(out, one_or_two[[1]])
-            lastblock = one_or_two[[2]]
+            out = c(out, tmp[[1]])
+            lastblock = tmp[[2]]
         }
     }
     c(out, lastblock)
@@ -252,7 +252,14 @@ collapseAdjacentBlocks = function(blocks)
 
 
 # inputs are two adjacent blocks to collapse
-# output is a list containing 1 block if they could be collapsed, 2 blocks otherwise
+# output is either a collapsed block, or a list of two blocks.
 collapseTwoBlocks = function(b1, b2)
 {
+    if(is(b1, "SerialBlock") && is(b2, "SerialBlock")){
+        collapseTwoSerialBlocks(b1, b2)
+    } else if(is(b1, "ParallelBlock") && is(b2, "ParallelBlock")){
+        collapseTwoParallelBlocks(b1, b2)
+    } else {
+        list(b1, b2)
+    }
 }
