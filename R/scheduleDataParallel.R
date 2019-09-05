@@ -215,7 +215,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
         stop("AST has unexpected form.")
 
     # Mark everything with whether it's a chunked object or not.
-    propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkFuncs)
+    propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = reduceFuncs)
 
     # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
     load_block = DataLoadBlock()

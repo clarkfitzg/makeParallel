@@ -127,14 +127,18 @@ update_resource.Assign = function(node, name_resource, resources, namer, ...)
 }
 
 
-update_resource.Call = function(node, name_resource, resources, namer, chunkableFuncs = character(), ...)
+update_resource.Call = function(node, name_resource, resources, namer
+        , chunkFuncs = character(), reduceFuncs = character(), ...)
 {
     # First implementation will behave naively.
     # If the call is to a vectorized function, and any of the arguments to that function are chunked objects, then the result is a chunked object.
     # A more robust version will match on argument names, but for this we will need the argument list to be named.
 
     fname = node$fn$value
+
     chunkableArgs = sapply(node$args$contents, isChunked, resources = resources)
+    # TODO: Check for and handle mixing chunked and non chunked objects?
+    hasChunkArgs = any(chunkableArgs)
 
     # TODO:
     # This treats split() as a special case.
@@ -142,6 +146,7 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
     # Then it becomes pretty similar to function handlers in CodeDepends.
     # This one is an implementation using the rstatic AST rather than R's AST.
     # We'll need to carefully explain the resources for users to be able to extend it.
+
 
     if(fname == "split"){
 
@@ -153,22 +158,21 @@ update_resource.Call = function(node, name_resource, resources, namer, chunkable
         IDsplit_x = resource_id(node$args$contents$x)
         IDsplit_f = resource_id(node$args$contents$f)
 
-        # TODO: Check for and handle mixing chunked and non chunked objects?
-        chunked = any(chunkableArgs)
-
         # Adding these resource IDs in here as values means that resources refers to itself.
         # It's getting to be a fairly complicated self referential data structure.
 
         return(new_named_resource(node, resources, namer
             , split = TRUE
-            , chunked = chunked
+            , chunked = hasChunkArgs
             , IDsplit_x = IDsplit_x
             , IDsplit_f = IDsplit_f
             ))
     }
 
-    if(fname %in% chunkableFuncs && any(chunkableArgs)){
+    if(fname %in% chunkFuncs && hasChunkArgs){
         new_named_resource(node, resources, namer, chunked = TRUE)
+    } else if(fname %in% reduceFuncs && hasChunkArgs){
+        new_named_resource(node, resources, namer, reduceFun = fname)
     } else {
         NextMethod()
     }
