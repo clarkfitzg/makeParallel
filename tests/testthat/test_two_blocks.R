@@ -14,16 +14,18 @@ x_desc = ChunkDataFiles(varName = "x0"
 outFile = "gen/two_blocks.R"
 
 out = makeParallel("
-x = sin(x0)             # chunkable 1
-mx = median(x)          # general 1
-x2 = x - mx             # chunkable 2
-result = max(x2)        # reduce 1
-saveRDS(result, 'gen/result_two_blocks.rds') # general 2
+x = sin(x0)             # ParallelBlock 1
+y = cos(x0)
+z = ceiling(x)
+mx = median(x)          # SerialBlock 1
+x2 = x + y + z - mx     # ParallelBlock 2
+result = max(x2)        # Reduce 1
+saveRDS(result, 'gen/result_two_blocks.rds') # SerialBlock2
 "
 , data = x_desc
 , scheduler = scheduleDataParallel
 , platform = parallelLocalCluster()
-, chunkableFuncs = c("sin", "-")
+, chunkableFuncs = c("sin", "cos", "+", "-", "ceiling")
 , outFile = outFile
 , overWrite = TRUE
 )
@@ -42,5 +44,9 @@ if(identical(Sys.getenv("TESTTHAT"), "true")){
     expected = readRDS("expected/result_two_blocks.rds")
 
     expect_equal(result, expected)
+
+    s = schedule(out)
+    block_class = sapply(s@blocks, class)
+    expect_equal(sum(block_class == "ParallelBlock"), 2L)
 
 }
