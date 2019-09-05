@@ -199,6 +199,18 @@ convert_object_to_language = function(x)
 }
 
 
+# Turns c("a", "b", "c") into this call:
+# list(a = a, b = b, c = c)
+char_to_symbol_list = function(vars)
+{
+    lc = call("list")
+    for(v in vars){
+        lc[[v]] = as.symbol(v)
+    }
+    lc
+}
+
+
 if(FALSE){
 
 

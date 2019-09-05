@@ -221,6 +221,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     load_block = DataLoadBlock()
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources)
     blocks = c(load_block, blocks)
+    blocks = collapseAdjacentBlocks(blocks)
 
     DataParallelSchedule(assignmentIndices = assignmentIndices
                        , nWorkers = nWorkers
@@ -229,13 +230,29 @@ scheduleDataParallel = function(graph, platform = Platform(), data
 }
 
 
-# Turns c("a", "b", "c") into this call:
-# list(a = a, b = b, c = c)
-char_to_symbol_list = function(vars)
+# Collapses two or more adjacent SerialBlocks into one. 
+# Collapses two or more adjacent ParallelBlocks into one. 
+# Reordering should happen before this.
+# input is list of blocks before collapsing, output is list of blocks after collapsing.
+collapseAdjacentBlocks = function(blocks)
 {
-    lc = call("list")
-    for(v in vars){
-        lc[[v]] = as.symbol(v)
+    out = list()
+    lastblock = blocks[[1]]
+    for(b in blocks[-1]){
+        one_or_two = collapseTwoBlocks(lastblock, b)
+        if(length(one_or_two) == 1){
+            lastblock = one_or_two[[1]]
+        } else {
+            out = c(out, one_or_two[[1]])
+            lastblock = one_or_two[[2]]
+        }
     }
-    lc
+    c(out, lastblock)
+}
+
+
+# inputs are two adjacent blocks to collapse
+# output is a list containing 1 block if they could be collapsed, 2 blocks otherwise
+collapseTwoBlocks = function(b1, b2)
+{
 }
