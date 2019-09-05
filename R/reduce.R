@@ -1,5 +1,5 @@
 #' Construct ReduceFun Objects
-reduceFun = function(original, summaryFun = original, combineFun = "c", queryFun = "character")
+reduceFun = function(original, summaryFun = original, combineFun = "c", queryFun = summaryFun)
 {
-    ReduceFun(
+    ReduceFun(original = original, summaryFun = summaryFun, combineFun = combineFun, queryFun = queryFun)
 }
