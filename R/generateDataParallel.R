@@ -269,6 +269,7 @@ setMethod("generate", signature(schedule = "ReduceBlock", platform = "ParallelLo
 function(schedule, platform, data
          , template = as.expression(body(TEMPLATE_ParallelLocalCluster_ReduceBlock))
          , ...){
+
     rfun = schedule@reduceFun
     if(!is(rfun, "SimpleReduceFun"))
         stop("Not yet implemented.")
