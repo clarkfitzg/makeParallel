@@ -256,9 +256,9 @@ collapseAdjacentBlocks = function(blocks)
 collapseTwoBlocks = function(b1, b2)
 {
     if(is(b1, "SerialBlock") && is(b2, "SerialBlock")){
-        collapseTwoSerialBlocks(b1, b2)
+        SerialBlock(code = c(b1@code, b2@code), collect = c(b1@collect, b2@collect))
     } else if(is(b1, "ParallelBlock") && is(b2, "ParallelBlock")){
-        collapseTwoParallelBlocks(b1, b2)
+        ParallelBlock(code = c(b1@code, b2@code), export = c(b1@export, b2@export))
     } else {
         list(b1, b2)
     }
