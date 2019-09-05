@@ -1,5 +1,7 @@
 library(makeParallel)
 
+maxReduce = reduceFun("max")
+
 files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE)
 
 # Can surely do this for the user
@@ -25,7 +27,8 @@ saveRDS(result, 'gen/result_two_blocks.rds') # SerialBlock2
 , data = x_desc
 , scheduler = scheduleDataParallel
 , platform = parallelLocalCluster()
-, chunkableFuncs = c("sin", "cos", "+", "-", "ceiling")
+, chunkFuncs = c("sin", "cos", "+", "-", "ceiling")
+, reduceFuncs = list(maxReduce)
 , outFile = outFile
 , overWrite = TRUE
 )

@@ -297,7 +297,30 @@ SplitBlock = setClass("SplitBlock", contains = "ParallelBlock",
                    ))
 
 
-# TODO: ReduceBlock
+#' Contains implementation for a reducible function
+#'
+#' @slot summaryFun name of a function that each worker will call on their chunk of the data.
+#'		This produces an intermediate result.
+#' @slot combineFun name of a function to combine many intermediate results into a single intermediate results
+#' @slot queryFun name of a function to produce the actual final result from an intermediate result
+ReduceFun = setClass("ReduceFun",
+        slots = c(original = "character"
+                  , summaryFun = "character"
+                  , combineFun = "character"
+                  , queryFun = "character"
+                  ))
+
+
+#' Reduce in parallel on the workers
+#'
+#' @slot objectToReduce name of the object to apply the reduce to
+#' @slot saveObj name of the object to save the result as
+#' @slot reduceFun implementation of a reduce to use
+ReduceBlock = setClass("ReduceBlock", contains = "CodeBlock",
+         slots = c(objectToReduce = "character"
+                   , saveObj = "character"
+                   , reduceFun = "ReduceFun"
+                   ))
 
 
 #' @slot assignmentIndices assigns each data chunk to a worker. For example, c(2, 1, 1) assigns the 1st chunk to worker 2, and chunks 2 and 3 to worker 1.

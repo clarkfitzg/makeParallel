@@ -22,7 +22,7 @@ saveRDS(med_petal, 'gen/med_petal.rds')
 , data = x_desc
 , scheduler = scheduleDataParallel
 , platform = parallelLocalCluster(scratchDir = "gen")
-, chunkableFuncs = c("sapply", "$")
+, chunkFuncs = c("sapply", "$")
 , outFile = outFile
 , overWrite = TRUE
 )
@@ -43,8 +43,8 @@ if(identical(Sys.getenv("TESTTHAT"), "true")){
     expect_equal(result[names(expected)], expected)
 
     s = schedule(out)
-
     block_class = sapply(s@blocks, class)
+
     expect_true("SplitBlock" %in% block_class)
 
 }

@@ -29,7 +29,7 @@ out = makeParallel("
 , nWorkers = 2L
 , scheduler = scheduleDataParallel
 , platform = parallelLocalCluster()
-, chunkableFuncs = "sin"
+, chunkFuncs = "sin"
 , outFile = outFile
 , overWrite = TRUE
 )
@@ -67,7 +67,7 @@ if(FALSE){
     , data = list(x = x_desc)
     , nWorkers = 2L
     , scheduler = scheduleDataParallel
-    , chunkableFuncs = c("lapply", "sapply", "log", "+")
+    , chunkFuncs = c("lapply", "sapply", "log", "+")
     , outFile = "lapply_example.R"
     , overWrite = TRUE
     )

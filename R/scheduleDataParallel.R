@@ -182,17 +182,17 @@ nodeToCodeBlock = function(node, resources)
 #' 3. Clarify behavior of subexpressions, handling cases such as `min(sin(large_object))`
 #'
 #' @inheritParams schedule
-#' @param knownChunkableFuncs character, the names of chunkable functions from recommended and base packages.
-#' @param chunkableFuncs character, names of additional chunkable functions known to the user.
-#' @param allChunkableFuncs character, names of all chunkable functions to use in the analysis.
+#' @param knownchunkFuncs character, the names of chunkable functions from recommended and base packages.
+#' @param chunkFuncs character, names of additional chunkable functions known to the user.
+#' @param allchunkFuncs character, names of all chunkable functions to use in the analysis.
 #' @seealso [makeParallel], [schedule]
 #' @export
 #' @md
 scheduleDataParallel = function(graph, platform = Platform(), data
     , nWorkers = platform@nWorkers
-    , KnownChunkableFuncs = c("exp", "+", "*", "sin")
-    , chunkableFuncs = character()
-    , allChunkableFuncs = c(KnownChunkableFuncs, chunkableFuncs)
+    , knownChunkFuncs = c("exp", "+", "*", "sin")
+    , chunkFuncs = character()
+    , allChunkFuncs = c(knownChunkFuncs, chunkFuncs)
     )
 {
     if(!is(data, "ChunkDataFiles")) 
@@ -215,7 +215,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
         stop("AST has unexpected form.")
 
     # Mark everything with whether it's a chunked object or not.
-    propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkableFuncs)
+    propagate(ast, name_resource, resources, namer, chunkableFuncs = allChunkFuncs)
 
     # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
     load_block = DataLoadBlock()
