@@ -257,7 +257,18 @@ function(schedule, platform
 })
 
 
-TEMPLATE_ParallelLocalCluster_ReduceBlock = function()
+TEMPLATE_ParallelLocalCluster_ReduceBlock_1 = function()
+{
+    clusterEvalQ(`_CLUSTER_NAME`, {
+        `_SUMMARY_FUN` = `_SUMMARY_FUN_IMPLEMENTATION` 
+        NULL
+    })
+    `_COMBINE_FUN` = `_COMBINE_FUN_IMPLEMENTATION` 
+    `_QUERY_FUN` = `_QUERY_FUN_IMPLEMENTATION` 
+}
+
+
+TEMPLATE_ParallelLocalCluster_ReduceBlock_2 = function()
 {
     `_TMP_VAR` = clusterEvalQ(`_CLUSTER_NAME`, `_SUMMARY_FUN`(`_OBJECT_TO_REDUCE`))
     `_TMP_VAR` = do.call(`_COMBINE_FUN`, `_TMP_VAR`)
@@ -267,19 +278,43 @@ TEMPLATE_ParallelLocalCluster_ReduceBlock = function()
 
 setMethod("generate", signature(schedule = "ReduceBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform, data
-         , template = as.expression(body(TEMPLATE_ParallelLocalCluster_ReduceBlock))
+         , tmp_var = "tmp"
+         , summaryFun_tmp_var = "summaryFun"
+         , combineFun_tmp_var = "combineFun"
+         , queryFun_tmp_var = "queryFun"
+         , template1 = as.expression(body(TEMPLATE_ParallelLocalCluster_ReduceBlock_1))
+         , template2 = as.expression(body(TEMPLATE_ParallelLocalCluster_ReduceBlock_2))
          , ...){
 
     rfun = schedule@reduceFun
-    if(!is(rfun, "SimpleReduceFun"))
-        stop("Not yet implemented.")
+    first = expression()
 
-    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+    if(is(rfun, "UserDefinedReduceFun")){
+        # Inline the user defined implementations for the reduce.
+        # This will inline them every single time they are used.
+        # Another argument to generate a package...
+
+        first = substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+            , `_SUMMARY_FUN` = as.symbol(summaryFun_tmp_var)
+            , `_SUMMARY_FUN_IMPLEMENTATION` = rfun@summaryFun
+            , `_COMBINE_FUN` = as.symbol(combineFun_tmp_var)
+            , `_COMBINE_FUN_IMPLEMENTATION` = rfun@combineFun
+            , `_QUERY_FUN` = as.symbol(queryFun_tmp_var)
+            , `_QUERY_FUN_IMPLEMENTATION` = rfun@queryFun
+            ))
+
+        # Reuse the temporary variable names.
+        rfun = SimpleReduceFun(reduceFun = reduceFun, summaryFun = summaryFun_tmp_var
+                               , combineFun = combineFun_tmp_var, queryFun = queryFun_tmp_var)
+    }
+
+    second = substitute_language(template2, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         , `_OBJECT_TO_REDUCE` = as.symbol(schedule@objectToReduce)
-        , `_TMP_VAR` = as.symbol("tmp")
+        , `_TMP_VAR` = as.symbol(tmp_var)
         , `_SUMMARY_FUN` = as.symbol(rfun@summaryFun)
         , `_COMBINE_FUN` = as.symbol(rfun@combineFun)
         , `_QUERY_FUN` = as.symbol(rfun@queryFun)
         , `_RESULT` = as.symbol(schedule@resultName)
     ))
+    c(first, second)
 })
