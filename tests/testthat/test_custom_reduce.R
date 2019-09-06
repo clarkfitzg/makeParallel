@@ -25,7 +25,7 @@ x_desc = ChunkDataFiles(varName = "x0"
 	, readFuncName = "readRDS"
     )
 
-outFile = "gen/two_blocks.R"
+outFile = "gen/custom_reduce.R"
 
 out = makeParallel("
 x = sin(x0)

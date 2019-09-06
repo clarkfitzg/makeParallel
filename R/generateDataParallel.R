@@ -289,12 +289,12 @@ function(schedule, platform, data
     rfun = schedule@reduceFun
     first = expression()
 
-    if(is(rfun, "UserDefinedReduceFun")){
+    if(is(rfun, "UserDefinedReduce")){
         # Inline the user defined implementations for the reduce.
         # This will inline them every single time they are used.
         # Another argument to generate a package...
 
-        first = substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+        first = substitute_language(template1, list(`_CLUSTER_NAME` = as.symbol(platform@name)
             , `_SUMMARY_FUN` = as.symbol(summaryFun_tmp_var)
             , `_SUMMARY_FUN_IMPLEMENTATION` = rfun@summary
             , `_COMBINE_FUN` = as.symbol(combineFun_tmp_var)
@@ -304,8 +304,8 @@ function(schedule, platform, data
             ))
 
         # Reuse the temporary variable names.
-        rfun = SimpleReduceFun(reduceFun = reduceFun, summaryFun = summaryFun_tmp_var
-                               , combineFun = combineFun_tmp_var, queryFun = queryFun_tmp_var)
+        rfun = SimpleReduce(reduce = rfun@reduce, summary = summaryFun_tmp_var
+            , combine = combineFun_tmp_var, query = queryFun_tmp_var)
     }
 
     second = substitute_language(template2, list(`_CLUSTER_NAME` = as.symbol(platform@name)
