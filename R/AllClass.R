@@ -263,6 +263,10 @@ CodeBlock = setClass("CodeBlock", slots = c(code = "expression"))
 InitPlatformBlock = setClass("InitPlatformBlock", contains = "CodeBlock")
 
 
+#' Shut down the platform
+StopPlatformBlock = setClass("StopPlatformBlock", contains = "CodeBlock")
+
+
 #' Load Data
 DataLoadBlock = setClass("DataLoadBlock", contains = "CodeBlock")
 

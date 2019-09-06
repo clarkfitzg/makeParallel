@@ -18,10 +18,17 @@ function(schedule, platform, data, ...)
     # localInitBlock could be a method, and this would work more generally.
     # Or we could dispatch generate on an InitBlock object, but then we'd have to do some contortions to avoid infinite recursion.
     initBlock = localInitBlock(schedule, platform)
+    lastBlock = lastBlock(platform)
     newcode = lapply(schedule@blocks, generate, platform = platform, data = data, ...)
     newcode = do.call(c, newcode)
-    GeneratedCode(schedule = schedule, code = c(initBlock, newcode))
+    GeneratedCode(schedule = schedule, code = c(initBlock, newcode, lastBlock))
 })
+
+
+lastBlock = function(platform, template = quote(stopCluster(`_CLS`)))
+{
+    substitute_language(template, list(`_CLS` = as.symbol(platform@name)))
+}
 
 
 TEMPLATE_ParallelLocalCluster_InitBlock = function(){
