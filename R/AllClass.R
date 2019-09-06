@@ -299,30 +299,30 @@ SplitBlock = setClass("SplitBlock", contains = "ParallelBlock",
 
 #' Abstract base class for reducible function implementations
 #'
-#' @slot reduceFun name of a reducible function 
-ReduceFun = setClass("ReduceFun", slots = c(reduceFun = "character"))
+#' @slot reduce name of a reducible function 
+ReduceFun = setClass("ReduceFun", slots = c(reduce = "character"))
 
 
 #' Implementation for a reducible function using function names only
 #'
 #' This assumes that all of the summary, combine and query functions are defined and available in the R environment where it will run.
-#' See \linkS4class{UserDefinedReduceFun} to define and use your own functions.
+#' See \linkS4class{UserDefinedReduce} to define and use your own functions.
 #'
-#' @slot summaryFun name of a function that each worker will call on their chunk of the data.
+#' @slot summary name of a function that each worker will call on their chunk of the data.
 #'		This produces an intermediate result.
-#' @slot combineFun name of a function to combine many intermediate results into a single intermediate results
-#' @slot queryFun name of a function to produce the actual final result from an intermediate result
-SimpleReduceFun = setClass("SimpleReduceFun", contains = "ReduceFun",
-        slots = c(summaryFun = "character"
-                  , combineFun = "character"
-                  , queryFun = "character"
+#' @slot combine name of a function to combine many intermediate results into a single intermediate results
+#' @slot query name of a function to produce the actual final result from an intermediate result
+SimpleReduce = setClass("SimpleReduce", contains = "ReduceFun",
+        slots = c(summary = "character"
+                  , combine = "character"
+                  , query = "character"
                   ))
 
 
-UserDefinedReduceFun = setClass("UserDefinedReduceFun", contains = "ReduceFun",
-        slots = c(summaryFun = "function"
-                  , combineFun = "function"
-                  , queryFun = "function"
+UserDefinedReduce = setClass("UserDefinedReduce", contains = "ReduceFun",
+        slots = c(summary = "function"
+                  , combine = "function"
+                  , query = "function"
                   ))
 
 

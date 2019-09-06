@@ -296,11 +296,11 @@ function(schedule, platform, data
 
         first = substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
             , `_SUMMARY_FUN` = as.symbol(summaryFun_tmp_var)
-            , `_SUMMARY_FUN_IMPLEMENTATION` = rfun@summaryFun
+            , `_SUMMARY_FUN_IMPLEMENTATION` = rfun@summary
             , `_COMBINE_FUN` = as.symbol(combineFun_tmp_var)
-            , `_COMBINE_FUN_IMPLEMENTATION` = rfun@combineFun
+            , `_COMBINE_FUN_IMPLEMENTATION` = rfun@combine
             , `_QUERY_FUN` = as.symbol(queryFun_tmp_var)
-            , `_QUERY_FUN_IMPLEMENTATION` = rfun@queryFun
+            , `_QUERY_FUN_IMPLEMENTATION` = rfun@query
             ))
 
         # Reuse the temporary variable names.
@@ -311,9 +311,9 @@ function(schedule, platform, data
     second = substitute_language(template2, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         , `_OBJECT_TO_REDUCE` = as.symbol(schedule@objectToReduce)
         , `_TMP_VAR` = as.symbol(tmp_var)
-        , `_SUMMARY_FUN` = as.symbol(rfun@summaryFun)
-        , `_COMBINE_FUN` = as.symbol(rfun@combineFun)
-        , `_QUERY_FUN` = as.symbol(rfun@queryFun)
+        , `_SUMMARY_FUN` = as.symbol(rfun@summary)
+        , `_COMBINE_FUN` = as.symbol(rfun@combine)
+        , `_QUERY_FUN` = as.symbol(rfun@query)
         , `_RESULT` = as.symbol(schedule@resultName)
     ))
     c(first, second)

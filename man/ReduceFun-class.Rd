@@ -11,6 +11,6 @@ Abstract base class for reducible function implementations
 \section{Slots}{
 
 \describe{
-\item{\code{reduceFun}}{name of a reducible function}
+\item{\code{reduce}}{name of a reducible function}
 }}
 

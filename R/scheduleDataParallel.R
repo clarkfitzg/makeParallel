@@ -234,7 +234,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     if(!is(ast, "Brace"))
         stop("AST has unexpected form.")
 
-    names(reduceFuncs) = sapply(reduceFuncs, slot, "reduceFun")
+    names(reduceFuncs) = sapply(reduceFuncs, slot, "reduce")
 
     # Run the code inference and store all the results in `resources`
     propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = names(reduceFuncs))
