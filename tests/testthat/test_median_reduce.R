@@ -1,9 +1,10 @@
 library(makeParallel)
 
 medianReduce = reduceFun("median"
-    , summary = function(data) NULL
-    , combine = function(...) NULL
-    , query = function(s) NULL
+    , summary = "base::table"
+    , combine = "makeParallel::combine_tables"
+    , query = function(s) 100
+    , predicate = function(r) !is.null(r$fewDistinct) && r$fewDistinct
     )
 
 files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE)
