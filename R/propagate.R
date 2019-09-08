@@ -36,7 +36,11 @@
 #
 # There should be a clearer model for this, for example, all the values in the resource environment have a class inheriting from Resource.
 # Alternatively, I could nix the resource object completely and instead build off the AST, with another data structure only for resources that don't correspond to elements of the AST.
+# There are two ways to implement such a data structure: I could just use the `.data` field in the AST, or build another tree with identical structure as the AST, that just holds the resources I'm interested in.
 
+# All implementation details though- end user should never see this.
+# Or should they?
+# I can imagine building the task graph like this.
 
 
 # Modifies the node and resources.
