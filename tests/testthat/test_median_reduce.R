@@ -8,7 +8,7 @@ medianReduce = reduceFun("median"
     , summary = "table"
     , combine = "makeParallel::combine_tables"
     , query = ".NotYetImplemented"              # TODO: Implement
-    , predicate = function(r) !is.null(r$uniqValueBound) && r$uniqValueBound < 1000
+    , predicate = function(r) !is.null(r[["uniqueValueBound"]]) && r[["uniqueValueBound"]] < 1000
     )
 
 files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE)

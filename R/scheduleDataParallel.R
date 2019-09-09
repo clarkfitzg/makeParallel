@@ -168,14 +168,13 @@ nodeToCodeBlock = function(node, resources, reduceFuncs)
     if(!is.null(r$reduceFun)){
         lhs = getLHS(node, names(reduceFuncs))
         args = node$read$args$contents
-
-        if(1 < length(args) || !is(args[[1]], "Symbol"))
+        arg1 = args[[1]]
+        if(1 < length(args) || !is(arg1, "Symbol"))
             stop("This code assumes the reducible function call `foo` is of the form `foo(x)`. Other cases not yet implemented.")
-
+        
         rfun = reduceFuncs[[r$reduceFun]]
-
-        if(rfun@predicate(r)){
-            # Predicate function identifies this particular call as reducible or not based on the resource.
+        if(rfun@predicate(get_resource(arg1, resources))){
+            # Predicate function identifies this particular call as reducible or not based on the properties of the argument.
             # If it isn't reducible, then the general case applies.
             return(ReduceBlock(objectToReduce = args[[1]]$ssa_name
                                , resultName = lhs
