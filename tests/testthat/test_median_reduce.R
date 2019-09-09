@@ -20,7 +20,7 @@ x_desc = ChunkDataFiles(varName = "x0"
     , files = files
 	, sizes = sizes
 	, readFuncName = "readRDS"
-    , uniqValueBound = 500
+    , uniqueValueBound = 500
     )
 
 outFile = "gen/median_reduce.R"

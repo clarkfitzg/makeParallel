@@ -240,7 +240,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
 
     # TODO: Generalize how we store and propagate relevant parts of the data description to other resources in the program.
     # What I'm doing here suggests defining a class `Resource` such that `DataSource` contains it.
-    r0 = list(chunked = TRUE, varName = data@varName, uniqValueBound = data@uniqValueBound)
+    r0 = list(chunked = TRUE, varName = data@varName, uniqueValueBound = data@uniqueValueBound)
     resources[[data_id]] = r0
 
     ast = rstatic::to_ast(graph@code)

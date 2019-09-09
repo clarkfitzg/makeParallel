@@ -13,6 +13,6 @@ Abstract Base Class For Data Descriptions
 \describe{
 \item{\code{varName}}{name of the variable in the code}
 
-\item{\code{uniqValueBound}}{upper bound for number of distinct values}
+\item{\code{uniqueValueBound}}{upper bound for number of distinct values}
 }}
 
