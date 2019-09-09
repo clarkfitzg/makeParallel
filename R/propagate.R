@@ -179,7 +179,7 @@ update_resource.Call = function(node, name_resource, resources, namer
         # It won't be correct if the arguments are not both chunked in the same way.
         # We need a more general mechanism.
         first_chunk_arg = node$args$contents[chunkableArgs][[1L]]
-        uvb = first_chunk_arg$uniqueValueBound
+        uvb = get_resource(first_chunk_arg, resources)$uniqueValueBound
 
         new_named_resource(node, resources, namer, chunked = TRUE, uniqueValueBound = uvb)
     } else if(fname %in% reduceFuncs && hasChunkArgs){

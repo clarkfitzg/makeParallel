@@ -7,7 +7,7 @@ library(makeParallel)
 medianReduce = reduceFun("median"
     , summary = "table"
     , combine = "makeParallel::combine_tables"
-    , query = function(s) 100
+    , query = ".NotYetImplemented"              # TODO: Implement
     , predicate = function(r) !is.null(r$uniqValueBound) && r$uniqValueBound < 1000
     )
 
