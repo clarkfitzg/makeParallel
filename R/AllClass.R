@@ -91,8 +91,10 @@ UnixPlatform = setClass("UnixPlatform",
 
 #' Abstract Base Class For Data Descriptions
 #'
+#' @slot varName name of the variable in the code
+#' @slot nDistinctUpper upper bound for number of distinct values
 #' @export
-DataSource = setClass("DataSource", slots = c(varName = "character"))
+DataSource = setClass("DataSource", slots = c(varName = "character", nDistinctUpper = "numeric"))
 
 
 #' Data Unspecified
@@ -305,6 +307,7 @@ SplitBlock = setClass("SplitBlock", contains = "ParallelBlock",
 #'
 #' @slot reduce name of a reducible function 
 #' @slot predicate function that takes in a resource and returns TRUE if this particular resource can be reduced using this ReduceFun, and FALSE otherwise.
+#'  TODO: Define resource and make it more user accessible if users are expected to compute on it.
 ReduceFun = setClass("ReduceFun", slots = c(reduce = "character", predicate = "function"))
 
 

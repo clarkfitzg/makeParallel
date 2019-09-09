@@ -171,16 +171,25 @@ nodeToCodeBlock = function(node, resources, reduceFuncs)
 
         if(1 < length(args) || !is(args[[1]], "Symbol"))
             stop("This code assumes the reducible function call `foo` is of the form `foo(x)`. Other cases not yet implemented.")
-        ReduceBlock(objectToReduce = args[[1]]$ssa_name, resultName = lhs, reduceFun = reduceFuncs[[r$reduceFun]])
 
-    } else if(isChunked(node, resources)){
+        rfun = reduceFuncs[[r$reduceFun]]
+
+        if(rfun@predicate(r)){
+            # Predicate function identifies this particular call as reducible or not based on the resource.
+            # If it isn't reducible, then the general case applies.
+            return(ReduceBlock(objectToReduce = args[[1]]$ssa_name
+                               , resultName = lhs
+                               , reduceFun = rfun))
+        }
+    } 
+    
+    if(isChunked(node, resources)){
         export = findVarsToMove(node, resources, predicate = isLocalNotChunked)
-        ParallelBlock(code = code, export = export)
+        return(ParallelBlock(code = code, export = export))
+    } 
 
-    } else {
-        collect = findVarsToMove(node, resources)
-        SerialBlock(code = code, collect = collect)
-    }
+    collect = findVarsToMove(node, resources)
+    SerialBlock(code = code, collect = collect)
 }
 
 
@@ -228,7 +237,10 @@ scheduleDataParallel = function(graph, platform = Platform(), data
 
     data_id = namer()
     name_resource[[data@varName]] = data_id
-    resources[[data_id]] = list(chunked = TRUE, varName = data@varName)
+
+    # TODO: Generalize how we store and propagate relevant parts of the data description to other resources in the program.
+    r0 = list(chunked = TRUE, varName = data@varName)
+    resources[[data_id]] = r0
 
     ast = rstatic::to_ast(graph@code)
     if(!is(ast, "Brace"))
