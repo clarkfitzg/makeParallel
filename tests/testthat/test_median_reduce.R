@@ -4,8 +4,20 @@ library(makeParallel)
 # We don't want to inline package functions in generated code because they may use package internal objects, as in this case.
 # It's also messy.
 
+
+# Compute the median given a table where the names are the values
 tableMedian = function(tbl){
+
+    tbl = tbl[order(as.numeric(names(tbl)))]
+    totals = cumsum(tbl)
+
+    n = totals[length(totals)]
+    med_count = n / 2
+
+    med = names(tbl)[med_count <= totals][1L]
+    as.numeric(med)
 }
+
 
 medianReduce = reduceFun("median"
     , summary = "table"
