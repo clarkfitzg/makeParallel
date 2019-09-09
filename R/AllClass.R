@@ -326,11 +326,14 @@ SimpleReduce = setClass("SimpleReduce", contains = "ReduceFun",
                   , query = "character"
                   ))
 
+setClassUnion("functionOrName", c("function", "character"))
 
+# Values are either functions, names of functions, or names of functions with a double colon, for example "base::table".
+# Could do add validity checks to enforce this.
 UserDefinedReduce = setClass("UserDefinedReduce", contains = "ReduceFun",
-        slots = c(summary = "function"
-                  , combine = "function"
-                  , query = "function"
+        slots = c(summary = "functionOrName"
+                  , combine = "functionOrName"
+                  , query = "functionOrName"
                   ))
 
 

@@ -283,6 +283,19 @@ TEMPLATE_ParallelLocalCluster_ReduceBlock_2 = function()
 }
 
 
+# Let's us handle these cases of functions:
+#   1. name of a function, say "table"
+#   2. name including package, say "base::table"
+#   3. user implementation, say `function(x) ...`
+func_name_or_implementation = function(x){
+    if(is.function(x)){
+        x
+    } else {
+        as_symbol_maybe_colons(x)
+    }
+}
+
+
 setMethod("generate", signature(schedule = "ReduceBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform, data
          , tmp_var = "tmp"
@@ -303,11 +316,11 @@ function(schedule, platform, data
 
         first = substitute_language(template1, list(`_CLUSTER_NAME` = as.symbol(platform@name)
             , `_SUMMARY_FUN` = as.symbol(summaryFun_tmp_var)
-            , `_SUMMARY_FUN_IMPLEMENTATION` = rfun@summary
+            , `_SUMMARY_FUN_IMPLEMENTATION` = func_name_or_implementation(rfun@summary)
             , `_COMBINE_FUN` = as.symbol(combineFun_tmp_var)
-            , `_COMBINE_FUN_IMPLEMENTATION` = rfun@combine
+            , `_COMBINE_FUN_IMPLEMENTATION` = func_name_or_implementation(rfun@combine)
             , `_QUERY_FUN` = as.symbol(queryFun_tmp_var)
-            , `_QUERY_FUN_IMPLEMENTATION` = rfun@query
+            , `_QUERY_FUN_IMPLEMENTATION` = func_name_or_implementation(rfun@query)
             ))
 
         # Reuse the temporary variable names.
