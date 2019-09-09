@@ -4,7 +4,8 @@
 \alias{reduceFun}
 \title{Construct ReduceFun Objects}
 \usage{
-reduceFun(reduce, summary = reduce, combine = "c", query = summary)
+reduceFun(reduce, summary = reduce, combine = "c", query = summary,
+  predicate = function(...) TRUE)
 }
 \description{
 Construct ReduceFun Objects

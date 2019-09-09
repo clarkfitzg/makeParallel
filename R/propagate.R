@@ -157,7 +157,7 @@ update_resource.Call = function(node, name_resource, resources, namer
         #split_call = rstatic::match_call(node, split)
         # Call matching needs to happen in a preprocessing step, because it's useful in many places.
         # Assume that it has happened here.
-        # If it didn't, then hopefully the following lines will break!
+        # If it didn't, then hopefully the following lines will throw an error!
 
         IDsplit_x = resource_id(node$args$contents$x)
         IDsplit_f = resource_id(node$args$contents$f)
@@ -174,7 +174,14 @@ update_resource.Call = function(node, name_resource, resources, namer
     }
 
     if(fname %in% chunkFuncs && hasChunkArgs){
-        new_named_resource(node, resources, namer, chunked = TRUE)
+
+        # TODO: This is a hack to propagate the uniqueValueBound forward.
+        # It won't be correct if the arguments are not both chunked in the same way.
+        # We need a more general mechanism.
+        first_chunk_arg = node$args$contents[chunkableArgs][[1L]]
+        uvb = first_chunk_arg$uniqueValueBound
+
+        new_named_resource(node, resources, namer, chunked = TRUE, uniqueValueBound = uvb)
     } else if(fname %in% reduceFuncs && hasChunkArgs){
         new_named_resource(node, resources, namer, reduceFun = fname)
     } else {

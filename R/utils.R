@@ -211,6 +211,19 @@ char_to_symbol_list = function(vars)
 }
 
 
+as_symbol_maybe_colons = function(x)
+{
+    colons = "::"
+    has_colons = grepl(colons, x)
+    if(has_colons){
+        tmp = strsplit(x, colons)[[1]]
+        call(colons, as.symbol(tmp[1]), as.symbol(tmp[2]))
+    } else {
+        as.symbol(x)
+    }
+}
+
+
 if(FALSE){
 
 

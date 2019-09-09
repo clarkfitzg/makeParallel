@@ -92,9 +92,9 @@ UnixPlatform = setClass("UnixPlatform",
 #' Abstract Base Class For Data Descriptions
 #'
 #' @slot varName name of the variable in the code
-#' @slot nDistinctUpper upper bound for number of distinct values
+#' @slot uniqValueBound upper bound for number of distinct values
 #' @export
-DataSource = setClass("DataSource", slots = c(varName = "character", nDistinctUpper = "numeric"))
+DataSource = setClass("DataSource", slots = c(varName = "character", uniqValueBound = "numeric"))
 
 
 #' Data Unspecified

@@ -8,3 +8,11 @@
 \description{
 Abstract Base Class For Data Descriptions
 }
+\section{Slots}{
+
+\describe{
+\item{\code{varName}}{name of the variable in the code}
+
+\item{\code{uniqValueBound}}{upper bound for number of distinct values}
+}}
+

@@ -1,13 +1,14 @@
 library(makeParallel)
 
-# Implementation note- regarding the functions in strings, the code generator can check for :: in the string and generate a call instead of a symbol.
+# Implementation note- regarding the functions in strings, the code generator can check for :: in the string and generate a call to `::` instead of a symbol.
 # We don't want to inline package functions in generated code because they may use package internal objects, as in this case.
+# It's also messy.
 
 medianReduce = reduceFun("median"
     , summary = "table"
     , combine = "makeParallel::combine_tables"
     , query = function(s) 100
-    , predicate = function(r) !is.null(r$fewDistinct) && r$fewDistinct
+    , predicate = function(r) !is.null(r$uniqValueBound) && r$uniqValueBound < 1000
     )
 
 files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE)
@@ -19,7 +20,7 @@ x_desc = ChunkDataFiles(varName = "x0"
     , files = files
 	, sizes = sizes
 	, readFuncName = "readRDS"
-    , fewDistinct = TRUE
+    , uniqValueBound = 500
     )
 
 outFile = "gen/median_reduce.R"

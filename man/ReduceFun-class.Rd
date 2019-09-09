@@ -12,5 +12,8 @@ Abstract base class for reducible function implementations
 
 \describe{
 \item{\code{reduce}}{name of a reducible function}
+
+\item{\code{predicate}}{function that takes in a resource and returns TRUE if this particular resource can be reduced using this ReduceFun, and FALSE otherwise.
+TODO: Define resource and make it more user accessible if users are expected to compute on it.}
 }}
 
