@@ -4,14 +4,17 @@ library(makeParallel)
 # We don't want to inline package functions in generated code because they may use package internal objects, as in this case.
 # It's also messy.
 
+tableMedian = function(tbl){
+}
+
 medianReduce = reduceFun("median"
     , summary = "table"
     , combine = "makeParallel::combine_tables"
-    , query = ".NotYetImplemented"              # TODO: Implement
+    , query = tableMedian
     , predicate = function(r) !is.null(r[["uniqueValueBound"]]) && r[["uniqueValueBound"]] < 1000
     )
 
-files = list.files("single_numeric_vector", pattern = "*.rds", full.names = TRUE)
+files = list.files("single_numeric_few_distinct", pattern = "*.rds", full.names = TRUE)
 
 # Can surely do this for the user
 sizes = file.info(files)[, "size"]
