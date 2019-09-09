@@ -304,7 +304,8 @@ SplitBlock = setClass("SplitBlock", contains = "ParallelBlock",
 #' Abstract base class for reducible function implementations
 #'
 #' @slot reduce name of a reducible function 
-ReduceFun = setClass("ReduceFun", slots = c(reduce = "character"))
+#' @slot predicate function that takes in a resource and returns TRUE if this particular resource can be reduced using this ReduceFun, and FALSE otherwise.
+ReduceFun = setClass("ReduceFun", slots = c(reduce = "character", predicate = "function"))
 
 
 #' Implementation for a reducible function using function names only

@@ -1,7 +1,10 @@
 library(makeParallel)
 
+# Implementation note- regarding the functions in strings, the code generator can check for :: in the string and generate a call instead of a symbol.
+# We don't want to inline package functions in generated code because they may use package internal objects, as in this case.
+
 medianReduce = reduceFun("median"
-    , summary = "base::table"
+    , summary = "table"
     , combine = "makeParallel::combine_tables"
     , query = function(s) 100
     , predicate = function(r) !is.null(r$fewDistinct) && r$fewDistinct
