@@ -112,6 +112,8 @@ findVarsToMove = function(node, resources, predicate = isChunked)
 {
     matches = rstatic::find_nodes(node, predicate, resources)
     out = sapply(matches, function(idx) node[[idx]]$ssa_name)
+    # Remove the NULLs
+    out = unique(do.call(c, out))
 
     if(length(out) == 0)
         # No chunked variables in this node.

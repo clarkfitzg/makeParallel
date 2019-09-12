@@ -55,7 +55,7 @@ setMethod("inferDataSourceFromCall", "read.fwf_Call", function(expr, ...)
     # It's more appealing to me to do that all at once, as well as we can, early in the analysis, because then we can use it everywhere after.
     # Otherwise, we're handling all these same corner cases over and over again.
 
-    # I can imagine an AlmostLiteral to represent all these 
+    # This is the same thing as identifying compile time constants.
 
     FixedWidthFiles(files = args$file$value
                     , widths = as.integer(args$widths$value)

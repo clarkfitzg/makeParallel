@@ -19,6 +19,9 @@ tableMedian = function(tbl){
 }
 
 
+# For someone to write a predicate function they need to know about how we've implemented resources and propagation.
+# This is bad for extensibility.
+
 medianReduce = reduceFun("median"
     , summary = "table"
     , combine = "makeParallel::combine_tables"

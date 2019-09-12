@@ -22,7 +22,7 @@ d1 = dataSource(quote(
     dt <- read.fwf('dates.txt', widths = 10L)
 ))
 
-# Discovered by makeParallel
+# Discovered in the original code by makeParallel
 d2 = dataSource(out)
 
 expect_equal(d0, d1)
