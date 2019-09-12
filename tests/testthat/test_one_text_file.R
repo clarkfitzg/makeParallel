@@ -15,7 +15,7 @@ print(range(d))
 if(identical(Sys.getenv("TESTTHAT"), "true")){
 
 # Manual specification
-d0 = FixedWidthFiles(varName = "dt", files = "dates.txt", widths = 10L)
+d0 = FixedWidthFiles(varName = "dt", files = "dates.txt", widths = 10L, readFuncName = "read.fwf")
 
 # Inference on a single call
 d1 = dataSource(quote(

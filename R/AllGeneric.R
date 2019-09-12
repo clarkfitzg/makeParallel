@@ -162,10 +162,15 @@ setGeneric("file<-", function(description, value)
            standardGeneric("file<-"))
 
 
-#' Infer Data Source Object
+#' Infer Or Extract Data Source Object
 #'
+#' @export
 #' @param x object to infer the data source from
 #' @param ... additional arguments to methods
 #' @return \linkS4class{DataSource} object
 setGeneric("dataSource", function(expr, ...)
            standardGeneric("dataSource"))
+
+
+setGeneric("inferDataSourceFromCall", function(expr, ...)
+           standardGeneric("inferDataSourceFromCall"))

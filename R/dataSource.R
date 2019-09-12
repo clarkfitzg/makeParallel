@@ -5,6 +5,50 @@ setMethod("dataSource", "expression", function(expr, ...)
 })
 
 
+setMethod("dataSource", "<-", function(expr, ...)
+{
+    callGeneric(rstatic::to_ast(expr), ...)
+})
+
+
+setOldClass("Assign")
+setMethod("dataSource", "Assign", function(expr, ...)
+{
+    lhs = expr$write$ssa_name
+    callGeneric(expr$read, varName = lhs, ...)
+})
+
+
+setOldClass("Call")
+setMethod("dataSource", "Call", function(expr, ...)
+{
+    # The data inference depends on the function that was called.
+    # So we can continue to dispatch, using the function name as the class.
+    # Nevermind, that's crazy, I'm setting myself up for infinite recursion if we don't have a method implemented.
+    # I need to use a different function.
+
+    func_class = paste0(expr$fn$ssa_name, "_Call")
+    class(expr) = c(func_class, class(expr))
+
+    inferDataSourceFromCall(expr, ...)
+})
+
+
+setMethod("inferDataSourceFromCall", "ANY", function(expr, ...)
+{
+    stop("No method yet implemented to infer a data source from this function: ", expr)
+})
+
+
+setOldClass("read.fwf_Call")
+setMethod("inferDataSourceFromCall", "read.fwf_Call", function(expr, ...)
+{
+    "TODO: Implement me."
+})
+
+
+
+
 # Given a single call that loads data, return a DataSource object.
 
 #' @export

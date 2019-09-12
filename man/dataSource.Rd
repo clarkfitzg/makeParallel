@@ -2,7 +2,7 @@
 % Please edit documentation in R/AllGeneric.R
 \name{dataSource}
 \alias{dataSource}
-\title{Infer Data Source Object}
+\title{Infer Or Extract Data Source Object}
 \usage{
 dataSource(expr, ...)
 }
@@ -15,5 +15,5 @@ dataSource(expr, ...)
 \linkS4class{DataSource} object
 }
 \description{
-Infer Data Source Object
+Infer Or Extract Data Source Object
 }
