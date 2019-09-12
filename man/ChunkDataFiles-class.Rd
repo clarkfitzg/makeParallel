@@ -4,7 +4,7 @@
 \name{ChunkDataFiles-class}
 \alias{ChunkDataFiles-class}
 \alias{ChunkDataFiles}
-\title{Many Files Representing One Object}
+\title{One or More Files Representing One Object}
 \description{
-Many Files Representing One Object
+One or More Files Representing One Object
 }

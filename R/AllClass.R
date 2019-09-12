@@ -119,7 +119,7 @@ ChunkDataFiles = setClass("ChunkDataFiles", contains = "DataSource",
 #' One or More Files Representing One Data Frame
 #'
 #' @exportClass DataFrameFiles
-DataFrameFiles = setClass("FixedWidthFiles", contains = "ChunkDataFiles",
+DataFrameFiles = setClass("DataFrameFiles", contains = "ChunkDataFiles",
     slots = c(col.names = "character", header = "logical"))
 
 
@@ -128,7 +128,7 @@ DataFrameFiles = setClass("FixedWidthFiles", contains = "ChunkDataFiles",
 #' @export FixedWidthFiles
 #' @exportClass FixedWidthFiles
 FixedWidthFiles = setClass("FixedWidthFiles", contains = "DataFrameFiles",
-    slots = c(widths = integer))
+    slots = c(widths = "integer"))
 
 
 

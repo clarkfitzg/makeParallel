@@ -10,6 +10,7 @@ generated_code_matches = function(input, expected)
 
 test_that("Basic transformation to parallel", {
 
+    skip("plan to deprecate")
     generated_code_matches(lapply(f, x)
         , parallel::mclapply(f, x))
 
@@ -21,6 +22,7 @@ test_that("Basic transformation to parallel", {
 
 test_that("Nested parallelism", {
 
+    skip("plan to deprecate")
     generated_code_matches(lapply(lapply(x, f), g)
         , parallel::mclapply(lapply(x, f), g))
 
