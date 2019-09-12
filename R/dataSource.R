@@ -24,8 +24,10 @@ setMethod("dataSource", "Call", function(expr, ...)
 {
     # The data inference depends on the function that was called.
     # So we can continue to dispatch, using the function name as the class.
-    # Nevermind, that's crazy, I'm setting myself up for infinite recursion if we don't have a method implemented.
+    # Nevermind, that's crazy, I'm setting myself up for infinite recursion.
     # I need to use a different function.
+
+    expr = rstatic::match_call(expr)
 
     func_class = paste0(expr$fn$ssa_name, "_Call")
     class(expr) = c(func_class, class(expr))
@@ -43,9 +45,22 @@ setMethod("inferDataSourceFromCall", "ANY", function(expr, ...)
 setOldClass("read.fwf_Call")
 setMethod("inferDataSourceFromCall", "read.fwf_Call", function(expr, ...)
 {
-    "TODO: Implement me."
-})
+    args = expr$args$contents
 
+    # Taking the value of the arguments assumes they are string literal.
+    # True after constant propagation.
+    # It could also be something like list.files()
+    # Or widths = c(10, 20), which is almost a string literal.
+    # If we have all the resources then we could use that for constant propagation, and for evaluating and storing those simple objects where we actually have the values.
+    # It's more appealing to me to do that all at once, as well as we can, early in the analysis, because then we can use it everywhere after.
+    # Otherwise, we're handling all these same corner cases over and over again.
+
+    # I can imagine an AlmostLiteral to represent all these 
+
+    FixedWidthFiles(files = args$file$value
+                    , widths = as.integer(args$widths$value)
+                    , ...)
+})
 
 
 
