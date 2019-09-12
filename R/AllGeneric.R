@@ -173,3 +173,12 @@ setGeneric("writeCode", function(code, file, ...)
 #' @param value file name to associate with object
 setGeneric("file<-", function(description, value)
            standardGeneric("file<-"))
+
+
+#' Infer Data Source Object
+#'
+#' @param x object to infer the data source from
+#' @param ... additional arguments to methods
+#' @return \linkS4class{DataSource} object
+setGeneric("inferDataSource", function(expr, ...)
+           standardGeneric("inferDataSource"))

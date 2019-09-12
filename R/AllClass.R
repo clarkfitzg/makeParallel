@@ -88,11 +88,15 @@ UnixPlatform = setClass("UnixPlatform",
 
 # Data Descriptions
 ############################################################
+# These aren't so different from what I've been thinking of as resources, chunked R objects.
+# I could put both into the same class hierarchy.
+# But I'll wait until it seems more compelling.
 
 #' Abstract Base Class For Data Descriptions
 #'
 #' @slot varName name of the variable in the code
-#' @slot uniqueValueBound upper bound for number of distinct values
+#' @slot uniqueValueBound upper bound for number of distinct values.
+#'      TODO: Define what this means for tables and vectors.
 #' @export
 DataSource = setClass("DataSource", slots = c(varName = "character", uniqueValueBound = "numeric"))
 
@@ -101,17 +105,31 @@ DataSource = setClass("DataSource", slots = c(varName = "character", uniqueValue
 NoDataSource = setClass("NoDataSource", contains = "DataSource")
 
 
-#' Many Files Representing One Object
+#' One or More Files Representing One Object
 #'
 #' @export ChunkDataFiles
 #' @exportClass ChunkDataFiles
-ChunkDataFiles = setClass("ChunkDataFiles"
-    , slots = c(files = "character"
-                , sizes = "numeric"
-                , readFuncName = "character"
-                )
-    , contains = "DataSource"
-    )
+ChunkDataFiles = setClass("ChunkDataFiles", contains = "DataSource",
+    slots = c(files = "character"
+              , sizes = "numeric"
+              , readFuncName = "character"
+              ))
+
+
+#' One or More Files Representing One Data Frame
+#'
+#' @exportClass DataFrameFiles
+DataFrameFiles = setClass("FixedWidthFiles", contains = "ChunkDataFiles",
+    slots = c(col.names = "character", header = "logical"))
+
+
+#' A Collection Of One Or More Fixed Width Files
+#'
+#' @export FixedWidthFiles
+#' @exportClass FixedWidthFiles
+FixedWidthFiles = setClass("FixedWidthFiles", contains = "DataFrameFiles",
+    slots = c(widths = integer))
+
 
 
 # #' @export ChunkLoadFunc
@@ -134,58 +152,57 @@ ChunkDataFiles = setClass("ChunkDataFiles"
 # })
 
 
-
 # Thu Aug  8 14:50:39 PDT 2019
 # The data descriptions that follow seem to use the expanding expression idea, which I've now abandoned.
-
-
-#' Chunked Data Source defined by R expressions
-#'
-#' Contains information necessary to load chunks of data into an R session.
-#'
-#' @export
-#' @slot expr expression such that evaluating \code{expr[[i]]} produces the ith chunk of data.
-#'      May requires evaluating parent expressions first.
-#' @slot varname character variable name in the original code
-#' @slot mangledNames names of each chunk of data
-#' @slot collector name of a function to call to collect all the chunks into one object
-#' @slot collected for internal use with \code{expandData}
-ExprChunkData = setClass("ExprChunkData"
-    , slots = c(expr = "expression"
-                , varname = "character"
-                , mangledNames = "character"
-                , collector = "character"
-                , collected = "logical"
-                )
-    , contains = "DataSource"
-    )
-
-
-#' Chunked Tables
-#'
-#' @export
-#' @slot columns names of the columns
-#' @slot splitColumn name of the columns by which the data is split.
-#'      \code{NA} means no split.
-TableChunkData = setClass("TableChunkData"
-    , slots = c(columns = "character"
-                , splitColumn = "character"
-                )
-    , contains = "ExprChunkData"
-    )
-
-
-#' Description of Data Files
-#'
-#' Contains information necessary to generate a call to read in these data files
-#'
-#' @export
-#' @slot files absolute paths to all the files
-#' @slot readDetails list of details to help efficiently and correctly read in the data
-TextTableFiles = setClass("TextTableFiles"
-    , slots = c(files = "character", readDetails = "list")
-    , contains = "TableChunkData"
-)
+# 
+# 
+# #' Chunked Data Source defined by R expressions
+# #'
+# #' Contains information necessary to load chunks of data into an R session.
+# #'
+# #' @export
+# #' @slot expr expression such that evaluating \code{expr[[i]]} produces the ith chunk of data.
+# #'      May requires evaluating parent expressions first.
+# #' @slot varname character variable name in the original code
+# #' @slot mangledNames names of each chunk of data
+# #' @slot collector name of a function to call to collect all the chunks into one object
+# #' @slot collected for internal use with \code{expandData}
+# ExprChunkData = setClass("ExprChunkData"
+#     , slots = c(expr = "expression"
+#                 , varname = "character"
+#                 , mangledNames = "character"
+#                 , collector = "character"
+#                 , collected = "logical"
+#                 )
+#     , contains = "DataSource"
+#     )
+# 
+# 
+# #' Chunked Tables
+# #'
+# #' @export
+# #' @slot columns names of the columns
+# #' @slot splitColumn name of the columns by which the data is split.
+# #'      \code{NA} means no split.
+# TableChunkData = setClass("TableChunkData"
+#     , slots = c(columns = "character"
+#                 , splitColumn = "character"
+#                 )
+#     , contains = "ExprChunkData"
+#     )
+# 
+# 
+# #' Description of Data Files
+# #'
+# #' Contains information necessary to generate a call to read in these data files
+# #'
+# #' @export
+# #' @slot files absolute paths to all the files
+# #' @slot readDetails list of details to help efficiently and correctly read in the data
+# TextTableFiles = setClass("TextTableFiles"
+#     , slots = c(files = "character", readDetails = "list")
+#     , contains = "TableChunkData"
+# )
  
 
 # Schedules

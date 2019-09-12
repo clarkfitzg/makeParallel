@@ -3,7 +3,7 @@
 library(makeParallel)
 
 out = makeParallel("
-dt = read.fwf('dates.txt', widths = 10)
+dt = read.fwf('dates.txt', widths = 10L)
 d = as.Date(vals[, 1])
 print(range(d))
 ", scheduler = scheduleDataParallel
@@ -14,6 +14,19 @@ print(range(d))
 ############################################################
 if(identical(Sys.getenv("TESTTHAT"), "true")){
 
-# Verify that the DataSource is correctly inferred.
+# Manual specification
+d0 = FixedWidthFiles(varName = "dt", files = "dates.txt", widths = 10L)
+
+# Inference on a single call
+d1 = inferDataSource(quote(
+    dt <- read.fwf('dates.txt', widths = 10L)
+))
+
+# Discovered by makeParallel
+d2 = dataSource(out)
+
+expect_equal(d0, d1)
+
+expect_equal(d0, d2)
 
 } 
