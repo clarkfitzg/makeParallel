@@ -18,7 +18,7 @@ if(identical(Sys.getenv("TESTTHAT"), "true")){
 d0 = FixedWidthFiles(varName = "dt", files = "dates.txt", widths = 10L)
 
 # Inference on a single call
-d1 = inferDataSource(quote(
+d1 = dataSource(quote(
     dt <- read.fwf('dates.txt', widths = 10L)
 ))
 

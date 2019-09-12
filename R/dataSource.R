@@ -1,4 +1,4 @@
-setMethod("inferDataSource", "expression", function(expr, ...)
+setMethod("dataSource", "expression", function(expr, ...)
 {
     warning("Data source inference not yet implemented.")
     NoDataSource()

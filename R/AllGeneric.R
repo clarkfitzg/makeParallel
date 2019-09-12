@@ -75,19 +75,6 @@ setMethod("schedule", "GeneratedCode", function(graph, data, platform, ...)
 })
 
 
-#' Describe Data Source
-#'
-#' Creates and returns an object of class DataSource
-#'
-#' @export
-#' @param expr code or function to load chunks of the data
-#' @param args list of arguments to function
-#' @param varname name of the variable in the source code
-#' @rdname dataSource
-#' @param ... additional arguments to methods
-setGeneric("dataSource", function(expr, args, varname, ...)
-           standardGeneric("dataSource"))
-
 
 #' Expand Data
 #'
@@ -180,5 +167,5 @@ setGeneric("file<-", function(description, value)
 #' @param x object to infer the data source from
 #' @param ... additional arguments to methods
 #' @return \linkS4class{DataSource} object
-setGeneric("inferDataSource", function(expr, ...)
-           standardGeneric("inferDataSource"))
+setGeneric("dataSource", function(expr, ...)
+           standardGeneric("dataSource"))

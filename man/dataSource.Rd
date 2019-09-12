@@ -2,19 +2,18 @@
 % Please edit documentation in R/AllGeneric.R
 \name{dataSource}
 \alias{dataSource}
-\title{Describe Data Source}
+\title{Infer Data Source Object}
 \usage{
-dataSource(expr, args, varname, ...)
+dataSource(expr, ...)
 }
 \arguments{
-\item{expr}{code or function to load chunks of the data}
-
-\item{args}{list of arguments to function}
-
-\item{varname}{name of the variable in the source code}
-
 \item{...}{additional arguments to methods}
+
+\item{x}{object to infer the data source from}
+}
+\value{
+\linkS4class{DataSource} object
 }
 \description{
-Creates and returns an object of class DataSource
+Infer Data Source Object
 }

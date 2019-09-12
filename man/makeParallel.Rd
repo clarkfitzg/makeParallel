@@ -6,10 +6,9 @@
 \usage{
 makeParallel(code, isFile = file.exists(code), expr = if (isFile)
   parse(code, keep.source = TRUE) else parse(text = code, keep.source =
-  FALSE), data = inferDataSource(expr),
-  nWorkers = parallel::detectCores(), platform = Platform(nWorkers =
-  nWorkers), graph = inferGraph(expr), run = FALSE,
-  scheduler = schedule, ..., generator = generate,
+  FALSE), data = dataSource(expr), nWorkers = parallel::detectCores(),
+  platform = Platform(nWorkers = nWorkers), graph = inferGraph(expr),
+  run = FALSE, scheduler = schedule, ..., generator = generate,
   generatorArgs = list(), outFile = FALSE, prefix = "gen_",
   overWrite = FALSE)
 }
