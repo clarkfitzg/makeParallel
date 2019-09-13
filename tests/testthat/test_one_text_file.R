@@ -22,7 +22,6 @@ d1 = dataSource(quote(
     dt <- read.fwf('dates.txt', widths = 10L)
 ))
 
-
 inferDataSourceFromCall.read.csv_Call = function(expr, ...) "Boom!"
 
 tst = dataSource(quote(

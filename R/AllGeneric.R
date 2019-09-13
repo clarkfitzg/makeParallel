@@ -172,5 +172,6 @@ dataSource = function(expr, ...)
     UseMethod("dataSource")
 
 
+#' @export
 inferDataSourceFromCall = function(expr, ...)
     UseMethod("inferDataSourceFromCall")

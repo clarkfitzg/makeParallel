@@ -1,3 +1,4 @@
+#' @export
 dataSource.expression = function(expr, ...)
 {
     warning("Data source inference not yet implemented.")
@@ -5,6 +6,7 @@ dataSource.expression = function(expr, ...)
 }
 
 
+#' @export
 `dataSource.<-` = function(expr, ...)
 {
     callGeneric(rstatic::to_ast(expr), ...)
@@ -34,6 +36,7 @@ dataSource.expression = function(expr, ...)
 }
 
 
+#' @export
 inferDataSourceFromCall.default = function(expr, ...)
 {
     stop("No method yet implemented to infer a data source from this function call: ", utils::capture.output(rstatic::as_language(expr)))
