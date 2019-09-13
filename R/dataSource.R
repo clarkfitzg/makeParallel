@@ -1,26 +1,24 @@
-setMethod("dataSource", "expression", function(expr, ...)
+dataSource.expression = function(expr, ...)
 {
     warning("Data source inference not yet implemented.")
     NoDataSource()
-})
+}
 
 
-setMethod("dataSource", "<-", function(expr, ...)
+`dataSource.<-` = function(expr, ...)
 {
     callGeneric(rstatic::to_ast(expr), ...)
-})
+}
 
 
-setOldClass("Assign")
-setMethod("dataSource", "Assign", function(expr, ...)
+`dataSource.Assign` = function(expr, ...)
 {
     lhs = expr$write$ssa_name
     callGeneric(expr$read, varName = lhs, ...)
-})
+}
 
 
-setOldClass("Call")
-setMethod("dataSource", "Call", function(expr, ...)
+`dataSource.Call` = function(expr, ...)
 {
     # The data inference depends on the function that was called.
     # So we can continue to dispatch, using the function name as the class.
@@ -33,17 +31,16 @@ setMethod("dataSource", "Call", function(expr, ...)
     class(expr) = c(func_class, class(expr))
 
     inferDataSourceFromCall(expr, ...)
-})
+}
 
 
-setMethod("inferDataSourceFromCall", "ANY", function(expr, ...)
+inferDataSourceFromCall.default = function(expr, ...)
 {
-    stop("No method yet implemented to infer a data source from this function: ", expr)
-})
+    stop("No method yet implemented to infer a data source from this function call: ", utils::capture.output(rstatic::as_language(expr)))
+}
 
 
-setOldClass("read.fwf_Call")
-setMethod("inferDataSourceFromCall", "read.fwf_Call", function(expr, ...)
+inferDataSourceFromCall.read.fwf_Call = function(expr, ...)
 {
     args = expr$args$contents
 
@@ -60,7 +57,7 @@ setMethod("inferDataSourceFromCall", "read.fwf_Call", function(expr, ...)
     FixedWidthFiles(files = args$file$value
                     , widths = as.integer(args$widths$value)
                     , ...)
-})
+}
 
 
 

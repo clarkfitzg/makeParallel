@@ -22,6 +22,14 @@ d1 = dataSource(quote(
     dt <- read.fwf('dates.txt', widths = 10L)
 ))
 
+
+inferDataSourceFromCall.read.csv_Call = function(expr, ...) "Boom!"
+
+tst = dataSource(quote(
+    dt <- read.csv('dates.txt', widths = 10L)
+))
+
+
 # Discovered in the original code by makeParallel
 d2 = dataSource(out)
 

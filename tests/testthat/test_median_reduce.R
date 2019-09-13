@@ -18,9 +18,17 @@ tableMedian = function(tbl){
     as.numeric(med)
 }
 
+# Could generalize this with quantile through preprocessing instead of specifying all the reduces:
+# Change median -> quantile, which is more general
+# Could also change two or more calls into one:
+# iqr = c(quantile(x, 0.25), mean(x), quantile(x, 0.75))
+
+# There's a whole class of statistics that can be computed from a table.
+# More generally, could return and estimate statistics from a KDE
 
 # For someone to write a predicate function they need to know about how we've implemented resources and propagation.
 # This is bad for extensibility.
+# Other idea: cost
 
 medianReduce = reduceFun("median"
     , summary = "table"
@@ -28,6 +36,12 @@ medianReduce = reduceFun("median"
     , query = tableMedian
     , predicate = function(r) !is.null(r[["uniqueValueBound"]]) && r[["uniqueValueBound"]] < 1000
     )
+
+# quantile(x, 0.5) 
+# quantile(a, 0.5) # few unique values
+# quantile(b, 0.5) # only care about approximation
+# Could imagine user declaring that they only need a specified amount of precision for some calculation, and using a different implementation.
+# makeParallel(..., precision = c(x = 0.99))
 
 files = list.files("single_numeric_few_distinct", pattern = "*.rds", full.names = TRUE)
 
