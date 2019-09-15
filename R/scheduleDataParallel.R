@@ -244,9 +244,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     r0 = list(chunked = TRUE, varName = data@varName, uniqueValueBound = data@uniqueValueBound)
     resources[[data_id]] = r0
 
-    ast = rstatic::to_ast(graph@code)
-    if(!is(ast, "Brace"))
-        stop("AST has unexpected form.")
+    ast = canonical_ast(graph@code)
 
     names(reduceFuncs) = sapply(reduceFuncs, slot, "reduce")
 
