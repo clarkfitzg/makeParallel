@@ -138,6 +138,11 @@ update_resource.Call = function(node, name_resource, resources, namer
     # If the call is to a vectorized function, and any of the arguments to that function are chunked objects, then the result is a chunked object.
     # A more robust version will match on argument names, but for this we will need the argument list to be named.
 
+    # Call matching should ideally happen in a different preprocessing step, because it's useful in many places.
+    # To make this robust we need to have access to the functions in package code and handle user defined functions.
+    # I'm using the try() to ignore those cases.
+    try(node$args <- rstatic::match_call(node)$args)
+
     fname = node$fn$value
 
     chunkableArgs = sapply(node$args$contents, isChunked, resources = resources)
@@ -154,13 +159,9 @@ update_resource.Call = function(node, name_resource, resources, namer
 
     if(fname == "split"){
 
-        #split_call = rstatic::match_call(node, split)
-        # Call matching needs to happen in a preprocessing step, because it's useful in many places.
-        # Assume that it has happened here.
-        # If it didn't, then hopefully the following lines will throw an error!
 
-        IDsplit_x = resource_id(node$args$contents$x)
-        IDsplit_f = resource_id(node$args$contents$f)
+        IDsplit_x = resource_id(node$args$contents[["x"]])
+        IDsplit_f = resource_id(node$args$contents[["f"]])
 
         # Adding these resource IDs in here as values means that resources refers to itself.
         # It's getting to be a fairly complicated self referential data structure.
