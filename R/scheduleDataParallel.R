@@ -111,7 +111,7 @@ greedy_assign = function(tasktimes, w)
 findVarsToMove = function(node, resources, predicate = isChunked)
 {
     matches = rstatic::find_nodes(node, predicate, resources)
-    out = sapply(matches, function(idx) node[[idx]]$ssa_name)
+    out = lapply(matches, function(idx) node[[idx]]$ssa_name)
     # Remove the NULLs
     out = unique(do.call(c, out))
 
