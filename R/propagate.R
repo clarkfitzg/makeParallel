@@ -143,11 +143,6 @@ update_resource.Call = function(node, name_resource, resources, namer
     # If the call is to a vectorized function, and any of the arguments to that function are chunked objects, then the result is a chunked object.
     # A more robust version will match on argument names, but for this we will need the argument list to be named.
 
-    # Call matching should ideally happen in a different preprocessing step, because it's useful in many places.
-    # To make this robust we need to have access to the functions in package code and handle user defined functions.
-    # I'm using the try() to ignore those cases.
-    try(node$args <- rstatic::match_call(node)$args)
-
     fname = node$fn$value
 
     chunkableArgs = sapply(node$args$contents, isChunked, resources = resources)
