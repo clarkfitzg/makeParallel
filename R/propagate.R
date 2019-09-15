@@ -75,7 +75,12 @@ propagate = function(node, name_resource, resources, namer, ...)
     # This is different from the conventional DFS / BFS.
     # We can implement this by making sure all the children have their resource_id's set
     for(child in rstatic::children(node)){
-        Recall(child, name_resource, resources, namer, ...)
+        # Walk everything except user defined functions.
+        if(is(child, "Function")){
+            update_resource(child, name_resource, resources, namer, ...)
+        } else {
+            Recall(child, name_resource, resources, namer, ...)
+        }
     }
     # This guarantees the children all have resources, so we can proceed to this node.
     update_resource(node, name_resource, resources, namer, ...)
