@@ -202,11 +202,11 @@ namer_factory = function(basename = "r"){
 }
 
 
-resource_id = function(node) node$.data[["resource_id"]]
+resource_id = function(node) node[[".data"]][["resource_id"]]
 
 
 `resource_id<-` = function(node, value){
-    node$.data[["resource_id"]] = value
+    node[[".data"]][["resource_id"]] = value
     node
 }
 
