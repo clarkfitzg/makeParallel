@@ -12,6 +12,15 @@ canonical_ast = function(code)
         b$contents = ast
         ast = b
     }
-    rstatic::replace_nodes(ast, match_call_if_possible)
+    rstatic::replace_nodes(ast, match_call_if_possible, in_place = TRUE)
     ast
+}
+
+
+if(FALSE){
+
+    library(rstatic)
+    a = quote_ast(split(a, b))
+    ac = canonical_ast(a)
+
 }

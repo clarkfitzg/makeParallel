@@ -32,22 +32,3 @@ out = makeParallel("pems.R"
 )
 
 s = schedule(out)
-
-if(FALSE){
-
-    # debugging propagate.
-
-library(makeParallel)
-library(rstatic)
-
-#a = quote_ast(c("a", "b", "c"))
-a = quote_ast(c(a, b, c))
-name_resource = new.env()
-resources = new.env()
-namer = makeParallel:::namer_factory()
-
-makeParallel:::propagate(a, name_resource, resources, namer)
-
-makeParallel:::propagate(a$args, name_resource, resources, namer)
-
-}
