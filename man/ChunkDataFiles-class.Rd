@@ -3,7 +3,6 @@
 \docType{class}
 \name{ChunkDataFiles-class}
 \alias{ChunkDataFiles-class}
-\alias{ChunkDataFiles}
 \title{One or More Files Representing One Object}
 \description{
 One or More Files Representing One Object

@@ -107,9 +107,8 @@ NoDataSource = setClass("NoDataSource", contains = "DataSource")
 
 #' One or More Files Representing One Object
 #'
-#' @export ChunkDataFiles
-#' @exportClass ChunkDataFiles
-ChunkDataFiles = setClass("ChunkDataFiles", contains = "DataSource",
+#' @export
+setClass("ChunkDataFiles", contains = "DataSource",
     slots = c(files = "character"
               , sizes = "numeric"
               , readFuncName = "character"

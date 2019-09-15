@@ -13,18 +13,16 @@ files = list.files("~/data/pems"
                    , pattern = "d04_text_station_raw_2016_08_2*"
                    , full.names = TRUE
                    )
-sizes = file.info(files)[, "size"]
 
-x_desc = ChunkDataFiles(varName = "x"
+pems_data = ChunkDataFiles(varName = "pems"
     , files = files
-    , sizes = sizes
     , readFuncName = "read.csv"
     )
 
 outFile = "gen2.R"
 
 out = makeParallel("pems.R"
-, data = x_desc
+, data = pems_data
 , nWorkers = 2L
 , scheduler = scheduleDataParallel
 , platform = parallelLocalCluster()
@@ -33,6 +31,7 @@ out = makeParallel("pems.R"
 , overWrite = TRUE
 )
 
+s = schedule(out)
 
 if(FALSE){
 

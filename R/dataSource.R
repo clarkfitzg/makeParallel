@@ -1,3 +1,20 @@
+#' Constructor for ChunkDataFiles
+#'
+#' @export
+ChunkDataFiles = function(files, sizes = file.info(files)$size
+                          , readFuncName = inferReadFuncFromFile(files[1]), ...)
+{
+    new("ChunkDataFiles", files = files, sizes = sizes, readFuncName = "character", ...)
+}
+
+
+#' Attempt to infer the type of a file.
+inferReadFuncFromFile = function(fname)
+{
+    .NotYetImplemented()
+}
+
+
 #' @export
 dataSource.expression = function(expr, ...)
 {
