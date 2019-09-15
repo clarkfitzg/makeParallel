@@ -157,11 +157,13 @@ update_resource.Call = function(node, name_resource, resources, namer
     # We'll need to carefully explain the resources for users to be able to extend it.
 
 
-    if(fname == "split"){
-
+    if(fname == "split" && hasChunkArgs){
 
         IDsplit_x = resource_id(node$args$contents[["x"]])
         IDsplit_f = resource_id(node$args$contents[["f"]])
+
+        if(is.null(IDsplit_x) || is.null(IDsplit_f))
+            stop("Cannot find resources in split call.")
 
         # Adding these resource IDs in here as values means that resources refers to itself.
         # It's getting to be a fairly complicated self referential data structure.
