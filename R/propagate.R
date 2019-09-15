@@ -209,18 +209,25 @@ resource_id = function(node) node[[".data"]][["resource_id"]]
 # The resource that corresponds to a node, or NULL if none exists
 get_resource = function(node, resources)
 {
-    resources[[resource_id(node)]]
+    id = resource_id(node)
+    if(is.null(id)) NULL else resources[[id]]
 }
 
 
 # Check if the resource associated with a node is chunked or not
-isChunked = function(node, resources) get_resource(node, resources)$chunked
+isChunked = function(node, resources)
+{
+    r = get_resource(node, resources)
+    if(is.null(r)) FALSE else r$chunked
+}
 
 
 # Check if the resource associated with a node has been locally assigned, and is not chunked
 isLocalNotChunked = function(node, resources)
 {
     r = get_resource(node, resources)
+    if(is.null(r))
+        return(FALSE)
     !is.null(r$assigned) && r$assigned && !r$chunked 
 }
 
