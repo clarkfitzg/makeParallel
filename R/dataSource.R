@@ -4,7 +4,7 @@
 ChunkDataFiles = function(files, sizes = file.info(files)$size
                           , readFuncName = inferReadFuncFromFile(files[1]), ...)
 {
-    new("ChunkDataFiles", files = files, sizes = sizes, readFuncName = "character", ...)
+    new("ChunkDataFiles", files = files, sizes = sizes, readFuncName = readFuncName, ...)
 }
 
 

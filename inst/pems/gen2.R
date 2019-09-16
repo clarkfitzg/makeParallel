@@ -1,5 +1,5 @@
 {
-    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-15 16:35:16")
+    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-15 17:12:18")
     library(parallel)
     assignments = c(1, 2, 1, 2)
     nWorkers = 2
@@ -16,7 +16,7 @@
     clusterEvalQ(cls, {
         read_args = c("/Users/clark/data/pems/d04_text_station_raw_2016_08_22.txt.gz", "/Users/clark/data/pems/d04_text_station_raw_2016_08_23.txt.gz", "/Users/clark/data/pems/d04_text_station_raw_2016_08_24.txt.gz", "/Users/clark/data/pems/d04_text_station_raw_2016_08_25.txt.gz")
         read_args = read_args[assignments]
-        chunks = lapply(read_args, character)
+        chunks = lapply(read_args, read.csv)
         pems = do.call(c, chunks)
         NULL
     })

@@ -94,11 +94,13 @@ UnixPlatform = setClass("UnixPlatform",
 
 #' Abstract Base Class For Data Descriptions
 #'
+#'
 #' @slot varName name of the variable in the code
 #' @slot uniqueValueBound upper bound for number of distinct values.
 #'      TODO: Define what this means for tables and vectors.
 #' @export
-DataSource = setClass("DataSource", slots = c(varName = "character", uniqueValueBound = "numeric"))
+DataSource = setClass("DataSource", slots = c(varName = "character", uniqueValueBound = "numeric"
+              , columns = "character"))
 
 
 #' Data Unspecified
@@ -117,9 +119,12 @@ setClass("ChunkDataFiles", contains = "DataSource",
 
 #' One or More Files Representing One Data Frame
 #'
+#' Slots correspond to arguments in read.table
+#'
+#' @export DataFrameFiles
 #' @exportClass DataFrameFiles
 DataFrameFiles = setClass("DataFrameFiles", contains = "ChunkDataFiles",
-    slots = c(col.names = "character", header = "logical"))
+    slots = c(col.names = "character", header = "logical", colClasses = "character"))
 
 
 #' A Collection Of One Or More Fixed Width Files
