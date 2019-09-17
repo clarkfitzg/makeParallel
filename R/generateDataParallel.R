@@ -59,11 +59,11 @@ localInitBlock = function(schedule, platform
         , message = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
         , template = as.expression(body(TEMPLATE_ParallelLocalCluster_InitBlock))
         , ...){
-    substitute_language(template, list(`_MESSAGE` = message
+    substitute_language(template, `_MESSAGE` = message
         , `_NWORKERS` = platform@nWorkers
         , `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
         , `_CLUSTER_NAME` = as.symbol(platform@name)
-        ))
+        )
 }
 
 
@@ -87,12 +87,12 @@ function(schedule, platform, data
     # Stick the lapply call in
     template = substitute_language(template, `_LAPPLY_CALL` = quote(lapply(read_args, `_READ_FUNC`)))
 
-    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+    substitute_language(template, `_CLUSTER_NAME` = as.symbol(platform@name)
         , `_READ_ARGS` = data@files
         , `_READ_FUNC` = as.symbol(data@readFuncName)
         , `_DATA_VARNAME` = as.symbol(data@varName)
         , `_COMBINE_FUNC` = combine_func
-        ))
+        )
 })
 
 
@@ -119,12 +119,12 @@ function(schedule, platform, data
     # Should be fine though.
     template = substitute_language(template, `_LAPPLY_CALL` = lapply_call)
 
-    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+    substitute_language(template, `_CLUSTER_NAME` = as.symbol(platform@name)
         , `_READ_ARGS` = data@files
         , `_READ_FUNC` = as.symbol(data@readFuncName)
         , `_DATA_VARNAME` = as.symbol(data@varName)
         , `_COMBINE_FUNC` = combine_func
-        ))
+        )
 })
 
 

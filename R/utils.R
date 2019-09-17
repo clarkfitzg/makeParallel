@@ -174,7 +174,7 @@ as.expression.ASTNode = function(x)
 }
 
 
-substitute_language2 = function(expr, env, ast = rstatic::to_ast(expr))
+substitute_language2 = function(expr, ..., env = list(...), ast = rstatic::to_ast(expr))
 {
     replacer = function(node){
         if(is(node, "Symbol") && node$value %in% names(env)){
