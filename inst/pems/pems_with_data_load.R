@@ -1,6 +1,7 @@
 # This is the high level code that I would *like* to run. It won't work
 # because it will run out of memory
 
+old_time = Sys.time()
 
 dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.01)
 {
@@ -51,13 +52,7 @@ npbin = function(x)
 # - Apply a function to each group
 # - Write the result
 
-# We'll generate the reading code
-
-# From this line we can infer that we only need these 3 columns.
-# How do we know for sure?
-# Because it writes over the pems variable.
-# I wrote code to do this in the CodeAnalysis package.
-files = list.files("data", full.names = TRUE)
+files = list.files("/scratch/clarkf/pems/district4/", full.names = TRUE)
 
 col.names = c("timeperiod", "station"
     , "flow1", "occupancy1", "speed1"
@@ -82,14 +77,35 @@ colClasses = columns = c(timeperiod = "NULL", station = "integer"
     )
 
 pems = lapply(files, read.csv, col.names = col.names, colClasses = colClasses)
+
+new_time = Sys.time()
+message(sprintf("read in files: %g seconds", new_time - old_time))
+old_time = new_time
+
 pems = do.call(rbind, pems)
  
+new_time = Sys.time()
+message(sprintf("rbind: %g seconds", new_time - old_time))
+old_time = new_time
+
 # The data description will tell us if the data starts grouped by the "station" column
 station = pems[, "station"]
 pems2 = split(pems, station)
 
+new_time = Sys.time()
+message(sprintf("split: %g seconds", new_time - old_time))
+old_time = new_time
+
 results = lapply(pems2, npbin)
+
+new_time = Sys.time()
+message(sprintf("actual computations: %g seconds", new_time - old_time))
+old_time = new_time
 
 results = do.call(rbind, results)
 
 write.csv(results, "results.csv", row.names = FALSE)
+
+new_time = Sys.time()
+message(sprintf("save output: %g seconds", new_time - old_time))
+old_time = new_time
