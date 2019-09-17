@@ -27,7 +27,7 @@ function(schedule, platform, data, ...)
 
 lastBlock = function(platform, template = quote(stopCluster(`_CLS`)))
 {
-    substitute_language(template, list(`_CLS` = as.symbol(platform@name)))
+    substitute_language(template, `_CLS` = as.symbol(platform@name))
 }
 
 
@@ -105,7 +105,7 @@ function(schedule, platform, data
     # We need a way to add the ... ellipses.
     # I'll just hack it for now.
     lapply_template = quote(
-        lapply(read_args, `READ_FUNC`
+        lapply(read_args, `_READ_FUNC`
                 , col.names = `_COL.NAMES`
                 , colClasses = `_COLCLASSES`
                 , header = `_HEADER`

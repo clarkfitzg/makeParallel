@@ -1,5 +1,5 @@
 {
-    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-16 18:44:05")
+    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-16 18:48:37")
     library(parallel)
     assignments = 1:2
     nWorkers = 2
@@ -16,7 +16,7 @@
     clusterEvalQ(cls, {
         read_args = c("small_grouped_by_stationID/head313368.csv", "small_grouped_by_stationID/head313369.csv")
         read_args = read_args[assignments]
-        chunks = lapply(read_args, READ_FUNC, col.names = c("timeperiod", "station", "flow1", "occupancy1", "speed1", "flow2", "occupancy2", "speed2", "flow3", "occupancy3", "speed3", "flow4", "occupancy4", "speed4", "flow5", "occupancy5", "speed5", "flow6", "occupancy6", "speed6", "flow7", "occupancy7", "speed7", "flow8", "occupancy8", "speed8"), colClasses = c("character", "integer", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", 
+        chunks = lapply(read_args, read.csv, col.names = c("timeperiod", "station", "flow1", "occupancy1", "speed1", "flow2", "occupancy2", "speed2", "flow3", "occupancy3", "speed3", "flow4", "occupancy4", "speed4", "flow5", "occupancy5", "speed5", "flow6", "occupancy6", "speed6", "flow7", "occupancy7", "speed7", "flow8", "occupancy8", "speed8"), colClasses = c("character", "integer", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", 
         "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric"), header = FALSE)
         pems = do.call(c, chunks)
         NULL
@@ -43,7 +43,7 @@ dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.
     c(lower, cuts, upper)
 }
 npbin = function(x) {
-    breaks = dyncut(x$occupancy2, pts_per_bin = 200)
+    breaks = dyncut(x = x$occupancy2, pts_per_bin = 200)
     binned = cut(x = x$occupancy2, breaks, right = FALSE)
     groups = split(x = x$flow2, f = binned)
     out = data.frame(station = rep(x = x[i = 1, j = "station"], length(x = groups)), right_end_occ = breaks[i = -1], mean_flow = sapply(X = groups, FUN = mean), sd_flow = sapply(X = groups, FUN = sd), number_observed = sapply(X = groups, FUN = length))
@@ -118,4 +118,4 @@ clusterEvalQ(cls, {
 }
 results = do.call(what = rbind, args = results)
 write.csv(results, "results.csv")
-stopCluster(`_CLS`)
+stopCluster(cls)
