@@ -99,8 +99,8 @@ UnixPlatform = setClass("UnixPlatform",
 #' @slot uniqueValueBound upper bound for number of distinct values.
 #'      TODO: Define what this means for tables and vectors.
 #' @export
-DataSource = setClass("DataSource", slots = c(varName = "character", uniqueValueBound = "numeric"
-              , columns = "character"))
+DataSource = setClass("DataSource", slots = c(varName = "character", uniqueValueBound = "numeric"))
+#              , columns = "character"))
 
 
 #' Data Unspecified

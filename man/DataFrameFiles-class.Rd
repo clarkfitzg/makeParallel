@@ -6,5 +6,5 @@
 \alias{DataFrameFiles}
 \title{One or More Files Representing One Data Frame}
 \description{
-One or More Files Representing One Data Frame
+Slots correspond to arguments in read.table
 }

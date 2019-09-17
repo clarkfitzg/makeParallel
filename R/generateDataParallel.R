@@ -72,17 +72,53 @@ TEMPLATE_ParallelLocalCluster_DataLoadBlock = function()
     clusterEvalQ(`_CLUSTER_NAME`, {
         read_args = `_READ_ARGS`
         read_args = read_args[assignments]
-        chunks = lapply(read_args, `_READ_FUNC`)
+        chunks = `_LAPPLY_CALL`
         `_DATA_VARNAME` = do.call(`_COMBINE_FUNC`, chunks)
         NULL
     })
 }
+
 
 setMethod("generate", signature(schedule = "DataLoadBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform, data
          , combine_func = as.symbol("c") # TODO: Use rbind if it's a data.frame
          , template = as.expression(body(TEMPLATE_ParallelLocalCluster_DataLoadBlock))
          , ...){
+    # Stick the lapply call in
+    template = substitute_language(template, `_LAPPLY_CALL` = quote(lapply(read_args, `_READ_FUNC`)))
+
+    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+        , `_READ_ARGS` = data@files
+        , `_READ_FUNC` = as.symbol(data@readFuncName)
+        , `_DATA_VARNAME` = as.symbol(data@varName)
+        , `_COMBINE_FUNC` = combine_func
+        ))
+})
+
+
+setMethod("generate", signature(schedule = "DataLoadBlock", platform = "ParallelLocalCluster", data = "DataFrameFiles"),
+function(schedule, platform, data
+         , combine_func = as.symbol("c") # TODO: Use rbind if it's a data.frame
+         , template = as.expression(body(TEMPLATE_ParallelLocalCluster_DataLoadBlock))
+         , ...){
+    # Build up the lapply call with all the read arguments separately.
+    # We need a way to add the ... ellipses.
+    # I'll just hack it for now.
+    lapply_call = substitute_language(quote(
+        lapply(read_args, `READ_FUNC`
+                , col.names = `_COL.NAMES`
+                , colClasses = `_COLCLASSES`
+                , header = `_HEADER`
+                )),
+                , `_COL.NAMES` = data@col.names
+                , `_COLCLASSES` = data@colClasses
+                , `_HEADER` = data@header
+                )
+
+    # This is rather strange to keep modifying the template.
+    # Should be fine though.
+    template = substitute_language(template, `_LAPPLY_CALL` = lapply_call)
+
     substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
         , `_READ_ARGS` = data@files
         , `_READ_FUNC` = as.symbol(data@readFuncName)
