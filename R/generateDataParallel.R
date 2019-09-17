@@ -104,12 +104,13 @@ function(schedule, platform, data
     # Build up the lapply call with all the read arguments separately.
     # We need a way to add the ... ellipses.
     # I'll just hack it for now.
-    lapply_call = substitute_language(quote(
+    lapply_template = quote(
         lapply(read_args, `READ_FUNC`
                 , col.names = `_COL.NAMES`
                 , colClasses = `_COLCLASSES`
                 , header = `_HEADER`
-                )),
+                ))
+    lapply_call = substitute_language(lapply_template
                 , `_COL.NAMES` = data@col.names
                 , `_COLCLASSES` = data@colClasses
                 , `_HEADER` = data@header
@@ -150,10 +151,10 @@ function(schedule, platform, data
          , template = as.expression(body(TEMPLATE_ParallelLocalCluster_SerialBlock))
          , ...){
     if(1 <= length(schedule@collect)){
-        first = substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+        first = substitute_language(template, `_CLUSTER_NAME` = as.symbol(platform@name)
             , `_OBJECTS_RECEIVE_FROM_WORKERS` = char_to_symbol_list(schedule@collect)
             , `_COMBINE_FUNC` = combine_func
-            ))
+            )
     } else {
         first = expression()
     }
@@ -176,15 +177,15 @@ clusterEvalQ(`_CLUSTER_NAME`, {
     part1 = if(0 == length(schedule@export)){
         expression()
     } else {
-        substitute_language(export_template, list(
+        substitute_language(export_template, 
             `_CLUSTER_NAME` = as.symbol(platform@name)
             , `_EXPORT` = schedule@export
-            ))
+            )
     }
 
-    part2 = substitute_language(run_template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+    part2 = substitute_language(run_template, `_CLUSTER_NAME` = as.symbol(platform@name)
         , `_BODY` = schedule@code
-        ))
+        )
 
     c(part1, part2)
 })
@@ -286,7 +287,7 @@ function(schedule, platform
     # Assumes there are not multiple variables to split by.
     # It would be a miracle if this did the right thing when groupIndex is a list.
 
-    substitute_language(template, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+    substitute_language(template, `_CLUSTER_NAME` = as.symbol(platform@name)
         , `_SCRATCH_DIR` = platform@scratchDir
         , `_GROUP_DATA` = as.symbol(schedule@groupData)
         , `_GROUP_DATA_STRING` = schedule@groupData
@@ -296,7 +297,7 @@ function(schedule, platform
         , `_INTERMEDIATE_LOAD_FUNC` = intermediate_load_func 
         , `_SPLIT_LHS` = schedule@lhs
         , `_NWORKERS` = platform@nWorkers
-        ))
+        )
 })
 
 
@@ -350,27 +351,27 @@ function(schedule, platform, data
         # This will inline them every single time they are used.
         # Another argument to generate a package...
 
-        first = substitute_language(template1, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+        first = substitute_language(template1, `_CLUSTER_NAME` = as.symbol(platform@name)
             , `_SUMMARY_FUN` = as.symbol(summaryFun_tmp_var)
             , `_SUMMARY_FUN_IMPLEMENTATION` = func_name_or_implementation(rfun@summary)
             , `_COMBINE_FUN` = as.symbol(combineFun_tmp_var)
             , `_COMBINE_FUN_IMPLEMENTATION` = func_name_or_implementation(rfun@combine)
             , `_QUERY_FUN` = as.symbol(queryFun_tmp_var)
             , `_QUERY_FUN_IMPLEMENTATION` = func_name_or_implementation(rfun@query)
-            ))
+            )
 
         # Reuse the temporary variable names.
         rfun = SimpleReduce(reduce = rfun@reduce, summary = summaryFun_tmp_var
             , combine = combineFun_tmp_var, query = queryFun_tmp_var)
     }
 
-    second = substitute_language(template2, list(`_CLUSTER_NAME` = as.symbol(platform@name)
+    second = substitute_language(template2, `_CLUSTER_NAME` = as.symbol(platform@name)
         , `_OBJECT_TO_REDUCE` = as.symbol(schedule@objectToReduce)
         , `_TMP_VAR` = as.symbol(tmp_var)
         , `_SUMMARY_FUN` = as_symbol_maybe_colons(rfun@summary)
         , `_COMBINE_FUN` = as_symbol_maybe_colons(rfun@combine)
         , `_QUERY_FUN` = as_symbol_maybe_colons(rfun@query)
         , `_RESULT` = as.symbol(schedule@resultName)
-    ))
+    )
     c(first, second)
 })

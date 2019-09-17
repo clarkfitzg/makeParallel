@@ -1,7 +1,7 @@
 {
-    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-15 17:12:18")
+    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-16 18:44:05")
     library(parallel)
-    assignments = c(1, 2, 1, 2)
+    assignments = 1:2
     nWorkers = 2
     cls = makeCluster(nWorkers)
     c.data.frame = rbind
@@ -14,9 +14,10 @@
 }
 {
     clusterEvalQ(cls, {
-        read_args = c("/Users/clark/data/pems/d04_text_station_raw_2016_08_22.txt.gz", "/Users/clark/data/pems/d04_text_station_raw_2016_08_23.txt.gz", "/Users/clark/data/pems/d04_text_station_raw_2016_08_24.txt.gz", "/Users/clark/data/pems/d04_text_station_raw_2016_08_25.txt.gz")
+        read_args = c("small_grouped_by_stationID/head313368.csv", "small_grouped_by_stationID/head313369.csv")
         read_args = read_args[assignments]
-        chunks = lapply(read_args, read.csv)
+        chunks = lapply(read_args, READ_FUNC, col.names = c("timeperiod", "station", "flow1", "occupancy1", "speed1", "flow2", "occupancy2", "speed2", "flow3", "occupancy3", "speed3", "flow4", "occupancy4", "speed4", "flow5", "occupancy5", "speed5", "flow6", "occupancy6", "speed6", "flow7", "occupancy7", "speed7", "flow8", "occupancy8", "speed8"), colClasses = c("character", "integer", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", 
+        "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric"), header = FALSE)
         pems = do.call(c, chunks)
         NULL
     })
@@ -117,4 +118,4 @@ clusterEvalQ(cls, {
 }
 results = do.call(what = rbind, args = results)
 write.csv(results, "results.csv")
-stopCluster(cls)
+stopCluster(`_CLS`)
