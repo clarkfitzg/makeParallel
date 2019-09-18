@@ -42,7 +42,7 @@ outFile = "gen2.R"
 
 out = makeParallel("pems.R"
 , data = pems_data
-, nWorkers = 2L
+, nWorkers = 20L
 , scheduler = scheduleDataParallel
 , platform = parallelLocalCluster()
 , chunkFuncs = c("[", "lapply")

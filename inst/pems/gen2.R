@@ -1,5 +1,5 @@
 {
-    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-17 19:24:55")
+    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-18 10:35:21")
     {
         dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.01) {
             x = x[x < upper]
@@ -120,5 +120,5 @@ clusterEvalQ(cls, {
     }
 }
 results = do.call(rbind, results)
-write.csv(results, "results.csv")
+write.csv(results, "results.csv", row.names = FALSE)
 stopCluster(cls)

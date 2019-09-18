@@ -68,4 +68,4 @@ results = lapply(pems2, npbin)
 
 results = do.call(rbind, results)
 
-write.csv(results, "results.csv")
+write.csv(results, "results.csv", row.names = FALSE)
