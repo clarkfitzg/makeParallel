@@ -194,6 +194,16 @@ nodeToCodeBlock = function(node, resources, reduceFuncs)
 }
 
 
+# Pull out all the user defined functions assigned to variables from the ast, modifying it in place.
+# This is a hack to put all the functions into one place, first in the script, so we can export them to the workers.
+# It will fail if a function is redefined in a script, or if a function calls an existing package function and then overwrites it later.
+# But who does that?
+rm_udf_from_ast = function(ast)
+{
+    list(code = code, funcNames = funcNames)
+}
+
+
 #' Schedule Based On Data Parallelism
 #'
 #' If you're doing a series of computations over a large data set, then start with this scheduler.
@@ -251,10 +261,13 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     # Run the code inference and store all the results in `resources`
     propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = names(reduceFuncs))
 
+    funcs = rm_udf_from_ast(ast)
+    init_block = InitBlock(code = funcs[["code"]], funcNames = funcs[["funcNames"]])
+
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources, reduceFuncs = reduceFuncs)
 
     # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
-    blocks = c(InitBlock(), DataLoadBlock(), blocks, FinalBlock())
+    blocks = c(init_block, DataLoadBlock(), blocks, FinalBlock())
     blocks = collapseAdjacentBlocks(blocks)
 
     DataParallelSchedule(assignmentIndices = assignmentIndices

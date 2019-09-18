@@ -283,7 +283,9 @@ CodeBlock = setClass("CodeBlock", slots = c(code = "expression"))
 
 
 #' Initialize the platform
-InitBlock = setClass("InitBlock", contains = "CodeBlock")
+#'
+#' @slot funcNames list of functions defined in slot code to make available for the remainder of the program.
+InitBlock = setClass("InitBlock", contains = "CodeBlock", slots = c(funcNames = "character"))
 
 
 #' Finalize, shut down the platform, free the resources, because everything is done.

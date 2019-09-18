@@ -50,7 +50,6 @@ TEMPLATE_ParallelLocalCluster_InitBlock = function(){
 
 setMethod("generate", signature(schedule = "InitBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform, data
-        , function_names, function_defs
         , message = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
         , template = as.expression(body(TEMPLATE_ParallelLocalCluster_InitBlock))
         , ...){
@@ -58,8 +57,8 @@ function(schedule, platform, data
         , `_NWORKERS` = platform@nWorkers
         , `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
         , `_CLUSTER_NAME` = as.symbol(platform@name)
-        , `_FUNCTION_DEFS` = function_defs
-        , `_FUNCTION_NAMES` = function_names
+        , `_FUNCTION_DEFS` = schedule@code
+        , `_FUNCTION_NAMES` = schedule@funcNames
         )
 }
 
