@@ -16,7 +16,7 @@ function(schedule, platform, data, ...)
 # Assuming it's all R code, of course.
     newcode = lapply(schedule@blocks, generate, platform = platform, data = data, ...)
     newcode = do.call(c, newcode)
-    GeneratedCode(schedule = schedule, code = c(initBlock, newcode, lastBlock))
+    GeneratedCode(schedule = schedule, code = newcode)
 })
 
 
@@ -60,7 +60,7 @@ function(schedule, platform, data
         , `_FUNCTION_DEFS` = schedule@code
         , `_FUNCTION_NAMES` = schedule@funcNames
         )
-}
+})
 
 
 TEMPLATE_ParallelLocalCluster_DataLoadBlock = function()
@@ -378,4 +378,4 @@ function(schedule, platform, data
         , template = quote(stopCluster(`_CLS`)))
 {
     substitute_language(template, `_CLS` = as.symbol(platform@name))
-}
+})

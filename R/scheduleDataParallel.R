@@ -16,7 +16,7 @@
 #' @export
 setMethod("inferGraph", signature(code = "Brace", time = "missing"),
     function(code, time, ...){
-        expr = lapply(code$contents, as_language)
+        expr = lapply(code$contents, rstatic::as_language)
         expr = as.expression(expr)
         callGeneric(expr, ...)
 })
@@ -208,13 +208,13 @@ rm_udf_from_ast = function(ast)
 {
     func_indices = sapply(ast$contents, topLevelFuncAssign)
     funcs = ast$contents[func_indices]
-    code = as_language(rstatic::Brace$new(funcs))
+    code = rstatic::as_language(rstatic::Brace$new(funcs))
     funcNames = sapply(funcs, function(x) x$write$ssa_name)
 
     # Pull the functions out of the AST
     ast$contents[func_indices] = NULL
 
-    list(code = code, funcNames = funcNames)
+    list(code = as.expression(code), funcNames = funcNames)
 }
 
 
@@ -278,7 +278,10 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = names(reduceFuncs))
 
     funcs = rm_udf_from_ast(ast)
-    init_block = InitBlock(code = funcs[["code"]], funcNames = funcs[["funcNames"]])
+    init_block = InitBlock(code = funcs[["code"]]
+                           , funcNames = funcs[["funcNames"]]
+                           , assignmentIndices = assignmentIndices
+                           )
 
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources, reduceFuncs = reduceFuncs)
 
@@ -286,10 +289,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     blocks = c(init_block, DataLoadBlock(), blocks, FinalBlock())
     blocks = collapseAdjacentBlocks(blocks)
 
-    DataParallelSchedule(assignmentIndices = assignmentIndices
-                       , nWorkers = nWorkers
-                       , blocks = blocks
-                       )
+    DataParallelSchedule(nWorkers = nWorkers, blocks = blocks)
 }
 
 

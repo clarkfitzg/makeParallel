@@ -285,11 +285,13 @@ CodeBlock = setClass("CodeBlock", slots = c(code = "expression"))
 #' Initialize the platform
 #'
 #' @slot funcNames list of functions defined in slot code to make available for the remainder of the program.
-InitBlock = setClass("InitBlock", contains = "CodeBlock", slots = c(funcNames = "character"))
+#' @slot assignmentIndices assigns each data chunk to a worker. For example, c(2, 1, 1) assigns the 1st chunk to worker 2, and chunks 2 and 3 to worker 1.
+InitBlock = setClass("InitBlock", contains = "CodeBlock", 
+                     slots = c(funcNames = "character", assignmentIndices = "integer"))
 
 
 #' Finalize, shut down the platform, free the resources, because everything is done.
-FinalBlock = setClass("StopBlock", contains = "CodeBlock")
+FinalBlock = setClass("FinalBlock", contains = "CodeBlock")
 
 
 #' Load Data
@@ -372,12 +374,10 @@ ReduceBlock = setClass("ReduceBlock", contains = "CodeBlock",
                    ))
 
 
-#' @slot assignmentIndices assigns each data chunk to a worker. For example, c(2, 1, 1) assigns the 1st chunk to worker 2, and chunks 2 and 3 to worker 1.
 #' @slot blocks list with every object an instance of a CodeBlock
 #' @export
 DataParallelSchedule = setClass("DataParallelSchedule", contains = "Schedule",
-         slots = c(assignmentIndices = "integer"
-                   , nWorkers = "integer"
+         slots = c(nWorkers = "integer"
                    , blocks = "list"
                    ))
 
