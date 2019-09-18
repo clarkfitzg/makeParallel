@@ -251,10 +251,10 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     # Run the code inference and store all the results in `resources`
     propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = names(reduceFuncs))
 
-    # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
-    load_block = DataLoadBlock()
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources, reduceFuncs = reduceFuncs)
-    blocks = c(load_block, blocks)
+
+    # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
+    blocks = c(InitBlock(), DataLoadBlock(), blocks, FinalBlock())
     blocks = collapseAdjacentBlocks(blocks)
 
     DataParallelSchedule(assignmentIndices = assignmentIndices

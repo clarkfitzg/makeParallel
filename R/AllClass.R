@@ -283,11 +283,11 @@ CodeBlock = setClass("CodeBlock", slots = c(code = "expression"))
 
 
 #' Initialize the platform
-InitPlatformBlock = setClass("InitPlatformBlock", contains = "CodeBlock")
+InitBlock = setClass("InitBlock", contains = "CodeBlock")
 
 
-#' Shut down the platform
-StopPlatformBlock = setClass("StopPlatformBlock", contains = "CodeBlock")
+#' Finalize, shut down the platform, free the resources, because everything is done.
+FinalBlock = setClass("StopBlock", contains = "CodeBlock")
 
 
 #' Load Data

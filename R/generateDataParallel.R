@@ -14,25 +14,16 @@ function(schedule, platform, data, ...)
 # Idea:
 # We can generate all the code independently for each block, and then just stick it all together to make the complete program.
 # Assuming it's all R code, of course.
-
-    # localInitBlock could be a method, and this would work more generally.
-    # Or we could dispatch generate on an InitBlock object, but then we'd have to do some contortions to avoid infinite recursion.
-    initBlock = localInitBlock(schedule, platform)
-    lastBlock = lastBlock(platform)
     newcode = lapply(schedule@blocks, generate, platform = platform, data = data, ...)
     newcode = do.call(c, newcode)
     GeneratedCode(schedule = schedule, code = c(initBlock, newcode, lastBlock))
 })
 
 
-lastBlock = function(platform, template = quote(stopCluster(`_CLS`)))
-{
-    substitute_language(template, `_CLS` = as.symbol(platform@name))
-}
-
-
 TEMPLATE_ParallelLocalCluster_InitBlock = function(){
     message(`_MESSAGE`)
+
+    `_FUNCTION_DEFS`
 
     library(parallel)
 
@@ -45,6 +36,7 @@ TEMPLATE_ParallelLocalCluster_InitBlock = function(){
     c.data.frame = rbind
     # It will break code that tries to use the list method for c() on a data.frame
 
+    clusterExport(`_CLUSTER_NAME`, `_FUNCTION_NAMES`)
     clusterExport(`_CLUSTER_NAME`, c("assignments", "c.data.frame"))
     parLapply(cls, seq(nWorkers), function(i) assign("workerID", i, globalenv()))
 
@@ -52,10 +44,13 @@ TEMPLATE_ParallelLocalCluster_InitBlock = function(){
         assignments = which(assignments == workerID)
         NULL
     })
+
 }
 
 
-localInitBlock = function(schedule, platform
+setMethod("generate", signature(schedule = "InitBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
+function(schedule, platform, data
+        , function_names, function_defs
         , message = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
         , template = as.expression(body(TEMPLATE_ParallelLocalCluster_InitBlock))
         , ...){
@@ -63,6 +58,8 @@ localInitBlock = function(schedule, platform
         , `_NWORKERS` = platform@nWorkers
         , `_ASSIGNMENT_INDICES` = schedule@assignmentIndices
         , `_CLUSTER_NAME` = as.symbol(platform@name)
+        , `_FUNCTION_DEFS` = function_defs
+        , `_FUNCTION_NAMES` = function_names
         )
 }
 
@@ -375,3 +372,11 @@ function(schedule, platform, data
     )
     c(first, second)
 })
+
+
+setMethod("generate", signature(schedule = "FinalBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
+function(schedule, platform, data
+        , template = quote(stopCluster(`_CLS`)))
+{
+    substitute_language(template, `_CLS` = as.symbol(platform@name))
+}
