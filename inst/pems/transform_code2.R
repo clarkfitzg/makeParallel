@@ -14,7 +14,7 @@ library(makeParallel)
 #                   , full.names = TRUE
 #                   )
 
-files = list.files("small_grouped_by_stationID"
+files = list.files("data"
         , full.names = TRUE)
 
 columns = c(timeperiod = "character", station = "integer"

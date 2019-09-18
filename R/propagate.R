@@ -136,6 +136,20 @@ update_resource.Assign = function(node, name_resource, resources, namer, ...)
 }
 
 
+# Dirty hack because of issues with match_call and primitives.
+# Modification *must* happen in place or we lose the resources associated with the nodes.
+clean_up_split_call = function(s)
+{
+    split_params = c("x", "f")
+    split_args = names(s$args$contents)
+    if(is.null(split_args)){
+        names(s$args$contents) = split_params
+    } else if(any(split_args != split_params)){
+        stop("Unexpected form of split call: ", rstatic::as_language(s))
+    }
+}
+
+
 update_resource.Call = function(node, name_resource, resources, namer
         , chunkFuncs = character(), reduceFuncs = character(), ...)
 {
@@ -158,6 +172,8 @@ update_resource.Call = function(node, name_resource, resources, namer
 
 
     if(fname == "split" && hasChunkArgs){
+
+        clean_up_split_call(node)
 
         IDsplit_x = resource_id(node$args$contents[["x"]])
         IDsplit_f = resource_id(node$args$contents[["f"]])

@@ -16,7 +16,7 @@
 #' @export
 setMethod("inferGraph", signature(code = "Brace", time = "missing"),
     function(code, time, ...){
-        expr = lapply(code$contents, as_language)
+        expr = lapply(code$contents, rstatic::as_language)
         expr = as.expression(expr)
         callGeneric(expr, ...)
 })
@@ -194,6 +194,30 @@ nodeToCodeBlock = function(node, resources, reduceFuncs)
 }
 
 
+topLevelFuncAssign = function(node)
+{
+    is(node, "Assign") && is(node$read, "Function")
+}
+
+
+# Pull out all the user defined functions assigned to variables from the ast, modifying it in place.
+# This is a hack to put all the functions into one place, first in the script, so we can export them to the workers.
+# It will fail if a function is redefined in a script, or if a function calls an existing package function and then overwrites it later.
+# But who does that?
+rm_udf_from_ast = function(ast)
+{
+    func_indices = sapply(ast$contents, topLevelFuncAssign)
+    funcs = ast$contents[func_indices]
+    code = rstatic::as_language(rstatic::Brace$new(funcs))
+    funcNames = sapply(funcs, function(x) x$write$ssa_name)
+
+    # Pull the functions out of the AST
+    ast$contents[func_indices] = NULL
+
+    list(code = as.expression(code), funcNames = funcNames)
+}
+
+
 #' Schedule Based On Data Parallelism
 #'
 #' If you're doing a series of computations over a large data set, then start with this scheduler.
@@ -244,23 +268,28 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     r0 = list(chunked = TRUE, varName = data@varName, uniqueValueBound = data@uniqueValueBound)
     resources[[data_id]] = r0
 
-    ast = canonical_ast(graph@code)
+    ast = rstatic::to_ast(graph@code)
+    if(!is(ast, "Brace"))
+        stop("Unexpected form of AST")
 
     names(reduceFuncs) = sapply(reduceFuncs, slot, "reduce")
 
     # Run the code inference and store all the results in `resources`
     propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = names(reduceFuncs))
 
-    # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
-    load_block = DataLoadBlock()
+    funcs = rm_udf_from_ast(ast)
+    init_block = InitBlock(code = funcs[["code"]]
+                           , funcNames = funcs[["funcNames"]]
+                           , assignmentIndices = assignmentIndices
+                           )
+
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources, reduceFuncs = reduceFuncs)
-    blocks = c(load_block, blocks)
+
+    # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
+    blocks = c(init_block, DataLoadBlock(), blocks, FinalBlock())
     blocks = collapseAdjacentBlocks(blocks)
 
-    DataParallelSchedule(assignmentIndices = assignmentIndices
-                       , nWorkers = nWorkers
-                       , blocks = blocks
-                       )
+    DataParallelSchedule(nWorkers = nWorkers, blocks = blocks)
 }
 
 

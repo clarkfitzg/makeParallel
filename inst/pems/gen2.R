@@ -1,10 +1,40 @@
 {
-    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-16 19:11:55")
+    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-17 19:24:55")
+    {
+        dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.01) {
+            x = x[x < upper]
+            N = length(x)
+            max_num_cuts = ceiling(upper/min_bin_width)
+            eachq = pts_per_bin/N
+            possible_cuts = quantile(x, probs = seq(from = 0, to = 1, by = eachq))
+            cuts = rep(NA, max_num_cuts)
+            current_cut = lower
+            for (i in seq_along(cuts)) {
+                possible_cuts = possible_cuts[possible_cuts >= current_cut + min_bin_width]
+                if (length(possible_cuts) == 0) 
+                  break
+                else {
+                }
+                current_cut = possible_cuts[1]
+                cuts[i] = current_cut
+            }
+            cuts = cuts[!is.na(cuts)]
+            c(lower, cuts, upper)
+        }
+        npbin = function(x) {
+            breaks = dyncut(x$occupancy2, pts_per_bin = 200)
+            binned = cut(x$occupancy2, breaks, right = FALSE)
+            groups = split(x$flow2, binned)
+            out = data.frame(station = rep(x[1, "station"], length(groups)), right_end_occ = breaks[-1], mean_flow = sapply(groups, mean), sd_flow = sapply(groups, sd), number_observed = sapply(groups, length))
+            out
+        }
+    }
     library(parallel)
-    assignments = 1:2
+    assignments = c(1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1)
     nWorkers = 2
     cls = makeCluster(nWorkers)
     c.data.frame = rbind
+    clusterExport(cls, c("dyncut", "npbin"))
     clusterExport(cls, c("assignments", "c.data.frame"))
     parLapply(cls, seq(nWorkers), function(i) assign("workerID", i, globalenv()))
     clusterEvalQ(cls, {
@@ -14,7 +44,7 @@
 }
 {
     clusterEvalQ(cls, {
-        read_args = c("small_grouped_by_stationID/313368.csv", "small_grouped_by_stationID/313369.csv")
+        read_args = c("data/xab.gz", "data/xac.gz", "data/xad.gz", "data/xae.gz", "data/xaf.gz", "data/xag.gz", "data/xah.gz", "data/xai.gz", "data/xaj.gz", "data/xak.gz", "data/xal.gz", "data/xam.gz", "data/xan.gz")
         read_args = read_args[assignments]
         chunks = lapply(read_args, read.csv, col.names = c("timeperiod", "station", "flow1", "occupancy1", "speed1", "flow2", "occupancy2", "speed2", "flow3", "occupancy3", "speed3", "flow4", "occupancy4", "speed4", "flow5", "occupancy5", "speed5", "flow6", "occupancy6", "speed6", "flow7", "occupancy7", "speed7", "flow8", "occupancy8", "speed8"), colClasses = c("character", "integer", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", 
         "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric"), header = FALSE)
@@ -22,39 +52,12 @@
         NULL
     })
 }
-dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.01) {
-    x = x[i = x < upper]
-    N = length(x = x)
-    max_num_cuts = ceiling(x = upper/min_bin_width)
-    eachq = pts_per_bin/N
-    possible_cuts = quantile(x = x, probs = seq(from = 0, to = 1, by = eachq))
-    cuts = rep(x = NA, max_num_cuts)
-    current_cut = lower
-    for (i in seq_along(along.with = cuts)) {
-        possible_cuts = possible_cuts[i = possible_cuts >= current_cut + min_bin_width]
-        if (length(x = possible_cuts) == 0) 
-            break
-        else {
-        }
-        current_cut = possible_cuts[i = 1]
-        cuts[i] = current_cut
-    }
-    cuts = cuts[i = !is.na(x = cuts)]
-    c(lower, cuts, upper)
-}
-npbin = function(x) {
-    breaks = dyncut(x$occupancy2, pts_per_bin = 200)
-    binned = cut(x = x$occupancy2, breaks, right = FALSE)
-    groups = split(x = x$flow2, f = binned)
-    out = data.frame(station = rep(x = x[i = 1, j = "station"], length(x = groups)), right_end_occ = breaks[i = -1], mean_flow = sapply(X = groups, FUN = mean), sd_flow = sapply(X = groups, FUN = sd), number_observed = sapply(X = groups, FUN = length))
-    out
-}
 cols = c("station", "flow2", "occupancy2")
 clusterExport(cls, "cols")
 clusterEvalQ(cls, {
     {
-        pems = pems[j = cols]
-        station = pems[j = "station"]
+        pems = pems[, cols]
+        station = pems[, "station"]
     }
     NULL
 })
@@ -101,7 +104,7 @@ clusterEvalQ(cls, {
 }
 clusterExport(cls, "npbin")
 clusterEvalQ(cls, {
-    results = lapply(X = pems2, FUN = npbin)
+    results = lapply(pems2, npbin)
     NULL
 })
 {
@@ -116,6 +119,6 @@ clusterEvalQ(cls, {
         assign(varname, value)
     }
 }
-results = do.call(what = rbind, args = results)
+results = do.call(rbind, results)
 write.csv(results, "results.csv")
-#stopCluster(cls)
+stopCluster(cls)
