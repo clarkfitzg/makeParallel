@@ -1,12 +1,12 @@
 {
-    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-18 10:50:10")
+    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-18 11:13:21")
     {
         dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.01) {
             x = x[x < upper]
             N = length(x)
             max_num_cuts = ceiling(upper/min_bin_width)
             eachq = pts_per_bin/N
-            possible_cuts = quantile(x, probs = seq(from = 0, to = 1, by = eachq))
+            possible_cuts = quantile(x, probs = seq(from = 0, to = 1, by = eachq), na.rm = TRUE)
             cuts = rep(NA, max_num_cuts)
             current_cut = lower
             for (i in seq_along(cuts)) {
