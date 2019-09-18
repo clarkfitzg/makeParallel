@@ -9,13 +9,13 @@
 
 library(makeParallel)
 
-#files = list.files("~/data/pems"
-#                   , pattern = "d04_text_station_raw_2016_08_2*"
-#                   , full.names = TRUE
-#                   )
+files = list.files("/scratch/clarkf/pems/district4"
+                   , pattern = "d04_text_station_raw_2016_08_2."
+                   , full.names = TRUE
+                   )
 
-files = list.files("data"
-        , full.names = TRUE)
+#files = list.files("data"
+#        , full.names = TRUE)
 
 columns = c(timeperiod = "character", station = "integer"
     , flow1 = "integer", occupancy1 = "numeric", speed1 = "numeric"
@@ -42,9 +42,8 @@ outFile = "gen2.R"
 
 out = makeParallel("pems.R"
 , data = pems_data
-, nWorkers = 20L
 , scheduler = scheduleDataParallel
-, platform = parallelLocalCluster()
+, platform = parallelLocalCluster(nWorkers = 5L)
 , chunkFuncs = c("[", "lapply")
 , outFile = outFile
 , overWrite = TRUE

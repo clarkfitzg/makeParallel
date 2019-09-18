@@ -1,5 +1,5 @@
 {
-    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-18 10:35:21")
+    message("This code was generated from R by makeParallel version 0.2.0 at 2019-09-18 10:50:10")
     {
         dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.01) {
             x = x[x < upper]
@@ -30,8 +30,8 @@
         }
     }
     library(parallel)
-    assignments = c(1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1)
-    nWorkers = 2
+    assignments = c(1, 2, 3, 4, 5, 3, 2, 1, 4, 5)
+    nWorkers = 5
     cls = makeCluster(nWorkers)
     c.data.frame = rbind
     clusterExport(cls, c("dyncut", "npbin"))
@@ -44,7 +44,8 @@
 }
 {
     clusterEvalQ(cls, {
-        read_args = c("data/xab.gz", "data/xac.gz", "data/xad.gz", "data/xae.gz", "data/xaf.gz", "data/xag.gz", "data/xah.gz", "data/xai.gz", "data/xaj.gz", "data/xak.gz", "data/xal.gz", "data/xam.gz", "data/xan.gz")
+        read_args = c("/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_20.txt.gz", "/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_21.txt.gz", "/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_22.txt.gz", "/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_23.txt.gz", "/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_24.txt.gz", "/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_25.txt.gz", "/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_26.txt.gz", 
+        "/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_27.txt.gz", "/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_28.txt.gz", "/scratch/clarkf/pems/district4/d04_text_station_raw_2016_08_29.txt.gz")
         read_args = read_args[assignments]
         chunks = lapply(read_args, read.csv, col.names = c("timeperiod", "station", "flow1", "occupancy1", "speed1", "flow2", "occupancy2", "speed2", "flow3", "occupancy3", "speed3", "flow4", "occupancy4", "speed4", "flow5", "occupancy5", "speed5", "flow6", "occupancy6", "speed6", "flow7", "occupancy7", "speed7", "flow8", "occupancy8", "speed8"), colClasses = c("character", "integer", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", 
         "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric", "integer", "numeric", "numeric"), header = FALSE)
@@ -85,7 +86,7 @@ clusterEvalQ(cls, {
         as.table(out)
     }
     group_counts = Reduce(add_table, group_counts_each_worker, init = table(logical()))
-    split_assignments = makeParallel:::greedy_assign(group_counts, 2)
+    split_assignments = makeParallel:::greedy_assign(group_counts, 5)
     group_names = names(group_counts)
     split_read_args = file.path(".", "pems", group_names)
     names(split_read_args) = group_names
