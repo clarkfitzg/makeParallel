@@ -1,6 +1,11 @@
 # This is the high level code that I would *like* to run. It won't work
-# because it will run out of memory
+# because it will run out of memory.
+#
+# Wed Sep 18 09:10:36 PDT 2019
+#
+# The problem here is that 
 
+message("starting")
 old_time = Sys.time()
 
 dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.01)
@@ -79,13 +84,13 @@ colClasses = columns = c(timeperiod = "NULL", station = "integer"
 pems = lapply(files, read.csv, col.names = col.names, colClasses = colClasses)
 
 new_time = Sys.time()
-message(sprintf("read in files: %g seconds", new_time - old_time))
+message("read in files: ", capture.output(new_time - old_time))
 old_time = new_time
 
 pems = do.call(rbind, pems)
  
 new_time = Sys.time()
-message(sprintf("rbind: %g seconds", new_time - old_time))
+message("rbind: ", capture.output(new_time - old_time))
 old_time = new_time
 
 # The data description will tell us if the data starts grouped by the "station" column
@@ -93,13 +98,13 @@ station = pems[, "station"]
 pems2 = split(pems, station)
 
 new_time = Sys.time()
-message(sprintf("split: %g seconds", new_time - old_time))
+message("split: ", capture.output(new_time - old_time))
 old_time = new_time
 
 results = lapply(pems2, npbin)
 
 new_time = Sys.time()
-message(sprintf("actual computations: %g seconds", new_time - old_time))
+message("actual computations: ", capture.output(new_time - old_time))
 old_time = new_time
 
 results = do.call(rbind, results)
@@ -107,5 +112,5 @@ results = do.call(rbind, results)
 write.csv(results, "results.csv", row.names = FALSE)
 
 new_time = Sys.time()
-message(sprintf("save output: %g seconds", new_time - old_time))
+message("save output: ", capture.output(new_time - old_time))
 old_time = new_time
