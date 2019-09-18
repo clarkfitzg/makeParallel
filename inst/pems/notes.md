@@ -1,3 +1,14 @@
+Wed Sep 18 11:18:56 PDT 2019
+
+Ran a test version on 10 of the 300 files with 5 workers.
+Takes 143 seconds.
+So with 20 workers to do all the data it should take around:
+
+143 * (300/10) * (5/20) *(1/60) = 18 minutes.
+
+Hmmm, we shall see.
+
+
 ## Summary
 
 For meeting Duncan and Nick on 30 May.
