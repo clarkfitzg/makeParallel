@@ -9,6 +9,7 @@
 
 library(makeParallel)
 
+nWorkers = 20L
 files = list.files("/scratch/clarkf/pems/district4"
 #                   , pattern = "d04_text_station_raw_2016_08_2."
                    , full.names = TRUE
@@ -43,7 +44,7 @@ outFile = "gen2.R"
 out = makeParallel("pems.R"
 , data = pems_data
 , scheduler = scheduleDataParallel
-, platform = parallelLocalCluster(nWorkers = 5L)
+, platform = parallelLocalCluster(nWorkers = nWorkers)
 , chunkFuncs = c("[", "lapply")
 , outFile = outFile
 , overWrite = TRUE
