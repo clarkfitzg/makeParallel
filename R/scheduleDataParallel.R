@@ -194,12 +194,26 @@ nodeToCodeBlock = function(node, resources, reduceFuncs)
 }
 
 
+topLevelFuncAssign = function(node)
+{
+    is(node, "Assign") && is(node$read, "Function")
+}
+
+
 # Pull out all the user defined functions assigned to variables from the ast, modifying it in place.
 # This is a hack to put all the functions into one place, first in the script, so we can export them to the workers.
 # It will fail if a function is redefined in a script, or if a function calls an existing package function and then overwrites it later.
 # But who does that?
 rm_udf_from_ast = function(ast)
 {
+    func_indices = sapply(ast$contents, topLevelFuncAssign)
+    funcs = ast$contents[func_indices]
+    code = as_language(rstatic::Brace$new(funcs))
+    funcNames = sapply(funcs, function(x) x$write$ssa_name)
+
+    # Pull the functions out of the AST
+    ast$contents[func_indices] = NULL
+
     list(code = code, funcNames = funcNames)
 }
 
@@ -255,6 +269,8 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     resources[[data_id]] = r0
 
     ast = rstatic::to_ast(graph@code)
+    if(!is(ast, "Brace"))
+        stop("Unexpected form of AST")
 
     names(reduceFuncs) = sapply(reduceFuncs, slot, "reduce")
 
