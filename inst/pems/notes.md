@@ -1,3 +1,37 @@
+With 10 workers in parallel on the same 50 files this runs in 5 minutes, about 3 times faster.
+My parallel `split` implementation is disk based, so it takes 2.5 minutes.
+
+```
+This code was generated from R by makeParallel version 0.2.0 at 2019-09-19 08:51:52
+starting
+read in files and rbind: Time difference of 0.05943608 secs
+split: Time difference of 2.34454 mins
+actual computations: Time difference of 12.20462 secs
+save output: Time difference of 0.7329969 secs
+   user  system elapsed
+  1.155   0.147 317.789
+```
+
+I watched `top` as it runs- CPU stays close to 100%, which means that it's CPU bound, not IO bound from when it writes the intermediate computations.
+
+
+Thu Sep 19 08:41:30 PDT 2019
+
+The serial version on 50 files runs in 16 minutes.
+
+```
+> system.time(source("~/dev/makeParallel/inst/pems/pems_with_data_load.R"))
+starting
+read in files: Time difference of 11.9573 mins
+rbind: Time difference of 1.029486 mins
+split: Time difference of 1.87391 mins
+actual computations: Time difference of 51.65321 secs
+save output: Time difference of 0.541415 secs
+   user  system elapsed
+880.788  63.031 943.844
+```
+
+
 Thu Sep 19 08:25:19 PDT 2019
 
 I'm trying to verify how these are killed.

@@ -1,6 +1,10 @@
 # This is the high level code that I would *like* to run. It won't work
 # because it will run out of memory
 
+message("starting")
+old_time = Sys.time()
+
+
 
 dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.01)
 {
@@ -60,12 +64,28 @@ npbin = function(x)
 cols = c("station", "flow2", "occupancy2")
 pems = pems[, cols]
  
+new_time = Sys.time()
+message("read in files and rbind: ", capture.output(new_time - old_time))
+old_time = new_time
+
 # The data description will tell us if the data starts grouped by the "station" column
 station = pems[, "station"]
 pems2 = split(pems, station)
 
+new_time = Sys.time()
+message("split: ", capture.output(new_time - old_time))
+old_time = new_time
+
 results = lapply(pems2, npbin)
+
+new_time = Sys.time()
+message("actual computations: ", capture.output(new_time - old_time))
+old_time = new_time
 
 results = do.call(rbind, results)
 
 write.csv(results, "results.csv", row.names = FALSE)
+
+new_time = Sys.time()
+message("save output: ", capture.output(new_time - old_time))
+old_time = new_time

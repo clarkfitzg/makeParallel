@@ -15,7 +15,7 @@ dyncut = function(x, pts_per_bin = 200, lower = 0, upper = 1, min_bin_width = 0.
     max_num_cuts = ceiling(upper / min_bin_width)
     eachq = pts_per_bin / N
 
-    possible_cuts = quantile(x, probs = seq(from = 0, to = 1, by = eachq))
+    possible_cuts = quantile(x, probs = seq(from = 0, to = 1, by = eachq), na.rm = TRUE)
     cuts = rep(NA, max_num_cuts)
     current_cut = lower
     for(i in seq_along(cuts)){
@@ -58,6 +58,10 @@ npbin = function(x)
 # - Write the result
 
 files = list.files("/scratch/clarkf/pems/district4/", full.names = TRUE)
+
+# Adding this in an attempt to avoid memory problems.
+nfiles = 50L
+files = files[seq(nfiles)]
 
 col.names = c("timeperiod", "station"
     , "flow1", "occupancy1", "speed1"
