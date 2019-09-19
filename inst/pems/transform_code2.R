@@ -9,7 +9,7 @@
 
 library(makeParallel)
 
-nWorkers = 20L
+nWorkers = 10L
 files = list.files("/scratch/clarkf/pems/district4"
 #                   , pattern = "d04_text_station_raw_2016_08_2."
                    , full.names = TRUE

@@ -1,3 +1,76 @@
+Wed Sep 18 17:47:19 PDT 2019
+
+Now The processes have been terminated, and I don't know why.
+
+```
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+ 80880 clarkf    39  19   27.6g  27.3g   1072 R 100.0 10.8  14:14.79 R
+ 80815 clarkf    39  19   27.8g  27.5g   1472 R 100.0 10.9  14:16.15 R
+ 80828 clarkf    39  19   27.0g  26.7g   1472 R 100.0 10.6  14:18.43 R
+ 80854 clarkf    39  19   29.9g  29.6g   1468 R 100.0 11.8  14:15.98 R
+ 80867 clarkf    39  19   30.3g  30.0g   1468 R 100.0 11.9  14:18.19 R
+ 80893 clarkf    39  19   28.6g  28.3g   1472 R  99.3 11.3  14:16.56 R
+```
+
+When I run `stopCluster` nothing happens, I have to go in and kill them by hand.
+
+
+Wed Sep 18 17:37:47 PDT 2019
+
+Trying it again with 10 workers instead of 20.
+I see them all here working as they should.
+They have all been alive for 4 minutes and 20 seconds, good they started at the same time.
+
+```
+ 80776 clarkf    39  19   10.1g   9.8g   7876 R 100.0  3.9   4:20.18 R
+ 80854 clarkf    39  19 9189092   8.5g   7876 R 100.0  3.4   4:20.31 R
+ 80893 clarkf    39  19 8807588   8.1g   7876 R 100.0  3.2   4:20.31 R
+ 80802 clarkf    39  19   10.0g   9.7g   7876 R 100.0  3.8   4:20.32 R
+ 80815 clarkf    39  19 9061364   8.4g   7876 R 100.0  3.3   4:19.33 R
+ 80828 clarkf    39  19   10.5g  10.2g   7876 R 100.0  4.0   4:20.42 R
+ 80841 clarkf    39  19   10.1g   9.8g   7876 R 100.0  3.9   4:20.30 R
+ 80867 clarkf    39  19 9989.7m   9.5g   7876 R 100.0  3.8   4:20.37 R
+ 80789 clarkf    39  19 9801776   9.1g   7876 R  99.7  3.6   4:20.25 R
+ 80880 clarkf    39  19 9924576   9.2g   7876 R  99.0  3.6   4:20.27 R
+```
+
+-------
+Earlier:
+
+Debugging this now. I expected to see more of my processes running:
+
+Here is the output of top for my user:
+
+```
+ 75951 clarkf    39  19   16.9g  16.6g   1372 R 100.0  6.6   5:23.05 R
+ 76020 clarkf    39  19   20.0g  19.7g    880 R 100.0  7.8   5:23.50 R
+ 76052 clarkf    39  19   20.7g  20.4g    320 R 100.0  8.1   5:24.22 R
+ 76134 clarkf    39  19   20.4g  20.1g    320 R 100.0  8.0   5:23.43 R
+ 76241 clarkf    39  19   21.1g  20.8g   1360 R 100.0  8.3   5:24.27 R
+ 76277 clarkf    39  19   17.7g  17.4g    880 R 100.0  6.9   5:23.31 R
+ 76303 clarkf    39  19   20.1g  19.8g    880 R 100.0  7.9   5:22.97 R
+ 76098 clarkf    39  19   20.8g  20.5g    320 R 100.0  8.2   5:23.83 R
+ 76186 clarkf    39  19   17.3g  17.0g   1376 R  99.7  6.8   5:23.68 R
+```
+
+It uses a bunch of memory, as I expected.
+Then it dies.
+Is it getting killed?
+Another user has come on and is using lots of CPU, a professor with more privileges.
+
+Looks like zombies may well be the issue:
+```
+ 75951 clarkf    39  19   50.1g  49.9g    836 S   0.0 19.8  10:24.39 R
+ 76098 clarkf    39  19   56.5g  56.2g    872 S   0.0 22.3   9:42.25 R
+ 76134 clarkf    39  19   55.6g  55.3g    840 S   0.0 22.0  10:19.09 R
+```
+
+OK, killed them, they are gone.
+But they are only 10 minutes old... which means they are left over from the most recent command.
+Why are their ages so different? By 40 seconds, close to a minute.
+They should have been created within seconds of each other.
+
+
 Wed Sep 18 11:18:56 PDT 2019
 
 Ran a test version on 10 of the 300 files with 5 workers.
