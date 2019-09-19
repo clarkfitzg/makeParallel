@@ -1,3 +1,17 @@
+Wed Sep 18 19:01:43 PDT 2019
+
+I put the data on the cluster and am trying to run it with 10 processes on 1 node.
+I foresee a couple issues:
+
+- Each node only has 64 GB memory, which is way too small.
+  This will probably exceed memory and swap, and the program will fail.
+- My shuffle implementation should use the local disk, rather than going to and from NFS.
+  This may or may not be a big deal.
+
+Watching `top` on that node I see the workers happily running away.
+Nothing else is happening on that node, which is good.
+
+
 Wed Sep 18 17:47:19 PDT 2019
 
 Now The processes have been terminated, and I don't know why.
