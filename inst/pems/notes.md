@@ -1,3 +1,39 @@
+Thu Sep 19 12:39:14 PDT 2019
+
+Sysadmin (Nehad) checked the logs for me, we can see where the OOM killer killed one of the processes when it used ~31 GB of memory.
+10 of these ran at the same time, so cumulatively that's well beyond the available memory.
+
+```
+-----
+(poisson)-nehad# grep 80776 /var/log/messages
+Sep 18 17:41:04 poisson kernel: [80776]  5003 80776  4172201  4094530    8103        0             0 R
+Sep 18 17:42:50 poisson kernel: [80776]  5003 80776  4930571  4852934    9588        0             0 R
+Sep 18 17:43:43 poisson kernel: [80776]  5003 80776  6067164  5989532   11807        0             0 R
+Sep 18 17:45:51 poisson kernel: [80776]  5003 80776  7838782  7761075   15270        0             0 R
+Sep 18 17:45:51 poisson kernel: Out of memory: Kill process 80776 (R) score 98 or sacrifice child
+Sep 18 17:45:51 poisson kernel: Killed process 80776 (R) total-vm:31355128kB, anon-rss:31043484kB, file-rss:816kB, shmem-rss:0kB
+(poisson)-nehad#
+```
+
+output of `sar` shows peaks when I ran the jobs, no news there.
+
+```
+-----
+05:00:01 PM kbmemfree kbmemused  %memused kbbuffers  kbcached  kbcommit   %commit  kbactive   kbinact   kbdirty
+05:10:01 PM  31472168 232389208     88.07     22184   2374684 289188260     91.47 221313540   7523208       128
+05:20:02 PM 200918108  62943268     23.85     24908   2428652 119960352     37.94  52169564   7525276       192
+05:30:01 PM 200817524  63043852     23.89     30304   2440164 120134452     38.00  52275040   7537048       260
+05:40:01 PM  20265864 243595512     92.32     32976  10138524 292578888     92.54 224802008  15233900       208
+05:50:01 PM 199755708  64105668     24.30      3660   3001872 120663040     38.17  52606052   8232316        68
+06:00:01 PM 200031020  63830356     24.19     14088   3024628 120317968     38.06  52346576   8257040        80
+06:10:01 PM 199558260  64303116     24.37     19708   3084980 120618536     38.15  52764052   8317812       128
+06:20:01 PM 200100004  63761372     24.16     21720   3085984 120067260     37.98  52218672   8318720       244
+-----
+```
+
+
+------------------------------------------------------------
+
 With 10 workers in parallel on the same 50 files this runs in 5 minutes, about 3 times faster.
 My parallel `split` implementation is disk based, so it takes 2.5 minutes.
 
