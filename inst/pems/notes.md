@@ -1,3 +1,31 @@
+Thu Sep 19 08:25:19 PDT 2019
+
+I'm trying to verify how these are killed.
+When I `kill -9` an interactive R terminal by process ID I see:
+
+```
+> Killed
+clarkf@c0-14 ~/data/scratch
+```
+
+Start a cluster:
+
+```
+library(parallel)
+cls = parallel::makeCluster(2, outfile = "workers.log")
+clusterEvalQ(cls, Sys.getpid())
+```
+
+Now I send the same `kill -9` to one worker.
+Nothing shows up in the log file after this.
+This may be because of the `--slave` flags to `Rscript` that are passed to the workers that prevent output.
+I could fool around with this, but it isn't a priority.
+I know the processes are getting killed, because they stop existing.
+
+
+
+
+
 Wed Sep 18 20:31:22 PDT 2019
 
 And it's dead, in the same way as on Poisson, apparently.
