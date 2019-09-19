@@ -1,3 +1,26 @@
+Wed Sep 18 19:18:05 PDT 2019
+
+Just checked top again on the cluster node where I'm running.
+Now they've maxed out memory, as I expected.
+We'll see if it fails, or just swaps forever.
+At least this is different from Poisson.
+
+```
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COM
+19848 clarkf    20   0 29.021g 0.026t    736 D  29.3 10.7  14:13.27 R
+19454 clarkf    20   0 26.578g 0.024t   3452 R  26.1  9.8  13:51.67 R
+19670 clarkf    20   0 25.917g 0.024t    552 D  26.1  9.7  13:58.68 R
+19503 clarkf    20   0 30.136g 0.026t    720 D  10.1 10.7  14:01.14 R
+19405 clarkf    20   0 26.955g 0.023t   1292 D   8.5  9.5  13:49.75 R
+19789 clarkf    20   0 25.863g 0.024t   1616 D   5.2  9.6  13:56.69 R
+19730 clarkf    20   0 26.564g 0.024t    968 D   2.6  9.7  14:04.04 R
+19552 clarkf    20   0 27.055g 0.023t    468 D   2.0  9.5  14:08.57 R
+19607 clarkf    20   0 27.763g 0.025t   3232 D   1.0 10.1  13:55.95 R
+20493 clarkf    20   0   40856   3980   2992 R   1.0  0.0   0:00.09 top
+19907 clarkf    20   0 28.312g 0.025t    424 D   0.7 10.0  13:53.68 R
+```
+
+
 Wed Sep 18 19:01:43 PDT 2019
 
 I put the data on the cluster and am trying to run it with 10 processes on 1 node.
