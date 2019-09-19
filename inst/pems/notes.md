@@ -1,3 +1,23 @@
+Wed Sep 18 20:31:22 PDT 2019
+
+And it's dead, in the same way as on Poisson, apparently.
+Processes just falling over.
+
+```
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ CO
+19454 clarkf    20   0 58.567g 0.037t   3252 D   2.0 14.9  26:58.01 R
+19552 clarkf    20   0 51.579g 0.032t   4032 D   1.3 12.8  27:12.89 R
+19670 clarkf    20   0 56.333g 0.039t   4036 D   1.3 15.9  27:55.63 R
+19789 clarkf    20   0 57.808g 0.038t   4112 D   1.3 15.6  26:46.38 R
+19848 clarkf    20   0 55.896g 0.039t   4120 D   1.3 15.7  27:21.35 R
+21824 clarkf    20   0   40780   4072   3136 R   1.0  0.0   0:00.22 to
+19503 clarkf    20   0 53.353g 0.036t   3388 D   0.3 14.7  27:36.23 R
+18096 clarkf    20   0   20732    204    192 S   0.0  0.0   0:00.04 ba
+19119 clarkf    20   0 1343524   6896    572 S   0.0  0.0   0:04.65 R
+19907 clarkf    20   0 41.107g 0.023t      4 S   0.0  9.4  23:09.60 R
+```
+
+
 Wed Sep 18 19:18:05 PDT 2019
 
 Just checked top again on the cluster node where I'm running.
