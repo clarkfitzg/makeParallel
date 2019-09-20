@@ -209,7 +209,9 @@ rm_udf_from_ast = function(ast)
     func_indices = sapply(ast$contents, topLevelFuncAssign)
     funcs = ast$contents[func_indices]
     code = rstatic::as_language(rstatic::Brace$new(funcs))
-    funcNames = sapply(funcs, function(x) x$write$ssa_name)
+    funcNames = lapply(funcs, function(x) x$write$ssa_name)
+    # Necessary to keep the class if there are no funcNames.
+    funcNames = as.character(funcNames)
 
     # Pull the functions out of the AST
     ast$contents[func_indices] = NULL

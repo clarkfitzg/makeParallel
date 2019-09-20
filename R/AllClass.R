@@ -80,6 +80,7 @@ ParallelLocalCluster = setClass("ParallelLocalCluster"
     )
 
 
+
 #' @export
 UnixPlatform = setClass("UnixPlatform",
     contains = "Platform")
