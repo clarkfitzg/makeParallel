@@ -4,7 +4,7 @@ POSIXLocalCluster = setClass("POSIXLocalCluster", contains = "ParallelLocalClust
 
 msg = "Yay right method"
 
-setMethod("generate", signature(schedule = "DataLoadBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
+setMethod("generate", signature(schedule = "DataLoadBlock", platform = "POSIXLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform, data)
 {
     stop(msg)
