@@ -40,7 +40,7 @@ out = makeParallel("
 if(identical(Sys.getenv("TESTTHAT"), "true")){
 
     # Check that the load balancing happens.
-    expect_equal(schedule(out)@assignmentIndices, c(1, 2, 1))
+    expect_equal(schedule(out)@blocks[[1]]@assignmentIndices, c(1, 2, 1))
 
     rr = "gen/result_map_reduce.rds"
     unlink(rr)
