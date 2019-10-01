@@ -37,19 +37,22 @@ dataSource.expression = function(expr, ...)
 }
 
 
-`dataSource.Call` = function(expr, ...)
+`dataSource.Call` = function(expr, handlers = list(), ...)
 {
     # The data inference depends on the function that was called.
     # So we can continue to dispatch, using the function name as the class.
-    # Nevermind, that's crazy, I'm setting myself up for infinite recursion.
-    # I need to use a different function.
 
     expr = rstatic::match_call(expr)
+    fname = expr$fn$ssa_name
+    m = match(fname, names(handlers))
+    if(!is.na(m)){
+        handlers[[m]](expr, handlers, ...)
+    } else {
+        func_class = paste0(fname, "_Call")
+        class(expr) = c(func_class, class(expr))
 
-    func_class = paste0(expr$fn$ssa_name, "_Call")
-    class(expr) = c(func_class, class(expr))
-
-    inferDataSourceFromCall(expr, ...)
+        inferDataSourceFromCall(expr, ...)
+    }
 }
 
 

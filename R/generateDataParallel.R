@@ -1,10 +1,11 @@
 # The following methods for the platform = "ParallelLocalCluster" are designed to work together.
 # I'm not thinking about name collisions at all right now.
 # 
-# The pattern with most of the generate methods on the CodeBlock's is to define a function where the body is a template for all the generated code.
-# We don't call these functions, we just extract their bodies, which is why they don't have arguments.
+# The pattern with most of the generate methods on the CodeBlock's is to write down a quoted expression as a template
 # This is better using strings for templates because R only needs to parse them once, and we catch parse errors early.
 # It's better than using external template files, because we can keep all this code in one place (this file) so it's easy to find.
+
+# TODO: Use as.expression(quote( rather than empty functions
 
 
 #' @export
@@ -63,65 +64,55 @@ function(schedule, platform, data
 })
 
 
-TEMPLATE_ParallelLocalCluster_DataLoadBlock = function()
+TEMPLATE_ParallelLocalCluster_DataLoadBlock = as.expression(quote(
 {
     clusterEvalQ(`_CLUSTER_NAME`, {
         read_args = `_READ_ARGS`
         read_args = read_args[assignments]
-        chunks = `_LAPPLY_CALL`
+        chunks = lapply(read_args, `_READ_FUNC`)
         `_DATA_VARNAME` = do.call(`_COMBINE_FUNC`, chunks)
         NULL
     })
-}
+}))
 
 
 setMethod("generate", signature(schedule = "DataLoadBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform, data
          , combine_func = as.symbol("c") # TODO: Use rbind if it's a data.frame
-         , template = as.expression(body(TEMPLATE_ParallelLocalCluster_DataLoadBlock))
+         , read_func = as.symbol(data@readFuncName)
+         , template = TEMPLATE_ParallelLocalCluster_DataLoadBlock
          , ...){
-    # Stick the lapply call in
-    template = substitute_language(template, `_LAPPLY_CALL` = quote(lapply(read_args, `_READ_FUNC`)))
-
     substitute_language(template, `_CLUSTER_NAME` = as.symbol(platform@name)
         , `_READ_ARGS` = data@files
-        , `_READ_FUNC` = as.symbol(data@readFuncName)
+        , `_READ_FUNC` = read_func
         , `_DATA_VARNAME` = as.symbol(data@varName)
         , `_COMBINE_FUNC` = combine_func
         )
 })
 
 
+TEMPLATE_read_chunk_func_body = as.expression(quote(
+    function(x) `_READ_FUNC`(x
+            , col.names = `_COL.NAMES`
+            , colClasses = `_COLCLASSES`
+            , header = `_HEADER`
+            )
+))
+
+
 setMethod("generate", signature(schedule = "DataLoadBlock", platform = "ParallelLocalCluster", data = "DataFrameFiles"),
 function(schedule, platform, data
-         , combine_func = as.symbol("c") # TODO: Use rbind if it's a data.frame
-         , template = as.expression(body(TEMPLATE_ParallelLocalCluster_DataLoadBlock))
-         , ...){
-    # Build up the lapply call with all the read arguments separately.
-    # We need a way to add the ... ellipses.
-    # I'll just hack it for now.
-    lapply_template = quote(
-        lapply(read_args, `_READ_FUNC`
-                , col.names = `_COL.NAMES`
-                , colClasses = `_COLCLASSES`
-                , header = `_HEADER`
-                ))
-    lapply_call = substitute_language(lapply_template
+         , combine_func = as.symbol("rbind")
+         , template = TEMPLATE_read_chunk_func_body
+         , read_func = substitute_language(template, 
+                , `_READ_FUNC` = as.symbol(data@readFuncName)
                 , `_COL.NAMES` = data@col.names
                 , `_COLCLASSES` = data@colClasses
                 , `_HEADER` = data@header
                 )
+         , ...){
 
-    # This is rather strange to keep modifying the template.
-    # Should be fine though.
-    template = substitute_language(template, `_LAPPLY_CALL` = lapply_call)
-
-    substitute_language(template, `_CLUSTER_NAME` = as.symbol(platform@name)
-        , `_READ_ARGS` = data@files
-        , `_READ_FUNC` = as.symbol(data@readFuncName)
-        , `_DATA_VARNAME` = as.symbol(data@varName)
-        , `_COMBINE_FUNC` = combine_func
-        )
+    callNextMethod(read_func = read_func, combine_func = combine_func)
 })
 
 
