@@ -112,7 +112,7 @@ function(schedule, platform, data
                 )
          , ...){
 
-    callNextMethod(read_func = read_func, combine_func = combine_func)
+    callNextMethod(schedule, platform, data, read_func = read_func, combine_func = combine_func)
 })
 
 

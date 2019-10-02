@@ -6,7 +6,8 @@
 \usage{
 scheduleDataParallel(graph, platform = Platform(), data,
   nWorkers = platform@nWorkers, chunkFuncs = character(),
-  reduceFuncs = list(), knownChunkFuncs = c("exp", "+", "*", "sin"),
+  reduceFuncs = list(), knownReduceFuncs = getKnownReduceFuncs(),
+  knownChunkFuncs = getKnownChunkFuncs(),
   allChunkFuncs = c(knownChunkFuncs, chunkFuncs))
 }
 \arguments{
@@ -20,9 +21,11 @@ The names of the list elements correspond to the variables in the code that thes
 
 \item{chunkFuncs}{character, names of additional chunkable functions known to the user.}
 
-\item{reduceFuncs}{list of ReduceFun objects}
+\item{reduceFuncs}{list of ReduceFun objects, these can override the knownReduceFuncs.}
 
-\item{knownchunkFuncs}{character, the names of chunkable functions from recommended and base packages.}
+\item{knownReduceFuncs}{list of known ReduceFun objects}
+
+\item{knownChunkFuncs}{character, the names of chunkable functions from recommended and base packages.}
 
 \item{allchunkFuncs}{character, names of all chunkable functions to use in the analysis.}
 }

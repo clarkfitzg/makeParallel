@@ -1,4 +1,6 @@
-b = as.date(x[, "b"])
-d = as.date(x[, "d"])
+b = as.Date(x[, "b"], origin = "2010-01-01")
+d = as.Date(x[, "d"], origin = "2010-01-01")
 rb = range(b)
 rd = range(d)
+print(rb)
+print(rd)

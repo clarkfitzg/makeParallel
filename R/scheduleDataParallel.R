@@ -220,6 +220,21 @@ rm_udf_from_ast = function(ast)
 }
 
 
+# This is so the tests and examples work.
+# Can build this up comprehensively later.
+getKnownChunkFuncs = function() c("exp", "+", "*", "sin", "as.date")
+
+
+# The simple ones
+getKnownReduceFuncs = function()
+{
+    fnames = c("max", "min", "range")
+    out = lapply(fnames, reduceFun)
+    names(out) = fnames
+    out
+}
+
+
 #' Schedule Based On Data Parallelism
 #'
 #' If you're doing a series of computations over a large data set, then start with this scheduler.
@@ -237,8 +252,9 @@ rm_udf_from_ast = function(ast)
 #'
 #' @inheritParams schedule
 #' @param chunkFuncs character, names of additional chunkable functions known to the user.
-#' @param reduceFuncs list of ReduceFun objects
-#' @param knownchunkFuncs character, the names of chunkable functions from recommended and base packages.
+#' @param reduceFuncs list of ReduceFun objects, these can override the knownReduceFuncs.
+#' @param knownChunkFuncs character, the names of chunkable functions from recommended and base packages.
+#' @param knownReduceFuncs list of known ReduceFun objects
 #' @param allchunkFuncs character, names of all chunkable functions to use in the analysis.
 #' @seealso [makeParallel], [schedule]
 #' @export
@@ -247,12 +263,18 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     , nWorkers = platform@nWorkers
     , chunkFuncs = character()
     , reduceFuncs = list()
-    , knownChunkFuncs = c("exp", "+", "*", "sin")
+    , knownReduceFuncs = getKnownReduceFuncs()
+    , knownChunkFuncs = getKnownChunkFuncs()
     , allChunkFuncs = c(knownChunkFuncs, chunkFuncs)
     )
 {
     if(!is(data, "ChunkDataFiles")) 
         stop("Currently only implemented for ChunkDataFiles.")
+
+    names(knownReduceFuncs) = sapply(knownReduceFuncs, slot, "reduce")
+    names(reduceFuncs) = sapply(reduceFuncs, slot, "reduce")
+    allReduceFuncs = knownReduceFuncs
+    allReduceFuncs[names(reduceFuncs)] = reduceFuncs
 
     nchunks = length(data@files)
 
@@ -274,10 +296,8 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     if(!is(ast, "Brace"))
         stop("Unexpected form of AST")
 
-    names(reduceFuncs) = sapply(reduceFuncs, slot, "reduce")
-
     # Run the code inference and store all the results in `resources`
-    propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = names(reduceFuncs))
+    propagate(ast, name_resource, resources, namer, chunkFuncs = allChunkFuncs, reduceFuncs = names(allReduceFuncs))
 
     funcs = rm_udf_from_ast(ast)
     init_block = InitBlock(code = funcs[["code"]]
@@ -285,7 +305,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
                            , assignmentIndices = assignmentIndices
                            )
 
-    blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources, reduceFuncs = reduceFuncs)
+    blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources, reduceFuncs = allReduceFuncs)
 
     # It may be better to put the data loading block somewhere else in the schedule, but if we put them first, then the objects are guaranteed to be there when we need them later.
     blocks = c(init_block, DataLoadBlock(), blocks, FinalBlock())
