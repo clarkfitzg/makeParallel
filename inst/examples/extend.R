@@ -1,9 +1,9 @@
 {
-    message("This code was generated from R by makeParallel version 0.2.1 at 2019-10-02 14:56:50")
+    message("This code was generated from R by makeParallel version 0.2.1 at 2019-10-02 17:36:03")
     {
     }
     library(parallel)
-    assignments = 1:2
+    assignments = c(1, 2, 1)
     nWorkers = 2
     cls = makeCluster(nWorkers)
     c.data.frame = rbind
@@ -17,7 +17,7 @@
 }
 {
     clusterEvalQ(cls, {
-        read_args = c("d1.csv", "d2.csv")
+        read_args = c("d1.csv", "d2.csv", "d3.csv")
         read_args = read_args[assignments]
         chunks = lapply(read_args, function(fname) {
             command = paste("cut -d , -f 2,4", fname)

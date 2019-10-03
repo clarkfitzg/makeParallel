@@ -96,11 +96,12 @@ TEMPLATE_read_chunk_func_body = as.expression(quote(
             , col.names = `_COL.NAMES`
             , colClasses = `_COLCLASSES`
             , header = `_HEADER`
+            , sep = `_SEP`
             )
 ))
 
 
-setMethod("generate", signature(schedule = "DataLoadBlock", platform = "ParallelLocalCluster", data = "DataFrameFiles"),
+setMethod("generate", signature(schedule = "DataLoadBlock", platform = "ParallelLocalCluster", data = "TextTableFiles"),
 function(schedule, platform, data
          , combine_func = as.symbol("rbind")
          , template = TEMPLATE_read_chunk_func_body
@@ -109,6 +110,7 @@ function(schedule, platform, data
                 , `_COL.NAMES` = data@col.names
                 , `_COLCLASSES` = data@colClasses
                 , `_HEADER` = data@header
+                , `_SEP` = data@sep
                 )
          , ...){
 

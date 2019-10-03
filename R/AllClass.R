@@ -122,17 +122,17 @@ setClass("ChunkDataFiles", contains = "DataSource",
 #'
 #' Slots correspond to arguments in read.table
 #'
-#' @export DataFrameFiles
-#' @exportClass DataFrameFiles
-DataFrameFiles = setClass("DataFrameFiles", contains = "ChunkDataFiles",
-    slots = c(col.names = "character", header = "logical", colClasses = "character"))
+#' @export TextTableFiles
+#' @exportClass TextTableFiles
+TextTableFiles = setClass("TextTableFiles", contains = "ChunkDataFiles",
+    slots = c(col.names = "character", header = "logical", colClasses = "character", sep = "character"))
 
 
 #' A Collection Of One Or More Fixed Width Files
 #'
 #' @export FixedWidthFiles
 #' @exportClass FixedWidthFiles
-FixedWidthFiles = setClass("FixedWidthFiles", contains = "DataFrameFiles",
+FixedWidthFiles = setClass("FixedWidthFiles", contains = "TextTableFiles",
     slots = c(widths = "integer"))
 
 
