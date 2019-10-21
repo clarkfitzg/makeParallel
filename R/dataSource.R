@@ -77,6 +77,16 @@ inferDataSourceFromCall.default = function(expr, ...)
 }
 
 
+inferDataSourceFromCall.read.table_Call = function(expr, ...)
+{
+    args = expr$args$contents
+
+    # TODO: Fill these in.
+    TextTableFiles(files = args$file$value
+                   , ...)
+}
+
+
 inferDataSourceFromCall.read.fwf_Call = function(expr, ...)
 {
     args = expr$args$contents

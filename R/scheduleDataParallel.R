@@ -278,7 +278,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
 
     nchunks = length(data@files)
 
-    # Now, I'm trying to generalize this beyond lists of files
+    # Now, I'm trying to generalize this beyond lists of files.
     assignmentIndices = greedy_assign(data@sizes, nWorkers)
 
     name_resource = new.env()
@@ -303,7 +303,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     funcs = rm_udf_from_ast(ast)
     init_block = InitBlock(code = funcs[["code"]]
                            , funcNames = funcs[["funcNames"]]
-                           , assignmentIndices = assignmentIndices
+                           , assignmentIndices = as.integer(assignmentIndices)
                            )
 
     blocks = lapply(ast$contents, nodeToCodeBlock, resources = resources, reduceFuncs = allReduceFuncs)
