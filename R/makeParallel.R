@@ -61,10 +61,9 @@
 makeParallel = function(code
     , isFile = file.exists(code)
     , expr = if(isFile) parse(code, keep.source = TRUE) else parse(text = code, keep.source = FALSE)
-    , data = dataSource(expr)
+    , data = NULL
     , nWorkers = parallel::detectCores()
     , platform = Platform(nWorkers = nWorkers)
-    , graph = inferGraph(expr)
     , run = FALSE
     , scheduler = schedule
     , ...
@@ -75,10 +74,17 @@ makeParallel = function(code
     , overWrite = FALSE
     )
 {
+
+    if(is.null(data)){
+        d = findFirstDataSource(expr)
+        data = d[["DataSource"]]
+        expr = expr[-d[["location"]]]
+    }
+    data = standardizeData(data)
+
+    graph = inferGraph(expr)
     if(run)
         graph = runMeasure(graph)
-
-    data = standardizeData(data)
 
     sc = scheduler(graph, platform, data, ...)
     out = do.call(generator, c(list(schedule = sc, platform = platform, data = data), generatorArgs))

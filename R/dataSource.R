@@ -30,14 +30,14 @@ dataSource.expression = function(expr, ...)
 }
 
 
-`dataSource.Assign` = function(expr, ...)
+dataSource.Assign = function(expr, ...)
 {
     lhs = expr$write$ssa_name
     callGeneric(expr$read, varName = lhs, ...)
 }
 
 
-`dataSource.Call` = function(expr, handlers = list(), ...)
+dataSource.Call = function(expr, handlers = list(), ...)
 {
     # The data inference depends on the function that was called.
     # So we can continue to dispatch, using the function name as the class.
@@ -56,10 +56,21 @@ dataSource.expression = function(expr, ...)
 }
 
 
+# Borrowing from http://adv-r.had.co.nz/Exceptions-Debugging.html#condition-handling
+DataSourceNotFound = function(message = "Data source not found.", call = sys.call(-1))
+{
+    structure(
+        class = c("DataSourceNotFound", "error"),
+        list(message = message, call = call)
+    )
+}
+
+
 #' @export
 inferDataSourceFromCall.default = function(expr, ...)
 {
-    stop("No method yet implemented to infer a data source from this function call: ", utils::capture.output(rstatic::as_language(expr)))
+    cond = DataSourceNotFound("No method yet implemented to infer a data source from this function call: ", utils::capture.output(rstatic::as_language(expr)))
+    stop(cond)
 }
 
 
