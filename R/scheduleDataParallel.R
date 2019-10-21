@@ -278,6 +278,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
 
     nchunks = length(data@files)
 
+    # Now, I'm trying to generalize this beyond lists of files
     assignmentIndices = greedy_assign(data@sizes, nWorkers)
 
     name_resource = new.env()

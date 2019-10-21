@@ -3,18 +3,28 @@
 library(makeParallel)
 
 script = "
-dt = read.fwf('dates.txt', widths = 10L)
+dt = read.table('dates.txt')
 d = as.Date(vals[, 1])
-print(range(d))
+rd = range(d)
+print(rd)
 "
 
 out = makeParallel(script, scheduler = scheduleDataParallel)
+
 
 
 # Test code
 ############################################################
 if(identical(Sys.getenv("TESTTHAT"), "true")){
 
+script = "
+dt = read.fwf('dates.txt', widths = 10L)
+d = as.Date(vals[, 1])
+rd = range(d)
+print(rd)
+"
+
+out = makeParallel(script, scheduler = scheduleDataParallel)
 
 # Manual specification
 d0 = FixedWidthFiles(varName = "dt", files = "dates.txt", widths = 10L)

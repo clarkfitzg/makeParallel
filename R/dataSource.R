@@ -60,10 +60,13 @@ dataSource.Call = function(expr, handlers = list(), ...)
 DataSourceNotFound = function(message = "Data source not found.", call = sys.call(-1))
 {
     structure(
-        class = c("DataSourceNotFound", "error"),
+        class = c("DataSourceNotFound", "simpleError", "error", "condition"),
         list(message = message, call = call)
     )
 }
+
+
+#conditionMessage.DataSourceNotFound = 
 
 
 #' @export
@@ -97,10 +100,11 @@ inferDataSourceFromCall.read.fwf_Call = function(expr, ...)
 #' Find the first expression that we can infer a DataSource from
 findFirstDataSource = function(expr, ...)
 {
-    for(i in seq_along(expr)){
+    ast = rstatic::to_ast(expr)
+    for(i in seq_along(ast)){
         tryCatch({
-            ds = dataSource(expr[[i]])
-            return(list(DataSource = ds, location = location))
+            ds = dataSource(ast[[i]])
+            return(list(DataSource = ds, location = i))
         }, DataSourceNotFound = function(e) NULL)
     }
     warning("Unable to infer the data source.")
