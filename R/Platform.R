@@ -6,19 +6,18 @@
 #' @param OS.type character, \code{"unix"} or \code{"windows"} 
 #' @param nWorkers integer, number of parallel workers
 #' @return \linkS4class{Platform}
-Platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::detectCores())
+Platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::detectCores()
+    , name = "cls", scratchDir = ".")
 {
     nWorkers = as.integer(nWorkers)
+    p = ParallelLocalCluster(name = name, nWorkers = nWorkers, scratchDir = scratchDir)
     if(OS.type == "unix"){
-        UnixPlatform(nWorkers = nWorkers)
-    } else if(OS.type == "windows"){
-        Platform(nWorkers = nWorkers)
-    } else {
-        stop("Unknown operating system type: ", OS.type)
-    }
+        p = as(p, "UnixPlatform")
+    } 
+    p
 }
 
 
-#' @export
-parallelLocalCluster = function(name = "cls", nWorkers = 2L, scratchDir = ".")
-    new("ParallelLocalCluster", name = name, nWorkers = nWorkers, scratchDir = scratchDir)
+# #' @export
+# parallelLocalCluster = function(name = "cls", nWorkers = 2L, scratchDir = ".")
+#     new("ParallelLocalCluster", name = name, nWorkers = nWorkers, scratchDir = scratchDir)
