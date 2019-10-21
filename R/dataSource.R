@@ -94,6 +94,19 @@ inferDataSourceFromCall.read.fwf_Call = function(expr, ...)
 }
 
 
+#' Find the first expression that we can infer a DataSource from
+findFirstDataSource = function(expr, ...)
+{
+    for(i in seq_along(expr)){
+        tryCatch({
+            ds = dataSource(expr[[i]])
+            return(list(DataSource = ds, location = location))
+        }, DataSourceNotFound = function(e) NULL)
+    }
+    warning("Unable to infer the data source.")
+    list(DataSource = NoDataSource(), location = NA)
+}
+
 
 # Given a single call that loads data, return a DataSource object.
 

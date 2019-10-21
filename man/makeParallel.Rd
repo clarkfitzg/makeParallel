@@ -6,9 +6,9 @@
 \usage{
 makeParallel(code, isFile = file.exists(code), expr = if (isFile)
   parse(code, keep.source = TRUE) else parse(text = code, keep.source =
-  FALSE), data = dataSource(expr), nWorkers = parallel::detectCores(),
-  platform = Platform(nWorkers = nWorkers), graph = inferGraph(expr),
-  run = FALSE, scheduler = schedule, ..., generator = generate,
+  FALSE), data = NULL, nWorkers = parallel::detectCores(),
+  platform = Platform(nWorkers = nWorkers), run = FALSE,
+  scheduler = schedule, ..., generator = generate,
   generatorArgs = list(), outFile = FALSE, prefix = "gen_",
   overWrite = FALSE)
 }
@@ -26,8 +26,6 @@ The names of the list elements correspond to the variables in the code that thes
 \item{nWorkers}{integer, number of parallel workers}
 
 \item{platform}{\linkS4class{Platform} describing resource to compute on}
-
-\item{graph}{\linkS4class{TaskGraph}, code dependency graph}
 
 \item{run}{logical, evaluate the code once to gather timings?}
 
