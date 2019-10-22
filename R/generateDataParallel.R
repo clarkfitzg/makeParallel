@@ -107,10 +107,10 @@ TEMPLATE_split_on_disk = quote({
     nlines = as.integer(nlines)
     lines_per_file = ceiling(nlines / `_NWORKERS`)
     chunk_file_dir = paste0("chunk_", `_DATA_FILE_NAME`)
-    dir.create(chunk_file_dir)
+    dir.create(chunk_file_dir, showWarnings = FALSE)
 
-    system2("split", c("-l", lines_per_file, `_DATA_FILE_NAME`, chunk_file_dir))
-    chunk_files = list.files(chunk_file_dir)
+    system2("split", c("-l", lines_per_file, `_DATA_FILE_NAME`, paste0(chunk_file_dir, "/")))
+    chunk_files = list.files(chunk_file_dir, full.names = TRUE)
 
     clusterExport(`_CLUSTER_NAME`, "chunk_files")
 

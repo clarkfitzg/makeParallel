@@ -2,7 +2,9 @@
 
 library(makeParallel)
 
-out = makeParallel("range_of_dates.R", scheduler = scheduleDataParallel)
+out = makeParallel("range_of_dates.R", scheduler = scheduleDataParallel
+                   , chunkFuncs = c("[", "as.Date")
+                   , reduceFuncs = list(reduceFun("range")))
 
 d = dataSource(out)
 
@@ -10,6 +12,7 @@ writeCode(out, "gen_range_of_dates.R", overWrite = TRUE)
 
 source("gen_range_of_dates.R")
 
+schedule(out)@blocks
 
 
 # Test code
