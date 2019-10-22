@@ -105,7 +105,7 @@ TEMPLATE_split_on_disk = quote({
     nlines = system2("wc", c("-l", `_DATA_FILE_NAME`))
     lines_per_file = ceiling(nlines / `_NWORKERS`)
     chunk_file_dir = paste0("chunk_", `_DATA_FILE_NAME`)
-    system2("split", c("-i", lines_per_file, `_DATA_FILE_NAME`, chunk_file_dir))
+    system2("split", c("-l", lines_per_file, `_DATA_FILE_NAME`, chunk_file_dir))
 
     clusterExport(`_CLUSTER_NAME`, "chunk_file_dir")
 
@@ -129,7 +129,7 @@ function(schedule, platform, data, template = TEMPLATE_split_on_disk, ...)
         , `_NWORKERS` = platform@nWorkers
         , `_CLUSTER_NAME` = as.symbol(platform@name)
         , `_DATA_VARNAME` = as.symbol(data@varName)
-        , `_READ_FUNC` = as.symbol(data@read_func)
+        , `_READ_FUNC` = as.symbol(data@readFuncName)
         )
     } else {
         callNextMethod(schedule, platform, data, ...)

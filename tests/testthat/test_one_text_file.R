@@ -2,15 +2,11 @@
 
 library(makeParallel)
 
-script = "
-dt = read.table('dates.txt')
-d = as.Date(vals[, 1])
-rd = range(d)
-print(rd)
-"
+out = makeParallel("range_of_dates.R", scheduler = scheduleDataParallel)
 
-out = makeParallel(script, scheduler = scheduleDataParallel)
+writeCode(out, "gen_range_of_dates.R", overWrite = TRUE)
 
+d = dataSource(out)
 
 
 # Test code
