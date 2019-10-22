@@ -102,15 +102,20 @@ TEMPLATE_read_chunk_func_body = as.expression(quote(
 
 
 TEMPLATE_split_on_disk = quote({
-    nlines = system2("wc", c("-l", `_DATA_FILE_NAME`))
+    nlines = system2("wc", c("-l", `_DATA_FILE_NAME`), stdout = TRUE)
+    nlines = regmatches(nlines, regexpr("[0-9]+", nlines))
+    nlines = as.integer(nlines)
     lines_per_file = ceiling(nlines / `_NWORKERS`)
     chunk_file_dir = paste0("chunk_", `_DATA_FILE_NAME`)
-    system2("split", c("-l", lines_per_file, `_DATA_FILE_NAME`, chunk_file_dir))
+    dir.create(chunk_file_dir)
 
-    clusterExport(`_CLUSTER_NAME`, "chunk_file_dir")
+    system2("split", c("-l", lines_per_file, `_DATA_FILE_NAME`, chunk_file_dir))
+    chunk_files = list.files(chunk_file_dir)
+
+    clusterExport(`_CLUSTER_NAME`, "chunk_files")
 
     clusterEvalQ(`_CLUSTER_NAME`, {
-        read_arg = list.files(chunk_file_dir)[workerID]
+        read_arg = chunk_files[workerID]
         `_DATA_VARNAME` = `_READ_FUNC`(read_arg)
         NULL
     })

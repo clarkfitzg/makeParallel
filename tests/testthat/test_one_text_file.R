@@ -4,9 +4,12 @@ library(makeParallel)
 
 out = makeParallel("range_of_dates.R", scheduler = scheduleDataParallel)
 
+d = dataSource(out)
+
 writeCode(out, "gen_range_of_dates.R", overWrite = TRUE)
 
-d = dataSource(out)
+source("gen_range_of_dates.R")
+
 
 
 # Test code
