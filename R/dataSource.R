@@ -16,6 +16,20 @@ inferReadFuncFromFile = function(fname)
 
 
 #' @export
+dataSource.GeneratedCode = function(expr, ...)
+{
+    callGeneric(schedule(expr), ...)
+}
+
+
+#' @export
+dataSource.Schedule = function(expr, ...)
+{
+    expr@data
+}
+
+
+#' @export
 dataSource.expression = function(expr, ...)
 {
     warning("Data source inference not yet implemented.")
@@ -83,6 +97,7 @@ inferDataSourceFromCall.read.table_Call = function(expr, ...)
 
     # TODO: Fill these in.
     TextTableFiles(files = args$file$value
+                   , readFuncName = "read.table"
                    , ...)
 }
 

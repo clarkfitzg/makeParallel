@@ -312,7 +312,7 @@ scheduleDataParallel = function(graph, platform = Platform(), data
     blocks = c(init_block, DataLoadBlock(), blocks, FinalBlock())
     blocks = collapseAdjacentBlocks(blocks)
 
-    DataParallelSchedule(nWorkers = nWorkers, blocks = blocks)
+    DataParallelSchedule(nWorkers = nWorkers, data = data, blocks = blocks)
 }
 
 

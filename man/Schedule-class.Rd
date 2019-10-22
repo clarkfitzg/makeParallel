@@ -13,5 +13,7 @@ parallel using various models.
 
 \describe{
 \item{\code{graph}}{\linkS4class{TaskGraph} used to create the schedule}
+
+\item{\code{data}}{\linkS4class{DataSource} used to create the schedule}
 }}
 

@@ -105,7 +105,7 @@ setMethod("generate", signature(schedule = "DataLoadBlock", platform = "Parallel
 function(schedule, platform, data
          , combine_func = as.symbol("rbind")
          , template = TEMPLATE_read_chunk_func_body
-         , read_func = substitute_language(template, 
+         , read_func = substitute_language(template
                 , `_READ_FUNC` = as.symbol(data@readFuncName)
                 , `_COL.NAMES` = data@col.names
                 , `_COLCLASSES` = data@colClasses

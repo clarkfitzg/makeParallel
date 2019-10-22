@@ -220,8 +220,10 @@ FixedWidthFiles = setClass("FixedWidthFiles", contains = "TextTableFiles",
 #'
 #' @export
 #' @slot graph \linkS4class{TaskGraph} used to create the schedule
+#' @slot data \linkS4class{DataSource} used to create the schedule
 Schedule = setClass("Schedule", 
     slots = c(graph = "TaskGraph"
+              , data = "DataSource"
         ))
 
 
