@@ -133,12 +133,13 @@ TEMPLATE_UnixPlatform_DataLoadBlock_TextTableFiles = quote({
     clusterExport(`_CLUSTER_NAME`, c("lines_per_worker", "skip_per_worker"))
 
     clusterEvalQ(`_CLUSTER_NAME`, {
-        read_arg = chunk_files[workerID]
         `_DATA_VARNAME` = data.table::fread(`_DATA_FILE_NAME`
             , nrows = lines_per_worker[workerID]
             , skip = skip_per_worker[workerID]
             , nThread = 1L
             )
+        # Convert back to data frame by reference:
+        data.table::setDF(`_DATA_VARNAME`)
         NULL
     })
 })
