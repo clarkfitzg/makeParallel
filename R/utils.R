@@ -224,6 +224,15 @@ as_symbol_maybe_colons = function(x)
 }
 
 
+even_splits = function(n, nworkers)
+{
+    n_per_worker = rep(floor(n / nworkers), times = nworkers)
+    leftover = n %% nworkers
+    extra = rep(c(1, 0), times = c(leftover, nworkers - leftover))
+    n_per_worker + extra
+}
+
+
 if(FALSE){
 
 

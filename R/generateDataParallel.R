@@ -126,18 +126,19 @@ TEMPLATE_UnixPlatform_DataLoadBlock_TextTableFiles = quote({
     nlines = system2("wc", c("-l", `_DATA_FILE_NAME`), stdout = TRUE)
     nlines = regmatches(nlines, regexpr("[0-9]+", nlines))
     nlines = as.integer(nlines)
-    lines_per_file = ceiling(nlines / `_NWORKERS`)
-    chunk_file_dir = paste0("chunk_", `_DATA_FILE_NAME`)
-    dir.create(chunk_file_dir, showWarnings = FALSE)
 
-    system2("split", c("-l", lines_per_file, `_DATA_FILE_NAME`, paste0(chunk_file_dir, "/")))
-    chunk_files = list.files(chunk_file_dir, full.names = TRUE)
+    lines_per_worker = makeParallel:::even_splits(nlines, `_NWORKERS`)
+    skip_per_worker = c(0, cumsum(lines_per_worker[-length(lines_per_worker)]))
 
-    clusterExport(`_CLUSTER_NAME`, "chunk_files")
+    clusterExport(`_CLUSTER_NAME`, c("lines_per_worker", "skip_per_worker"))
 
     clusterEvalQ(`_CLUSTER_NAME`, {
         read_arg = chunk_files[workerID]
-        `_DATA_VARNAME` = `_READ_FUNC`(read_arg)
+        `_DATA_VARNAME` = data.table::fread(`_DATA_FILE_NAME`
+            , nrows = lines_per_worker[workerID]
+            , skip = skip_per_worker[workerID]
+            , nThread = 1L
+            )
         NULL
     })
 })
@@ -147,15 +148,11 @@ setMethod("generate", signature(schedule = "DataLoadBlock", platform = "UnixPlat
 function(schedule, platform, data, template = TEMPLATE_UnixPlatform_DataLoadBlock_TextTableFiles, ...)
 {
     if(length(data@files) == 1){
-        # There's only a single text file, so split it up into as many text files as there are workers in the platform.
-        # This copies the entire data set on disk, which is not ideal.
-        # It also has all the limitations of line by line text processing in UNIX, particularly problems with quoted strings.
     substitute_language(template
         , `_DATA_FILE_NAME` = data@files
         , `_NWORKERS` = platform@nWorkers
         , `_CLUSTER_NAME` = as.symbol(platform@name)
         , `_DATA_VARNAME` = as.symbol(data@varName)
-        , `_READ_FUNC` = as.symbol(data@readFuncName)
         )
     } else {
         callNextMethod(schedule, platform, data, ...)
