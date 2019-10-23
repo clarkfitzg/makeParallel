@@ -6,7 +6,7 @@
 #' @param OS.type character, \code{"unix"} or \code{"windows"} 
 #' @param nWorkers integer, number of parallel workers
 #' @return \linkS4class{Platform}
-Platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::detectCores()
+Platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::detectCores(logical = FALSE)
     , name = "cls", scratchDir = ".")
 {
     nWorkers = as.integer(nWorkers)

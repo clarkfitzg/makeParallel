@@ -5,10 +5,12 @@
 \title{Description of a Platform}
 \usage{
 Platform(OS.type = .Platform[["OS.type"]],
-  nWorkers = parallel::detectCores(), name = "cls", scratchDir = ".")
+  nWorkers = parallel::detectCores(logical = FALSE), name = "cls",
+  scratchDir = ".")
 
 Platform(OS.type = .Platform[["OS.type"]],
-  nWorkers = parallel::detectCores(), name = "cls", scratchDir = ".")
+  nWorkers = parallel::detectCores(logical = FALSE), name = "cls",
+  scratchDir = ".")
 }
 \arguments{
 \item{OS.type}{character, \code{"unix"} or \code{"windows"}}
