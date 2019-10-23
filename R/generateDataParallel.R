@@ -21,7 +21,7 @@ function(schedule, platform, data, ...)
 })
 
 
-TEMPLATE_ParallelLocalCluster_InitBlock = function(){
+TEMPLATE_ParallelLocalCluster_InitBlock = as.expression(quote({
     message(`_MESSAGE`)
 
     `_FUNCTION_DEFS`
@@ -31,7 +31,7 @@ TEMPLATE_ParallelLocalCluster_InitBlock = function(){
     assignments = `_ASSIGNMENT_INDICES`
     nWorkers = `_NWORKERS`
 
-    `_CLUSTER_NAME` = makeCluster(nWorkers)
+    `_CLUSTER_NAME` = makeCluster(nWorkers, type = `_CLUSTER_TYPE`)
 
     # TODO: This is a hack until we have a more robust way to specify and infer combining functions.
     # It will break code that tries to use the list method for c() on a data.frame
@@ -45,14 +45,14 @@ TEMPLATE_ParallelLocalCluster_InitBlock = function(){
         assignments = which(assignments == workerID)
         NULL
     })
-
-}
+}))
 
 
 setMethod("generate", signature(schedule = "InitBlock", platform = "ParallelLocalCluster", data = "ChunkDataFiles"),
 function(schedule, platform, data
         , message = sprintf("This code was generated from R by makeParallel version %s at %s", packageVersion("makeParallel"), Sys.time())
-        , template = as.expression(body(TEMPLATE_ParallelLocalCluster_InitBlock))
+        , template = TEMPLATE_ParallelLocalCluster_InitBlock
+        , cluster_type = "PSOCK"
         , ...){
     substitute_language(template, `_MESSAGE` = message
         , `_NWORKERS` = platform@nWorkers
@@ -60,7 +60,14 @@ function(schedule, platform, data
         , `_CLUSTER_NAME` = as.symbol(platform@name)
         , `_FUNCTION_DEFS` = schedule@code
         , `_FUNCTION_NAMES` = schedule@funcNames
+        , `_CLUSTER_TYPE` = cluster_type
         )
+})
+
+
+setMethod("generate", signature(schedule = "InitBlock", platform = "UnixPlatform", data = "ChunkDataFiles"),
+function(schedule, platform, data, ...){
+    callNextMethod(schedule, platform, data, cluster_type = "FORK", ...)
 })
 
 
