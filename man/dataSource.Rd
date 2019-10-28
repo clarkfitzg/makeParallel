@@ -7,9 +7,9 @@
 dataSource(expr, ...)
 }
 \arguments{
-\item{...}{additional arguments to methods}
+\item{expr}{object to infer the data source from}
 
-\item{x}{object to infer the data source from}
+\item{...}{additional arguments to methods}
 }
 \value{
 \linkS4class{DataSource} object

@@ -17,6 +17,7 @@ Platform = function(OS.type = .Platform[["OS.type"]] , nWorkers = parallel::dete
     p
 }
 
+setMethod("platform", "GeneratedCode", function(x, ...) callGeneric(schedule(x), ...))
 
 # #' @export
 # parallelLocalCluster = function(name = "cls", nWorkers = 2L, scratchDir = ".")

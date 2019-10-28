@@ -224,6 +224,7 @@ FixedWidthFiles = setClass("FixedWidthFiles", contains = "TextTableFiles",
 Schedule = setClass("Schedule", 
     slots = c(graph = "TaskGraph"
               , data = "DataSource"
+              , platform = "Platform"
         ))
 
 

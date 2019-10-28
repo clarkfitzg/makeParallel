@@ -165,7 +165,7 @@ setGeneric("file<-", function(description, value)
 #' Infer Or Extract Data Source Object
 #'
 #' @export
-#' @param x object to infer the data source from
+#' @param expr object to infer the data source from
 #' @param ... additional arguments to methods
 #' @return \linkS4class{DataSource} object
 dataSource = function(expr, ...)
@@ -175,3 +175,15 @@ dataSource = function(expr, ...)
 #' @export
 inferDataSourceFromCall = function(expr, ...)
     UseMethod("inferDataSourceFromCall")
+
+
+#' extract platform
+#'
+#' @export
+#' @param x object with a platform
+#' @param ... additional arguments to methods
+#' @return \linkS4class{Platform} object
+setGeneric("platform", function(x, ...)
+           standardGeneric("platform"))
+
+setMethod("platform", "ANY", function(x) x@platform)
