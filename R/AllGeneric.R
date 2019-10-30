@@ -75,7 +75,6 @@ setMethod("schedule", "GeneratedCode", function(graph, data, platform, ...)
 })
 
 
-
 #' Expand Data
 #'
 #' Updates code to include code to load data

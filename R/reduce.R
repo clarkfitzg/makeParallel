@@ -36,3 +36,4 @@ combine_tables = function(...){
     dots = list(...)
     Reduce(combine_two_tables, dots, init = table(logical()))
 }
+

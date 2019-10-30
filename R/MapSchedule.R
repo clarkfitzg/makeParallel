@@ -171,11 +171,6 @@ mapSchedule = function(graph)
 
 
 #' @export
-#' @rdname schedule
-setMethod("schedule", signature(graph = "TaskGraph", data = "ANY", platform = "ANY"), mapSchedule)
-
-
-#' @export
 #' @rdname generate
 setMethod("generate", signature(schedule = "MapSchedule"),
 function (schedule, platform, ...) 

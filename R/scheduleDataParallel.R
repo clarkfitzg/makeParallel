@@ -222,13 +222,13 @@ rm_udf_from_ast = function(ast)
 
 # This is so the tests and examples work.
 # Can build this up comprehensively later.
-getKnownChunkFuncs = function() c("exp", "+", "*", "sin", "as.date")
+getKnownChunkFuncs = function() c("exp", "+", "*", "sin", "as.Date", "sub", "gsub", "[")
 
 
 # The simple ones
 getKnownReduceFuncs = function()
 {
-    fnames = c("max", "min", "range")
+    fnames = c("min", "max", "range", "sum", "any", "all")
     out = lapply(fnames, reduceFun)
     names(out) = fnames
     out
@@ -259,7 +259,7 @@ getKnownReduceFuncs = function()
 #' @seealso [makeParallel], [schedule]
 #' @export
 #' @md
-scheduleDataParallel = function(graph, platform = Platform(), data
+scheduleDataParallel = function(graph, data, platform = Platform()
     , nWorkers = platform@nWorkers
     , chunkFuncs = character()
     , reduceFuncs = list()

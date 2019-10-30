@@ -86,7 +86,7 @@ makeParallel = function(code
     if(run)
         graph = runMeasure(graph)
 
-    sc = scheduler(graph, platform, data, ...)
+    sc = scheduler(graph = graph, data = data, platform = platform, ...)
     out = do.call(generator, c(list(schedule = sc, platform = platform, data = data), generatorArgs))
 
     originalFile = file(graph)

@@ -4,7 +4,7 @@
 \alias{scheduleDataParallel}
 \title{Schedule Based On Data Parallelism}
 \usage{
-scheduleDataParallel(graph, platform = Platform(), data,
+scheduleDataParallel(graph, data, platform = Platform(),
   nWorkers = platform@nWorkers, chunkFuncs = character(),
   reduceFuncs = list(), knownReduceFuncs = getKnownReduceFuncs(),
   knownChunkFuncs = getKnownChunkFuncs(),
@@ -13,11 +13,11 @@ scheduleDataParallel(graph, platform = Platform(), data,
 \arguments{
 \item{graph}{\linkS4class{TaskGraph}, code dependency graph}
 
-\item{platform}{\linkS4class{Platform} describing resource to compute on}
-
 \item{data}{list of data descriptions. 
 Each element is a \linkS4class{DataSource}.
 The names of the list elements correspond to the variables in the code that these objects are bound to.}
+
+\item{platform}{\linkS4class{Platform} describing resource to compute on}
 
 \item{chunkFuncs}{character, names of additional chunkable functions known to the user.}
 
